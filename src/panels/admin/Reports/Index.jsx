@@ -226,12 +226,12 @@ const rowData = [
   },
 ];
 
-const Owners = () => {
+const Reports = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(setPageTitle("Owners"));
+    dispatch(setPageTitle("Reports"));
   });
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -296,24 +296,12 @@ const Owners = () => {
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              Owners
+              Clinics
             </h5>
-            <Tippy content="Total Owners">
+            <Tippy content="Total Reports">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={rowData.length} duration={3}></CountUp>
               </span>
-            </Tippy>
-          </div>
-          <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Owner">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => addUser()}
-              >
-                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                Add Owner
-              </button>
             </Tippy>
           </div>
         </div>
@@ -330,7 +318,6 @@ const Owners = () => {
             highlightOnHover
             className="whitespace-nowrap table-hover"
             records={recordsData}
-            onRowClick={() => navigate("/admin/owners/clinic")}
             columns={[
               { accessor: "id", title: "ID" },
               { accessor: "firstName", title: "First Name" },
@@ -683,4 +670,4 @@ const Owners = () => {
   );
 };
 
-export default Owners;
+export default Reports;

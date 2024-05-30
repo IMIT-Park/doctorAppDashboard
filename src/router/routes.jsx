@@ -13,7 +13,10 @@ const Profile = lazy(() => import("../pages/Profile/Profile"));
 // <--------------> admin panel imports starts here<-------------->
 const AdminIndex = lazy(() => import("../panels/admin/Index"));
 const AdminOwners = lazy(() => import("../panels/admin/owners/Index"));
-
+const AdminClinics = lazy(() => import("../panels/admin/clinics/Index"));
+const AdminDoctors = lazy(() => import("../panels/admin/doctors/Index"));
+const AdminReports = lazy(() => import("../panels/admin/Reports/Index"));
+const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
 // <--------------> admin panel imports ends here <-------------->
 
 // <--------------> owner panel imports starts here<-------------->
@@ -72,12 +75,40 @@ const routes = [
     layout: "default",
   },
 
-    // owners
-    {
-      path: "/admin/owners",
-      element: <AdminOwners />,
-      layout: "default",
-    },
+  // owners
+  {
+    path: "/admin/owners",
+    element: <AdminOwners />,
+    layout: "default",
+  },
+
+  // clinic
+  {
+    path: "/admin/owners/clinic",
+    element: <AdminClinics />,
+    layout: "default",
+  },
+
+  // doctor
+  {
+    path: "/admin/owners/clinics/doctor",
+    element: <AdminDoctors />,
+    layout: "default",
+  },
+
+  // reports
+  {
+    path: "/admin/reports",
+    element: <AdminReports />,
+    layout: "default",
+  },
+
+  // sales-team
+  {
+    path: "/admin/sales",
+    element: <AdminSales />,
+    layout: "default",
+  },
 
   // <--------------> admin panel ends here <-------------->
 

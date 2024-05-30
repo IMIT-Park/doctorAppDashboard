@@ -21,7 +21,7 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const rowData = [
   {
@@ -226,12 +226,12 @@ const rowData = [
   },
 ];
 
-const Owners = () => {
+const Doctors = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(setPageTitle("Owners"));
+    dispatch(setPageTitle("Doctors"));
   });
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -291,28 +291,46 @@ const Owners = () => {
 
   return (
     <div>
+      <ul className="flex space-x-2 rtl:space-x-reverse">
+        <li>
+          <Link to="/admin/owners" className="text-primary hover:underline">
+            Owners
+          </Link>
+        </li>
+        <li className="before:content-['/']">
+          <Link
+            to="/admin/owners/clinic"
+            className="before:mr-2 text-primary hover:underline"
+          >
+            Clinic
+          </Link>
+        </li>
+        <li className="before:content-['/'] before:mr-2">
+          <span>Doctor</span>
+        </li>
+      </ul>
       <ScrollToTop />
-      <div className="panel">
+      <div className="panel mt-1">
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              Owners
+              Doctors
             </h5>
-            <Tippy content="Total Owners">
+            <Tippy content="Total Doctor">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={rowData.length} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Owner">
+            <Tippy content="Click to Add Doctor">
               <button
                 type="button"
                 className="btn btn-primary"
                 onClick={() => addUser()}
               >
                 <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                Add Owner
+                Add Doctor
               </button>
             </Tippy>
           </div>
@@ -320,7 +338,7 @@ const Owners = () => {
         {/* <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" /> */}
         <div className="datatables">
           <DataTable
-            noRecordsText="No Owners to show"
+            noRecordsText="No Clinics to show"
             noRecordsIcon={
               <span className="mb-2">
                 <img src={emptyBox} alt="" className="w-10" />
@@ -330,7 +348,6 @@ const Owners = () => {
             highlightOnHover
             className="whitespace-nowrap table-hover"
             records={recordsData}
-            onRowClick={() => navigate("/admin/owners/clinic")}
             columns={[
               { accessor: "id", title: "ID" },
               { accessor: "firstName", title: "First Name" },
@@ -683,4 +700,4 @@ const Owners = () => {
   );
 };
 
-export default Owners;
+export default Doctors;

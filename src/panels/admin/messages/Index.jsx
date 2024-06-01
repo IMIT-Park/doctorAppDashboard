@@ -3,20 +3,25 @@ import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import IconEdit from "../../../components/Icon/IconEdit";
+import IconEye from "../../../components/Icon/IconEye";
+import { Dialog, Transition } from "@headlessui/react";
+import IconX from "../../../components/Icon/IconX";
 import Swal from "sweetalert2";
-import IconUserPlus from "../../../components/Icon/IconUserPlus";
+import IconPencilPaper from "../../../components/Icon/IconPencilPaper";
+import IconCoffee from "../../../components/Icon/IconCoffee";
+import IconCalendar from "../../../components/Icon/IconCalendar";
+import IconMapPin from "../../../components/Icon/IconMapPin";
+import IconMail from "../../../components/Icon/IconMail";
+import IconPhone from "../../../components/Icon/IconPhone";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { Link, useNavigate } from "react-router-dom";
-import AddSalesPerson from "./AddSalesPerson";
-import DeleteSalesPerson from "./DeleteSalesPerson";
-import IconEye from "../../../components/Icon/IconEye";
-import ShowSalesPerson from "./ShowSalesPerson";
+import { useNavigate } from "react-router-dom";
+import SendMessage from "./SendMessage";
+import ViewMessage from "./ViewMessage";
 
 const rowData = [
   {
@@ -221,30 +226,23 @@ const rowData = [
   },
 ];
 
-const Sales = () => {
+const Messages = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(setPageTitle("Doctors"));
+    dispatch(setPageTitle("Messages"));
   });
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const initialRecords = rowData.slice(0, pageSize);
   const [recordsData, setRecordsData] = useState(initialRecords);
-  const [addSalesPersonModal, setAddSalesPersonModal] = useState(false);
+  const [addUserModal, setAddUserModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [input, setInput] = useState({
-    name: "",
-    email: "",
-    username: "",
-    phone: "",
-    address: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [sendMessage, setSendMessage] = useState(false);
+
 
   useEffect(() => {
     setPage(1);
@@ -256,53 +254,25 @@ const Sales = () => {
     setRecordsData(rowData.slice(from, to));
   }, [page, pageSize]);
 
-  // handle sales person modal
-  const openAddSalesPersonModal = () => {
-    setAddSalesPersonModal(true);
+  // send message modal handler
+  const openSendMessage = () => {
+    setSendMessage(true);
+  };
+  const closeSendMessage = () => {
+    setSendMessage(false);
   };
 
-  const closeAddSalesPersonModal = () => {
-    setAddSalesPersonModal(false);
-    setInput({
-      ...input,
-      name: "",
-      email: "",
-      username: "",
-      password: "",
-      confirmPassword: "",
-      phone: "",
-      address: "",
-    });
-  };
-
-  const saveSalesPerson = () => {
-    if (
-      !input.name ||
-      !input.email ||
-      !input.phone ||
-      !input.address ||
-      !input.password ||
-      !input.confirmPassword
-    ) {
-      showMessage("Please fill in all required fields", "error");
-      return true;
-    }
-
-    if (input.password !== input.confirmPassword) {
-      showMessage("Passwords are not match", "error");
-      return true;
-    }
-
-    showMessage("Sales Person has been added successfully.");
+  const saveUser = () => {
+    // if (!params.name) {
+    //     showMessage('Name is required.', 'error');
+    //     return true;
+    // }
+    showMessage("User has been saved successfully.");
     setAddUserModal(false);
   };
 
-  // handle Delete Modal
-  const openDeleteConfirmModal = () => {
+  const deleteConfirm = () => {
     setDeleteModal(true);
-  };
-  const closeDeleteConfirmModal = () => {
-    setDeleteModal(false);
   };
 
   const deleteUser = () => {
@@ -310,12 +280,19 @@ const Sales = () => {
     setDeleteModal(false);
   };
 
+  // view message modal handler
+  const openViewMessage = () => {
+    setViewModal(true);
+  };
+  const closeViewMessage = () => {
+    setViewModal(false);
+  };
+
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
       toast: true,
-      position: "top-right",
+      position: "top",
       showConfirmButton: false,
-      showCloseButton: true,
       timer: 3000,
       customClass: { container: "toast" },
     });
@@ -326,39 +303,30 @@ const Sales = () => {
     });
   };
 
-  // handle view modal
-  const openViewModal = () => {
-    setViewModal(true);
-  };
-
-  const closeViewModal = () => {
-    setViewModal(false);
-  };
-
   return (
     <div>
       <ScrollToTop />
-      <div className="panel mt-1">
+      <div className="panel">
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              Sales Teams
+              Messages
             </h5>
-            <Tippy content="Total Doctor">
+            <Tippy content="Total Messages">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={rowData.length} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Sales Person">
+            <Tippy content="Click to Send Message">
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => openAddSalesPersonModal()}
+                onClick={() => openSendMessage()}
               >
-                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                Add Sales Person
+                <IconPencilPaper className="ltr:mr-2 rtl:ml-2" />
+                Send Message
               </button>
             </Tippy>
           </div>
@@ -366,7 +334,7 @@ const Sales = () => {
         {/* <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" /> */}
         <div className="datatables">
           <DataTable
-            noRecordsText="No Clinics to show"
+            noRecordsText="No Owners to show"
             noRecordsIcon={
               <span className="mb-2">
                 <img src={emptyBox} alt="" className="w-10" />
@@ -378,37 +346,21 @@ const Sales = () => {
             records={recordsData}
             columns={[
               { accessor: "id", title: "ID" },
-              {
-                accessor: "firstName",
-                title: "Name",
-                render: (row) => row.firstName + " " + row.lastName,
-              },
+              { accessor: "firstName", title: "First Name" },
+              { accessor: "lastName", title: "Last Name" },
               { accessor: "email" },
-              // { accessor: "email", title: "Username" },
               { accessor: "phone" },
-              { accessor: "address.street", title: "Address" },
               {
                 accessor: "Actions",
                 textAlignment: "center",
                 render: (rowData) => (
                   <div className="flex gap-4 items-center w-max mx-auto">
-                    <Tippy content="Edit">
-                      <button
-                        className="flex hover:text-info"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addUser();
-                        }}
-                      >
-                        <IconEdit className="w-4.5 h-4.5" />
-                      </button>
-                    </Tippy>
                     <Tippy content="View">
                       <button
                         className="flex hover:text-primary"
                         onClick={(e) => {
                           e.stopPropagation();
-                          openViewModal();
+                          openViewMessage();
                         }}
                       >
                         <IconEye />
@@ -420,7 +372,7 @@ const Sales = () => {
                         className="flex hover:text-danger"
                         onClick={(e) => {
                           e.stopPropagation();
-                          openDeleteConfirmModal();
+                          deleteConfirm();
                         }}
                       >
                         <IconTrashLines />
@@ -443,24 +395,87 @@ const Sales = () => {
           />
         </div>
       </div>
-      {/* add sales person modal */}
-      <AddSalesPerson
-        open={addSalesPersonModal}
-        closeModal={closeAddSalesPersonModal}
-        input={input}
-        setInput={setInput}
-        formSubmit={saveSalesPerson}
-      />
 
-      {/* delete sales person modal */}
-      <DeleteSalesPerson
-        open={deleteModal}
-        closeModal={closeDeleteConfirmModal}
-      />
-      {/* view sales person modal */}
-      <ShowSalesPerson open={viewModal} closeModal={closeViewModal} />
+      {/* send message modal */}
+      <SendMessage open={sendMessage} closeModal={closeSendMessage}/>
+
+      {/* view message modal */}
+  <ViewMessage open={viewModal} closeModal={closeViewMessage}/>
+
+      {/* delete user modal */}
+      <Transition appear show={deleteModal} as={Fragment}>
+        <Dialog
+          as="div"
+          open={deleteModal}
+          onClose={() => setDeleteModal(false)}
+          className="relative z-[51]"
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-[black]/60" />
+          </Transition.Child>
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center px-4 py-8">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
+                  <button
+                    type="button"
+                    onClick={() => setDeleteModal(false)}
+                    className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
+                  >
+                    <IconX />
+                  </button>
+                  <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
+                    Delete Notes
+                  </div>
+                  <div className="p-5 text-center">
+                    <div className="text-white bg-danger ring-4 ring-danger/30 p-4 rounded-full w-fit mx-auto">
+                      <IconTrashLines className="w-7 h-7 mx-auto" />
+                    </div>
+                    <div className="sm:w-3/4 mx-auto mt-5">
+                      Are you sure you want to delete this User?
+                    </div>
+
+                    <div className="flex justify-center items-center mt-8">
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger"
+                        onClick={() => setDeleteModal(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                        onClick={deleteUser}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </div>
   );
 };
 
-export default Sales;
+export default Messages;

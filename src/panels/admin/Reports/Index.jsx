@@ -4,11 +4,9 @@ import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import IconEye from "../../../components/Icon/IconEye";
-import IconEdit from "../../../components/Icon/IconEdit";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import Swal from "sweetalert2";
-import IconUserPlus from "../../../components/Icon/IconUserPlus";
 import MaskedInput from "react-text-mask";
 import IconCoffee from "../../../components/Icon/IconCoffee";
 import IconCalendar from "../../../components/Icon/IconCalendar";
@@ -296,7 +294,7 @@ const Reports = () => {
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              Clinics
+              Reports
             </h5>
             <Tippy content="Total Reports">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
@@ -329,17 +327,6 @@ const Reports = () => {
                 textAlignment: "center",
                 render: (rowData) => (
                   <div className="flex gap-4 items-center w-max mx-auto">
-                    <Tippy content="Edit">
-                      <button
-                        className="flex hover:text-info"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addUser();
-                        }}
-                      >
-                        <IconEdit className="w-4.5 h-4.5" />
-                      </button>
-                    </Tippy>
                     <Tippy content="View">
                       <button
                         className="flex hover:text-primary"

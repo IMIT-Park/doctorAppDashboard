@@ -3,25 +3,20 @@ import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import IconEye from "../../../components/Icon/IconEye";
 import IconEdit from "../../../components/Icon/IconEdit";
-import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../components/Icon/IconX";
 import Swal from "sweetalert2";
 import IconUserPlus from "../../../components/Icon/IconUserPlus";
-import MaskedInput from "react-text-mask";
-import IconCoffee from "../../../components/Icon/IconCoffee";
-import IconCalendar from "../../../components/Icon/IconCalendar";
-import IconMapPin from "../../../components/Icon/IconMapPin";
-import IconMail from "../../../components/Icon/IconMail";
-import IconPhone from "../../../components/Icon/IconPhone";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import AddSalesPerson from "./AddSalesPerson";
+import DeleteSalesPerson from "./DeleteSalesPerson";
+import IconEye from "../../../components/Icon/IconEye";
+import ShowSalesPerson from "./ShowSalesPerson";
 
 const rowData = [
   {
@@ -231,16 +226,25 @@ const Sales = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(setPageTitle("Sales"));
+    dispatch(setPageTitle("Doctors"));
   });
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const initialRecords = rowData.slice(0, pageSize);
   const [recordsData, setRecordsData] = useState(initialRecords);
-  const [addUserModal, setAddUserModal] = useState(false);
+  const [addSalesPersonModal, setAddSalesPersonModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [input, setInput] = useState({
+    name: "",
+    email: "",
+    username: "",
+    phone: "",
+    address: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   useEffect(() => {
     setPage(1);
@@ -252,21 +256,53 @@ const Sales = () => {
     setRecordsData(rowData.slice(from, to));
   }, [page, pageSize]);
 
-  const addUser = () => {
-    setAddUserModal(true);
+  // handle sales person modal
+  const openAddSalesPersonModal = () => {
+    setAddSalesPersonModal(true);
   };
 
-  const saveUser = () => {
-    // if (!params.name) {
-    //     showMessage('Name is required.', 'error');
-    //     return true;
-    // }
-    showMessage("User has been saved successfully.");
+  const closeAddSalesPersonModal = () => {
+    setAddSalesPersonModal(false);
+    setInput({
+      ...input,
+      name: "",
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+      phone: "",
+      address: "",
+    });
+  };
+
+  const saveSalesPerson = () => {
+    if (
+      !input.name ||
+      !input.email ||
+      !input.phone ||
+      !input.address ||
+      !input.password ||
+      !input.confirmPassword
+    ) {
+      showMessage("Please fill in all required fields", "error");
+      return true;
+    }
+
+    if (input.password !== input.confirmPassword) {
+      showMessage("Passwords are not match", "error");
+      return true;
+    }
+
+    showMessage("Sales Person has been added successfully.");
     setAddUserModal(false);
   };
 
-  const deleteConfirm = () => {
+  // handle Delete Modal
+  const openDeleteConfirmModal = () => {
     setDeleteModal(true);
+  };
+  const closeDeleteConfirmModal = () => {
+    setDeleteModal(false);
   };
 
   const deleteUser = () => {
@@ -277,8 +313,9 @@ const Sales = () => {
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
       toast: true,
-      position: "top",
+      position: "top-right",
       showConfirmButton: false,
+      showCloseButton: true,
       timer: 3000,
       customClass: { container: "toast" },
     });
@@ -289,26 +326,47 @@ const Sales = () => {
     });
   };
 
+  // handle view modal
+  const openViewModal = () => {
+    setViewModal(true);
+  };
+
+  const closeViewModal = () => {
+    setViewModal(false);
+  };
+
   return (
     <div>
       <ScrollToTop />
-      <div className="panel">
+      <div className="panel mt-1">
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-            Sales Team
+              Sales Teams
             </h5>
-            <Tippy content="Total Sales Team">
+            <Tippy content="Total Doctor">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={rowData.length} duration={3}></CountUp>
               </span>
+            </Tippy>
+          </div>
+          <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
+            <Tippy content="Click to Add Sales Person">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => openAddSalesPersonModal()}
+              >
+                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
+                Add Sales Person
+              </button>
             </Tippy>
           </div>
         </div>
         {/* <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" /> */}
         <div className="datatables">
           <DataTable
-            noRecordsText="No Owners to show"
+            noRecordsText="No Clinics to show"
             noRecordsIcon={
               <span className="mb-2">
                 <img src={emptyBox} alt="" className="w-10" />
@@ -320,10 +378,15 @@ const Sales = () => {
             records={recordsData}
             columns={[
               { accessor: "id", title: "ID" },
-              { accessor: "firstName", title: "First Name" },
-              { accessor: "lastName", title: "Last Name" },
+              {
+                accessor: "firstName",
+                title: "Name",
+                render: (row) => row.firstName + " " + row.lastName,
+              },
               { accessor: "email" },
+              // { accessor: "email", title: "Username" },
               { accessor: "phone" },
+              { accessor: "address.street", title: "Address" },
               {
                 accessor: "Actions",
                 textAlignment: "center",
@@ -345,7 +408,7 @@ const Sales = () => {
                         className="flex hover:text-primary"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setViewModal(true);
+                          openViewModal();
                         }}
                       >
                         <IconEye />
@@ -357,7 +420,7 @@ const Sales = () => {
                         className="flex hover:text-danger"
                         onClick={(e) => {
                           e.stopPropagation();
-                          deleteConfirm();
+                          openDeleteConfirmModal();
                         }}
                       >
                         <IconTrashLines />
@@ -380,292 +443,22 @@ const Sales = () => {
           />
         </div>
       </div>
-      {/* add user modal */}
-      <Transition appear show={addUserModal} as={Fragment}>
-        <Dialog
-          as="div"
-          open={addUserModal}
-          onClose={() => setAddUserModal(false)}
-          className="relative z-[51]"
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-[black]/60" />
-          </Transition.Child>
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center px-4 py-8">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                  <button
-                    type="button"
-                    onClick={() => setAddUserModal(false)}
-                    className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                  >
-                    <IconX />
-                  </button>
-                  <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                    Add User
-                  </div>
-                  <div className="p-5">
-                    <form>
-                      <div className="mb-5">
-                        <label htmlFor="first-name">First Name</label>
-                        <input
-                          id="first-name"
-                          type="text"
-                          placeholder="Enter First Name"
-                          className="form-input"
-                        />
-                      </div>
-                      <div className="mb-5">
-                        <label htmlFor="last-name">Last Name</label>
-                        <input
-                          id="last-name"
-                          type="text"
-                          placeholder="Enter Last Name"
-                          className="form-input"
-                        />
-                      </div>
-                      <div className="mb-5">
-                        <label htmlFor="email">Email</label>
-                        <input
-                          id="email"
-                          type="email"
-                          placeholder="Enter Email"
-                          className="form-input"
-                        />
-                      </div>
-                      <div className="mb-5">
-                        <label htmlFor="number">Phone Number</label>
-                        <MaskedInput
-                          id="phoneMask"
-                          type="text"
-                          placeholder="Enter Phone Number"
-                          className="form-input"
-                          mask={[
-                            "+",
-                            "9",
-                            "1",
-                            " ",
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                          ]}
-                        />
-                      </div>
-                      {/* <div className="mb-5">
-                                                <label htmlFor="address">Address</label>
-                                                <textarea
-                                                    id="location"
-                                                    rows={3}
-                                                    placeholder="Enter Address"
-                                                    className="form-textarea resize-none min-h-[130px]"
-                                                ></textarea>
-                                            </div> */}
-                      <div className="flex justify-end items-center mt-8">
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger"
-                          onClick={() => setAddUserModal(false)}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                          onClick={saveUser}
-                        >
-                          Add
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      {/* add sales person modal */}
+      <AddSalesPerson
+        open={addSalesPersonModal}
+        closeModal={closeAddSalesPersonModal}
+        input={input}
+        setInput={setInput}
+        formSubmit={saveSalesPerson}
+      />
 
-      {/* view user modal */}
-      <Transition appear show={viewModal} as={Fragment}>
-        <Dialog as="div" open={viewModal} onClose={() => setViewModal(false)}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0"></div>
-          </Transition.Child>
-          <div
-            id="profile_modal"
-            className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60"
-          >
-            <div className="flex min-h-screen items-start justify-center px-4">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="panel my-8 w-full max-w-[300px] overflow-hidden rounded-lg border-0">
-                  <div className="flex items-center justify-end text-white dark:text-white-light">
-                    <button
-                      onClick={() => setViewModal(false)}
-                      type="button"
-                      className="text-white-dark hover:text-dark"
-                    >
-                      <IconX className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="mb-5">
-                    <div className="flex flex-col justify-center items-center">
-                      <img
-                        src="/assets/images/profile-34.jpeg"
-                        alt="img"
-                        className="w-24 h-24 rounded-full object-cover  mb-5"
-                      />
-                      <p className="font-semibold text-primary text-xl">
-                        Jimmy Turner
-                      </p>
-                    </div>
-                    <ul className="mt-5 flex flex-col max-w-[160px] m-auto space-y-4 font-semibold text-white-dark">
-                      <li className="flex items-center gap-2">
-                        <IconCoffee className="shrink-0" />
-                        Web Developer
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <IconCalendar className="shrink-0" />
-                        Jan 20, 1989
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <IconMapPin className="shrink-0" />
-                        New York, USA
-                      </li>
-                      <li>
-                        <button className="flex items-center gap-2">
-                          <IconMail className="w-5 h-5 shrink-0" />
-                          <span className="text-primary truncate">
-                            jimmy@gmail.com
-                          </span>
-                        </button>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <IconPhone className="w-5 h-5 shrink-0" />
-                        <span className="whitespace-nowrap" dir="ltr">
-                          +1 (530) 555-12121
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
-
-      {/* delete user modal */}
-      <Transition appear show={deleteModal} as={Fragment}>
-        <Dialog
-          as="div"
-          open={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          className="relative z-[51]"
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-[black]/60" />
-          </Transition.Child>
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center px-4 py-8">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                  <button
-                    type="button"
-                    onClick={() => setDeleteModal(false)}
-                    className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                  >
-                    <IconX />
-                  </button>
-                  <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                    Delete Notes
-                  </div>
-                  <div className="p-5 text-center">
-                    <div className="text-white bg-danger ring-4 ring-danger/30 p-4 rounded-full w-fit mx-auto">
-                      <IconTrashLines className="w-7 h-7 mx-auto" />
-                    </div>
-                    <div className="sm:w-3/4 mx-auto mt-5">
-                      Are you sure you want to delete this User?
-                    </div>
-
-                    <div className="flex justify-center items-center mt-8">
-                      <button
-                        type="button"
-                        className="btn btn-outline-danger"
-                        onClick={() => setDeleteModal(false)}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                        onClick={deleteUser}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      {/* delete sales person modal */}
+      <DeleteSalesPerson
+        open={deleteModal}
+        closeModal={closeDeleteConfirmModal}
+      />
+      {/* view sales person modal */}
+      <ShowSalesPerson open={viewModal} closeModal={closeViewModal} />
     </div>
   );
 };

@@ -1,20 +1,8 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import IconEye from "../../../components/Icon/IconEye";
-import IconEdit from "../../../components/Icon/IconEdit";
-import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../components/Icon/IconX";
 import Swal from "sweetalert2";
-import IconUserPlus from "../../../components/Icon/IconUserPlus";
-import MaskedInput from "react-text-mask";
-import IconCoffee from "../../../components/Icon/IconCoffee";
-import IconCalendar from "../../../components/Icon/IconCalendar";
-import IconMapPin from "../../../components/Icon/IconMapPin";
-import IconMail from "../../../components/Icon/IconMail";
-import IconPhone from "../../../components/Icon/IconPhone";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -229,6 +217,7 @@ const rowData = [
 const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
   });
@@ -240,6 +229,9 @@ const Clinics = () => {
   const [addUserModal, setAddUserModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [activeStatus, setActiveStatus] = useState(
+    rowData.reduce((acc, user) => ({ ...acc, [user.id]: user.isActive }), {})
+  );
 
   useEffect(() => {
     setPage(1);
@@ -288,22 +280,144 @@ const Clinics = () => {
     });
   };
 
+  const showBlockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to block this Owner!",
+      showCancelButton: true,
+      confirmButtonText: "Block",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        setActiveStatus((prevState) => ({ ...prevState, [id]: false }));
+        Swal.fire({
+          title: "Blocked!",
+          text: "The Owner has been blocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
+
+  const showUnblockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to unblock this Owner!",
+      showCancelButton: true,
+      confirmButtonText: "Unblock",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        setActiveStatus((prevState) => ({ ...prevState, [id]: true }));
+        Swal.fire({
+          title: "Unblocked!",
+          text: "The Owner has been unblocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
+
   return (
     <div>
-      <ul className="flex space-x-2 rtl:space-x-reverse">
-        <li>
-          <Link to="/admin/owners" className="text-primary hover:underline">
-            Owners
-          </Link>
-        </li>
-        <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-          <span>Clinic</span>
-        </li>
-      </ul>
       <ScrollToTop />
+      <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
+        <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
+          <li>
+            <Link to="/admin/owners" className="text-primary hover:underline">
+              Owners
+            </Link>
+          </li>
+          <li className="before:content-['/'] before:mr-2">
+            <span>Clinics</span>
+          </li>
+        </ul>
+        <div className="flex items-center flex-wrap gap-4">
+          <div className="flex items-start gap-1">
+            <h5 className="text-base font-semibold dark:text-white-light">
+              Active
+            </h5>
+            <label className="w-11 h-5 relative">
+              <input
+                type="checkbox"
+                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
+                id="custom_switch_checkbox_active"
+                checked
+                readOnly
+              />
+              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+            </label>
+          </div>
+          <div className="flex items-start gap-1">
+            <h5 className="text-base font-semibold dark:text-white-light">
+              Blocked
+            </h5>
+            <label className="w-11 h-5 relative">
+              <input
+                type="checkbox"
+                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
+                id="custom_switch_checkbox_active"
+                checked={false}
+                readOnly
+              />
+              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div className="panel mb-1">
+        <div className="flex justify-between flex-wrap gap-4 sm:px-4">
+          <div className="text-2xl font-semibold capitalize">Owner</div>
+          <label
+            className="w-12 h-6 relative"
+            onClick={(e) => {
+              e.stopPropagation();
+              showBlockAlert();
+            }}
+          >
+            <input
+              type="checkbox"
+              className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+              id={`custom_switch_checkbox${rowData.id}`}
+              checked={activeStatus[rowData.id]}
+              onChange={(e) => {
+                e.stopPropagation();
+                if (activeStatus[rowData.id]) {
+                  showBlockAlert(rowData.id);
+                } else {
+                  showUnblockAlert(rowData.id);
+                }
+              }}
+            />
+            <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+          </label>
+        </div>
+        <div className="text-left sm:px-4">
+          <div className="mt-5">
+            <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
+              <div className="text-white-dark">Address :</div>
+              <div>13 Tetrick Road, Cypress Gardens, Florida, 33884, US</div>
+            </div>
+            <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
+              <div className="text-white-dark">Email :</div>
+              <div>vristo@gmail.com</div>
+            </div>
+            <div className="flex items-center sm:gap-2 flex-wrap">
+              <div className="text-white-dark">Phone :</div>
+              <div>+1 (070) 123-4567</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <div className="panel mt-1">
-        <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
+      <div className="panel">
+        <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
               Clinics
@@ -314,23 +428,11 @@ const Clinics = () => {
               </span>
             </Tippy>
           </div>
-          <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Clinic">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => addUser()}
-              >
-                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                Add Clinic
-              </button>
-            </Tippy>
-          </div>
         </div>
         {/* <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" /> */}
         <div className="datatables">
           <DataTable
-            noRecordsText="No Clinics to show"
+            noRecordsText="No Owners to show"
             noRecordsIcon={
               <span className="mb-2">
                 <img src={emptyBox} alt="" className="w-10" />
@@ -340,53 +442,46 @@ const Clinics = () => {
             highlightOnHover
             className="whitespace-nowrap table-hover"
             records={recordsData}
-            onRowClick={() => navigate("/admin/owners/clinics/doctor")}
+            onRowClick={() => navigate("/admin/owners/clinics/doctors")}
             columns={[
               { accessor: "id", title: "ID" },
-              { accessor: "firstName", title: "First Name" },
-              { accessor: "lastName", title: "Last Name" },
+              {
+                accessor: "firstName",
+                title: "Name",
+                render: (row) => row.firstName + " " + row.lastName,
+              },
               { accessor: "email" },
               { accessor: "phone" },
+              { accessor: "address.street", title: "Address" },
               {
                 accessor: "Actions",
                 textAlignment: "center",
                 render: (rowData) => (
-                  <div className="flex gap-4 items-center w-max mx-auto">
-                    <Tippy content="Edit">
-                      <button
-                        className="flex hover:text-info"
-                        onClick={(e) => {
+                  <Tippy content="Block/Unblock">
+                    <label
+                      className="w-[46px] h-[22px] relative"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        showBlockAlert();
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                        id={`custom_switch_checkbox${rowData.id}`}
+                        checked={activeStatus[rowData.id]}
+                        onChange={(e) => {
                           e.stopPropagation();
-                          addUser();
+                          if (activeStatus[rowData.id]) {
+                            showBlockAlert(rowData.id);
+                          } else {
+                            showUnblockAlert(rowData.id);
+                          }
                         }}
-                      >
-                        <IconEdit className="w-4.5 h-4.5" />
-                      </button>
-                    </Tippy>
-                    <Tippy content="View">
-                      <button
-                        className="flex hover:text-primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setViewModal(true);
-                        }}
-                      >
-                        <IconEye />
-                      </button>
-                    </Tippy>
-                    <Tippy content="Delete">
-                      <button
-                        type="button"
-                        className="flex hover:text-danger"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteConfirm();
-                        }}
-                      >
-                        <IconTrashLines />
-                      </button>
-                    </Tippy>
-                  </div>
+                      />
+                      <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                    </label>
+                  </Tippy>
                 ),
               },
             ]}
@@ -403,292 +498,6 @@ const Clinics = () => {
           />
         </div>
       </div>
-      {/* add user modal */}
-      <Transition appear show={addUserModal} as={Fragment}>
-        <Dialog
-          as="div"
-          open={addUserModal}
-          onClose={() => setAddUserModal(false)}
-          className="relative z-[51]"
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-[black]/60" />
-          </Transition.Child>
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center px-4 py-8">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                  <button
-                    type="button"
-                    onClick={() => setAddUserModal(false)}
-                    className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                  >
-                    <IconX />
-                  </button>
-                  <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                    Add User
-                  </div>
-                  <div className="p-5">
-                    <form>
-                      <div className="mb-5">
-                        <label htmlFor="first-name">First Name</label>
-                        <input
-                          id="first-name"
-                          type="text"
-                          placeholder="Enter First Name"
-                          className="form-input"
-                        />
-                      </div>
-                      <div className="mb-5">
-                        <label htmlFor="last-name">Last Name</label>
-                        <input
-                          id="last-name"
-                          type="text"
-                          placeholder="Enter Last Name"
-                          className="form-input"
-                        />
-                      </div>
-                      <div className="mb-5">
-                        <label htmlFor="email">Email</label>
-                        <input
-                          id="email"
-                          type="email"
-                          placeholder="Enter Email"
-                          className="form-input"
-                        />
-                      </div>
-                      <div className="mb-5">
-                        <label htmlFor="number">Phone Number</label>
-                        <MaskedInput
-                          id="phoneMask"
-                          type="text"
-                          placeholder="Enter Phone Number"
-                          className="form-input"
-                          mask={[
-                            "+",
-                            "9",
-                            "1",
-                            " ",
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                            /[0-9]/,
-                          ]}
-                        />
-                      </div>
-                      {/* <div className="mb-5">
-                                                <label htmlFor="address">Address</label>
-                                                <textarea
-                                                    id="location"
-                                                    rows={3}
-                                                    placeholder="Enter Address"
-                                                    className="form-textarea resize-none min-h-[130px]"
-                                                ></textarea>
-                                            </div> */}
-                      <div className="flex justify-end items-center mt-8">
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger"
-                          onClick={() => setAddUserModal(false)}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                          onClick={saveUser}
-                        >
-                          Add
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
-
-      {/* view user modal */}
-      <Transition appear show={viewModal} as={Fragment}>
-        <Dialog as="div" open={viewModal} onClose={() => setViewModal(false)}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0"></div>
-          </Transition.Child>
-          <div
-            id="profile_modal"
-            className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60"
-          >
-            <div className="flex min-h-screen items-start justify-center px-4">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="panel my-8 w-full max-w-[300px] overflow-hidden rounded-lg border-0">
-                  <div className="flex items-center justify-end text-white dark:text-white-light">
-                    <button
-                      onClick={() => setViewModal(false)}
-                      type="button"
-                      className="text-white-dark hover:text-dark"
-                    >
-                      <IconX className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="mb-5">
-                    <div className="flex flex-col justify-center items-center">
-                      <img
-                        src="/assets/images/profile-34.jpeg"
-                        alt="img"
-                        className="w-24 h-24 rounded-full object-cover  mb-5"
-                      />
-                      <p className="font-semibold text-primary text-xl">
-                        Jimmy Turner
-                      </p>
-                    </div>
-                    <ul className="mt-5 flex flex-col max-w-[160px] m-auto space-y-4 font-semibold text-white-dark">
-                      <li className="flex items-center gap-2">
-                        <IconCoffee className="shrink-0" />
-                        Web Developer
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <IconCalendar className="shrink-0" />
-                        Jan 20, 1989
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <IconMapPin className="shrink-0" />
-                        New York, USA
-                      </li>
-                      <li>
-                        <button className="flex items-center gap-2">
-                          <IconMail className="w-5 h-5 shrink-0" />
-                          <span className="text-primary truncate">
-                            jimmy@gmail.com
-                          </span>
-                        </button>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <IconPhone className="w-5 h-5 shrink-0" />
-                        <span className="whitespace-nowrap" dir="ltr">
-                          +1 (530) 555-12121
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
-
-      {/* delete user modal */}
-      <Transition appear show={deleteModal} as={Fragment}>
-        <Dialog
-          as="div"
-          open={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          className="relative z-[51]"
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-[black]/60" />
-          </Transition.Child>
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center px-4 py-8">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                  <button
-                    type="button"
-                    onClick={() => setDeleteModal(false)}
-                    className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                  >
-                    <IconX />
-                  </button>
-                  <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                    Delete Notes
-                  </div>
-                  <div className="p-5 text-center">
-                    <div className="text-white bg-danger ring-4 ring-danger/30 p-4 rounded-full w-fit mx-auto">
-                      <IconTrashLines className="w-7 h-7 mx-auto" />
-                    </div>
-                    <div className="sm:w-3/4 mx-auto mt-5">
-                      Are you sure you want to delete this User?
-                    </div>
-
-                    <div className="flex justify-center items-center mt-8">
-                      <button
-                        type="button"
-                        className="btn btn-outline-danger"
-                        onClick={() => setDeleteModal(false)}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                        onClick={deleteUser}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
     </div>
   );
 };

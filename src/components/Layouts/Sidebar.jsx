@@ -246,13 +246,13 @@ const Sidebar = () => {
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Clinics"}
+                        {"Reports"}
                       </span>
                     </div>
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/admin/docotors" className="group">
+                  <NavLink to="/admin/messages" className="group">
                     <div className="flex items-center">
                       <IconMenuDocumentation
                         className={`group-hover:!text-primary shrink-0 ${
@@ -260,7 +260,7 @@ const Sidebar = () => {
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Doctors"}
+                        {"Messages"}
                       </span>
                     </div>
                   </NavLink>
@@ -280,7 +280,7 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/admin/subscription" className="group">
+                  <NavLink to="/admin/subscription-plans" className="group">
                     <div className="flex items-center">
                       <IconMenuDocumentation
                         className={`group-hover:!text-primary shrink-0 ${

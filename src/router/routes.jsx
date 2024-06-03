@@ -17,6 +17,8 @@ const AdminClinics = lazy(() => import("../panels/admin/clinics/Index"));
 const AdminDoctors = lazy(() => import("../panels/admin/doctors/Index"));
 const AdminReports = lazy(() => import("../panels/admin/Reports/Index"));
 const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
+const AdminMessages = lazy(() => import("../panels/admin/messages/Index"));
+const AdminSubscriptionPlans = lazy(() => import("../panels/admin/subscription-plans/Index"));
 // <--------------> admin panel imports ends here <-------------->
 
 // <--------------> owner panel imports starts here<-------------->
@@ -86,14 +88,14 @@ const routes = [
 
   // clinic
   {
-    path: "/admin/owners/clinic",
+    path: "/admin/owners/clinics",
     element: <AdminClinics />,
     layout: "default",
   },
 
   // doctor
   {
-    path: "/admin/owners/clinics/doctor",
+    path: "/admin/owners/clinics/doctors",
     element: <AdminDoctors />,
     layout: "default",
   },
@@ -105,6 +107,13 @@ const routes = [
     layout: "default",
   },
 
+  // messages
+  {
+    path: "/admin/messages",
+    element: <AdminMessages />,
+    layout: "default",
+  },
+
   // sales-team
   {
     path: "/admin/sales",
@@ -112,6 +121,12 @@ const routes = [
     layout: "default",
   },
 
+    // subscription-plans
+    {
+      path: "/admin/subscription-plans",
+      element: <AdminSubscriptionPlans />,
+      layout: "default",
+    },
   // <--------------> admin panel ends here <-------------->
 
   // <--------------> owner panel starts here <-------------->

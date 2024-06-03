@@ -62,8 +62,12 @@ const Sidebar = () => {
       setCurrentMenu("admin-sales");
     } else if (location.pathname === "/owner/dashboard") {
       setCurrentMenu("owner-dashboard");
+    } else if (location.pathname === "/owner/doctors") {
+      setCurrentMenu("owner-doctors");
     } else if (location.pathname === "/clinic/dashboard") {
       setCurrentMenu("clinic-dashboard");
+    } else if (location.pathname === "/clinic/doctors") {
+      setCurrentMenu("clinic-doctors");
     } else if (location.pathname === "/doctor/dashboard") {
       setCurrentMenu("doctor-dashboard");
     } else if (location.pathname === "/sales/dashboard") {
@@ -131,6 +135,25 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+
+                <li className="nav-item">
+                  <NavLink to="/owner/doctors" className="group">
+                    <div className="flex items-center">
+                      <IconMenuDashboard
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "owner-doctors"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Doctors"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+
+
               </ul>
             ) : role === "clinic" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
@@ -150,6 +173,25 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+
+                <li className="nav-item">
+                  <NavLink to="/clinic/doctors" className="group">
+                    <div className="flex items-center">
+                      <IconMenuDashboard
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "clinic-doctors"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Doctors"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+
+
               </ul>
             ) : role === "doctor" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">

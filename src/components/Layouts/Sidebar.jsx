@@ -235,7 +235,7 @@ const Sidebar = () => {
                     <div className="flex items-center">
                       <IconMenuUsers
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "sales-dashboard"
+                          currentMenu === "sales-owners"
                             ? "!text-primary"
                             : ""
                         }`}

@@ -1,15 +1,3 @@
-// import React from 'react'
-
-// const ownerDoctor = () => {
-//   return (
-//     <div>
-//       <p>Owner Doctors</p>
-//     </div>
-//   )
-// }
-
-// export default ownerDoctor
-
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { DataTable } from "mantine-datatable";
@@ -17,6 +5,8 @@ import CountUp from "react-countup";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import Tippy from "@tippyjs/react";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
+import AddDoctor from "./AddDoctor";
+import AddDoctorModalDetail from "./AddDoctorModalDetail";
 
 const rowData = [
   {
@@ -85,6 +75,10 @@ const ownerDoctor = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const initialRecords = rowData.slice(0, pageSize);
   const [recordsData, setRecordsData] = useState(initialRecords);
+  const [addDoctorModal, setaddDoctorModal] = useState(false);
+  const [addDoctorModalDetail, setAddDoctorModalDetail] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+
 
   useEffect(() => {
     setPage(1);
@@ -104,6 +98,35 @@ const ownerDoctor = () => {
     return `${day}-${month}-${year}`;
   }
 
+  const openAddDoctorModal = () => {
+    setaddDoctorModal(true);
+  };
+
+  const closeAddDoctorModal = () => {
+    setaddDoctorModal(false);
+  };
+
+  const closeAddDoctorModalDetail = () => {
+    setAddDoctorModalDetail(false);
+    setaddDoctorModal(true);
+  };
+
+  const openAddDoctorModalDetail = () => {
+    setAddDoctorModalDetail(true);
+  };
+
+  const handleNextClick = () => {
+    closeAddDoctorModal();
+    openAddDoctorModalDetail();
+  };
+
+  const saveDoctor = () => {
+    alert("Success")
+  };
+
+  
+
+
   return (
     <div>
       <div className="panel">
@@ -122,7 +145,7 @@ const ownerDoctor = () => {
               <button
                 type="button"
                 className="btn btn-primary"
-                // onClick={() => addUser()}
+                onClick={openAddDoctorModal}
               >
                 <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
                 Add Doctor
@@ -164,6 +187,20 @@ const ownerDoctor = () => {
           />
         </div>
       </div>
+      <AddDoctor
+        addDoctorModal={addDoctorModal}
+        setaddDoctorModal={setaddDoctorModal}
+        buttonLoading={buttonLoading}
+        saveDoctor={saveDoctor}
+        handleNextClick={handleNextClick}
+        closeAddDoctorModal={closeAddDoctorModal}
+        
+      />
+       <AddDoctorModalDetail
+        addDoctorModalDetail={addDoctorModalDetail}
+        closeAddDoctorModalDetail={closeAddDoctorModalDetail}
+        buttonLoading={buttonLoading}
+      />
     </div>
   );
 };

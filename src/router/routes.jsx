@@ -21,10 +21,14 @@ const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
 
 // <--------------> owner panel imports starts here<-------------->
 const OwnerIndex = lazy(() => import("../panels/owner/Index"));
+const OwnerDoctors = lazy(() =>import("../panels/owner/Doctors/index") )
+
 // <--------------> owner panel imports ends here <-------------->
 
 // <--------------> clinic panel imports starts here<-------------->
 const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
+const ClinicDoctors = lazy(() =>import("../panels/clinic/Doctors/index") )
+
 // <--------------> clinic panel imports ends here <-------------->
 
 // <--------------> doctor panel imports starts here<-------------->
@@ -121,6 +125,15 @@ const routes = [
     layout: "default",
   },
 
+   // OwnerDoctors
+   {
+    path: "/owner/doctors",
+    element: <OwnerDoctors />,
+    layout: "default",
+  },
+  
+  
+
   // <--------------> owner panel ends here <-------------->
 
   // <--------------> clinic panel starts here <-------------->
@@ -129,6 +142,13 @@ const routes = [
   {
     path: "/clinic/dashboard",
     element: <ClinicIndex />,
+    layout: "default",
+  },
+
+   // clinicDoctors
+   {
+    path: "/clinic/doctors",
+    element: <ClinicDoctors />,
     layout: "default",
   },
 

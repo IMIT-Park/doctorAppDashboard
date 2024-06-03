@@ -352,12 +352,12 @@ const Users = () => {
     <div>
       <div className="flex items-center justify-center overflow-hidden">
         <div className="max-w-xl w-full mx-auto">
-          <div className="{bg-[#f1f2f3] p-5 rounded dark:bg-[#060818]">
+          <div className="{bg-[#f1f2f3] p-5 rounded dark:bg-[#060818]}">
             <ul className="flex items-center justify-center gap-6">
               <li>
                 <button
                   onClick={shareOnFacebook}
-                  className="btn bg-blue-800 flex items-center justify-center rounded-full w-10 h-10 p-0 text-white"
+                  className="btn btn-primary flex items-center justify-center rounded-full w-10 h-10 p-0"
                 >
                   <IconFacebook className="w-6 h-6" />
                 </button>
@@ -404,8 +404,8 @@ const Users = () => {
                     }
                   }}
                 >
-                  <div className="flex justify-center w-full">
-                    <button type="button" className="btn btn-primary">
+                  <div className="flex justify-center w-full ">
+                    <button type="button" className="btn btn-primary ">
                       <IconCopy className="ltr:mr-2 rtl:ml-2" />
                       Copy from Input
                     </button>

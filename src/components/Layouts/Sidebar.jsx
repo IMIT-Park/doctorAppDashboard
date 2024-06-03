@@ -188,6 +188,22 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+                <li className="nav-item">
+                  <NavLink to="/sales/owners" className="group">
+                    <div className="flex items-center">
+                      <IconMenuUsers
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "sales-dashboard"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Owners"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
               </ul>
             ) : (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">

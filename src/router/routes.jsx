@@ -35,6 +35,8 @@ const DoctorIndex = lazy(() => import("../panels/doctor/Index"));
 
 // <--------------> sales panel imports starts here<-------------->
 const SalesIndex = lazy(() => import("../panels/sales/Index"));
+const SalesOwners = lazy(() => import("../panels/sales/owners/Owners"));
+
 // <--------------> sales panel imports ends here <-------------->
 
 const routes = [
@@ -165,7 +167,12 @@ const routes = [
   // dashboard
   {
     path: "/sales/dashboard",
-    element: <SalesIndex />,
+    element: <SalesIndex />, 
+    layout: "default",
+  },
+  {
+    path: "/sales/owners",
+    element: <SalesOwners />, 
     layout: "default",
   },
 

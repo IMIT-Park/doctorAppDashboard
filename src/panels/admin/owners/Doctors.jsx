@@ -10,7 +10,6 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import IconSearch from "../../../components/Icon/IconSearch";
 
 const rowData = [
   {
@@ -218,6 +217,8 @@ const rowData = [
 const Doctors = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const previousUrl = location?.state?.previousUrl;
 
   useEffect(() => {
     dispatch(setPageTitle("Doctors"));
@@ -233,8 +234,6 @@ const Doctors = () => {
   const [activeStatus, setActiveStatus] = useState(
     rowData.reduce((acc, user) => ({ ...acc, [user.id]: user.isActive }), {})
   );
-  const [search, setSearch] = useState("");
-
 
   useEffect(() => {
     setPage(1);
@@ -246,6 +245,27 @@ const Doctors = () => {
     setRecordsData(rowData.slice(from, to));
   }, [page, pageSize]);
 
+  const addUser = () => {
+    setAddUserModal(true);
+  };
+
+  const saveUser = () => {
+    // if (!params.name) {
+    //     showMessage('Name is required.', 'error');
+    //     return true;
+    // }
+    showMessage("User has been saved successfully.");
+    setAddUserModal(false);
+  };
+
+  const deleteConfirm = () => {
+    setDeleteModal(true);
+  };
+
+  const deleteUser = () => {
+    showMessage("User has been deleted successfully.");
+    setDeleteModal(false);
+  };
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -306,10 +326,40 @@ const Doctors = () => {
     });
   };
 
+
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
+      <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
+        <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
+          {previousUrl === "/admin/owners/clinics" && (
+            <li>
+              <Link to="/admin/owners" className="text-primary hover:underline">
+                Owners
+              </Link>
+            </li>
+          )}
+          <li
+            className={`${
+              previousUrl === "/admin/owners/clinics" &&
+              "before:content-['/'] before:mr-2"
+            }`}
+          >
+            <Link
+              to={
+                previousUrl === "/admin/owners/clinics"
+                  ? "/admin/owners/clinics"
+                  : "/admin/clinics"
+              }
+              className="text-primary hover:underline"
+            >
+              Clinics
+            </Link>
+          </li>
+          <li className="before:content-['/'] before:mr-2">
+            <span>Doctors</span>
+          </li>
+        </ul>
         <div className="flex items-center flex-wrap gap-4">
           <div className="flex items-start gap-1">
             <h5 className="text-base font-semibold dark:text-white-light">
@@ -343,9 +393,53 @@ const Doctors = () => {
           </div>
         </div>
       </div>
+      <div className="panel mb-1">
+        <div className="flex justify-between flex-wrap gap-4 sm:px-4">
+          <div className="text-2xl font-semibold capitalize">Clinic</div>
+          <label
+            className="w-12 h-6 relative"
+            onClick={(e) => {
+              e.stopPropagation();
+              showBlockAlert();
+            }}
+          >
+            <input
+              type="checkbox"
+              className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+              id={`custom_switch_checkbox${rowData.id}`}
+              checked={activeStatus[rowData.id]}
+              onChange={(e) => {
+                e.stopPropagation();
+                if (activeStatus[rowData.id]) {
+                  showBlockAlert(rowData.id);
+                } else {
+                  showUnblockAlert(rowData.id);
+                }
+              }}
+            />
+            <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+          </label>
+        </div>
+        <div className="text-left sm:px-4">
+          <div className="mt-5">
+            <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
+              <div className="text-white-dark">Address :</div>
+              <div>13 Tetrick Road, Cypress Gardens, Florida, 33884, US</div>
+            </div>
+            <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
+              <div className="text-white-dark">Email :</div>
+              <div>vristo@gmail.com</div>
+            </div>
+            <div className="flex items-center sm:gap-2 flex-wrap">
+              <div className="text-white-dark">Phone :</div>
+              <div>+1 (070) 123-4567</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="panel">
-      <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
+        <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
               Doctors
@@ -355,28 +449,6 @@ const Doctors = () => {
                 <CountUp start={0} end={rowData.length} duration={3}></CountUp>
               </span>
             </Tippy>
-          </div>
-          <div>
-            <form
-              onSubmit={(e) => handleSubmit(e)}
-              className="mx-auto w-full mb-2"
-            >
-              <div className="relative">
-                <input
-                  type="text"
-                  value={search}
-                  placeholder="Search Doctor..."
-                  className="form-input shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  className="btn btn-primary absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
-                >
-                  <IconSearch className="mx-auto" />
-                </button>
-              </div>
-            </form>
           </div>
         </div>
         {/* <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" /> */}
@@ -392,7 +464,7 @@ const Doctors = () => {
             highlightOnHover
             className="whitespace-nowrap table-hover"
             records={recordsData}
-            onRowClick={() => navigate("/admin/owners/clinics/doctors/doctor")}
+            onRowClick={() => navigate("/admin/owners/clinics/doctors/doctor",{state: { previousUrl: location.pathname },})}
             columns={[
               { accessor: "id", title: "ID" },
               {

@@ -9,10 +9,10 @@ import IconCaretDown from "../Icon/IconCaretDown";
 import IconMenuDashboard from "../Icon/Menu/IconMenuDashboard";
 import IconMenuDocumentation from "../Icon/Menu/IconMenuDocumentation";
 import IconMenuUsers from "../Icon/Menu/IconMenuUsers";
-
+import IconMenuChat from "../Icon/Menu/IconMenuChat";
+import IconMenuDatatables from "../Icon/Menu/IconMenuDatatables";
 import IconMenuMailbox from "../Icon/Menu/IconMenuMailbox";
 import IconCaretsDown from "../Icon/IconCaretsDown";
-import IconMenuDatatables from "../Icon/Menu/IconMenuDatatables";
 import IconMenuInvoice from "../Icon/Menu/IconMenuInvoice";
 import IconMenuTodo from "../Icon/Menu/IconMenuTodo";
 import IconUserPlus from "../Icon/IconUserPlus";
@@ -141,9 +141,7 @@ const Sidebar = () => {
                     <div className="flex items-center">
                       <IconMenuDashboard
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "owner-doctors"
-                            ? "!text-primary"
-                            : ""
+                          currentMenu === "owner-doctors" ? "!text-primary" : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
@@ -152,8 +150,6 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
-
-
               </ul>
             ) : role === "clinic" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
@@ -190,8 +186,6 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
-
-
               </ul>
             ) : role === "doctor" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
@@ -268,13 +262,41 @@ const Sidebar = () => {
                 <li className="nav-item">
                   <NavLink to="/admin/owners" className="group">
                     <div className="flex items-center">
-                      <IconMenuTodo
+                      <IconMenuUsers
                         className={`group-hover:!text-primary shrink-0 ${
                           currentMenu === "admin-owners" ? "!text-primary" : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Owners"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/clinics" className="group">
+                    <div className="flex items-center">
+                      <IconMenuTodo
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "admin-owners" ? "!text-primary" : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Clinics"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/doctors" className="group">
+                    <div className="flex items-center">
+                      <IconMenuUsers
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "admin-owners" ? "!text-primary" : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Doctors"}
                       </span>
                     </div>
                   </NavLink>
@@ -296,7 +318,7 @@ const Sidebar = () => {
                 <li className="nav-item">
                   <NavLink to="/admin/messages" className="group">
                     <div className="flex items-center">
-                      <IconMenuDocumentation
+                      <IconMenuChat
                         className={`group-hover:!text-primary shrink-0 ${
                           currentMenu === "admin-doctors" ? "!text-primary" : ""
                         }`}
@@ -310,7 +332,7 @@ const Sidebar = () => {
                 <li className="nav-item">
                   <NavLink to="/admin/sales" className="group">
                     <div className="flex items-center">
-                      <IconMenuDocumentation
+                      <IconMenuUsers
                         className={`group-hover:!text-primary shrink-0 ${
                           currentMenu === "admin-sales" ? "!text-primary" : ""
                         }`}
@@ -324,27 +346,13 @@ const Sidebar = () => {
                 <li className="nav-item">
                   <NavLink to="/admin/subscription-plans" className="group">
                     <div className="flex items-center">
-                      <IconMenuDocumentation
+                      <IconMenuDatatables
                         className={`group-hover:!text-primary shrink-0 ${
                           currentMenu === "admin-doctors" ? "!text-primary" : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Subscription Plans"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/admin/settings" className="group">
-                    <div className="flex items-center">
-                      <IconMenuDocumentation
-                        className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "admin-doctors" ? "!text-primary" : ""
-                        }`}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Settings"}
                       </span>
                     </div>
                   </NavLink>

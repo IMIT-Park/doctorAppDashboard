@@ -13,9 +13,13 @@ const Profile = lazy(() => import("../pages/Profile/Profile"));
 // <--------------> admin panel imports starts here<-------------->
 const AdminIndex = lazy(() => import("../panels/admin/Index"));
 const AdminOwners = lazy(() => import("../panels/admin/owners/Index"));
+const AdminOwnerClinics = lazy(() => import("../panels/admin/owners/Clinics"));
+const AdminOwnerDoctors = lazy(() => import("../panels/admin/owners/Doctors"));
 const AdminClinics = lazy(() => import("../panels/admin/clinics/Index"));
+const AdminClinicDoctors = lazy(() => import("../panels/admin/owners/Doctors"));
 const AdminDoctors = lazy(() => import("../panels/admin/doctors/Index"));
-const AdminReports = lazy(() => import("../panels/admin/Reports/Index"));
+const AdminDoctor = lazy(() => import("../panels/admin/doctors/SinglePage"));
+const AdminReports = lazy(() => import("../panels/admin/reports/Index"));
 const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
 const AdminMessages = lazy(() => import("../panels/admin/messages/Index"));
 const AdminSubscriptionPlans = lazy(() => import("../panels/admin/subscription-plans/Index"));
@@ -90,20 +94,62 @@ const routes = [
     layout: "default",
   },
 
-  // clinic
+  // owner -> clinics
   {
     path: "/admin/owners/clinics",
+    element: <AdminOwnerClinics />,
+    layout: "default",
+  },
+
+  // owner -> clinics -> doctors
+  {
+    path: "/admin/owners/clinics/doctors",
+    element: <AdminOwnerDoctors />,
+    layout: "default",
+  },
+
+    // owner -> clinics -> doctors -> doctor
+    {
+      path: "/admin/owners/clinics/doctors/doctor",
+      element: <AdminDoctor />,
+      layout: "default",
+    },
+
+   // clinics 
+   {
+    path: "/admin/clinics",
     element: <AdminClinics />,
     layout: "default",
   },
 
-  // doctor
-  {
-    path: "/admin/owners/clinics/doctors",
-    element: <AdminDoctors />,
-    layout: "default",
-  },
+     // clinics -> doctors
+     {
+      path: "/admin/clinics/doctors",
+      element: <AdminClinicDoctors />,
+      layout: "default",
+    },
 
+        // clinics -> doctors -> doctor
+        {
+          path: "/admin/clinics/doctors/doctor",
+          element: <AdminClinicDoctors />,
+          layout: "default",
+        },
+    
+
+     // doctors 
+     {
+      path: "/admin/doctors",
+      element: <AdminDoctors />,
+      layout: "default",
+    },
+  
+    // doctor profile
+    {
+      path: "/admin/doctors/doctor",
+      element: <AdminDoctor />,
+      layout: "default",
+    },
   // reports
   {
     path: "/admin/reports",

@@ -23,7 +23,7 @@ const AdminSubscriptionPlans = lazy(() => import("../panels/admin/subscription-p
 
 // <--------------> owner panel imports starts here<-------------->
 const OwnerIndex = lazy(() => import("../panels/owner/Index"));
-const OwnerDoctors = lazy(() =>import("../panels/owner/Doctors/index") )
+const OwnerDoctors = lazy(() =>import("../panels/owner/doctors/Index") )
 
 // <--------------> owner panel imports ends here <-------------->
 

@@ -9,6 +9,7 @@ import "flatpickr/dist/flatpickr.css";
 const AddDoctorModalDetail = ({
   addDoctorModalDetail,
   closeAddDoctorModalDetail,
+  handleDoctorPassword,
   buttonLoading,
 }) => {
   const [active, setActive] = useState("");
@@ -34,7 +35,7 @@ const AddDoctorModalDetail = ({
       <Dialog
         as="div"
         open={addDoctorModalDetail}
-        onClose={closeAddDoctorModalDetail}
+        onClose={(e) => {}}
         className="relative z-[51]"
       >
         <Transition.Child
@@ -163,7 +164,7 @@ const AddDoctorModalDetail = ({
                                               enableTime: true,
                                               dateFormat: "h:i K",
                                               time_24hr: false,
-                                              position: "auto left",                                             
+                                              position: "auto left",
                                             }}
                                             className="form-input"
                                             placeholder="Select Time"
@@ -193,20 +194,13 @@ const AddDoctorModalDetail = ({
                     <div className="flex justify-end items-center p-8">
                       <button
                         type="button"
-                        className="btn btn-outline-danger gap-2"
-                        onClick={closeAddDoctorModalDetail}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="button"
                         className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                        // onClick={handleSubmit}
+                        onClick={handleDoctorPassword}
                       >
                         {buttonLoading ? (
                           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />
                         ) : (
-                          "Save"
+                          "Next"
                         )}
                       </button>
                     </div>

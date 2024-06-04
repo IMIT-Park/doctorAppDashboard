@@ -6,12 +6,12 @@ import IconPlus from "../../../components/Icon/IconPlus";
 
 const AddDoctor = ({
   addDoctorModal,
-  handleNextClick,
+  handleSelectDays,
   saveDoctor,
   buttonLoading,
   closeAddDoctorModal,
 }) => {
-  const [drProfilePic,setDrProfilePic] = useState(null);
+  const [drProfilePic, setDrProfilePic] = useState(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -27,7 +27,7 @@ const AddDoctor = ({
       <Dialog
         as="div"
         open={addDoctorModal}
-        onClose={closeAddDoctorModal}
+        onClose={(e) => {}}
         className="relative z-[51]"
       >
         <Transition.Child
@@ -66,11 +66,12 @@ const AddDoctor = ({
                 </div>
                 <div className="p-5">
                   <form>
-                      <div className="flex flex-col justify-center items-center">
+                    <div className="flex flex-col justify-center items-center">
                       <div className="relative w-36 h-36 rounded-full dark:bg-[#121c2c] bg-gray-200 mb-5 flex justify-center items-center">
                         <label
                           htmlFor="fileInput"
                           className="cursor-pointer"
+                          title="Upload profile picture"
                         >
                           {drProfilePic ? (
                             <img
@@ -79,7 +80,7 @@ const AddDoctor = ({
                               className=" w-36 h-36 rounded-full object-cover"
                             />
                           ) : (
-                            <IconPlus className="text-slate-600 w-24 h-24"/>
+                            <IconPlus className="text-slate-600 w-24 h-24" />
                           )}
                           <input
                             id="fileInput"
@@ -90,7 +91,6 @@ const AddDoctor = ({
                           />
                         </label>
                       </div>
-                     
                     </div>
 
                     <div className="mb-5">
@@ -197,7 +197,7 @@ const AddDoctor = ({
                       <button
                         type="button"
                         className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                        onClick={handleNextClick}
+                        onClick={handleSelectDays}
                       >
                         {buttonLoading ? (
                           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />

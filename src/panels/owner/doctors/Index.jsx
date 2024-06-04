@@ -7,6 +7,11 @@ import Tippy from "@tippyjs/react";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
 import AddDoctor from "./AddDoctor";
 import AddDoctorModalDetail from "./AddDoctorModalDetail";
+import IconEdit from "../../../components/Icon/IconEdit";
+import IconEye from "../../../components/Icon/IconEye";
+import IconTrashLines from "../../../components/Icon/IconTrashLines";
+import DeleteDoctor from "./DeleteDoctor";
+import DoctorPassword from "./DoctorPassword";
 
 const rowData = [
   {
@@ -77,8 +82,11 @@ const ownerDoctor = () => {
   const [recordsData, setRecordsData] = useState(initialRecords);
   const [addDoctorModal, setaddDoctorModal] = useState(false);
   const [addDoctorModalDetail, setAddDoctorModalDetail] = useState(false);
+  const [addDoctorPasswordModal, setAddDoctorPasswordModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [data, setData] = useState({ password: "", confirmPassword: "" });
   const [buttonLoading, setButtonLoading] = useState(false);
-
+  const [deleteModal, setDeleteModal] = useState(false);
 
   useEffect(() => {
     setPage(1);
@@ -115,17 +123,36 @@ const ownerDoctor = () => {
     setAddDoctorModalDetail(true);
   };
 
-  const handleNextClick = () => {
+  const handleSelectDays = () => {
     closeAddDoctorModal();
     openAddDoctorModalDetail();
   };
 
-  const saveDoctor = () => {
-    alert("Success")
+  const doctorPasswordModal = () => {
+    setAddDoctorPasswordModal(true);
   };
 
-  
+  const closeDoctorPasswordModal = () => {
+    setAddDoctorPasswordModal(false);
+    setAddDoctorModalDetail(true);
+  };
 
+  const handleDoctorPassword = () => {
+    setAddDoctorModalDetail(false);
+    doctorPasswordModal();
+  };
+
+  const saveDoctor = () => {
+    alert("Success");
+  };
+
+  // handle Delete Modal
+  const openDeleteConfirmModal = () => {
+    setDeleteModal(true);
+  };
+  const closeDeleteConfirmModal = () => {
+    setDeleteModal(false);
+  };
 
   return (
     <div>
@@ -173,6 +200,48 @@ const ownerDoctor = () => {
                 title: "Date",
                 render: (rowData) => formatDate(rowData.date),
               },
+              {
+                accessor: "Actions",
+                textAlignment: "center",
+                render: (rowData) => (
+                  <div className="flex gap-4 items-center w-max mx-auto">
+                    <Tippy content="Edit">
+                      <button
+                        className="flex hover:text-info"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addUser();
+                        }}
+                      >
+                        <IconEdit className="w-4.5 h-4.5" />
+                      </button>
+                    </Tippy>
+                    <Tippy content="View">
+                      <button
+                        className="flex hover:text-primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openViewModal();
+                        }}
+                      >
+                        <IconEye />
+                      </button>
+                    </Tippy>
+                    <Tippy content="Delete">
+                      <button
+                        type="button"
+                        className="flex hover:text-danger"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteConfirmModal();
+                        }}
+                      >
+                        <IconTrashLines />
+                      </button>
+                    </Tippy>
+                  </div>
+                ),
+              },
             ]}
             totalRecords={rowData.length}
             recordsPerPage={pageSize}
@@ -192,14 +261,23 @@ const ownerDoctor = () => {
         setaddDoctorModal={setaddDoctorModal}
         buttonLoading={buttonLoading}
         saveDoctor={saveDoctor}
-        handleNextClick={handleNextClick}
+        handleSelectDays={handleSelectDays}
         closeAddDoctorModal={closeAddDoctorModal}
-        
       />
-       <AddDoctorModalDetail
+      <AddDoctorModalDetail
         addDoctorModalDetail={addDoctorModalDetail}
         closeAddDoctorModalDetail={closeAddDoctorModalDetail}
         buttonLoading={buttonLoading}
+        handleDoctorPassword={handleDoctorPassword}
+      />
+      <DeleteDoctor open={deleteModal} closeModal={closeDeleteConfirmModal} />
+      <DoctorPassword
+        addDoctorPasswordModal={addDoctorPasswordModal}
+        closeDoctorPasswordModal={closeDoctorPasswordModal}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
+        data={data}
+        setData={setData}
       />
     </div>
   );

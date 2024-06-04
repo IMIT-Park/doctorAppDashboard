@@ -9,6 +9,7 @@ import IconLaptop from "../../components/Icon/IconLaptop";
 import { toggleTheme } from "../../store/themeConfigSlice";
 import IconX from "../../components/Icon/IconX";
 import IconLoader from "../../components/Icon/IconLoader";
+import NetworkHandler from "../../utils/NetworkHandler";
 
 const ForgotPassword = () => {
   const dispatch = useDispatch();
@@ -32,25 +33,23 @@ const ForgotPassword = () => {
     setLoading(true);
     console.log("Submitting form...");
     try {
-      const response = await fetch("https://mds.gitdr.com/api/users/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: email }),
-      });
+      console.log("Email:", email);
+      const response = await NetworkHandler.makePostRequest(
+        "/v1/auth/forgotPasword",
+       {user_name: email} 
+      );
 
       console.log("Response:", response);
-      if (response.ok) {
-        setShowAlert({
-          show: true,
-          message: "Email sent successfully!",
-          type: "info",
-        });
-        navigate("/confirm-password");
-      } else {
-        throw new Error("Failed to send email");
-      }
+      // if (response.ok) {
+      //   setShowAlert({
+      //     show: true,
+      //     message: "Email sent successfully!",
+      //     type: "info",
+      //   });
+      //   navigate("/confirm-password");
+      // } else {
+      //   throw new Error("Failed to send email");
+      // }
     } catch (error) {
       setShowAlert({
         show: true,

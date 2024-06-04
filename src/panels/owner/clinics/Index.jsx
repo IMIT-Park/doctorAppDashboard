@@ -5,7 +5,7 @@ import { DataTable } from "mantine-datatable";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import IconEdit from "../../../components/Icon/IconEdit";
 import Swal from "sweetalert2";
-import IconUserPlus from "../../../components/Icon/IconUserPlus";
+import IconPlus from '../../../components/Icon/IconPlus';
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -13,10 +13,8 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useNavigate } from "react-router-dom";
-import AddSalesPerson from "./AddSalesPerson";
-import DeleteSalesPerson from "./DeleteSalesPerson";
-import IconEye from "../../../components/Icon/IconEye";
-import ShowSalesPerson from "./ShowSalesPerson";
+import AddClinic from "./AddClinic";
+import DeleteClinic from "./DeleteClinic";
 
 const rowData = [
   {
@@ -221,20 +219,19 @@ const rowData = [
   },
 ];
 
-const Sales = () => {
+const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(setPageTitle("Doctors"));
+    dispatch(setPageTitle("Clinics"));
   });
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const initialRecords = rowData.slice(0, pageSize);
   const [recordsData, setRecordsData] = useState(initialRecords);
-  const [addSalesPersonModal, setAddSalesPersonModal] = useState(false);
-  const [viewModal, setViewModal] = useState(false);
+  const [addModal, setAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [input, setInput] = useState({
     name: "",
@@ -256,13 +253,13 @@ const Sales = () => {
     setRecordsData(rowData.slice(from, to));
   }, [page, pageSize]);
 
-  // handle sales person modal
-  const openAddSalesPersonModal = () => {
-    setAddSalesPersonModal(true);
+  // handle add modal
+  const openAddModal = () => {
+    setAddModal(true);
   };
 
-  const closeAddSalesPersonModal = () => {
-    setAddSalesPersonModal(false);
+  const closeAddModal = () => {
+    setAddModal(false);
     setInput({
       ...input,
       name: "",
@@ -275,27 +272,6 @@ const Sales = () => {
     });
   };
 
-  const saveSalesPerson = () => {
-    if (
-      !input.name ||
-      !input.email ||
-      !input.phone ||
-      !input.address ||
-      !input.password ||
-      !input.confirmPassword
-    ) {
-      showMessage("Please fill in all required fields", "error");
-      return true;
-    }
-
-    if (input.password !== input.confirmPassword) {
-      showMessage("Passwords are not match", "error");
-      return true;
-    }
-
-    showMessage("Sales Person has been added successfully.");
-    setAddUserModal(false);
-  };
 
   // handle Delete Modal
   const openDeleteConfirmModal = () => {
@@ -326,14 +302,6 @@ const Sales = () => {
     });
   };
 
-  // handle view modal
-  const openViewModal = () => {
-    setViewModal(true);
-  };
-
-  const closeViewModal = () => {
-    setViewModal(false);
-  };
 
   return (
     <div>
@@ -342,23 +310,23 @@ const Sales = () => {
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              Sales Teams
+              Clinics
             </h5>
-            <Tippy content="Total Sales Team">
+            <Tippy content="Total Clinics">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={rowData.length} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Sales Person">
+            <Tippy content="Click to Add Clinic">
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => openAddSalesPersonModal()}
+                onClick={() => openAddModal()}
               >
-                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                Add Sales Person
+                <IconPlus className="ltr:mr-2 rtl:ml-2" />
+                Add Clinic
               </button>
             </Tippy>
           </div>
@@ -403,17 +371,6 @@ const Sales = () => {
                         <IconEdit className="w-4.5 h-4.5" />
                       </button>
                     </Tippy>
-                    <Tippy content="View">
-                      <button
-                        className="flex hover:text-primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openViewModal();
-                        }}
-                      >
-                        <IconEye />
-                      </button>
-                    </Tippy>
                     <Tippy content="Delete">
                       <button
                         type="button"
@@ -444,23 +401,18 @@ const Sales = () => {
         </div>
       </div>
       {/* add sales person modal */}
-      <AddSalesPerson
-        open={addSalesPersonModal}
-        closeModal={closeAddSalesPersonModal}
-        input={input}
-        setInput={setInput}
-        formSubmit={saveSalesPerson}
+      <AddClinic
+        open={addModal}
+        closeModal={closeAddModal}
       />
 
       {/* delete sales person modal */}
-      <DeleteSalesPerson
+      <DeleteClinic
         open={deleteModal}
         closeModal={closeDeleteConfirmModal}
       />
-      {/* view sales person modal */}
-      <ShowSalesPerson open={viewModal} closeModal={closeViewModal} />
     </div>
   );
 };
 
-export default Sales;
+export default Clinics;

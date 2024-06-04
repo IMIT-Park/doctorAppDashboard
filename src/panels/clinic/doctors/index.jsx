@@ -4,14 +4,16 @@ import { DataTable } from "mantine-datatable";
 import CountUp from "react-countup";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
+import IconEdit from "../../../components/Icon/IconEdit";
+import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import AddDoctor from "./AddDoctor";
 import AddDoctorModalDetail from "./AddDoctorModalDetail";
-import IconEdit from "../../../components/Icon/IconEdit";
-import IconEye from "../../../components/Icon/IconEye";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import DeleteDoctor from "./DeleteDoctor";
 import DoctorPassword from "./DoctorPassword";
+import IconEye from "../../../components/Icon/IconEye";
+
 
 const rowData = [
   {
@@ -70,7 +72,7 @@ const rowData = [
   },
 ];
 
-const ownerDoctor = () => {
+const ClinicDoctor = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(setPageTitle("ownerDoctor"));
@@ -283,7 +285,7 @@ const ownerDoctor = () => {
   );
 };
 
-export default ownerDoctor;
+export default ClinicDoctor;
 
 
 

@@ -35,7 +35,7 @@ const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
 
 // <--------------> clinic panel imports starts here<-------------->
 const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
-const ClinicDoctors = lazy(() => import("../panels/clinic/Doctors/index"));
+const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/index"));
 
 // <--------------> clinic panel imports ends here <-------------->
 

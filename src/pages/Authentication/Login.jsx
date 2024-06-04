@@ -51,67 +51,103 @@ const LoginBoxed = () => {
   };
 
   // login
-  //   const handleLogin = async (e) => {
-  // e.preventDefault();
-  // setLoading(true);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  // if (!data.email && !data.password) {
-  //     setShowAlert({ show: true, message: "Please enter your email and password.", type: "warning" });
-  //     setLoading(false);
-  //     return;
-  // }
+    if (!data.email && !data.password) {
+      setShowAlert({
+        show: true,
+        message: "Please enter your email and password.",
+        type: "warning",
+      });
+      setLoading(false);
+      return;
+    }
 
-  // if (!data.email) {
-  //     setShowAlert({ show: true, message: "Please enter your Email.", type: "warning" });
-  //     setLoading(false);
-  //     return;
-  // }
+    if (!data.email) {
+      setShowAlert({
+        show: true,
+        message: "Please enter your Email.",
+        type: "warning",
+      });
+      setLoading(false);
+      return;
+    }
 
-  // if (!data.password) {
-  //     setShowAlert({ show: true, message: "Please enter your Password.", type: "warning" });
-  //     setLoading(false);
-  //     return;
-  // }
+    if (!data.password) {
+      setShowAlert({
+        show: true,
+        message: "Please enter your Password.",
+        type: "warning",
+      });
+      setLoading(false);
+      return;
+    }
 
-  // const auth = btoa(`${data.email}:${data.password}`);
-  // const headers = new Headers({
-  //     'Content-Type': 'application/json',
-  //     Authorization: `${auth}`,
-  // });
+    const auth = btoa(`${data.email}:${data.password}`);
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      Authorization: `${auth}`,
+    });
 
-  // const email = data.email;
-  // const password = data.password;
+    const email = data.email;
+    const password = data.password;
 
-  // try {
-  //     const response = await fetch('https://mds.gitdr.com/api/users/Adminlogin', {
-  //         method: 'POST',
-  //         headers,
-  //         body: JSON.stringify({ email, password }),
-  //     });
+    try {
+      const response = await fetch(
+        "https://doctorbackend.gitdr.com/api/v1/auth/login",
+        {
+          method: "POST",
+          headers,
+        }
+      );
 
-  //     if (response.ok) {
-  //         const data = await response.json();
-  //         const { accessToken, user } = data;
-  //         // Store data in sessionStorage
-  //         sessionStorage.setItem('accessToken', JSON.stringify(accessToken));
-  //         sessionStorage.setItem('userData', JSON.stringify(user));
-  //         setLoading(false);
-  //         setIsIncorrect(false);
-  //         navigate('/dashboard');
+      if (response.ok) {
+        const data = await response.json();
+        const { accessToken, user } = data;
 
-  //     } else if (response.status === 401) {
-  //         setShowAlert({ show: true, message: "Incorrect password. Please try again.", type: "danger" });
-  //         setIsIncorrect(true);
-  //     } else {
-  //         setShowAlert({ show: true, message: "Incorrect email or password. Please try again.", type: "danger" });
-  //     }
-  // } catch (error) {
-  //     setShowAlert({ show: true, message: "An error occurred during login. Please try again later.", type: "danger" });
+        // Store data in sessionStorage
+        sessionStorage.setItem("accessToken", JSON.stringify(accessToken));
+        sessionStorage.setItem("userData", JSON.stringify(user));
+        setLoading(false);
+        setIsIncorrect(false);
+        if (user?.role_id === 2) {
+          navigate("/owner/dashboard");
+        } else if (user?.role_id === 3) {
+          navigate("/clinic/dashboard");
+        } else if (user?.role_id === 4) {
+          navigate("/doctor/dashboard");
+        } else if (user?.role_id === 5) {
+          navigate("/sales/dashboard");
+        } else {
+          navigate("/admin/dashboard");
+        }
 
-  // } finally {
-  //     setLoading(false);
-  // }
-  //   };
+      } else if (response.status === 401) {
+        setShowAlert({
+          show: true,
+          message: "Incorrect password. Please try again.",
+          type: "danger",
+        });
+        setIsIncorrect(true);
+      } else {
+        setShowAlert({
+          show: true,
+          message: "Incorrect email or password. Please try again.",
+          type: "danger",
+        });
+      }
+    } catch (error) {
+      setShowAlert({
+        show: true,
+        message: "An error occurred during login. Please try again later.",
+        type: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // useEffect(() => {
   //     const strigifyTokens = sessionStorage.getItem("accessToken");
@@ -138,25 +174,25 @@ const LoginBoxed = () => {
     }
   };
 
-  const [role, setRole] = useState("admin");
+  // const [role, setRole] = useState("admin");
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  // const handleLogin = (e) => {
+  //   e.preventDefault();
 
-    sessionStorage.setItem("role", role);
-    
-    if (role === "owner") {
-      navigate("owner/dashboard");
-    } else if (role === "clinic") {
-      navigate("clinic/dashboard");
-    } else if (role === "doctor") {
-      navigate("doctor/dashboard");
-    } else if (role === "sales") {
-      navigate("sales/dashboard");
-    } else {
-      navigate("admin/dashboard");
-    }
-  };
+  //   sessionStorage.setItem("role", role);
+
+  //   if (role === "owner") {
+  //     navigate("owner/dashboard");
+  //   } else if (role === "clinic") {
+  //     navigate("clinic/dashboard");
+  //   } else if (role === "doctor") {
+  //     navigate("doctor/dashboard");
+  //   } else if (role === "sales") {
+  //     navigate("sales/dashboard");
+  //   } else {
+  //     navigate("admin/dashboard");
+  //   }
+  // };
 
   return (
     <div>

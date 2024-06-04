@@ -6,8 +6,8 @@ function getAccessTokenDetails() {
   return { accessToken, RefreshToken };
 }
 
-export const baseUrl = "https://mds.gitdr.com/api";
-export const imageBaseUrl = "https://mds.gitdr.com/";
+export const baseUrl = "https://doctorbackend.gitdr.com/api";
+export const imageBaseUrl = "https://doctorbackend.gitdr.com";
 
 class NetworkHandler {
   #axios = axios.create({

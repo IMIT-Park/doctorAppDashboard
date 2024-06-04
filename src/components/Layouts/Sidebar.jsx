@@ -83,7 +83,10 @@ const Sidebar = () => {
     }
   }, [location]);
 
-  const role = sessionStorage.getItem("role");
+  // role handler
+  const strigifyUserData = sessionStorage.getItem("userData");
+  const userData = JSON.parse(strigifyUserData);
+  const role = userData?.role_id;
 
   return (
     <div className={semidark ? "dark" : ""}>
@@ -117,7 +120,7 @@ const Sidebar = () => {
             </button>
           </div>
           <PerfectScrollbar className="mt-10 h-[calc(100vh-80px)] relative">
-            {role === "owner" ? (
+            {role === 2 ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
                 <li className="nav-item">
                   <NavLink to="/owner/dashboard" className="group">
@@ -166,7 +169,7 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
               </ul>
-            ) : role === "clinic" ? (
+            ) : role === 3 ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
                 <li className="nav-item">
                   <NavLink to="/clinic/dashboard" className="group">
@@ -202,7 +205,7 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
               </ul>
-            ) : role === "doctor" ? (
+            ) : role === 4 ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
                 <li className="nav-item">
                   <NavLink to="/doctor/dashboard" className="group">
@@ -221,7 +224,7 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
               </ul>
-            ) : role === "sales" ? (
+            ) : role === 5 ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
                 <li className="nav-item">
                   <NavLink to="/sales/dashboard" className="group">
@@ -244,9 +247,7 @@ const Sidebar = () => {
                     <div className="flex items-center">
                       <IconMenuUsers
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "sales-owners"
-                            ? "!text-primary"
-                            : ""
+                          currentMenu === "sales-owners" ? "!text-primary" : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">

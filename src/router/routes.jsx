@@ -22,18 +22,20 @@ const AdminDoctor = lazy(() => import("../panels/admin/doctors/SinglePage"));
 const AdminReports = lazy(() => import("../panels/admin/reports/Index"));
 const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
 const AdminMessages = lazy(() => import("../panels/admin/messages/Index"));
-const AdminSubscriptionPlans = lazy(() => import("../panels/admin/subscription-plans/Index"));
+const AdminSubscriptionPlans = lazy(() =>
+  import("../panels/admin/subscription-plans/Index")
+);
 // <--------------> admin panel imports ends here <-------------->
 
 // <--------------> owner panel imports starts here<-------------->
 const OwnerIndex = lazy(() => import("../panels/owner/Index"));
-const OwnerDoctors = lazy(() =>import("../panels/owner/doctors/Index") )
-
+const OwnerDoctors = lazy(() => import("../panels/owner/doctors/Index"));
+const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
 // <--------------> owner panel imports ends here <-------------->
 
 // <--------------> clinic panel imports starts here<-------------->
 const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
-const ClinicDoctors = lazy(() =>import("../panels/clinic/Doctors/index") )
+const ClinicDoctors = lazy(() => import("../panels/clinic/Doctors/index"));
 
 // <--------------> clinic panel imports ends here <-------------->
 
@@ -108,48 +110,47 @@ const routes = [
     layout: "default",
   },
 
-    // owner -> clinics -> doctors -> doctor
-    {
-      path: "/admin/owners/clinics/doctors/doctor",
-      element: <AdminDoctor />,
-      layout: "default",
-    },
+  // owner -> clinics -> doctors -> doctor
+  {
+    path: "/admin/owners/clinics/doctors/doctor",
+    element: <AdminDoctor />,
+    layout: "default",
+  },
 
-   // clinics 
-   {
+  // clinics
+  {
     path: "/admin/clinics",
     element: <AdminClinics />,
     layout: "default",
   },
 
-     // clinics -> doctors
-     {
-      path: "/admin/clinics/doctors",
-      element: <AdminClinicDoctors />,
-      layout: "default",
-    },
+  // clinics -> doctors
+  {
+    path: "/admin/clinics/doctors",
+    element: <AdminClinicDoctors />,
+    layout: "default",
+  },
 
-        // clinics -> doctors -> doctor
-        {
-          path: "/admin/clinics/doctors/doctor",
-          element: <AdminClinicDoctors />,
-          layout: "default",
-        },
-    
+  // clinics -> doctors -> doctor
+  {
+    path: "/admin/clinics/doctors/doctor",
+    element: <AdminClinicDoctors />,
+    layout: "default",
+  },
 
-     // doctors 
-     {
-      path: "/admin/doctors",
-      element: <AdminDoctors />,
-      layout: "default",
-    },
-  
-    // doctor profile
-    {
-      path: "/admin/doctors/doctor",
-      element: <AdminDoctor />,
-      layout: "default",
-    },
+  // doctors
+  {
+    path: "/admin/doctors",
+    element: <AdminDoctors />,
+    layout: "default",
+  },
+
+  // doctor profile
+  {
+    path: "/admin/doctors/doctor",
+    element: <AdminDoctor />,
+    layout: "default",
+  },
   // reports
   {
     path: "/admin/reports",
@@ -171,12 +172,12 @@ const routes = [
     layout: "default",
   },
 
-    // subscription-plans
-    {
-      path: "/admin/subscription-plans",
-      element: <AdminSubscriptionPlans />,
-      layout: "default",
-    },
+  // subscription-plans
+  {
+    path: "/admin/subscription-plans",
+    element: <AdminSubscriptionPlans />,
+    layout: "default",
+  },
   // <--------------> admin panel ends here <-------------->
 
   // <--------------> owner panel starts here <-------------->
@@ -188,14 +189,19 @@ const routes = [
     layout: "default",
   },
 
-   // OwnerDoctors
-   {
+  // OwnerClinics
+  {
+    path: "/owner/clinics",
+    element: <OwnerClinics />,
+    layout: "default",
+  },
+
+  // OwnerDoctors
+  {
     path: "/owner/doctors",
     element: <OwnerDoctors />,
     layout: "default",
   },
-  
-  
 
   // <--------------> owner panel ends here <-------------->
 
@@ -208,8 +214,8 @@ const routes = [
     layout: "default",
   },
 
-   // clinicDoctors
-   {
+  // clinicDoctors
+  {
     path: "/clinic/doctors",
     element: <ClinicDoctors />,
     layout: "default",
@@ -233,12 +239,12 @@ const routes = [
   // dashboard
   {
     path: "/sales/dashboard",
-    element: <SalesIndex />, 
+    element: <SalesIndex />,
     layout: "default",
   },
   {
     path: "/sales/owners",
-    element: <SalesOwners />, 
+    element: <SalesOwners />,
     layout: "default",
   },
 

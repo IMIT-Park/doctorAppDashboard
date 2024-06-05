@@ -91,9 +91,6 @@ const LoginBoxed = () => {
       Authorization: `${auth}`,
     });
 
-    const email = data.email;
-    const password = data.password;
-
     try {
       const response = await fetch(
         "https://doctorbackend.gitdr.com/api/v1/auth/login",

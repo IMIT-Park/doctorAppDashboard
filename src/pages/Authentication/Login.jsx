@@ -279,7 +279,7 @@ const LoginBoxed = () => {
                   Sign in
                 </h1>
                 <p className="text-base font-bold leading-normal text-white-dark">
-                  Enter your email and password to login
+                  Enter your username and password to login
                 </p>
               </div>
               <form
@@ -287,12 +287,12 @@ const LoginBoxed = () => {
                 onSubmit={handleLogin}
               >
                 <div>
-                  <label htmlFor="Email">Email</label>
+                  <label htmlFor="Email">Username</label>
                   <div className="relative text-white-dark">
                     <input
                       id="Email"
                       type="email"
-                      placeholder="Enter Email"
+                      placeholder="Enter Username"
                       className="form-input ps-10 placeholder:text-white-dark"
                       value={data.email}
                       onChange={(e) =>
@@ -348,7 +348,7 @@ const LoginBoxed = () => {
                     Forgot Password ?
                   </span>
                 </label>
-                <div>
+                {/* <div>
                   <select
                     className="form-select text-white-dark"
                     onChange={(e) => setRole(e.target.value)}
@@ -360,7 +360,7 @@ const LoginBoxed = () => {
                     <option value="doctor">Doctor</option>
                     <option value="sales">Sales</option>
                   </select>
-                </div>
+                </div> */}
                 <button
                   type="submit"
                   className="btn btn-gradient !mt-8 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"

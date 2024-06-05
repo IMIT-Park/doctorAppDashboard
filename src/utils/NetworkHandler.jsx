@@ -1,9 +1,8 @@
 import axios from "axios";
 
 function getAccessTokenDetails() {
-  const storedTokenData = sessionStorage.getItem("accessToken");
-  const { accessToken, RefreshToken } = JSON.parse(storedTokenData);
-  return { accessToken, RefreshToken };
+  const accessToken = sessionStorage.getItem("accessToken");
+  return accessToken;
 }
 
 export const baseUrl = "https://doctorbackend.gitdr.com/api";
@@ -32,27 +31,7 @@ class NetworkHandler {
       function (response) {
         return response;
       },
-      async (error) => {
-        if (error?.response?.status == 401) {
-          const requestBody = {
-            refreshToken: getAccessTokenDetails().RefreshToken,
-          };
-          const response = await this.makePostRequest(
-            "refreshToken",
-            requestBody
-          );
-          const accessTokenDetails = getAccessTokenDetails();
-          accessTokenDetails.accessToken = response.data.accessToken;
-          sessionStorage.setItem(
-            "accessToken",
-            JSON.stringify(accessTokenDetails)
-          );
-          return new Promise((resolve) => {
-            const config = error.config;
-            config.headers.Authorization = `Bearer ${accessTokenDetails.accessToken}`;
-            resolve(this.#axios(config));
-          });
-        }
+      function (error) {
         return Promise.reject(error);
       }
     );

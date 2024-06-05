@@ -4,7 +4,7 @@ function getAccessTokenDetails() {
   const accessToken = sessionStorage.getItem("accessToken");
   return accessToken;
 }
-
+console.log(getAccessTokenDetails().accessToken);
 export const baseUrl = "https://doctorbackend.gitdr.com/api";
 export const imageBaseUrl = "https://doctorbackend.gitdr.com";
 

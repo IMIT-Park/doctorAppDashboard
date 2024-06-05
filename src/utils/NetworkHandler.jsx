@@ -12,8 +12,10 @@ class NetworkHandler {
     this.#axios.interceptors.request.use(
       function (config) {
         const accessToken = sessionStorage.getItem("accessToken");
+        
         if (accessToken) {
-          config.headers.Authorization = `Bearer ${accessToken}`;
+          const formattedToken = accessToken.replace(/^"(.*)"$/, '$1');
+          config.headers.Authorization = `Bearer ${formattedToken}`;
         }
         return config;
       },

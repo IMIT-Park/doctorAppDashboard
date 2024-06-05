@@ -344,6 +344,7 @@ const Clinics = () => {
             highlightOnHover
             className="whitespace-nowrap table-hover"
             records={recordsData}
+            onRowClick={() => navigate("/admin/owners/clinics/doctors")}
             columns={[
               { accessor: "id", title: "ID" },
               {

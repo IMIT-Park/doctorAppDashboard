@@ -36,9 +36,10 @@ const LoginBoxed = () => {
     // const currentUrl = window.location.href;
     // const url = new URL(currentUrl);
     // const tokenFromUrl = url.searchParams.get("token");
-    const tokenFromUrl = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImppbWxhdGltaXRAZ21haWwuY29tIiwiaWF0IjoxNzE1Njc2MzUxLCJleHAiOjE3MTU2Nzk5NTF9.7eKnNrzcPy0qZ50J03DdiEa6Sut9sD83WjatHaWJAoY";
+    const tokenFromUrl =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJqaW1sYXRpbWl0QGdtYWlsLmNvbSIsImlhdCI6MTcxNzU3Mjc5MywiZXhwIjoxNzE3NTc2MzkzfQ.oJHTRE6LCz98sKn7BBScgxLm9KT8-6T6i4zeaX7LdZk";
     setToken(tokenFromUrl);
-    console.log("Token:", tokenFromUrl);
+    // console.log("Token:", tokenFromUrl);
   }, []);
 
   // warning alert closer
@@ -94,19 +95,21 @@ const LoginBoxed = () => {
     }
 
     try {
-      const response = await fetch("https://mds.gitdr.com/api/users/password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          newPassword: data.newPassword,
-          confirmPassword: data.confirmPassword,
-          token: token,
-        }),
-      });
+      const response = await fetch(
+        "https://doctorbackend.gitdr.com/api/v1/auth/updatePassword",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            newpassword: data.newPassword,
+            token: token,
+          }),
+        }
+      );
       console.log(response);
-      if (response.ok) {
+      if (response.status === 201) {
         setShowAlert({
           show: true,
           message: "Password updated successfully!",

@@ -10,6 +10,7 @@ import { toggleTheme } from "../../store/themeConfigSlice";
 import IconX from "../../components/Icon/IconX";
 import IconLoader from "../../components/Icon/IconLoader";
 import NetworkHandler from "../../utils/NetworkHandler";
+import Swal from "sweetalert2";
 
 const ForgotPassword = () => {
   const dispatch = useDispatch();
@@ -30,36 +31,48 @@ const ForgotPassword = () => {
   //Submit Email
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    console.log("Submitting form...");
-    try {
-      console.log("Email:", email);
-      const response = await NetworkHandler.makePostRequest(
-        "/v1/auth/forgotPasword",
-       {user_name: email} 
-      );
 
-      console.log("Response:", response);
-      // if (response.ok) {
-      //   setShowAlert({
-      //     show: true,
-      //     message: "Email sent successfully!",
-      //     type: "info",
-      //   });
-      //   navigate("/confirm-password");
-      // } else {
-      //   throw new Error("Failed to send email");
-      // }
-    } catch (error) {
-      setShowAlert({
-        show: true,
-        message: "Failed to send email. Please try again later.",
-        type: "danger",
+    setLoading(true);
+    try {
+      const response = await fetch("https://doctorbackend.gitdr.com/api/v1/auth/forgotPasword", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({user_name:email}),
       });
+
+      console.log(response);
+
+      if (response.status === 201) {
+        setLoading(false);
+        showMessage("Email sent successfully.", "success");
+      }
+      navigate("/confirm-password");
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
+
+    //  show message function
+    const showMessage = (msg = "", type = "") => {
+      const toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: { container: "toast" },
+        showCloseButton: true,
+      });
+      toast.fire({
+        icon: type,
+        title: msg,
+        padding: "10px 20px",
+      });
+    };
 
   return (
     <div>

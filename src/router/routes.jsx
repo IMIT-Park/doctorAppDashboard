@@ -21,6 +21,8 @@ const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
 
 // <--------------> owner panel imports starts here<-------------->
 const OwnerIndex = lazy(() => import("../panels/owner/Index"));
+const OwnerClinics = lazy(() => import("../panels/owner/clinincs/Clinics"));
+
 // <--------------> owner panel imports ends here <-------------->
 
 // <--------------> clinic panel imports starts here<-------------->
@@ -118,6 +120,11 @@ const routes = [
   {
     path: "/owner/dashboard",
     element: <OwnerIndex />,
+    layout: "default",
+  },
+  {
+    path: "/owner/clinics",
+    element: <OwnerClinics />,
     layout: "default",
   },
 

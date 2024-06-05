@@ -91,9 +91,6 @@ const LoginBoxed = () => {
       Authorization: `${auth}`,
     });
 
-    const email = data.email;
-    const password = data.password;
-
     try {
       const response = await fetch(
         "https://doctorbackend.gitdr.com/api/v1/auth/login",
@@ -149,16 +146,6 @@ const LoginBoxed = () => {
     }
   };
 
-  // useEffect(() => {
-  //     const strigifyTokens = sessionStorage.getItem("accessToken");
-  //     const tokens = JSON.parse(strigifyTokens);
-  //     const accessToken = tokens?.accessToken;
-
-  //     if (accessToken) {
-  //         navigate("/dashboard");
-  //     }
-
-  // }, [])
 
   const handleEmailKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -173,26 +160,6 @@ const LoginBoxed = () => {
       handleLogin(e);
     }
   };
-
-  // const [role, setRole] = useState("admin");
-
-  // const handleLogin = (e) => {
-  //   e.preventDefault();
-
-  //   sessionStorage.setItem("role", role);
-
-  //   if (role === "owner") {
-  //     navigate("owner/dashboard");
-  //   } else if (role === "clinic") {
-  //     navigate("clinic/dashboard");
-  //   } else if (role === "doctor") {
-  //     navigate("doctor/dashboard");
-  //   } else if (role === "sales") {
-  //     navigate("sales/dashboard");
-  //   } else {
-  //     navigate("admin/dashboard");
-  //   }
-  // };
 
   return (
     <div>
@@ -279,7 +246,7 @@ const LoginBoxed = () => {
                   Sign in
                 </h1>
                 <p className="text-base font-bold leading-normal text-white-dark">
-                  Enter your email and password to login
+                  Enter your username and password to login
                 </p>
               </div>
               <form
@@ -287,12 +254,12 @@ const LoginBoxed = () => {
                 onSubmit={handleLogin}
               >
                 <div>
-                  <label htmlFor="Email">Email</label>
+                  <label htmlFor="Email">Username</label>
                   <div className="relative text-white-dark">
                     <input
                       id="Email"
                       type="email"
-                      placeholder="Enter Email"
+                      placeholder="Enter Username"
                       className="form-input ps-10 placeholder:text-white-dark"
                       value={data.email}
                       onChange={(e) =>
@@ -348,7 +315,7 @@ const LoginBoxed = () => {
                     Forgot Password ?
                   </span>
                 </label>
-                <div>
+                {/* <div>
                   <select
                     className="form-select text-white-dark"
                     onChange={(e) => setRole(e.target.value)}
@@ -360,7 +327,7 @@ const LoginBoxed = () => {
                     <option value="doctor">Doctor</option>
                     <option value="sales">Sales</option>
                   </select>
-                </div>
+                </div> */}
                 <button
                   type="submit"
                   className="btn btn-gradient !mt-8 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"

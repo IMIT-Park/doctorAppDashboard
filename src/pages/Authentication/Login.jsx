@@ -149,16 +149,6 @@ const LoginBoxed = () => {
     }
   };
 
-  // useEffect(() => {
-  //     const strigifyTokens = sessionStorage.getItem("accessToken");
-  //     const tokens = JSON.parse(strigifyTokens);
-  //     const accessToken = tokens?.accessToken;
-
-  //     if (accessToken) {
-  //         navigate("/dashboard");
-  //     }
-
-  // }, [])
 
   const handleEmailKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -173,26 +163,6 @@ const LoginBoxed = () => {
       handleLogin(e);
     }
   };
-
-  // const [role, setRole] = useState("admin");
-
-  // const handleLogin = (e) => {
-  //   e.preventDefault();
-
-  //   sessionStorage.setItem("role", role);
-
-  //   if (role === "owner") {
-  //     navigate("owner/dashboard");
-  //   } else if (role === "clinic") {
-  //     navigate("clinic/dashboard");
-  //   } else if (role === "doctor") {
-  //     navigate("doctor/dashboard");
-  //   } else if (role === "sales") {
-  //     navigate("sales/dashboard");
-  //   } else {
-  //     navigate("admin/dashboard");
-  //   }
-  // };
 
   return (
     <div>

@@ -1,10 +1,5 @@
 import axios from "axios";
 
-function getAccessTokenDetails() {
-  const accessToken = sessionStorage.getItem("accessToken");
-  return accessToken;
-}
-
 export const baseUrl = "https://doctorbackend.gitdr.com/api";
 export const imageBaseUrl = "https://doctorbackend.gitdr.com";
 
@@ -16,10 +11,10 @@ class NetworkHandler {
   constructor() {
     this.#axios.interceptors.request.use(
       function (config) {
-        if (getAccessTokenDetails().accessToken)
-          config.headers.Authorization = `Bearer ${
-            getAccessTokenDetails().accessToken
-          }`;
+        const accessToken = sessionStorage.getItem("accessToken");
+        if (accessToken) {
+          config.headers.Authorization = `Bearer ${accessToken}`;
+        }
         return config;
       },
       function (error) {

@@ -130,7 +130,6 @@ const LoginBoxed = () => {
     }
   };
 
-
   const handleNewPasswordKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();

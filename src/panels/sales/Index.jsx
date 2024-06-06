@@ -35,7 +35,7 @@ const Users = () => {
 
   useEffect(() => {
     dispatch(setPageTitle("Dashboard"));
-  });
+  },[]);
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -362,7 +362,6 @@ const Users = () => {
     fetchData();
   }, []);
 
-  // console.log(details);
   return (
     <div>
       <div className="flex items-center justify-center overflow-hidden">

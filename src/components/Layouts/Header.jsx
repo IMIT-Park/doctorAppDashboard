@@ -130,7 +130,6 @@ const [messages, setMessages] = useState([
 ]);
 
 
-console.log(userData);
   return (
     <header
       className={`z-40 ${

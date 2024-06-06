@@ -294,7 +294,7 @@ const Sidebar = () => {
                     <div className="flex items-center">
                       <IconMenuTodo
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "admin-owners" ? "!text-primary" : ""
+                          currentMenu === "admin-clinics" ? "!text-primary" : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
@@ -308,7 +308,7 @@ const Sidebar = () => {
                     <div className="flex items-center">
                       <IconMenuUsers
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "admin-owners" ? "!text-primary" : ""
+                          currentMenu === "admin-doctors" ? "!text-primary" : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">

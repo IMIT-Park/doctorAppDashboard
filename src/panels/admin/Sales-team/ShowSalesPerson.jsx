@@ -9,8 +9,8 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import IconCopy from "../../../components/Icon/IconCopy";
 import Swal from "sweetalert2";
 
-const ShowSalesPerson = ({ open, closeModal }) => {
-  const [message1, setMessage1] = useState("http://www.admin-dashboard.com");
+const ShowSalesPerson = ({ open, closeModal,details }) => {
+  const [message1, setMessage1] = useState(details ? "http://www.admin-dashboard.com/"+details.salespersoncode : "http://www.admin-dashboard.com");
 
   const showMessage = (message = "") => {
     const toast = Swal.mixin({
@@ -26,6 +26,9 @@ const ShowSalesPerson = ({ open, closeModal }) => {
       padding: "10px 20px",
     });
   };
+
+
+  console.log(details);
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -66,7 +69,7 @@ const ShowSalesPerson = ({ open, closeModal }) => {
                   <IconX />
                 </button>
                 <div className="flex items-center flex-wrap gap-2 text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  <div className="ltr:mr-3 rtl:ml-3">Mathew Thomas</div>
+                  <div className="ltr:mr-3 rtl:ml-3">{details.name}</div>
                 </div>
                 <div className="p-5">
                   <ul className="flex flex-col space-y-4 font-semibold text-white-dark">
@@ -74,19 +77,19 @@ const ShowSalesPerson = ({ open, closeModal }) => {
                       <button className="flex items-center gap-2">
                         <IconMail className="w-5 h-5 shrink-0" />
                         <span className="text-primary truncate">
-                          jimmy@gmail.com
+                        {details.email}
                         </span>
                       </button>
                     </li>
                     <li className="flex items-center gap-2">
                       <IconPhone className="w-5 h-5 shrink-0" />
                       <span className="whitespace-nowrap" dir="ltr">
-                        +1 (530) 555-12121
+                      {details.phone}
                       </span>
                     </li>
                     <li className="flex items-center gap-2">
                       <IconMapPin className="shrink-0" />
-                      New York, USA
+                      {details.address}
                     </li>
                   </ul>
 

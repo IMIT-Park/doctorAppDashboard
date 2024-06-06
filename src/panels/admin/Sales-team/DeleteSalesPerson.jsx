@@ -5,8 +5,7 @@ import MaskedInput from "react-text-mask";
 import IconLoader from "../../../components/Icon/IconLoader";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
 
-const DeleteSalesPerson = ({ open, closeModal }) => {
-  const handleSubmit = () => {};
+const DeleteSalesPerson = ({ open, closeModal, deleteUser }) => {
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -67,7 +66,7 @@ const DeleteSalesPerson = ({ open, closeModal }) => {
                     <button
                       type="button"
                       className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                      onClick={handleSubmit}
+                      onClick={deleteUser}
                     >
                       Delete
                     </button>

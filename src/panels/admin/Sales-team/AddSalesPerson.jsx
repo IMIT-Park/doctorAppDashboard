@@ -1,14 +1,58 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
-import MaskedInput from "react-text-mask";
 import IconLoader from "../../../components/Icon/IconLoader";
-
-const AddSalesPerson = ({ open, closeModal, input, setInput, formSubmit }) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    formSubmit();
+import IconEye from "../../../components/Icon/IconEye"; // Ensure this path is correct
+import IconCloseEye from "../../../components/Icon/IconCloseEye";
+const AddSalesPerson = ({
+  open,
+  closeModal,
+  input,
+  setInput,
+  formSubmit,
+  isEditMode,
+  emailError,
+  setEmailError,
+  buttonLoading,
+  setButtonLoading,
+  showPassword,
+  setShowPassword,
+  showComfirmPassword,
+  setShowComfirmPassword,
+}) => {
+  const handleEmailChange = (e) => {
+    const email = e.target.value;
+    setInput({ ...input, email, user_name: email });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailRegex.test(email)) {
+      setEmailError("");
+    } else {
+      setEmailError("Please enter a valid email address");
+    }
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setButtonLoading(true);
+    await formSubmit();
+    setButtonLoading(false);
+  };
+
+  useEffect(() => {
+    // Check if input.email exists and set the username accordingly
+    if (input.email) {
+      setInput((prevInput) => ({
+        ...prevInput,
+        user_name: input.email, // Extract username from email
+      }));
+    }
+  }, [input.email]);
+
+  // const extractUsernameFromEmail = (email) => {
+  //   const atIndex = email.indexOf("@");
+  //   const username = email.substring(0, atIndex);
+  //   return username + "@gmail.com";
+  // };
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -49,12 +93,12 @@ const AddSalesPerson = ({ open, closeModal, input, setInput, formSubmit }) => {
                   <IconX />
                 </button>
                 <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  Add Sales Person
+                  {isEditMode ? "Edit Sales Person" : "Add Sales Person"}
                 </div>
                 <div className="p-5">
                   <form>
                     <div className="mb-5">
-                      <label htmlFor="first-name">Full Name</label>
+                      <label htmlFor="full-name">Full Name</label>
                       <input
                         id="full-name"
                         type="text"
@@ -74,8 +118,24 @@ const AddSalesPerson = ({ open, closeModal, input, setInput, formSubmit }) => {
                         placeholder="Enter Email"
                         className="form-input"
                         value={input?.email}
+                        onChange={handleEmailChange}
+                      />
+                      {emailError && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {emailError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-5">
+                      <label htmlFor="user-name">User Name</label>
+                      <input
+                        id="user-name"
+                        type="text"
+                        placeholder="Enter User Name"
+                        className="form-input"
+                        value={input?.user_name}
                         onChange={(e) =>
-                          setInput({ ...input, email: e.target.value })
+                          setInput({ ...input, user_name: e.target.value })
                         }
                       />
                     </div>
@@ -105,35 +165,70 @@ const AddSalesPerson = ({ open, closeModal, input, setInput, formSubmit }) => {
                         }
                       ></textarea>
                     </div>
-                    <div className="mb-5">
-                      <label htmlFor="password">Password</label>
-                      <input
-                        id="password"
-                        type="text"
-                        placeholder="Enter Password"
-                        className="form-input"
-                        value={input?.password}
-                        onChange={(e) =>
-                          setInput({ ...input, password: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="mb-5">
-                      <label htmlFor="confirm-password">Confirm Password</label>
-                      <input
-                        id="confirm-password"
-                        type="text"
-                        placeholder="Enter Confirm Password"
-                        className="form-input"
-                        value={input?.confirmPassword}
-                        onChange={(e) =>
-                          setInput({
-                            ...input,
-                            confirmPassword: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
+
+                    {!isEditMode && (
+                      <>
+                        <div className="mb-5 relative">
+                          <label htmlFor="password">Password</label>
+                          <div className="relative">
+                            <input
+                              id="password"
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Enter Password"
+                              className="form-input pr-10"
+                              value={input?.password}
+                              onChange={(e) =>
+                                setInput({ ...input, password: e.target.value })
+                              }
+                            />
+                            <span
+                              title={
+                                showPassword ? "hide password" : "show password"
+                              }
+                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? <IconEye /> : <IconCloseEye />}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mb-5 relative">
+                          <label htmlFor="confirm-password">
+                            Confirm Password
+                          </label>
+                          <div className="relative">
+                            <input
+                              id="confirm-password"
+                              type={showComfirmPassword ? "text" : "password"}
+                              placeholder="Enter Confirm Password"
+                              className="form-input pr-10"
+                              value={input?.confirmPassword}
+                              onChange={(e) =>
+                                setInput({
+                                  ...input,
+                                  confirmPassword: e.target.value,
+                                })
+                              }
+                            />
+                            <span
+                              title={
+                                showComfirmPassword
+                                  ? "hide confirm-password"
+                                  : "show confirm-password"
+                              }
+                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
+                              onClick={() =>
+                                setShowComfirmPassword(!showComfirmPassword)
+                              }
+                            >
+                              {showComfirmPassword ? <IconEye /> : <IconCloseEye />}
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
                     <div className="flex justify-end items-center mt-8">
                       <button
                         type="button"
@@ -146,8 +241,15 @@ const AddSalesPerson = ({ open, closeModal, input, setInput, formSubmit }) => {
                         type="button"
                         className="btn btn-primary ltr:ml-4 rtl:mr-4"
                         onClick={handleSubmit}
+                        disabled={buttonLoading}
                       >
-                        Add
+                        {buttonLoading ? (
+                          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle" />
+                        ) : isEditMode ? (
+                          "Edit"
+                        ) : (
+                          "Add"
+                        )}
                       </button>
                     </div>
                   </form>

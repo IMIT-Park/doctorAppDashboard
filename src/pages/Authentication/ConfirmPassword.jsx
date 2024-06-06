@@ -37,7 +37,7 @@ const LoginBoxed = () => {
     // const url = new URL(currentUrl);
     // const tokenFromUrl = url.searchParams.get("token");
     const tokenFromUrl =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJqaW1sYXRpbWl0QGdtYWlsLmNvbSIsImlhdCI6MTcxNzU3Mjc5MywiZXhwIjoxNzE3NTc2MzkzfQ.oJHTRE6LCz98sKn7BBScgxLm9KT8-6T6i4zeaX7LdZk";
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJqaW1sYXRpbWl0QGdtYWlsLmNvbSIsImlhdCI6MTcxNzY0ODQxNiwiZXhwIjoxNzE3NjUyMDE2fQ.iYCaI-ircesjixBM92FXobwAkKI9HGV8_pCySZpuoLE";
     setToken(tokenFromUrl);
     // console.log("Token:", tokenFromUrl);
   }, []);

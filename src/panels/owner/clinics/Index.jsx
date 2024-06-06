@@ -5,7 +5,7 @@ import { DataTable } from "mantine-datatable";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import IconEdit from "../../../components/Icon/IconEdit";
 import Swal from "sweetalert2";
-import IconPlus from '../../../components/Icon/IconPlus';
+import IconPlus from "../../../components/Icon/IconPlus";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -15,8 +15,7 @@ import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useNavigate } from "react-router-dom";
 import AddClinic from "./AddClinic";
 import DeleteClinic from "./DeleteClinic";
-import NetworkHandler from "../../../utils/NetworkHandler";
-
+import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -29,7 +28,7 @@ const Clinics = () => {
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [allClinics, setAllClinics] = useState([]);
-  const [totalClinics,setTotalClinics] = useState(0);
+  const [totalClinics, setTotalClinics] = useState(0);
   const [addModal, setAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -52,24 +51,25 @@ const Clinics = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
+  // fetch function
+  const fetchData = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/clinic/getall?pageSize=${pageSize}&page=${page}`
+      );
+      console.log(response?.data);
+      console.log(response?.data?.Clinic?.rows);
 
- // fetch function
- const fetchData = async () => {
-  try {
-    const response = await NetworkHandler.makeGetRequest(
-      `/v1/clinic/getall?pageSize=${pageSize}&page=${page}`
-    );
-    console.log(response)
-    // setTotalClinics(response.data?.data?.count);
-    // setAllClinics(response.data?.data?.mdsList);
-    setLoading(false);
-  } catch (error) {
-    console.log(error);
-    setLoading(false);
-  } finally {
-    setLoading(false);
-  }
-};
+      setTotalClinics(response.data?.Clinic?.count);
+      setAllClinics(response.data?.Clinic?.rows);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
   // fetching Mds
   useEffect(() => {
     fetchData();
@@ -92,7 +92,6 @@ const Clinics = () => {
       address: "",
     });
   };
-
 
   // handle Delete Modal
   const openDeleteConfirmModal = () => {
@@ -123,7 +122,6 @@ const Clinics = () => {
     });
   };
 
-
   return (
     <div>
       <ScrollToTop />
@@ -135,7 +133,7 @@ const Clinics = () => {
             </h5>
             <Tippy content="Total Clinics">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                {/* <CountUp start={0} end={rowData.length} duration={3}></CountUp> */}
+                <CountUp start={0} end={totalClinics} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
@@ -152,87 +150,108 @@ const Clinics = () => {
             </Tippy>
           </div>
         </div>
-        {/* <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" /> */}
-        <div className="datatables">
-          <DataTable
-            noRecordsText="No Clinics to show"
-            noRecordsIcon={
-              <span className="mb-2">
-                <img src={emptyBox} alt="" className="w-10" />
-              </span>
-            }
-            mih={180}
-            highlightOnHover
-            className="whitespace-nowrap table-hover"
-            // records={recordsData}
-            onRowClick={() => navigate("/admin/owners/clinics/doctors")}
-            columns={[
-              { accessor: "id", title: "ID" },
-              {
-                accessor: "firstName",
-                title: "Name",
-                render: (row) => row.firstName + " " + row.lastName,
-              },
-              { accessor: "email" },
-              // { accessor: "email", title: "Username" },
-              { accessor: "phone" },
-              { accessor: "address.street", title: "Address" },
-              {
-                accessor: "Actions",
-                textAlignment: "center",
-                render: (rowData) => (
-                  <div className="flex gap-4 items-center w-max mx-auto">
-                    <Tippy content="Edit">
-                      <button
-                        className="flex hover:text-info"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addUser();
-                        }}
-                      >
-                        <IconEdit className="w-4.5 h-4.5" />
-                      </button>
-                    </Tippy>
-                    <Tippy content="Delete">
-                      <button
-                        type="button"
-                        className="flex hover:text-danger"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openDeleteConfirmModal();
-                        }}
-                      >
-                        <IconTrashLines />
-                      </button>
-                    </Tippy>
-                  </div>
-                ),
-              },
-            ]}
-            // totalRecords={rowData.length}
-            recordsPerPage={pageSize}
-            page={page}
-            onPageChange={(p) => setPage(p)}
-            recordsPerPageOptions={PAGE_SIZES}
-            onRecordsPerPageChange={setPageSize}
-            minHeight={200}
-            paginationText={({ from, to, totalRecords }) =>
-              `Showing  ${from} to ${to} of ${totalRecords} entries`
-            }
-          />
-        </div>
+        {loading ? (
+          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+        ) : (
+          <div className="datatables">
+  <DataTable
+    noRecordsText="No Clinics to show"
+    noRecordsIcon={
+      <span className="mb-2">
+        <img src={emptyBox} alt="" className="w-10" />
+      </span>
+    }
+    mih={180}
+    highlightOnHover
+    className="whitespace-nowrap table-hover"
+    records={allClinics}
+    idAccessor="clinic_id"
+    onRowClick={() => navigate("/admin/owners/clinics/doctors")}
+    columns={[
+      {
+        accessor: "",
+        title: "ID",
+        render: (rowData, index) => (
+          <span>{(page - 1) * pageSize + index + 1}</span>
+        ),
+      },
+            { accessor: "name", title: "Name" },
+      { accessor: "phone", title: "Phone" },
+      { accessor: "address", title: "Address" },
+      { accessor: "place", title: "Place" },
+      {
+        accessor: "banner_img_url",
+        title: "Banner Image",
+        render: (rowData) => (
+          <img src={imageBaseUrl+rowData.banner_img_url} alt="Banner" className="w-10" />
+        ),
+      },
+      {
+        accessor: "googleLocation",
+        title: "Google Location",
+        render: (rowData) => {
+          const location = JSON.parse(rowData.googleLocation);
+          const { lat, long } = location;
+          const googleMapsURL = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
+          return (
+            <a href={googleMapsURL} target="_blank" rel="noopener noreferrer">
+              View on Google Maps
+            </a>
+          );
+        },
+      },
+      {
+        accessor: "Actions",
+        textAlignment: "center",
+        render: (rowData) => (
+          <div className="flex gap-4 items-center w-max mx-auto">
+            <Tippy content="Edit">
+              <button
+                className="flex hover:text-info"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addUser();
+                }}
+              >
+                <IconEdit className="w-4.5 h-4.5" />
+              </button>
+            </Tippy>
+            <Tippy content="Delete">
+              <button
+                type="button"
+                className="flex hover:text-danger"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDeleteConfirmModal();
+                }}
+              >
+                <IconTrashLines />
+              </button>
+            </Tippy>
+          </div>
+        ),
+      },
+    ]}
+    recordsPerPage={pageSize}
+    page={page}
+    onPageChange={(p) => setPage(p)}
+    recordsPerPageOptions={PAGE_SIZES}
+    onRecordsPerPageChange={setPageSize}
+    minHeight={200}
+    paginationText={({ from, to, totalRecords }) =>
+      `Showing  ${from} to ${to} of ${totalRecords} entries`
+    }
+  />
+</div>
+
+
+        )}
       </div>
       {/* add sales person modal */}
-      <AddClinic
-        open={addModal}
-        closeModal={closeAddModal}
-      />
+      <AddClinic open={addModal} closeModal={closeAddModal} />
 
       {/* delete sales person modal */}
-      <DeleteClinic
-        open={deleteModal}
-        closeModal={closeDeleteConfirmModal}
-      />
+      <DeleteClinic open={deleteModal} closeModal={closeDeleteConfirmModal} />
     </div>
   );
 };

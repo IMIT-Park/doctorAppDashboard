@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const baseUrl = "https://doctorbackend.gitdr.com/api";
-export const imageBaseUrl = "https://doctorbackend.gitdr.com";
+export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
 
 class NetworkHandler {
   #axios = axios.create({

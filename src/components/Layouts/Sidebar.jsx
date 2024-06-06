@@ -62,8 +62,8 @@ const Sidebar = () => {
       setCurrentMenu("admin-sales");
     } else if (location.pathname === "/owner/dashboard") {
       setCurrentMenu("owner-dashboard");
-    } else if (location.pathname === "/owner/doctors") {
-      setCurrentMenu("owner-doctors");
+    } else if (location.pathname === "/owner/clinics") {
+      setCurrentMenu("owner-clinics");
     } else if (location.pathname === "/clinic/dashboard") {
       setCurrentMenu("clinic-dashboard");
     } else if (location.pathname === "/clinic/doctors") {
@@ -143,27 +143,11 @@ const Sidebar = () => {
                     <div className="flex items-center">
                       <IconMenuTodo
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "owner-dashboard"
-                            ? "!text-primary"
-                            : ""
+                          currentMenu === "owner-clinics" ? "!text-primary" : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Clinics"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/owner/doctors" className="group">
-                    <div className="flex items-center">
-                      <IconMenuDashboard
-                        className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "owner-doctors" ? "!text-primary" : ""
-                        }`}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Doctors"}
                       </span>
                     </div>
                   </NavLink>

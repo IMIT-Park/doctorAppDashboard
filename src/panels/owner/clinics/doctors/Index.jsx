@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setPageTitle } from "../../../store/themeConfigSlice";
+import { setPageTitle } from "../../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
 import Swal from "sweetalert2";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import IconLoader from "../../../components/Icon/IconLoader";
-import ScrollToTop from "../../../components/ScrollToTop";
+import IconLoader from "../../../../components/Icon/IconLoader";
+import ScrollToTop from "../../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import IconMenuScrumboard from "../../../../components/Icon/Menu/IconMenuScrumboard";
+import AddDoctor from "./AddDoctor";
+import AddDoctorModalDetail from "./AddDoctorModalDetail";
+import DoctorPassword from "./DoctorPassword";
+
 
 const rowData = [
   {
@@ -235,6 +240,14 @@ const Doctors = () => {
     rowData.reduce((acc, user) => ({ ...acc, [user.id]: user.isActive }), {})
   );
 
+  const [addDoctorModal, setaddDoctorModal] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [addDoctorModalDetail, setAddDoctorModalDetail] = useState(false);
+  const [addDoctorPasswordModal, setAddDoctorPasswordModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [data, setData] = useState({ password: "", confirmPassword: "" });
+
+
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
@@ -326,6 +339,41 @@ const Doctors = () => {
     });
   };
 
+  const openAddDoctorModal = () => {
+    setaddDoctorModal(true);
+  };
+
+  const closeAddDoctorModal = () => {
+    setaddDoctorModal(false);
+  };
+
+  const closeAddDoctorModalDetail = () => {
+    setAddDoctorModalDetail(false);
+    setaddDoctorModal(true);
+  };
+
+  const openAddDoctorModalDetail = () => {
+    setAddDoctorModalDetail(true);
+  };
+
+  const handleSelectDays = () => {
+    closeAddDoctorModal();
+    openAddDoctorModalDetail();
+  };
+
+  const doctorPasswordModal = () => {
+    setAddDoctorPasswordModal(true);
+  };
+
+  const closeDoctorPasswordModal = () => {
+    setAddDoctorPasswordModal(false);
+    setAddDoctorModalDetail(true);
+  };
+
+  const handleDoctorPassword = () => {
+    setAddDoctorModalDetail(false);
+    doctorPasswordModal();
+  };
 
   return (
     <div>
@@ -438,16 +486,28 @@ const Doctors = () => {
         </div>
       </div>
 
+     
       <div className="panel">
-        <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
+        <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
               Doctors
             </h5>
-            <Tippy content="Total Doctors">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={rowData.length} duration={3}></CountUp>
-              </span>
+            <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+              <CountUp start={0} end={rowData.length} duration={3}></CountUp>
+            </span>
+          </div>
+
+          <div className="flex items-right text-gray-500 font-semibold dark:text-white-dark gap-y-4">
+            <Tippy content="Click to Add Doctor">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={openAddDoctorModal}
+              >
+                <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
+                Add Doctor
+              </button>
             </Tippy>
           </div>
         </div>
@@ -464,7 +524,11 @@ const Doctors = () => {
             highlightOnHover
             className="whitespace-nowrap table-hover"
             records={recordsData}
-            onRowClick={() => navigate("/admin/owners/clinics/doctors/doctor",{state: { previousUrl: location.pathname },})}
+            onRowClick={() =>
+              navigate("/admin/owners/clinics/doctors/doctor", {
+                state: { previousUrl: location.pathname },
+              })
+            }
             columns={[
               { accessor: "id", title: "ID" },
               {
@@ -520,6 +584,31 @@ const Doctors = () => {
           />
         </div>
       </div>
+
+      <AddDoctor
+        addDoctorModal={addDoctorModal}
+        setaddDoctorModal={setaddDoctorModal}
+        buttonLoading={buttonLoading}
+        // saveDoctor={saveDoctor}
+        handleSelectDays={handleSelectDays}
+        closeAddDoctorModal={closeAddDoctorModal}
+      />
+       <AddDoctorModalDetail
+        addDoctorModalDetail={addDoctorModalDetail}
+        closeAddDoctorModalDetail={closeAddDoctorModalDetail}
+        buttonLoading={buttonLoading}
+        handleDoctorPassword={handleDoctorPassword}
+      />
+        <DoctorPassword
+        addDoctorPasswordModal={addDoctorPasswordModal}
+        closeDoctorPasswordModal={closeDoctorPasswordModal}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
+        data={data}
+        setData={setData}
+      />
+
+
     </div>
   );
 };

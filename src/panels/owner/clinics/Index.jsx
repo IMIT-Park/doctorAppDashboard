@@ -351,7 +351,7 @@ const Clinics = () => {
               >
                 <IconTrashLines />
               </button>
-            </Tippy> */}
+            </Tippy> 
                     </div>
                   ),
                 },

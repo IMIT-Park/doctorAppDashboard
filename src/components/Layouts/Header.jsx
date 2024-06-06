@@ -130,6 +130,7 @@ const [messages, setMessages] = useState([
 ]);
 
 
+console.log(userData);
   return (
     <header
       className={`z-40 ${
@@ -433,11 +434,8 @@ const [messages, setMessages] = useState([
                         alt="userProfile"
                       />
                       <div className="ltr:pl-4 rtl:pr-4 truncate">
-                        <h4 className="text-base capitalize">
+                        <h4 className="text-xs">
                           {userData?.user_name ? userData?.user_name : ""}
-                          <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">
-                            Admin
-                          </span>
                         </h4>
                         <button
                           type="button"

@@ -1,20 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../store/themeConfigSlice";
-import { DataTable } from "mantine-datatable";
-import IconTrashLines from "../../components/Icon/IconTrashLines";
-import IconEye from "../../components/Icon/IconEye";
-import IconEdit from "../../components/Icon/IconEdit";
-import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../components/Icon/IconX";
 import Swal from "sweetalert2";
-import IconUserPlus from "../../components/Icon/IconUserPlus";
-import MaskedInput from "react-text-mask";
-import IconCoffee from "../../components/Icon/IconCoffee";
-import IconCalendar from "../../components/Icon/IconCalendar";
-import IconMapPin from "../../components/Icon/IconMapPin";
 import IconMail from "../../components/Icon/IconMail";
-import IconPhone from "../../components/Icon/IconPhone";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -25,7 +13,6 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import IconCopy from "../../components/Icon/IconCopy";
 import IconTwitter from "../../components/Icon/IconTwitter";
 import IconFacebook from "../../components/Icon/IconFacebook";
-import IconInstagram from "../../components/Icon/IconInstagram";
 import IconChatDot from "../../components/Icon/IconChatDot";
 import { useSelector } from "react-redux";
 import IconMenuUsers from "../../components/Icon/Menu/IconMenuUsers";
@@ -34,9 +21,21 @@ import IconMenuDatatables from "../../components/Icon/Menu/IconMenuDatatables";
 import Dropdown from "../../components/Dropdown";
 import IconHorizontalDots from "../../components/Icon/IconHorizontalDots";
 import ReactApexChart from "react-apexcharts";
+import NetworkHandler from "../../utils/NetworkHandler";
 
 const Users = () => {
+  const [details, setDetails] = useState({});
   const [message1, setMessage1] = useState("http://www.admin-dashboard.com");
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const isDark = useSelector(
+    (state) =>
+      state.themeConfig.theme === "dark" || state.themeConfig.isDarkMode
+  );
+
+  useEffect(() => {
+    dispatch(setPageTitle("Dashboard"));
+  });
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -54,7 +53,7 @@ const Users = () => {
   };
 
   const shareOnWhatsApp = () => {
-    const url = "https://example.com";
+    const url = message1;
     const whatsappUrl = `https://api.whatsapp.com/send?text=%20${encodeURIComponent(
       url
     )}`;
@@ -62,7 +61,7 @@ const Users = () => {
   };
 
   const shareOnFacebook = () => {
-    const url = "https://example.com";
+    const url = message1;
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
       url
     )}`;
@@ -70,7 +69,7 @@ const Users = () => {
   };
 
   const shareOnTwitter = () => {
-    const url = "https://example.com";
+    const url = message1;
     const twitterUrl = `https://twitter.com/intent/tweet?text=$&url=${encodeURIComponent(
       url
     )}`;
@@ -82,17 +81,6 @@ const Users = () => {
     const mailtoUrl = `mailto:?subject=&body=${encodeURIComponent(body)}`;
     window.open(mailtoUrl, "_blank");
   };
-
-  const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
-  const isDark = useSelector(
-    (state) =>
-      state.themeConfig.theme === "dark" || state.themeConfig.isDarkMode
-  );
-
-  useEffect(() => {
-    dispatch(setPageTitle("Dashboard"));
-  });
 
   const revenueChart = {
     series: [
@@ -348,72 +336,105 @@ const Users = () => {
     },
   };
 
+  // fetch function
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/salesperson/getsalesperson/12`
+      );
+      setDetails(response?.data?.salespersons);
+      setMessage1(
+        "http://www.admin-dashboard.com/" +
+          response?.data?.salespersons?.salespersoncode
+      );
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // fetching Mds
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // console.log(details);
   return (
     <div>
       <div className="flex items-center justify-center overflow-hidden">
         <div className="max-w-xl w-full mx-auto">
-          <div className="{bg-[#f1f2f3] p-5 rounded dark:bg-[#060818]}">
-            <ul className="flex items-center justify-center gap-6">
-              <li>
-                <button
-                  onClick={shareOnFacebook}
-                  className="btn btn-primary flex items-center justify-center rounded-full w-10 h-10 p-0"
-                >
-                  <IconFacebook className="w-6 h-6" />
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={shareOnWhatsApp}
-                  className="btn btn-success flex items-center justify-center rounded-full w-10 h-10 p-0"
-                >
-                  <IconChatDot className="w-6 h-6" />
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={shareByEmail}
-                  className="btn btn-dark flex items-center justify-center rounded-full w-10 h-10 p-0"
-                >
-                  <IconMail className="w-6 h-6" />
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={shareOnTwitter}
-                  className="btn btn-info flex items-center justify-center rounded-full w-10 h-10 p-0"
-                >
-                  <IconTwitter className="w-6 h-6" />
-                </button>
-              </li>
-            </ul>
-            <br />
-            <form>
-              <input
-                type="text"
-                value={message1}
-                className="form-input"
-                onChange={(e) => setMessage1(e.target.value)}
-              />
-              <div className="sm:flex space-y-2 sm:space-y-0 sm:space-x-2 rtl:space-x-reverse mt-5">
-                <CopyToClipboard
-                  text={message1}
-                  onCopy={(text, result) => {
-                    if (result) {
-                      showMessage("Copied Successfully");
-                    }
-                  }}
-                >
-                  <div className="flex justify-center w-full ">
-                    <button type="button" className="btn btn-primary ">
-                      <IconCopy className="ltr:mr-2 rtl:ml-2" />
-                      Copy from Input
-                    </button>
-                  </div>
-                </CopyToClipboard>
-              </div>
-            </form>
-          </div>
+          {loading ? (
+            <div className="w-full grid place-items-center">
+              <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+            </div>
+          ) : (
+            <div className="{bg-[#f1f2f3] p-5 rounded dark:bg-[#060818]}">
+              <ul className="flex items-center justify-center gap-6">
+                <li>
+                  <button
+                    onClick={shareOnFacebook}
+                    className="btn btn-primary flex items-center justify-center rounded-full w-10 h-10 p-0"
+                  >
+                    <IconFacebook className="w-6 h-6" />
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={shareOnWhatsApp}
+                    className="btn btn-success flex items-center justify-center rounded-full w-10 h-10 p-0"
+                  >
+                    <IconChatDot className="w-6 h-6" />
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={shareByEmail}
+                    className="btn btn-dark flex items-center justify-center rounded-full w-10 h-10 p-0"
+                  >
+                    <IconMail className="w-6 h-6" />
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={shareOnTwitter}
+                    className="btn btn-info flex items-center justify-center rounded-full w-10 h-10 p-0"
+                  >
+                    <IconTwitter className="w-6 h-6" />
+                  </button>
+                </li>
+              </ul>
+              <br />
+              <form>
+                <input
+                  type="text"
+                  value={message1}
+                  className="form-input"
+                  onChange={(e) => setMessage1(e.target.value)}
+                />
+                <div className="sm:flex space-y-2 sm:space-y-0 sm:space-x-2 rtl:space-x-reverse mt-5">
+                  <CopyToClipboard
+                    text={message1}
+                    onCopy={(text, result) => {
+                      if (result) {
+                        showMessage("Copied Successfully");
+                      }
+                    }}
+                  >
+                    <div className="flex justify-center w-full ">
+                      <button type="button" className="btn btn-primary ">
+                        <IconCopy className="ltr:mr-2 rtl:ml-2" />
+                        Copy from Input
+                      </button>
+                    </div>
+                  </CopyToClipboard>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
       </div>
       <br />

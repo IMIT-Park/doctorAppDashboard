@@ -328,18 +328,17 @@ const Owners = () => {
                 title: "Active",
                 textAlignment: "center",
                 render: (user) => (
-                  <Tippy content="Active/Non-Active">
                     <label className="w-[46px] h-[22px] relative">
                       <input
                         type="checkbox"
-                        className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                        className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
                         id={`custom_switch_checkbox`}
                         checked={user.isActive}
                         readOnly
+                        disabled
                       />
                       <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
                     </label>
-                  </Tippy>
                 ),
               },
             ]}

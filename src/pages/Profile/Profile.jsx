@@ -156,24 +156,24 @@ const Profile = () => {
           <div className="panel">
             <div className="mb-2">
               <div className="flex flex-col justify-center items-center">
-                <img
-                  src="/assets/images/profile-4.jpeg"
-                  alt="img"
-                  className="w-36 h-36 rounded-full object-cover  mb-5"
-                />
-                <p className="font-semibold text-primary text-xl capitalize">
+                {userData?.profile && (
+                  <img
+                    src="/assets/images/profile-4.jpeg"
+                    alt="img"
+                    className="w-36 h-36 rounded-full object-cover  mb-5"
+                  />
+                )}
+                <p className="font-semibold text-primary text-base capitalize">
                   {userData?.user_name ? userData?.user_name : ""}
                 </p>
               </div>
               <ul className="mt-5 flex flex-col max-w-[160px] m-auto space-y-4 font-semibold text-white-dark">
-                <li className="flex items-center gap-2 capitalize">
-                  <IconCoffee className="shrink-0" />
-                  {userData?.role ? userData?.role : "Admin"}
-                </li>
-                <li className="flex items-center gap-2 capitalize">
-                  <IconMapPin className="shrink-0" />
-                  {userData?.address ? userData?.address : ""}
-                </li>
+                {userData?.address && (
+                  <li className="flex items-center gap-2 capitalize">
+                    <IconMapPin className="shrink-0" />
+                    {userData?.address ? userData?.address : ""}
+                  </li>
+                )}
                 <li>
                   <button className="flex items-center gap-2">
                     <IconMail className="w-5 h-5 shrink-0" />
@@ -182,12 +182,14 @@ const Profile = () => {
                     </span>
                   </button>
                 </li>
-                <li className="flex items-center gap-2">
-                  <IconPhone />
-                  <span className="whitespace-nowrap" dir="ltr">
-                    {userData?.phone ? `+91 ${userData?.phone}` : ""}
-                  </span>
-                </li>
+                {userData?.phone && (
+                  <li className="flex items-center gap-2">
+                    <IconPhone />
+                    <span className="whitespace-nowrap" dir="ltr">
+                      {userData?.phone ? `+91 ${userData?.phone}` : ""}
+                    </span>
+                  </li>
+                )}
               </ul>
             </div>
           </div>

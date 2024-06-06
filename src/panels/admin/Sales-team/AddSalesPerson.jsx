@@ -48,12 +48,6 @@ const AddSalesPerson = ({
     }
   }, [input.email]);
 
-  // const extractUsernameFromEmail = (email) => {
-  //   const atIndex = email.indexOf("@");
-  //   const username = email.substring(0, atIndex);
-  //   return username + "@gmail.com";
-  // };
-
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -222,7 +216,11 @@ const AddSalesPerson = ({
                                 setShowComfirmPassword(!showComfirmPassword)
                               }
                             >
-                              {showComfirmPassword ? <IconEye /> : <IconCloseEye />}
+                              {showComfirmPassword ? (
+                                <IconEye />
+                              ) : (
+                                <IconCloseEye />
+                              )}
                             </span>
                           </div>
                         </div>

@@ -2,19 +2,6 @@ import { Fragment, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import IconEye from "../../../components/Icon/IconEye";
-import IconEdit from "../../../components/Icon/IconEdit";
-import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../components/Icon/IconX";
-import Swal from "sweetalert2";
-import IconUserPlus from "../../../components/Icon/IconUserPlus";
-import MaskedInput from "react-text-mask";
-import IconCoffee from "../../../components/Icon/IconCoffee";
-import IconCalendar from "../../../components/Icon/IconCalendar";
-import IconMapPin from "../../../components/Icon/IconMapPin";
-import IconMail from "../../../components/Icon/IconMail";
-import IconPhone from "../../../components/Icon/IconPhone";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -28,6 +15,10 @@ const Owners = () => {
   useEffect(() => {
     dispatch(setPageTitle("Owners"));
   }, []);
+
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
+  const salespersonId = userData?.UserSalesperson?.[0]?.salesperson_id || 0;
 
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -50,7 +41,7 @@ const Owners = () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/salesperson/getsalespersonid/10?page=${page}&pageSize=${pageSize}`
+        `/v1/salesperson/getsalespersonid/${salespersonId}?page=${page}&pageSize=${pageSize}`
       );
 
       setTotalOwners(response?.data?.Owner?.count);
@@ -123,7 +114,7 @@ const Owners = () => {
         ) : (
           <div className="datatables">
             <DataTable
-              noRecordsText="No Users to show"
+              noRecordsText="No Owners to show"
               noRecordsIcon={
                 <span className="mb-2">
                   <img src={emptyBox} alt="" className="w-10" />

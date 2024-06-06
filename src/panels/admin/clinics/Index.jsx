@@ -25,9 +25,8 @@ const Clinics = () => {
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
 
-  const [activeStatus, setActiveStatus] = useState({})
+  const [activeStatus, setActiveStatus] = useState({});
 
-  
   const [search, setSearch] = useState("");
   const [totalClinics, setTotalClinics] = useState(0);
   const [allClinics, setAllClinics] = useState([]);
@@ -49,9 +48,9 @@ const Clinics = () => {
   const fetchData = async () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/clinic/getall?page=${page}&pagesize=${pageSize}`
+        `/v1/clinic/getall?pageSize=${pageSize}&page=${page}`
       );
-      console.log(response);
+      console.log(response?.data?.Clinic);
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
       setLoading(false);
@@ -68,8 +67,6 @@ const Clinics = () => {
     fetchData();
   }, [page, pageSize]);
 
-  
-
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
       toast: true,
@@ -85,6 +82,18 @@ const Clinics = () => {
     });
   };
 
+  //  block or unblock handler
+  const handleActiveUser = async (userId) => {
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/auth/activate/${userId}`
+      );
+      fetchData();
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+    }
+  };
+
   const showBlockAlert = (id) => {
     Swal.fire({
       icon: "warning",
@@ -96,7 +105,7 @@ const Clinics = () => {
       customClass: "sweet-alerts",
     }).then((result) => {
       if (result.value) {
-        setActiveStatus((prevState) => ({ ...prevState, [id]: false }));
+        handleActiveUser(id);
         Swal.fire({
           title: "Blocked!",
           text: "The Owner has been blocked.",
@@ -118,7 +127,7 @@ const Clinics = () => {
       customClass: "sweet-alerts",
     }).then((result) => {
       if (result.value) {
-        setActiveStatus((prevState) => ({ ...prevState, [id]: true }));
+        handleActiveUser(id);
         Swal.fire({
           title: "Unblocked!",
           text: "The Owner has been unblocked.",
@@ -217,6 +226,7 @@ const Clinics = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allClinics}
+              idAccessor="clinic_id"
               onRowClick={() =>
                 navigate("/admin/clinics/doctors", {
                   state: { previousUrl: location.pathname },
@@ -275,7 +285,11 @@ const Clinics = () => {
                         className="w-[46px] h-[22px] relative"
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleClinicStatus(rowData.User.status);
+                          if (rowData?.User?.status) {
+                            showBlockAlert(rowData?.user_id);
+                          } else {
+                            showUnblockAlert(rowData?.user_id);
+                          }
                         }}
                       >
                         <input
@@ -283,14 +297,7 @@ const Clinics = () => {
                           className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
                           id={`custom_switch_checkbox${rowData.User.user_id}`}
                           checked={rowData.User.status}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            if (rowData.User.status) {
-                              showBlockAlert(rowData.id);
-                            } else {
-                              showUnblockAlert(rowData.id);
-                            }
-                          }}
+                          readOnly
                         />
                         <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
                       </label>

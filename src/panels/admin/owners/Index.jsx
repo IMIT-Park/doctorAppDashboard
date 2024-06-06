@@ -87,7 +87,6 @@ const Owners = () => {
     });
   };
 
-
   // fetch function
   const fetchData = async () => {
     try {
@@ -116,8 +115,6 @@ const Owners = () => {
       const response = await NetworkHandler.makePostRequest(
         `/v1/auth/activate/${userId}`
       );
-      console.log(response);
-      showMessage("User status has been changed successfully.", "success");
       fetchData();
     } catch (error) {
       showMessage("An error occurred. Please try again.", "error");
@@ -167,8 +164,6 @@ const Owners = () => {
       }
     });
   };
-
-
 
   console.log(allOwners);
   return (
@@ -234,7 +229,9 @@ const Owners = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allOwners}
-              onRowClick={(row) => navigate(`/admin/owners/${row?.owner_id}/clinics/`)}
+              onRowClick={(row) =>
+                navigate(`/admin/owners/${row?.owner_id}/clinics/`)
+              }
               idAccessor="owner_id"
               columns={[
                 {
@@ -270,14 +267,7 @@ const Owners = () => {
                           className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
                           id={`custom_switch_checkbox${rowData.owner_id}`}
                           checked={rowData?.User?.status}
-                          // onChange={(e) => {
-                          //   e.stopPropagation();
-                          //   if (activeStatus[rowData.id]) {
-                          //     showBlockAlert(rowData.id);
-                          //   } else {
-                          //     showUnblockAlert(rowData.id);
-                          //   }
-                          // }}
+                          readOnly
                         />
                         <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
                       </label>

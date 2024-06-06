@@ -11,209 +11,7 @@ import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import IconSearch from "../../../components/Icon/IconSearch";
-
-const rowData = [
-  {
-    id: 1,
-    firstName: "Caroline",
-    lastName: "Jensen",
-    email: "carolinejensen@zidant.com",
-    dob: "2004-05-28",
-    address: {
-      street: "529 Scholes Street",
-      city: "Temperanceville",
-      zipcode: 5235,
-      geo: {
-        lat: 23.806115,
-        lng: 164.677197,
-      },
-    },
-    phone: "+1 (821) 447-3782",
-    isActive: true,
-    age: 39,
-    company: "POLARAX",
-  },
-  {
-    id: 2,
-    firstName: "Celeste",
-    lastName: "Grant",
-    email: "celestegrant@polarax.com",
-    dob: "1989-11-19",
-    address: {
-      street: "639 Kimball Street",
-      city: "Bascom",
-      zipcode: 8907,
-      geo: {
-        lat: 65.954483,
-        lng: 98.906478,
-      },
-    },
-    phone: "+1 (838) 515-3408",
-    isActive: false,
-    age: 32,
-    company: "MANGLO",
-  },
-  {
-    id: 3,
-    firstName: "Tillman",
-    lastName: "Forbes",
-    email: "tillmanforbes@manglo.com",
-    dob: "2016-09-05",
-    address: {
-      street: "240 Vandalia Avenue",
-      city: "Thynedale",
-      zipcode: 8994,
-      geo: {
-        lat: -34.949388,
-        lng: -82.958111,
-      },
-    },
-    phone: "+1 (969) 496-2892",
-    isActive: false,
-    age: 26,
-    company: "APPLIDECK",
-  },
-  {
-    id: 4,
-    firstName: "Daisy",
-    lastName: "Whitley",
-    email: "daisywhitley@applideck.com",
-    dob: "1987-03-23",
-    address: {
-      street: "350 Pleasant Place",
-      city: "Idledale",
-      zipcode: 9369,
-      geo: {
-        lat: -54.458809,
-        lng: -127.476556,
-      },
-    },
-    phone: "+1 (861) 564-2877",
-    isActive: true,
-    age: 21,
-    company: "VOLAX",
-  },
-  {
-    id: 5,
-    firstName: "Weber",
-    lastName: "Bowman",
-    email: "weberbowman@volax.com",
-    dob: "1983-02-24",
-    address: {
-      street: "154 Conway Street",
-      city: "Broadlands",
-      zipcode: 8131,
-      geo: {
-        lat: 54.501351,
-        lng: -167.47138,
-      },
-    },
-    phone: "+1 (962) 466-3483",
-    isActive: false,
-    age: 26,
-    company: "ORBAXTER",
-  },
-  {
-    id: 6,
-    firstName: "Buckley",
-    lastName: "Townsend",
-    email: "buckleytownsend@orbaxter.com",
-    dob: "2011-05-29",
-    address: {
-      street: "131 Guernsey Street",
-      city: "Vallonia",
-      zipcode: 6779,
-      geo: {
-        lat: -2.681655,
-        lng: 3.528942,
-      },
-    },
-    phone: "+1 (884) 595-2643",
-    isActive: true,
-    age: 40,
-    company: "OPPORTECH",
-  },
-  {
-    id: 7,
-    firstName: "Latoya",
-    lastName: "Bradshaw",
-    email: "latoyabradshaw@opportech.com",
-    dob: "2010-11-23",
-    address: {
-      street: "668 Lenox Road",
-      city: "Lowgap",
-      zipcode: 992,
-      geo: {
-        lat: 36.026423,
-        lng: 130.412198,
-      },
-    },
-    phone: "+1 (906) 474-3155",
-    isActive: true,
-    age: 24,
-    company: "GORGANIC",
-  },
-  {
-    id: 8,
-    firstName: "Kate",
-    lastName: "Lindsay",
-    email: "katelindsay@gorganic.com",
-    dob: "1987-07-02",
-    address: {
-      street: "773 Harrison Avenue",
-      city: "Carlton",
-      zipcode: 5909,
-      geo: {
-        lat: 42.464724,
-        lng: -12.948403,
-      },
-    },
-    phone: "+1 (930) 546-2952",
-    isActive: true,
-    age: 24,
-    company: "AVIT",
-  },
-  {
-    id: 9,
-    firstName: "Marva",
-    lastName: "Sandoval",
-    email: "marvasandoval@avit.com",
-    dob: "2010-11-02",
-    address: {
-      street: "200 Malta Street",
-      city: "Tuskahoma",
-      zipcode: 1292,
-      geo: {
-        lat: -52.206169,
-        lng: 74.19452,
-      },
-    },
-    phone: "+1 (927) 566-3600",
-    isActive: false,
-    age: 28,
-    company: "QUILCH",
-  },
-  {
-    id: 10,
-    firstName: "Decker",
-    lastName: "Russell",
-    email: "deckerrussell@quilch.com",
-    dob: "1994-04-21",
-    address: {
-      street: "708 Bath Avenue",
-      city: "Coultervillle",
-      zipcode: 1268,
-      geo: {
-        lat: -41.550295,
-        lng: -146.598075,
-      },
-    },
-    phone: "+1 (846) 535-3283",
-    isActive: false,
-    age: 27,
-    company: "MEMORA",
-  },
-];
+import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -226,12 +24,17 @@ const Clinics = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const initialRecords = rowData.slice(0, pageSize);
-  const [recordsData, setRecordsData] = useState(initialRecords);
-  const [activeStatus, setActiveStatus] = useState(
-    rowData.reduce((acc, user) => ({ ...acc, [user.id]: user.isActive }), {})
-  );
+
+  const [activeStatus, setActiveStatus] = useState({})
+
+  
   const [search, setSearch] = useState("");
+  const [totalClinics, setTotalClinics] = useState(0);
+  const [allClinics, setAllClinics] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
 
   useEffect(() => {
     setPage(1);
@@ -240,8 +43,32 @@ const Clinics = () => {
   useEffect(() => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
-    setRecordsData(rowData.slice(from, to));
   }, [page, pageSize]);
+
+  // fetch Clininc function
+  const fetchData = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/clinic/getall?page=${page}&pagesize=${pageSize}`
+      );
+      console.log(response);
+      setTotalClinics(response.data?.Clinic?.count);
+      setAllClinics(response.data?.Clinic?.rows);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // fetching Loans
+  useEffect(() => {
+    fetchData();
+  }, [page, pageSize]);
+
+  
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -348,7 +175,7 @@ const Clinics = () => {
             </h5>
             <Tippy content="Total Clinics">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={rowData.length} duration={3}></CountUp>
+                <CountUp start={0} end={totalClinics} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
@@ -375,78 +202,115 @@ const Clinics = () => {
             </form>
           </div>
         </div>
-        {/* <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" /> */}
-        <div className="datatables">
-          <DataTable
-            noRecordsText="No Clinics to show"
-            noRecordsIcon={
-              <span className="mb-2">
-                <img src={emptyBox} alt="" className="w-10" />
-              </span>
-            }
-            mih={180}
-            highlightOnHover
-            className="whitespace-nowrap table-hover"
-            records={recordsData}
-            onRowClick={() =>
-              navigate("/admin/clinics/doctors", {
-                state: { previousUrl: location.pathname },
-              })
-            }
-            columns={[
-              { accessor: "id", title: "ID" },
-              {
-                accessor: "firstName",
-                title: "Name",
-                render: (row) => row.firstName + " " + row.lastName,
-              },
-              { accessor: "email" },
-              { accessor: "phone" },
-              { accessor: "address.street", title: "Address" },
-              {
-                accessor: "Actions",
-                textAlignment: "center",
-                render: (rowData) => (
-                  <Tippy content="Block/Unblock">
-                    <label
-                      className="w-[46px] h-[22px] relative"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        showBlockAlert();
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                        id={`custom_switch_checkbox${rowData.id}`}
-                        checked={activeStatus[rowData.id]}
-                        onChange={(e) => {
+        {loading ? (
+          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+        ) : (
+          <div className="datatables">
+            <DataTable
+              noRecordsText="No Clinics to show"
+              noRecordsIcon={
+                <span className="mb-2">
+                  <img src={emptyBox} alt="" className="w-10" />
+                </span>
+              }
+              mih={180}
+              highlightOnHover
+              className="whitespace-nowrap table-hover"
+              records={allClinics}
+              onRowClick={() =>
+                navigate("/admin/clinics/doctors", {
+                  state: { previousUrl: location.pathname },
+                })
+              }
+              columns={[
+                {
+                  accessor: "No",
+                  title: "No",
+                  render: (row, rowIndex) => rowIndex + 1,
+                },
+                {
+                  accessor: "owner_id",
+                  title: "Owner Id",
+                },
+                { accessor: "name", title: "Name" },
+                { accessor: "phone" },
+                { accessor: "place", title: "Place" },
+                { accessor: "address", title: "Address" },
+                {
+                  accessor: "googleLocation",
+                  title: "Location",
+                  render: (rowData) => {
+                    const { lat, long } = JSON.parse(rowData.googleLocation);
+                    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
+                    return (
+                      <a
+                        href={mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 underline hover:text-blue-700"
+                      >
+                        Clinic Location
+                      </a>
+                    );
+                  },
+                },
+                {
+                  accessor: "banner_img_url",
+                  title: "Banner Image",
+                  render: (rowData) => (
+                    <img
+                      src={imageBaseUrl + rowData?.banner_img_url}
+                      alt="Banner"
+                      className="h-10 w-auto object-cover"
+                    />
+                  ),
+                },
+
+                {
+                  accessor: "Actions",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <Tippy content="Block/Unblock">
+                      <label
+                        className="w-[46px] h-[22px] relative"
+                        onClick={(e) => {
                           e.stopPropagation();
-                          if (activeStatus[rowData.id]) {
-                            showBlockAlert(rowData.id);
-                          } else {
-                            showUnblockAlert(rowData.id);
-                          }
+                          toggleClinicStatus(rowData.User.status);
                         }}
-                      />
-                      <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                    </label>
-                  </Tippy>
-                ),
-              },
-            ]}
-            totalRecords={rowData.length}
-            recordsPerPage={pageSize}
-            page={page}
-            onPageChange={(p) => setPage(p)}
-            recordsPerPageOptions={PAGE_SIZES}
-            onRecordsPerPageChange={setPageSize}
-            minHeight={200}
-            paginationText={({ from, to, totalRecords }) =>
-              `Showing  ${from} to ${to} of ${totalRecords} entries`
-            }
-          />
-        </div>
+                      >
+                        <input
+                          type="checkbox"
+                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                          id={`custom_switch_checkbox${rowData.User.user_id}`}
+                          checked={rowData.User.status}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            if (rowData.User.status) {
+                              showBlockAlert(rowData.id);
+                            } else {
+                              showUnblockAlert(rowData.id);
+                            }
+                          }}
+                        />
+                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                      </label>
+                    </Tippy>
+                  ),
+                },
+              ]}
+              totalRecords={totalClinics}
+              recordsPerPage={pageSize}
+              page={page}
+              onPageChange={(p) => setPage(p)}
+              recordsPerPageOptions={PAGE_SIZES}
+              onRecordsPerPageChange={setPageSize}
+              minHeight={200}
+              paginationText={({ from, to, totalRecords }) =>
+                `Showing  ${from} to ${to} of ${totalRecords} entries`
+              }
+            />
+          </div>
+        )}
       </div>
     </div>
   );

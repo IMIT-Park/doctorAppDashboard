@@ -24,6 +24,10 @@ import ReactApexChart from "react-apexcharts";
 import NetworkHandler from "../../utils/NetworkHandler";
 
 const Users = () => {
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
+  const salespersonId = userData?.UserSalesperson?.[0]?.salesperson_id || 0;
+
   const [details, setDetails] = useState({});
   const [message1, setMessage1] = useState("http://www.admin-dashboard.com");
   const [loading, setLoading] = useState(false);
@@ -341,7 +345,7 @@ const Users = () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/salesperson/getsalesperson/12`
+        `/v1/salesperson/getsalesperson/${salespersonId}`
       );
       setDetails(response?.data?.salespersons);
       setMessage1(

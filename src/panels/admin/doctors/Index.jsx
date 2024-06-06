@@ -306,6 +306,32 @@ const Doctors = () => {
     });
   };
 
+
+   // fetch function
+  //  const fetchData = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await NetworkHandler.makeGetRequest(
+  //       `/v1/salesperson/getsalespersonid/${salespersonId}?page=${page}&pageSize=${pageSize}`
+  //     );
+
+  //     setTotalOwners(response?.data?.Owner?.count);
+  //     setAllOwners(response?.data?.Owner?.rows);
+
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.log(error);
+  //     setLoading(false);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // // fetching Mds
+  // useEffect(() => {
+  //   fetchData();
+  // }, [page, pageSize]);
+
   return (
     <div>
       <ScrollToTop />

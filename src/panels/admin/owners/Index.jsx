@@ -234,7 +234,7 @@ const Owners = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allOwners}
-              onRowClick={() => navigate("/admin/owners/clinics")}
+              onRowClick={(row) => navigate(`/admin/owners/${row?.owner_id}/clinics/`)}
               idAccessor="owner_id"
               columns={[
                 {

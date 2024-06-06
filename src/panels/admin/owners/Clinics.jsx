@@ -9,7 +9,7 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 const rowData = [
   {
@@ -218,6 +218,7 @@ const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { ownerId } = useParams();
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
@@ -325,6 +326,8 @@ const Clinics = () => {
     });
   };
 
+
+  console.log(ownerId);
   return (
     <div>
       <ScrollToTop />

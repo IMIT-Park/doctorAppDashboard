@@ -14,7 +14,6 @@ import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useNavigate } from "react-router-dom";
 import AddSalesPerson from "./AddSalesPerson";
-import DeleteSalesPerson from "./DeleteSalesPerson";
 import IconEye from "../../../components/Icon/IconEye";
 import ShowSalesPerson from "./ShowSalesPerson";
 import NetworkHandler from "../../../utils/NetworkHandler";
@@ -30,12 +29,12 @@ const Sales = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const [recordsData, setRecordsData] = useState([]);
   const [addSalesPersonModal, setAddSalesPersonModal] = useState(false);
   const [selectedSalesPerson, setSelectedSalesPerson] = useState(null);
   const [editSalesPersonModal, setEditSalesPersonModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [totalSaleperson, setTotalSalesPerson] = useState(0);
   const [allSalesPerson, setAllSalesPerson] = useState([]);
   const [loading, setLoading] = useState(true);
   const [input, setInput] = useState({
@@ -51,7 +50,7 @@ const Sales = () => {
   const [buttonLoading, setButtonLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showComfirmPassword, setShowComfirmPassword] = useState(false);
-  const [singleDetails,setSingleDetails] = useState({})
+  const [singleDetails, setSingleDetails] = useState({});
 
   useEffect(() => {
     setPage(1);
@@ -60,12 +59,10 @@ const Sales = () => {
   useEffect(() => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
-    setRecordsData(allSalesPerson.slice(from, to));
-  }, [page, pageSize, allSalesPerson]);
+  }, [page, pageSize]);
 
   const openAddSalesPersonModal = () => {
     setAddSalesPersonModal(true);
-    
   };
 
   const closeAddSalesPersonModal = () => {
@@ -87,11 +84,9 @@ const Sales = () => {
   const fetchData = async () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/salesperson/getallsalespersons?page=${page}&pagesize=${pageSize}`
+        `/v1/salesperson/getallsalespersons?page=${page}&pageSize=${pageSize}`
       );
-      console.log(response.data?.Salesperson?.rows);
-      console.log(response.data?.pageInfo);
-
+      setTotalSalesPerson(response.data?.Salesperson?.count);
       setAllSalesPerson(response.data?.Salesperson?.rows);
       setLoading(false);
     } catch (error) {
@@ -117,7 +112,7 @@ const Sales = () => {
       !input.password ||
       !input.confirmPassword
     ) {
-      showMessage("Please fill in all required fields", "error");
+      showMessage("Please fill in all required fields", "warning");
       return true;
     }
 
@@ -184,19 +179,6 @@ const Sales = () => {
     }
   };
 
-  // const openDeleteConfirmModal = () => {
-  //   setDeleteModal(true);
-  // };
-
-  // const closeDeleteConfirmModal = () => {
-  //   setDeleteModal(false);
-  // };
-
-  // const deleteUser = () => {
-  //   setDeleteModal(false);
-  //   showMessage("User has been deleted successfully.");
-  // };
-
   const openEditModal = (salesPerson) => {
     setSelectedSalesPerson(salesPerson);
     setEditSalesPersonModal(true);
@@ -251,6 +233,62 @@ const Sales = () => {
     setViewModal(false);
   };
 
+  //  block or unblock handler
+  const handleActiveUser = async (userId) => {
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/auth/activate/${userId}`
+      );
+      fetchData();
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+    }
+  };
+
+  const showBlockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to block this Owner!",
+      showCancelButton: true,
+      confirmButtonText: "Block",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        handleActiveUser(id);
+        Swal.fire({
+          title: "Blocked!",
+          text: "The Owner has been blocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
+
+  const showUnblockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to unblock this Owner!",
+      showCancelButton: true,
+      confirmButtonText: "Unblock",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        handleActiveUser(id);
+        Swal.fire({
+          title: "Unblocked!",
+          text: "The Owner has been unblocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
+
   return (
     <div>
       <ScrollToTop />
@@ -262,7 +300,7 @@ const Sales = () => {
             </h5>
             <Tippy content="Total Sales Team">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={allSalesPerson.length} duration={3} />
+                <CountUp start={0} end={totalSaleperson} duration={3} />
               </span>
             </Tippy>
           </div>
@@ -281,9 +319,7 @@ const Sales = () => {
         </div>
         <div className="datatables">
           {loading ? (
-            <div className="flex justify-center items-center">
-              <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
-            </div>
+            <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
           ) : (
             <DataTable
               noRecordsText="No Salespersons to show"
@@ -295,7 +331,7 @@ const Sales = () => {
               mih={180}
               highlightOnHover
               className="whitespace-nowrap table-hover"
-              records={recordsData}
+              records={allSalesPerson}
               idAccessor="salesperson_id"
               columns={[
                 {
@@ -312,6 +348,28 @@ const Sales = () => {
                   textAlignment: "center",
                   render: (user) => (
                     <div className="flex gap-4 items-center w-max mx-auto">
+                      <Tippy content="Unblocked/Blocked">
+                        <label
+                          className="w-[46px] h-[22px] relative"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (user?.User?.status) {
+                              showBlockAlert(user?.user_id);
+                            } else {
+                              showUnblockAlert(user?.user_id);
+                            }
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                            id={`custom_switch_checkbox${user.owner_id}`}
+                            checked={user?.User?.status}
+                            readOnly
+                          />
+                          <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                        </label>
+                      </Tippy>
                       <Tippy content="Edit">
                         <button
                           className="flex hover:text-info"
@@ -334,25 +392,14 @@ const Sales = () => {
                           <IconEye />
                         </button>
                       </Tippy>
-                      <Tippy content="Unblocked/Blocked">
-                        <label className="w-[46px] h-[22px] relative">
-                          <input
-                            type="checkbox"
-                            className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id={`custom_switch_checkbox`}
-                            checked={user.isActive}
-                          />
-                          <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                        </label>
-                      </Tippy>
                     </div>
                   ),
                 },
               ]}
-              totalRecords={allSalesPerson.length}
+              totalRecords={totalSaleperson}
               recordsPerPage={pageSize}
               page={page}
-              onPageChange={setPage}
+              onPageChange={(p) => setPage(p)}
               recordsPerPageOptions={PAGE_SIZES}
               onRecordsPerPageChange={setPageSize}
               minHeight={200}
@@ -389,7 +436,11 @@ const Sales = () => {
         buttonLoading={buttonLoading}
         setButtonLoading={setButtonLoading}
       />
-      <ShowSalesPerson open={viewModal} closeModal={closeViewModal}  details={singleDetails}/>
+      <ShowSalesPerson
+        open={viewModal}
+        closeModal={closeViewModal}
+        details={singleDetails}
+      />
     </div>
   );
 };

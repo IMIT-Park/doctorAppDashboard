@@ -165,7 +165,6 @@ const Owners = () => {
     });
   };
 
-  console.log(allOwners);
   return (
     <div>
       <ScrollToTop />

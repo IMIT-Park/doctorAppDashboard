@@ -166,7 +166,7 @@ const Clinics = () => {
     className="whitespace-nowrap table-hover"
     records={allClinics}
     idAccessor="clinic_id"
-    onRowClick={() => navigate("/admin/owners/clinics/doctors")}
+    onRowClick={() => navigate("/owner/clinics/doctors")}
     columns={[
       {
         accessor: "",

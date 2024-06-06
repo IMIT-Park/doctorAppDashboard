@@ -29,9 +29,10 @@ const AdminSubscriptionPlans = lazy(() =>
 
 // <--------------> owner panel imports starts here<-------------->
 const OwnerIndex = lazy(() => import("../panels/owner/Index"));
-const OwnerDoctors = lazy(() => import("../panels/owner/doctors/Index"));
+const OwnerDoctors = lazy(() => import("../panels/owner/clinics/doctors/Index"));
 const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
 const OwnerSingleViewClinic = lazy(() => import("../panels/owner/clinics/SingleViewClinic"));
+
 
 // <--------------> owner panel imports ends here <-------------->
 
@@ -200,7 +201,7 @@ const routes = [
 
   // OwnerDoctors
   {
-    path: "/owner/doctors",
+    path: "/owner/clinics/doctors",
     element: <OwnerDoctors />,
     layout: "default",
   },

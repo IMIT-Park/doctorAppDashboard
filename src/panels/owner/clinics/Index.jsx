@@ -66,6 +66,21 @@ const Clinics = () => {
     setInput({ ...input, picture: null });
   };
 
+  const getCurrentLocation = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        setInput({
+          ...input,
+          googleLocation: JSON.stringify({ lat: latitude, long: longitude }),
+        });
+      });
+    } else {
+      // Handle when geolocation is not available
+      console.log("Geolocation is not available");
+    }
+  };
+  
   // fetch function
   const fetchData = async () => {
     try {

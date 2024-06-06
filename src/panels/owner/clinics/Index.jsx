@@ -14,7 +14,7 @@ import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useNavigate } from "react-router-dom";
 import AddClinic from "./AddClinic";
-import DeleteClinic from "./DeleteClinic";
+// import DeleteClinic from "./DeleteClinic";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 
 const Clinics = () => {
@@ -30,8 +30,9 @@ const Clinics = () => {
   const [allClinics, setAllClinics] = useState([]);
   const [totalClinics, setTotalClinics] = useState(0);
   const [addModal, setAddModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
+  // const [deleteModal, setDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [activeStatus, setActiveStatus] = useState({});
   const [input, setInput] = useState({
     name: "",
     email: "",
@@ -62,6 +63,18 @@ const Clinics = () => {
 
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
+
+         // Extract active status from the response and update the state
+         const activeStatusObj = response.data?.Clinic?.rows.reduce(
+          (acc, clinic) => {
+            acc[clinic.clinic_id] = clinic.User?.status || false;
+            return acc;
+          },
+          {}
+        );
+        setActiveStatus(activeStatusObj);
+
+        
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -94,16 +107,24 @@ const Clinics = () => {
   };
 
   // handle Delete Modal
-  const openDeleteConfirmModal = () => {
-    setDeleteModal(true);
-  };
-  const closeDeleteConfirmModal = () => {
-    setDeleteModal(false);
-  };
+  // const openDeleteConfirmModal = () => {
+  //   setDeleteModal(true);
+  // };
+  // const closeDeleteConfirmModal = () => {
+  //   setDeleteModal(false);
+  // };
 
-  const deleteUser = () => {
-    showMessage("User has been deleted successfully.");
-    setDeleteModal(false);
+  // const deleteUser = () => {
+  //   showMessage("User has been deleted successfully.");
+  //   setDeleteModal(false);
+  // };
+  
+  
+  const toggleActiveStatus = (id) => {
+    setActiveStatus((prevStatus) => ({
+      ...prevStatus,
+      [id]: !prevStatus[id],
+    }));
   };
 
   const showMessage = (msg = "", type = "success") => {
@@ -121,10 +142,86 @@ const Clinics = () => {
       padding: "10px 20px",
     });
   };
+  const showBlockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to block this Owner!",
+      showCancelButton: true,
+      confirmButtonText: "Block",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        setActiveStatus((prevState) => ({ ...prevState, [id]: false }));
+        Swal.fire({
+          title: "Blocked!",
+          text: "The Owner has been blocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
 
+  const showUnblockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to unblock this Owner!",
+      showCancelButton: true,
+      confirmButtonText: "Unblock",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        setActiveStatus((prevState) => ({ ...prevState, [id]: true }));
+        Swal.fire({
+          title: "Unblocked!",
+          text: "The Owner has been unblocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
   return (
     <div>
-      <ScrollToTop />
+       <ScrollToTop />
+      <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
+        <div className="flex items-center flex-wrap gap-4">
+          <div className="flex items-start gap-1">
+            <h5 className="text-base font-semibold dark:text-white-light">
+              Active
+            </h5>
+            <label className="w-11 h-5 relative">
+              <input
+                type="checkbox"
+                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
+                id="custom_switch_checkbox_active"
+                checked
+                readOnly
+              />
+              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+            </label>
+          </div>
+          <div className="flex items-start gap-1">
+            <h5 className="text-base font-semibold dark:text-white-light">
+              Blocked
+            </h5>
+            <label className="w-11 h-5 relative">
+              <input
+                type="checkbox"
+                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
+                id="custom_switch_checkbox_active"
+                checked={false}
+                readOnly
+              />
+              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+            </label>
+          </div>
+        </div>
+      </div>
       <div className="panel mt-1">
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
@@ -200,11 +297,35 @@ const Clinics = () => {
           );
         },
       },
+     
       {
         accessor: "Actions",
         textAlignment: "center",
         render: (rowData) => (
           <div className="flex gap-4 items-center w-max mx-auto">
+            <Tippy content={activeStatus[rowData.clinic_id] ? "Unblock" : "Block"}>
+              <label
+                className="w-[46px] h-[22px] relative"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleActiveStatus(rowData.clinic_id);
+                  if (activeStatus[rowData.clinic_id]) {
+                    showUnblockAlert(rowData.clinic_id);
+                  } else {
+                    showBlockAlert(rowData.clinic_id);
+                  }
+                }}
+        >
+           <input
+                          type="checkbox"
+                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                          id={`custom_switch_checkbox${rowData.clinic_id}`}
+                          checked={activeStatus[rowData.clinic_id]}
+                          readOnly
+                        />
+                      <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                    </label>
+                  </Tippy>
             <Tippy content="Edit">
               <button
                 className="flex hover:text-info"
@@ -216,7 +337,7 @@ const Clinics = () => {
                 <IconEdit className="w-4.5 h-4.5" />
               </button>
             </Tippy>
-            <Tippy content="Delete">
+            {/* <Tippy content="Delete">
               <button
                 type="button"
                 className="flex hover:text-danger"
@@ -227,11 +348,12 @@ const Clinics = () => {
               >
                 <IconTrashLines />
               </button>
-            </Tippy>
+            </Tippy> */}
           </div>
         ),
       },
     ]}
+    totalRecords={totalClinics}
     recordsPerPage={pageSize}
     page={page}
     onPageChange={(p) => setPage(p)}
@@ -251,7 +373,7 @@ const Clinics = () => {
       <AddClinic open={addModal} closeModal={closeAddModal} />
 
       {/* delete sales person modal */}
-      <DeleteClinic open={deleteModal} closeModal={closeDeleteConfirmModal} />
+      {/* <DeleteClinic open={deleteModal} closeModal={closeDeleteConfirmModal} /> */}
     </div>
   );
 };

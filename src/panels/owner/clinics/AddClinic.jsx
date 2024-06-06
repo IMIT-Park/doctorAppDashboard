@@ -1,35 +1,21 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
-import MaskedInput from "react-text-mask";
 import IconLoader from "../../../components/Icon/IconLoader";
 
 const AddClinic = ({ open, closeModal, input, setInput, formSubmit }) => {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
     formSubmit();
   };
-
-  const [location, setLocation] = useState({ latitude: null, longitude: null });
-
-  const getLocation = (e) => {
-    e.preventDefault()
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        });
-      }, (error) => {
-        console.error("Error getting location", error);
-      });
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  };
-
-
-  console.log(location);
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -75,7 +61,7 @@ const AddClinic = ({ open, closeModal, input, setInput, formSubmit }) => {
                 <div className="p-5">
                   <form>
                     <div className="mb-5">
-                      <label htmlFor="first-name">Full Name</label>
+                      <label htmlFor="full-name">Full Name</label>
                       <input
                         id="full-name"
                         type="text"
@@ -101,24 +87,30 @@ const AddClinic = ({ open, closeModal, input, setInput, formSubmit }) => {
                         className="form-input"
                       />
                     </div>
-                    <button onClick={getLocation}>Get Location</button>
                     <div className="mb-5">
                       <label htmlFor="password">Password</label>
                       <input
                         id="password"
-                        type="text"
+                        type="password"
                         placeholder="Enter Password"
                         className="form-input"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                       />
                     </div>
                     <div className="mb-5">
                       <label htmlFor="confirm-password">Confirm Password</label>
                       <input
                         id="confirm-password"
-                        type="text"
+                        type="password"
                         placeholder="Enter Confirm Password"
                         className="form-input"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                       />
+                      {passwordError && (
+                        <p className="text-red-500">{passwordError}</p>
+                      )}
                     </div>
                     <div className="flex justify-end items-center mt-8">
                       <button

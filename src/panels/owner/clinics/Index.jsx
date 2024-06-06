@@ -39,6 +39,7 @@ const Clinics = () => {
     username: "",
     phone: "",
     address: "",
+    picture: null,
     password: "",
     confirmPassword: "",
   });
@@ -52,6 +53,19 @@ const Clinics = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setInput({ ...input, picture: file });
+    } else {
+      setInput({ ...input, picture: null });
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setInput({ ...input, picture: null });
+  };
+
   // fetch function
   const fetchData = async () => {
     try {
@@ -64,17 +78,16 @@ const Clinics = () => {
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
 
-         // Extract active status from the response and update the state
-         const activeStatusObj = response.data?.Clinic?.rows.reduce(
-          (acc, clinic) => {
-            acc[clinic.clinic_id] = clinic.User?.status || false;
-            return acc;
-          },
-          {}
-        );
-        setActiveStatus(activeStatusObj);
+      // Extract active status from the response and update the state
+      const activeStatusObj = response.data?.Clinic?.rows.reduce(
+        (acc, clinic) => {
+          acc[clinic.clinic_id] = clinic.User?.status || false;
+          return acc;
+        },
+        {}
+      );
+      setActiveStatus(activeStatusObj);
 
-        
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -118,8 +131,7 @@ const Clinics = () => {
   //   showMessage("User has been deleted successfully.");
   //   setDeleteModal(false);
   // };
-  
-  
+
   const toggleActiveStatus = (id) => {
     setActiveStatus((prevStatus) => ({
       ...prevStatus,
@@ -187,7 +199,7 @@ const Clinics = () => {
   };
   return (
     <div>
-       <ScrollToTop />
+      <ScrollToTop />
       <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
         <div className="flex items-center flex-wrap gap-4">
           <div className="flex items-start gap-1">
@@ -251,93 +263,105 @@ const Clinics = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <div className="datatables">
-  <DataTable
-    noRecordsText="No Clinics to show"
-    noRecordsIcon={
-      <span className="mb-2">
-        <img src={emptyBox} alt="" className="w-10" />
-      </span>
-    }
-    mih={180}
-    highlightOnHover
-    className="whitespace-nowrap table-hover"
-    records={allClinics}
-    idAccessor="clinic_id"
-    onRowClick={() => navigate("/admin/owners/clinics/doctors")}
-    columns={[
-      {
-        accessor: "",
-        title: "ID",
-        render: (rowData, index) => (
-          <span>{(page - 1) * pageSize + index + 1}</span>
-        ),
-      },
-            { accessor: "name", title: "Name" },
-      { accessor: "phone", title: "Phone" },
-      { accessor: "address", title: "Address" },
-      { accessor: "place", title: "Place" },
-      {
-        accessor: "banner_img_url",
-        title: "Banner Image",
-        render: (rowData) => (
-          <img src={imageBaseUrl+rowData.banner_img_url} alt="Banner" className="w-10" />
-        ),
-      },
-      {
-        accessor: "googleLocation",
-        title: "Google Location",
-        render: (rowData) => {
-          const location = JSON.parse(rowData.googleLocation);
-          const { lat, long } = location;
-          const googleMapsURL = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
-          return (
-            <a href={googleMapsURL} target="_blank" rel="noopener noreferrer">
-              View on Google Maps
-            </a>
-          );
-        },
-      },
-     
-      {
-        accessor: "Actions",
-        textAlignment: "center",
-        render: (rowData) => (
-          <div className="flex gap-4 items-center w-max mx-auto">
-            <Tippy content={activeStatus[rowData.clinic_id] ? "Unblock" : "Block"}>
-              <label
-                className="w-[46px] h-[22px] relative"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleActiveStatus(rowData.clinic_id);
-                  if (activeStatus[rowData.clinic_id]) {
-                    showUnblockAlert(rowData.clinic_id);
-                  } else {
-                    showBlockAlert(rowData.clinic_id);
-                  }
-                }}
-        >
-           <input
-                          type="checkbox"
-                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox${rowData.clinic_id}`}
-                          checked={activeStatus[rowData.clinic_id]}
-                          readOnly
-                        />
-                      <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                    </label>
-                  </Tippy>
-            <Tippy content="Edit">
-              <button
-                className="flex hover:text-info"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addUser();
-                }}
-              >
-                <IconEdit className="w-4.5 h-4.5" />
-              </button>
-            </Tippy>
-            {/* <Tippy content="Delete">
+            <DataTable
+              noRecordsText="No Clinics to show"
+              noRecordsIcon={
+                <span className="mb-2">
+                  <img src={emptyBox} alt="" className="w-10" />
+                </span>
+              }
+              mih={180}
+              highlightOnHover
+              className="whitespace-nowrap table-hover"
+              records={allClinics}
+              idAccessor="clinic_id"
+              onRowClick={() => navigate("/admin/owners/clinics/doctors")}
+              columns={[
+                {
+                  accessor: "",
+                  title: "ID",
+                  render: (rowData, index) => (
+                    <span>{(page - 1) * pageSize + index + 1}</span>
+                  ),
+                },
+                { accessor: "name", title: "Name" },
+                { accessor: "phone", title: "Phone" },
+                { accessor: "address", title: "Address" },
+                { accessor: "place", title: "Place" },
+                {
+                  accessor: "banner_img_url",
+                  title: "Banner Image",
+                  render: (rowData) => (
+                    <img
+                      src={imageBaseUrl + rowData.banner_img_url}
+                      alt="Banner"
+                      className="w-10"
+                    />
+                  ),
+                },
+                {
+                  accessor: "googleLocation",
+                  title: "Google Location",
+                  render: (rowData) => {
+                    const location = JSON.parse(rowData.googleLocation);
+                    const { lat, long } = location;
+                    const googleMapsURL = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
+                    return (
+                      <a
+                        href={googleMapsURL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View on Google Maps
+                      </a>
+                    );
+                  },
+                },
+
+                {
+                  accessor: "Actions",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="flex gap-4 items-center w-max mx-auto">
+                      <Tippy
+                        content={
+                          activeStatus[rowData.clinic_id] ? "Unblock" : "Block"
+                        }
+                      >
+                        <label
+                          className="w-[46px] h-[22px] relative"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleActiveStatus(rowData.clinic_id);
+                            if (activeStatus[rowData.clinic_id]) {
+                              showUnblockAlert(rowData.clinic_id);
+                            } else {
+                              showBlockAlert(rowData.clinic_id);
+                            }
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                            id={`custom_switch_checkbox${rowData.clinic_id}`}
+                            checked={activeStatus[rowData.clinic_id]}
+                            readOnly
+                          />
+                          <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                        </label>
+                      </Tippy>
+                      <Tippy content="Edit">
+                        <button
+                          className="flex hover:text-info"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addUser();
+                          }}
+                        >
+                          <IconEdit className="w-4.5 h-4.5" />
+                        </button>
+                      </Tippy>
+                      {/* <Tippy content="Delete">
               <button
                 type="button"
                 className="flex hover:text-danger"
@@ -349,28 +373,32 @@ const Clinics = () => {
                 <IconTrashLines />
               </button>
             </Tippy> */}
+                    </div>
+                  ),
+                },
+              ]}
+              totalRecords={totalClinics}
+              recordsPerPage={pageSize}
+              page={page}
+              onPageChange={(p) => setPage(p)}
+              recordsPerPageOptions={PAGE_SIZES}
+              onRecordsPerPageChange={setPageSize}
+              minHeight={200}
+              paginationText={({ from, to, totalRecords }) =>
+                `Showing  ${from} to ${to} of ${totalRecords} entries`
+              }
+            />
           </div>
-        ),
-      },
-    ]}
-    totalRecords={totalClinics}
-    recordsPerPage={pageSize}
-    page={page}
-    onPageChange={(p) => setPage(p)}
-    recordsPerPageOptions={PAGE_SIZES}
-    onRecordsPerPageChange={setPageSize}
-    minHeight={200}
-    paginationText={({ from, to, totalRecords }) =>
-      `Showing  ${from} to ${to} of ${totalRecords} entries`
-    }
-  />
-</div>
-
-
         )}
       </div>
       {/* add sales person modal */}
-      <AddClinic open={addModal} closeModal={closeAddModal} />
+      <AddClinic
+        open={addModal}
+        closeModal={closeAddModal}
+        handleFileChange={handleFileChange}
+        handleRemoveImage={handleRemoveImage}
+        data={input}
+      />
 
       {/* delete sales person modal */}
       {/* <DeleteClinic open={deleteModal} closeModal={closeDeleteConfirmModal} /> */}

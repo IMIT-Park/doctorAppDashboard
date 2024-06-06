@@ -1,21 +1,65 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
+import MaskedInput from "react-text-mask";
+import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 
-const AddClinic = ({ open, closeModal, input, setInput, formSubmit }) => {
+const AddClinic = ({
+  open,
+  closeModal,
+  handleFileChange,
+  saveUser,
+  data,
+  setData,
+  handleRemoveImage,
+}) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    // Clear the error when password is changed
+    setPasswordError("");
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+    if (e.target.value !== password) {
+      setPasswordError("Passwords do not match");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const handleSubmit = () => {
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match");
       return;
     }
-    formSubmit();
+    saveUser();
   };
+console.log(data)
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLatitude(position.coords.latitude);
+          setLongitude(position.coords.longitude);
+        },
+        (error) => {
+          console.error("Error getting location", error);
+          alert("Error getting location. Please try again.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+  
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -61,14 +105,15 @@ const AddClinic = ({ open, closeModal, input, setInput, formSubmit }) => {
                 <div className="p-5">
                   <form>
                     <div className="mb-5">
-                      <label htmlFor="full-name">Full Name</label>
+                      <label htmlFor="first-name">Name</label>
                       <input
-                        id="full-name"
+                        id="first-name"
                         type="text"
-                        placeholder="Enter Full Name"
+                        placeholder="Enter First Name"
                         className="form-input"
                       />
                     </div>
+
                     <div className="mb-5">
                       <label htmlFor="email">Email</label>
                       <input
@@ -79,14 +124,65 @@ const AddClinic = ({ open, closeModal, input, setInput, formSubmit }) => {
                       />
                     </div>
                     <div className="mb-5">
-                      <label htmlFor="phone">Phone Number</label>
-                      <input
-                        id="phone"
-                        type="number"
+                      <label htmlFor="number">Phone Number</label>
+                      <MaskedInput
+                        id="phoneMask"
+                        type="text"
                         placeholder="Enter Phone Number"
                         className="form-input"
+                        mask={[
+                          "+",
+                          "9",
+                          "1",
+                          " ",
+                          /[0-9]/,
+                          /[0-9]/,
+                          /[0-9]/,
+                          /[0-9]/,
+                          /[0-9]/,
+                          /[0-9]/,
+                          /[0-9]/,
+                          /[0-9]/,
+                          /[0-9]/,
+                          /[0-9]/,
+                        ]}
                       />
                     </div>
+
+                    <div className="mb-5">
+                      <label htmlFor="title">Picture</label>
+                      <label
+                        htmlFor="fileInput"
+                        className="relative cursor-pointer form-input bg-[#f1f2f3] dark:bg-[#121E32]"
+                      >
+                        <span className="z-10">Select the image</span>
+                        <input
+                          id="fileInput"
+                          type="file"
+                          className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
+                          onChange={handleFileChange}
+                          accept="image/*"
+                        />
+                      </label>
+                      {data?.picture && (
+                        <div className="mt-2 relative">
+                          <img
+                            src={URL.createObjectURL(data?.picture)}
+                            alt="Selected"
+                            className="max-w-full h-auto"
+                          />
+                          <button
+                            type="button"
+                            className="
+                            absolute top-1 right-1 btn btn-dark w-9 h-9 p-0 rounded-full"
+                            onClick={handleRemoveImage}
+                          >
+                            <IconX />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="mb-5">
                       <label htmlFor="password">Password</label>
                       <input
@@ -95,23 +191,42 @@ const AddClinic = ({ open, closeModal, input, setInput, formSubmit }) => {
                         placeholder="Enter Password"
                         className="form-input"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={handlePasswordChange}
                       />
                     </div>
+
                     <div className="mb-5">
                       <label htmlFor="confirm-password">Confirm Password</label>
                       <input
                         id="confirm-password"
                         type="password"
-                        placeholder="Enter Confirm Password"
+                        placeholder="Confirm Password"
                         className="form-input"
                         value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onChange={handleConfirmPasswordChange}
                       />
                       {passwordError && (
-                        <p className="text-red-500">{passwordError}</p>
+                        <p className="text-red-500 text-sm mt-2">
+                          {passwordError}
+                        </p>
                       )}
                     </div>
+
+                    <div className="mb-5">
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={getLocation}
+                      >
+                        Get Current Location
+                      </button>
+                      {latitude !== null && longitude !== null && (
+                        <p>
+                          Latitude: {latitude}, Longitude: {longitude}
+                        </p>
+                      )}
+                    </div>
+
                     <div className="flex justify-end items-center mt-8">
                       <button
                         type="button"

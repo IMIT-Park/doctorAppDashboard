@@ -107,7 +107,7 @@ const routes = [
 
   // owner -> clinics -> doctors
   {
-    path: "/admin/owners/clinics/doctors",
+    path: "/admin/owners/:ownerId/clinics/:clinicId/doctors",
     element: <AdminOwnerDoctors />,
     layout: "default",
   },

@@ -9,7 +9,7 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import NetworkHandler from "../../../utils/NetworkHandler";
+import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 const Doctors = () => {
@@ -20,57 +20,27 @@ const Doctors = () => {
 
   useEffect(() => {
     dispatch(setPageTitle("Doctors"));
-  }, [dispatch]);
+  });
 
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [clinicInfo, setClinicInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  // const [clinicInfo, setClinicInfo] = useState(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [clinicDetails, setClinicDetails] = useState({});
+
 
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
 
   useEffect(() => {
-    fetchData();
-    fetchClinicInfo();
-  }, [clinicId, page, pageSize]);
-
-  useEffect(() => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
   }, [page, pageSize]);
-
-  const fetchData = async () => {
-    try {
-      const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
-        // `/v1/doctor/getalldr/1?pageSize=10&page=1`
-      );
-      const { count, rows } = response.data?.Doctors || {};
-      setTotalDoctors(count || 0);
-      setAllDoctors(Array.isArray(rows) ? rows : []);
-      console.log(response?.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchClinicInfo = async () => {
-    try {
-      const response = await NetworkHandler.makeGetRequest(
-        `/v1/clinic/getbyId/${clinicId}`
-      );
-      setClinicInfo(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -87,7 +57,108 @@ const Doctors = () => {
     });
   };
 
-  const showBlockAlert = (id) => {
+  const fetchClinicInfo = async () => {
+    setDetailsLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/clinic/getbyId/${clinicId}`
+      );
+      setClinicDetails(response?.data?.Clinic);
+      setDetailsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setDetailsLoading(false);
+    }finally{
+      setDetailsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClinicInfo();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        // `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
+        `/v1/doctor/getalldr/1?pageSize=${pageSize}&page=${page}`
+      );
+      setTotalDoctors(response?.data?.Doctors?.count);
+      setAllDoctors(response?.data?.Doctors?.rows);
+
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // fetching doctors
+  useEffect(() => {
+    fetchData();
+  }, [page, pageSize]);
+
+  //  block or unblock handler
+  const handleActiveUser = async (userId) => {
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/auth/activate/${userId}`
+      );
+      fetchClinicInfo();
+      fetchData();
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+    }
+  };
+
+  const showClinicBlockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to block this Clinic!",
+      showCancelButton: true,
+      confirmButtonText: "Block",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        handleActiveUser(id);
+        Swal.fire({
+          title: "Blocked!",
+          text: "The Clinic has been blocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
+
+  const showClinicUnblockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to unblock this Clinic!",
+      showCancelButton: true,
+      confirmButtonText: "Unblock",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        handleActiveUser(id);
+        Swal.fire({
+          title: "Unblocked!",
+          text: "The Clinic has been unblocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
+
+  const showDoctorBlockAlert = (id) => {
     Swal.fire({
       icon: "warning",
       title: "Are you sure?",
@@ -98,7 +169,7 @@ const Doctors = () => {
       customClass: "sweet-alerts",
     }).then((result) => {
       if (result.value) {
-        setActiveStatus((prevState) => ({ ...prevState, [id]: false }));
+        handleActiveUser(id);
         Swal.fire({
           title: "Blocked!",
           text: "The Doctor has been blocked.",
@@ -109,7 +180,7 @@ const Doctors = () => {
     });
   };
 
-  const showUnblockAlert = (id) => {
+  const showDoctorUnblockAlert = (id) => {
     Swal.fire({
       icon: "warning",
       title: "Are you sure?",
@@ -120,7 +191,7 @@ const Doctors = () => {
       customClass: "sweet-alerts",
     }).then((result) => {
       if (result.value) {
-        setActiveStatus((prevState) => ({ ...prevState, [id]: true }));
+        handleActiveUser(id);
         Swal.fire({
           title: "Unblocked!",
           text: "The Doctor has been unblocked.",
@@ -130,6 +201,14 @@ const Doctors = () => {
       }
     });
   };
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
 
   return (
     <div>
@@ -186,47 +265,65 @@ const Doctors = () => {
           </div>
         </div>
       </div>
+
       <div className="panel mb-1">
-        <div className="flex justify-between flex-wrap gap-4">
-          <div className="text-2xl font-semibold capitalize">Clinic</div>
-          <label
-            className="w-12 h-6 relative"
-            onClick={(e) => {
-              e.stopPropagation();
-              showBlockAlert();
-            }}
-          >
-            <input
-              type="checkbox"
-              className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-              id={`custom_switch_checkbox_owner`} // Unique ID
-              checked={true}
-              readOnly
-            />
-            <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-          </label>
-        </div>
-        <div className="text-left sm:px-4">
-          <div className="mt-5">
-            <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-              <div className="text-white-dark">Name :</div>
-              <div>{clinicInfo?.Clinic.name}</div>
+        {detailsLoading ? (
+          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+        ) : (
+          <>
+            <div className="flex justify-between flex-wrap gap-4 sm:px-4">
+              <div className="text-2xl font-semibold capitalize">
+                {clinicDetails?.name || ""}
+              </div>
+              <label
+                className="w-12 h-6 relative"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (clinicDetails?.User?.status) {
+                    showClinicBlockAlert(clinicDetails?.user_id);
+                  } else {
+                    showClinicUnblockAlert(clinicDetails?.user_id);
+                  }
+                }}
+              >
+                <input
+                  type="checkbox"
+                  className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                  id={`custom_switch_checkbox${clinicDetails?.clinic_id}`}
+                  checked={clinicDetails?.User?.status}
+                  readOnly
+                />
+                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+              </label>
             </div>
-            <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-              <div className="text-white-dark">Address :</div>
-              <div>{clinicInfo?.Clinic.address}</div>
+            <div className="text-left sm:px-4">
+              <div className="mt-5">
+                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
+                  <div className="text-white-dark">Address :</div>
+                  <div>{clinicDetails?.address || ""}</div>
+                </div>
+                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
+                  <div className="text-white-dark">Place :</div>
+                  <div>{clinicDetails?.place || ""}</div>
+                </div>
+                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
+                  <div className="text-white-dark">Email :</div>
+                  <div>{clinicDetails?.User?.email || ""}</div>
+                </div>
+                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
+                  <div className="text-white-dark">Username :</div>
+                  <div>{clinicDetails?.User?.user_name || ""}</div>
+                </div>
+                <div className="flex items-center sm:gap-2 flex-wrap">
+                  <div className="text-white-dark">Phone :</div>
+                  <div>{clinicDetails?.phone || ""}</div>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-              <div className="text-white-dark">Email :</div>
-              <div>{clinicInfo?.Clinic.User.email}</div>
-            </div>
-            <div className="flex items-center sm:gap-2 flex-wrap">
-              <div className="text-white-dark">Phone :</div>
-              <div>{clinicInfo?.Clinic.phone}</div>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
+
       <div className="panel">
         <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
@@ -239,6 +336,7 @@ const Doctors = () => {
               </span>
             </Tippy>
           </div>
+          
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -256,23 +354,38 @@ const Doctors = () => {
               className="whitespace-nowrap table-hover"
               records={allDoctors}
               idAccessor="doctor_id"
-              onRowClick={(row) =>
-                navigate(
-                  `/admin/clinics/${clinicId}/doctors/${row?.doctor_id}`,
-                  {
-                    state: { previousUrl: location.pathname },
-                  }
-                )
-              }
               columns={[
                 { accessor: "doctor_id", title: "ID" },
+                {
+                  accessor: "photo",
+                  title: "Photo",
+                  render: (row) =>
+                    row?.photo ? (
+                      <img
+                        src={imageBaseUrl + row?.photo}
+                        alt="Doctor's photo"
+                        className="w-10 h-10 rounded-[50%]"
+                      />
+                    ) : (
+                      "---"
+                    ),
+                },
+
                 { accessor: "name", title: "Name" },
-                { accessor: "email", title: "Email" },
-                { accessor: "address", title: "Address" },
-                { accessor: "qualification", title: "Qualification" },
-                { accessor: "fees", title: "Fees" },
                 { accessor: "phone", title: "Phone" },
+                { accessor: "gender", title: "Gender" },
+                {
+                  accessor: "dateOfBirth",
+                  title: "Date of Birth",
+                  render: (row) => formatDate(row?.dateOfBirth),
+                },
+
+                // { accessor: "email", title: "Email" },
+                { accessor: "qualification", title: "Qualification" },
                 { accessor: "specialization", title: "Specialization" },
+                { accessor: "address", title: "Address" },
+                { accessor: "fees", title: "Fees" },
+                { accessor: "visibility", title: "Visibility", render: (row) => (row.visibility ? "Visible" : "Hidden"), },
                 {
                   accessor: "Actions",
                   textAlignment: "center",
@@ -282,17 +395,17 @@ const Doctors = () => {
                         className="w-[46px] h-[22px] relative"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (activeStatus[rowData.doctor_id]) {
-                          showBlockAlert();
+                          if (rowData?.status) {
+                            showDoctorBlockAlert(rowData?.user_id);
                           } else {
-                            showUnblockAlert(rowData.doctor_id);
+                            showDoctorUnblockAlert(rowData?.user_id);
                           }
                         }}
                       >
                         <input
                           type="checkbox"
                           className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox`}
+                          id={`custom_switch_checkbox${rowData?.doctor_id}`}
                           checked={rowData?.status}
                           readOnly
                         />

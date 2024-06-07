@@ -3,6 +3,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import IconPlus from "../../../../components/Icon/IconPlus";
 import IconX from "../../../../components/Icon/IconX";
+import Flatpickr from "react-flatpickr";
+import "flatpickr/dist/flatpickr.css";
 
 const AddDoctor = ({
   addDoctorModal,
@@ -67,7 +69,7 @@ const AddDoctor = ({
                 <div className="p-5">
                   <form>
                     <div className="flex flex-col justify-center items-center">
-                      <div className="relative w-36 h-36 rounded-full dark:bg-[#121c2c] bg-gray-200 mb-5 flex justify-center items-center">
+                      <div className="relative w-24 h-24 rounded-full dark:bg-[#121c2c] bg-gray-200 mb-5 flex justify-center items-center">
                         <label
                           htmlFor="fileInput"
                           className="cursor-pointer"
@@ -77,10 +79,10 @@ const AddDoctor = ({
                             <img
                               src={URL.createObjectURL(drProfilePic)}
                               alt="Selected"
-                              className=" w-36 h-36 rounded-full object-cover"
+                              className=" w-24 h-24 rounded-full object-cover"
                             />
                           ) : (
-                            <IconPlus className="text-slate-600 w-24 h-24" />
+                            <IconPlus className="text-slate-600 w-12 h-12" />
                           )}
                           <input
                             id="fileInput"
@@ -92,49 +94,69 @@ const AddDoctor = ({
                         </label>
                       </div>
                     </div>
-
                     <div className="mb-5">
-                      <label htmlFor="mds-name">Doctor Name</label>
+                      <label htmlFor="dr-name">Doctor Name</label>
                       <input
                         id="dr-name"
                         type="text"
                         placeholder="Enter Doctor Name"
                         className="form-input"
-                        // value={data.dr_name}
-                        // onChange={(e) =>
-                        //   setData({ ...data, dr_name: e.target.value })
-                        // }
                       />
                     </div>
 
                     <div className="mb-5">
-                      <label htmlFor="mds-name">Phone</label>
+                      <label htmlFor="dr-phone">Phone</label>
                       <input
                         id="dr-phone"
                         type="number"
                         placeholder="Enter Phone Number"
                         className="form-input"
-                        // value={data.dr_phone}
-                        // onChange={(e) =>
-                        //   setData({ ...data, dr_phone: e.target.value })
-                        // }
                       />
                     </div>
 
                     <div className="mb-5">
-                      <label htmlFor="mds-name">Email</label>
+                      <label htmlFor="email">Email</label>
                       <input
-                        id="dr-email"
-                        type="text"
+                        id="email"
+                        type="email"
                         placeholder="Enter Email"
                         className="form-input"
-                        // value={data.dr_email}
-                        // onChange={(e) =>
-                        //   setData({ ...data,dr_email: e.target.value })
-                        // }
                       />
                     </div>
+                    <div className="mb-5">
+                      <label htmlFor="gender">Gender</label>
+                      <select
+                        id="gender"
+                        className="form-select text-white-dark"
+                        required
+                      >
+                        <option>Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
 
+                    <div className="mb-5">
+                    <label htmlFor="gender">Date of Birth</label>
+                      <Flatpickr
+                        options={{
+                          dateFormat: "Y-m-d",
+                          position:"auto left",
+                        }}
+                        className="form-input"
+                        placeholder="Select Date of Birth"
+                      />
+                    </div>
+                    <div className="mb-5">
+                      <label htmlFor="dr-qualification">Qualification</label>
+                      <input
+                        id="dr-qualification"
+                        type="text"
+                        placeholder="Enter Experience"
+                        className="form-input"
+                      />
+                    </div>
                     <div className="mb-5">
                       <label htmlFor="mds-name">Experience</label>
                       <input
@@ -142,10 +164,6 @@ const AddDoctor = ({
                         type="text"
                         placeholder="Enter Experience"
                         className="form-input"
-                        // value={data.dr_experience}
-                        // onChange={(e) =>
-                        //   setData({ ...data, dr_experience: e.target.value })
-                        // }
                       />
                     </div>
 
@@ -154,26 +172,18 @@ const AddDoctor = ({
                       <input
                         id="dr-specialization"
                         type="text"
-                        placeholder="Enter Doctor Specialization"
+                        placeholder="Enter Specialization"
                         className="form-input"
-                        // value={data.dr_specialization}
-                        // onChange={(e) =>
-                        //   setData({ ...data, dr_specialization: e.target.value })
-                        // }
                       />
                     </div>
 
                     <div className="mb-5">
-                      <label htmlFor="desc">Remarks</label>
+                      <label htmlFor="address">Address</label>
                       <textarea
-                        id="Remarks"
+                        id="address"
                         rows={3}
                         className="form-textarea resize-none min-h-[130px]"
-                        placeholder="Enter Remarks"
-                        // value={data.remarks}
-                        // onChange={(e) =>
-                        //   setData({ ...data, Remarks: e.target.value })
-                        // }
+                        placeholder="Enter Address"
                       ></textarea>
                     </div>
 

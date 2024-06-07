@@ -92,17 +92,6 @@ const Clinics = () => {
 
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
-
-      // Extract active status from the response and update the state
-      const activeStatusObj = response.data?.Clinic?.rows.reduce(
-        (acc, clinic) => {
-          acc[clinic.clinic_id] = clinic.User?.status || false;
-          return acc;
-        },
-        {}
-      );
-      setActiveStatus(activeStatusObj);
-
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -147,13 +136,6 @@ const Clinics = () => {
   //   setDeleteModal(false);
   // };
 
-  const toggleActiveStatus = (id) => {
-    setActiveStatus((prevStatus) => ({
-      ...prevStatus,
-      [id]: !prevStatus[id],
-    }));
-  };
-
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
       toast: true,
@@ -169,6 +151,26 @@ const Clinics = () => {
       padding: "10px 20px",
     });
   };
+  
+   // Function to create a new clinic
+   const createClinic = async (clinicData) => {
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        "/api/v1/clinic/createClinic",
+        clinicData
+      );
+
+      // Handle successful creation
+      showMessage("Clinic created successfully", "success");
+
+      // Fetch data again to update the clinic list
+      fetchData();
+    } catch (error) {
+      // Handle error
+      showMessage("Failed to create clinic", "error");
+    }
+  };
+
   const showBlockAlert = (id) => {
     Swal.fire({
       icon: "warning",
@@ -180,7 +182,7 @@ const Clinics = () => {
       customClass: "sweet-alerts",
     }).then((result) => {
       if (result.value) {
-        setActiveStatus((prevState) => ({ ...prevState, [id]: false }));
+        handleActiveUser(id);
         Swal.fire({
           title: "Blocked!",
           text: "The Owner has been blocked.",
@@ -202,7 +204,7 @@ const Clinics = () => {
       customClass: "sweet-alerts",
     }).then((result) => {
       if (result.value) {
-        setActiveStatus((prevState) => ({ ...prevState, [id]: true }));
+        handleActiveUser(id);
         Swal.fire({
           title: "Unblocked!",
           text: "The Owner has been unblocked.",
@@ -212,6 +214,10 @@ const Clinics = () => {
       }
     });
   };
+
+ 
+
+
   return (
     <div>
       <ScrollToTop />
@@ -249,6 +255,7 @@ const Clinics = () => {
           </div>
         </div>
       </div>
+      
       <div className="panel mt-1">
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
@@ -303,6 +310,8 @@ const Clinics = () => {
       { accessor: "phone", title: "Phone" },
       { accessor: "address", title: "Address" },
       { accessor: "place", title: "Place" },
+      { accessor: "User.email", title: "Email" },
+
       {
         accessor: "banner_img_url",
         title: "Banner Image",
@@ -340,7 +349,29 @@ const Clinics = () => {
                 <IconEdit className="w-4.5 h-4.5" />
               </button>
             </Tippy>
-            <Tippy content="Delete">
+            <Tippy content="Block/Unblock">
+                      <label
+                        className="w-[46px] h-[22px] relative"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (rowData?.User?.status) {
+                            showBlockAlert(rowData?.user_id);
+                          } else {
+                            showUnblockAlert(rowData?.user_id);
+                          }
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                          id={`custom_switch_checkbox${rowData.User.user_id}`}
+                          checked={rowData.User.status}
+                          readOnly
+                        />
+                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                      </label>
+                    </Tippy>
+            {/* <Tippy content="Delete">
               <button
                 type="button"
                 className="flex hover:text-danger"
@@ -351,7 +382,7 @@ const Clinics = () => {
               >
                 <IconTrashLines />
               </button>
-            </Tippy> 
+            </Tippy>  */}
                     </div>
                   ),
                 },
@@ -376,7 +407,10 @@ const Clinics = () => {
         closeModal={closeAddModal}
         handleFileChange={handleFileChange}
         handleRemoveImage={handleRemoveImage}
+        createClinic={createClinic} // Pass the createClinic function as a prop
         data={input}
+        setData={setInput} // Pass the setData function to update input state
+
       />
 
       {/* delete sales person modal */}

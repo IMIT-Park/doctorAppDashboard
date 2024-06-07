@@ -117,7 +117,7 @@ const Sales = () => {
     }
 
     if (input.password !== input.confirmPassword) {
-      showMessage("Passwords do not match", "error");
+      showMessage("Passwords do not match", "warning");
       return true;
     }
     try {

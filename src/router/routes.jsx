@@ -16,7 +16,7 @@ const AdminOwners = lazy(() => import("../panels/admin/owners/Index"));
 const AdminOwnerClinics = lazy(() => import("../panels/admin/owners/Clinics"));
 const AdminOwnerDoctors = lazy(() => import("../panels/admin/owners/Doctors"));
 const AdminClinics = lazy(() => import("../panels/admin/clinics/Index"));
-const AdminClinicDoctors = lazy(() => import("../panels/admin/owners/Doctors"));
+const AdminClinicDoctors = lazy(() => import("../panels/admin/clinics/Doctors"));
 const AdminDoctors = lazy(() => import("../panels/admin/doctors/Index"));
 const AdminDoctor = lazy(() => import("../panels/admin/doctors/SinglePage"));
 const AdminReports = lazy(() => import("../panels/admin/reports/Index"));
@@ -98,7 +98,7 @@ const routes = [
     layout: "default",
   },
 
-  // owner -> clinics
+  // owners -> clinics
   {
     path: "/admin/owners/:ownerId/clinics",
     element: <AdminOwnerClinics />,
@@ -113,11 +113,11 @@ const routes = [
   },
 
   // owner -> clinics -> doctors -> doctor
-  {
-    path: "/admin/owners/clinics/doctors/doctor",
-    element: <AdminDoctor />,
-    layout: "default",
-  },
+  // {
+  //   path: "/admin/owners/clinics/doctors/doctor",
+  //   element: <AdminDoctor />,
+  //   layout: "default",
+  // },
 
   // clinics
   {
@@ -128,17 +128,17 @@ const routes = [
 
   // clinics -> doctors
   {
-    path: "/admin/clinics/doctors",
+    path: "/admin/clinics/:clinicId/doctors",
     element: <AdminClinicDoctors />,
     layout: "default",
   },
 
   // clinics -> doctors -> doctor
-  {
-    path: "/admin/clinics/doctors/doctor",
-    element: <AdminClinicDoctors />,
-    layout: "default",
-  },
+  // {
+  //   path: "/admin/clinics/doctors/doctor",
+  //   element: <AdminClinicDoctors />,
+  //   layout: "default",
+  // },
 
   // doctors
   {

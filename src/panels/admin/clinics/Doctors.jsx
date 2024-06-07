@@ -216,15 +216,7 @@ const Doctors = () => {
       <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
         <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
           <li>
-            <Link to="/admin/owners" className="text-primary hover:underline">
-              Owners
-            </Link>
-          </li>
-          <li className="before:content-['/'] before:mr-2">
-            <Link
-              to={`/admin/owners/${clinicId}/clinics`}
-              className="text-primary hover:underline"
-            >
+            <Link to="/admin/clinics" className="text-primary hover:underline">
               Clinics
             </Link>
           </li>

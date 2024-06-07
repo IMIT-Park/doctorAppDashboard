@@ -92,6 +92,7 @@ const Owners = () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getallowner?page=${page}&pageSize=${pageSize}`
+        // `/v1/owner/getowner/2`
       );
       setTotalOwners(response?.data?.Owner?.count);
       setAllOwners(response?.data?.Owner?.rows);
@@ -229,7 +230,7 @@ const Owners = () => {
               className="whitespace-nowrap table-hover"
               records={allOwners}
               onRowClick={(row) =>
-                navigate(`/admin/owners/${row?.owner_id}/clinics/`)
+                navigate(`/admin/owners/${row?.owner_id}/clinics`)
               }
               idAccessor="owner_id"
               columns={[

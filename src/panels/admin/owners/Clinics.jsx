@@ -12,209 +12,6 @@ import emptyBox from "/assets/images/empty-box.svg";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
-const rowData = [
-  // {
-  //   id: 1,
-  //   firstName: "Caroline",
-  //   lastName: "Jensen",
-  //   email: "carolinejensen@zidant.com",
-  //   dob: "2004-05-28",
-  //   address: {
-  //     street: "529 Scholes Street",
-  //     city: "Temperanceville",
-  //     zipcode: 5235,
-  //     geo: {
-  //       lat: 23.806115,
-  //       lng: 164.677197,
-  //     },
-  //   },
-  //   phone: "+1 (821) 447-3782",
-  //   isActive: true,
-  //   age: 39,
-  //   company: "POLARAX",
-  // },
-  // {
-  //   id: 2,
-  //   firstName: "Celeste",
-  //   lastName: "Grant",
-  //   email: "celestegrant@polarax.com",
-  //   dob: "1989-11-19",
-  //   address: {
-  //     street: "639 Kimball Street",
-  //     city: "Bascom",
-  //     zipcode: 8907,
-  //     geo: {
-  //       lat: 65.954483,
-  //       lng: 98.906478,
-  //     },
-  //   },
-  //   phone: "+1 (838) 515-3408",
-  //   isActive: false,
-  //   age: 32,
-  //   company: "MANGLO",
-  // },
-  // {
-  //   id: 3,
-  //   firstName: "Tillman",
-  //   lastName: "Forbes",
-  //   email: "tillmanforbes@manglo.com",
-  //   dob: "2016-09-05",
-  //   address: {
-  //     street: "240 Vandalia Avenue",
-  //     city: "Thynedale",
-  //     zipcode: 8994,
-  //     geo: {
-  //       lat: -34.949388,
-  //       lng: -82.958111,
-  //     },
-  //   },
-  //   phone: "+1 (969) 496-2892",
-  //   isActive: false,
-  //   age: 26,
-  //   company: "APPLIDECK",
-  // },
-  // {
-  //   id: 4,
-  //   firstName: "Daisy",
-  //   lastName: "Whitley",
-  //   email: "daisywhitley@applideck.com",
-  //   dob: "1987-03-23",
-  //   address: {
-  //     street: "350 Pleasant Place",
-  //     city: "Idledale",
-  //     zipcode: 9369,
-  //     geo: {
-  //       lat: -54.458809,
-  //       lng: -127.476556,
-  //     },
-  //   },
-  //   phone: "+1 (861) 564-2877",
-  //   isActive: true,
-  //   age: 21,
-  //   company: "VOLAX",
-  // },
-  // {
-  //   id: 5,
-  //   firstName: "Weber",
-  //   lastName: "Bowman",
-  //   email: "weberbowman@volax.com",
-  //   dob: "1983-02-24",
-  //   address: {
-  //     street: "154 Conway Street",
-  //     city: "Broadlands",
-  //     zipcode: 8131,
-  //     geo: {
-  //       lat: 54.501351,
-  //       lng: -167.47138,
-  //     },
-  //   },
-  //   phone: "+1 (962) 466-3483",
-  //   isActive: false,
-  //   age: 26,
-  //   company: "ORBAXTER",
-  // },
-  // {
-  //   id: 6,
-  //   firstName: "Buckley",
-  //   lastName: "Townsend",
-  //   email: "buckleytownsend@orbaxter.com",
-  //   dob: "2011-05-29",
-  //   address: {
-  //     street: "131 Guernsey Street",
-  //     city: "Vallonia",
-  //     zipcode: 6779,
-  //     geo: {
-  //       lat: -2.681655,
-  //       lng: 3.528942,
-  //     },
-  //   },
-  //   phone: "+1 (884) 595-2643",
-  //   isActive: true,
-  //   age: 40,
-  //   company: "OPPORTECH",
-  // },
-  // {
-  //   id: 7,
-  //   firstName: "Latoya",
-  //   lastName: "Bradshaw",
-  //   email: "latoyabradshaw@opportech.com",
-  //   dob: "2010-11-23",
-  //   address: {
-  //     street: "668 Lenox Road",
-  //     city: "Lowgap",
-  //     zipcode: 992,
-  //     geo: {
-  //       lat: 36.026423,
-  //       lng: 130.412198,
-  //     },
-  //   },
-  //   phone: "+1 (906) 474-3155",
-  //   isActive: true,
-  //   age: 24,
-  //   company: "GORGANIC",
-  // },
-  // {
-  //   id: 8,
-  //   firstName: "Kate",
-  //   lastName: "Lindsay",
-  //   email: "katelindsay@gorganic.com",
-  //   dob: "1987-07-02",
-  //   address: {
-  //     street: "773 Harrison Avenue",
-  //     city: "Carlton",
-  //     zipcode: 5909,
-  //     geo: {
-  //       lat: 42.464724,
-  //       lng: -12.948403,
-  //     },
-  //   },
-  //   phone: "+1 (930) 546-2952",
-  //   isActive: true,
-  //   age: 24,
-  //   company: "AVIT",
-  // },
-  // {
-  //   id: 9,
-  //   firstName: "Marva",
-  //   lastName: "Sandoval",
-  //   email: "marvasandoval@avit.com",
-  //   dob: "2010-11-02",
-  //   address: {
-  //     street: "200 Malta Street",
-  //     city: "Tuskahoma",
-  //     zipcode: 1292,
-  //     geo: {
-  //       lat: -52.206169,
-  //       lng: 74.19452,
-  //     },
-  //   },
-  //   phone: "+1 (927) 566-3600",
-  //   isActive: false,
-  //   age: 28,
-  //   company: "QUILCH",
-  // },
-  // {
-  //   id: 10,
-  //   firstName: "Decker",
-  //   lastName: "Russell",
-  //   email: "deckerrussell@quilch.com",
-  //   dob: "1994-04-21",
-  //   address: {
-  //     street: "708 Bath Avenue",
-  //     city: "Coultervillle",
-  //     zipcode: 1268,
-  //     geo: {
-  //       lat: -41.550295,
-  //       lng: -146.598075,
-  //     },
-  //   },
-  //   phone: "+1 (846) 535-3283",
-  //   isActive: false,
-  //   age: 27,
-  //   company: "MEMORA",
-  // },
-];
-
 const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -223,41 +20,41 @@ const Clinics = () => {
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
-  });
+  }, []);
+
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const initialRecords = rowData.slice(0, pageSize);
-  const [recordsData, setRecordsData] = useState(initialRecords);
-  const [addUserModal, setAddUserModal] = useState(false);
-  const [viewModal, setViewModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [ownerIdByClinic,setOwnerIdByClinic] = useState([])
-  const [activeStatus, setActiveStatus] = useState(
-    rowData.reduce((acc, user) => ({ ...acc, [user.id]: user.isActive }), {})
-  );
+  const [totalClinics, setTotalClinics] = useState(0);
+  const [allClinics, setAllClinics] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [ownerInfo, setOwnerInfo] = useState(null);
 
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
 
   useEffect(() => {
+    fetchData();
+    fetchOwnerInfo();
+  }, [ownerId, page, pageSize]);
+
+  useEffect(() => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
-    setRecordsData(rowData.slice(from, to));
   }, [page, pageSize]);
 
-   //GET METHOD
-   const fetchData = async () => {
+  //GET METHOD
+  const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/clinic/getallclinics/${ownerId}?page=${page}&pagesize=${pageSize}`
+        `/v1/clinic/getallclinics/${ownerId}?page=${page}&pageSize=${pageSize}`
+        // https://doctorbackend.gitdr.com/api/v1/clinic/getallclinics/1?page=1&pageSize=4
       );
-      console.log(response.data?.Clinic?.rows);
-      console.log(response.data?.pageInfo);
 
-      setOwnerIdByClinic(response.data?.Clinic?.rows);
+      setTotalClinics(response.data?.Clinic?.count);
+      setAllClinics(response.data?.Clinic?.rows);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -267,31 +64,15 @@ const Clinics = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  },[ownerId, page,pageSize]);
-
-
-  const addUser = () => {
-    setAddUserModal(true);
-  };
-
-  const saveUser = () => {
-    // if (!params.name) {
-    //     showMessage('Name is required.', 'error');
-    //     return true;
-    // }
-    showMessage("User has been saved successfully.");
-    setAddUserModal(false);
-  };
-
-  const deleteConfirm = () => {
-    setDeleteModal(true);
-  };
-
-  const deleteUser = () => {
-    showMessage("User has been deleted successfully.");
-    setDeleteModal(false);
+  const fetchOwnerInfo = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/owner/getowner/${ownerId}`
+      );
+      setOwnerInfo(response.data); // Set owner information in state
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const showMessage = (msg = "", type = "success") => {
@@ -353,8 +134,6 @@ const Clinics = () => {
     });
   };
 
-
-  console.log(ownerId);
   return (
     <div>
       <ScrollToTop />
@@ -378,7 +157,7 @@ const Clinics = () => {
               <input
                 type="checkbox"
                 className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
+                id="custom_switch_checkbox_active1" // Unique ID
                 checked
                 readOnly
               />
@@ -393,7 +172,7 @@ const Clinics = () => {
               <input
                 type="checkbox"
                 className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
+                id="custom_switch_checkbox_blocked1" // Unique ID
                 checked={false}
                 readOnly
               />
@@ -404,7 +183,8 @@ const Clinics = () => {
       </div>
       <div className="panel mb-1">
         <div className="flex justify-between flex-wrap gap-4 sm:px-4">
-          <div className="text-2xl font-semibold capitalize">Owner</div>
+
+        <div className="text-2xl font-semibold capitalize">Owner</div>
           <label
             className="w-12 h-6 relative"
             onClick={(e) => {
@@ -415,33 +195,30 @@ const Clinics = () => {
             <input
               type="checkbox"
               className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-              id={`custom_switch_checkbox${rowData.id}`}
-              checked={activeStatus[rowData.id]}
-              onChange={(e) => {
-                e.stopPropagation();
-                if (activeStatus[rowData.id]) {
-                  showBlockAlert(rowData.id);
-                } else {
-                  showUnblockAlert(rowData.id);
-                }
-              }}
+              id={`custom_switch_checkbox_owner`} // Unique ID
+              checked={true}
+              readOnly
             />
             <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
           </label>
         </div>
         <div className="text-left sm:px-4">
           <div className="mt-5">
+          <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
+              <div className="text-white-dark">Name :</div>
+              <div>{ownerInfo?.Owner.name}</div>
+            </div>
             <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
               <div className="text-white-dark">Address :</div>
-              <div>13 Tetrick Road, Cypress Gardens, Florida, 33884, US</div>
+              <div>{ownerInfo?.Owner.address}</div>
             </div>
             <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
               <div className="text-white-dark">Email :</div>
-              <div>vristo@gmail.com</div>
+              <div>{ownerInfo?.Owner.email}</div>
             </div>
             <div className="flex items-center sm:gap-2 flex-wrap">
               <div className="text-white-dark">Phone :</div>
-              <div>+1 (070) 123-4567</div>
+              <div>{ownerInfo?.Owner.phone}</div>
             </div>
           </div>
         </div>
@@ -455,83 +232,76 @@ const Clinics = () => {
             </h5>
             <Tippy content="Total Clinics">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={rowData.length} duration={3}></CountUp>
+                <CountUp start={0} end={totalClinics} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
         </div>
-        {/* <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" /> */}
-        <div className="datatables">
-          <DataTable
-            noRecordsText="No Clinics to show"
-            noRecordsIcon={
-              <span className="mb-2">
-                <img src={emptyBox} alt="" className="w-10" />
-              </span>
-            }
-            mih={180}
-            highlightOnHover
-            className="whitespace-nowrap table-hover"
-            records={recordsData}
-            onRowClick={() =>
-              navigate("/admin/owners/clinics/doctors", {
-                state: { previousUrl: location.pathname },
-              })
-            }
-            columns={[
-              { accessor: "clinic_id", title: "ID" },
-              {
-                accessor: "name",
-                title: "Name",
-                render: (row) => row.firstName + " " + row.lastName,
-              },
-              { accessor: "email" },
-              { accessor: "phone" },
-              { accessor: "address", title: "Address" },
-              {
-                accessor: "Actions",
-                textAlignment: "center",
-                render: (rowData) => (
-                  <Tippy content="Block/Unblock">
-                    <label
-                      className="w-[46px] h-[22px] relative"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        showBlockAlert();
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                        id={`custom_switch_checkbox${rowData.id}`}
-                        checked={activeStatus[rowData.id]}
-                        onChange={(e) => {
+        {loading ? (
+          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+        ) : (
+          <div className="datatables">
+            <DataTable
+              noRecordsText="No Clinics to show"
+              noRecordsIcon={
+                <span className="mb-2">
+                  <img src={emptyBox} alt="" className="w-10" />
+                </span>
+              }
+              mih={180}
+              highlightOnHover
+              className="whitespace-nowrap table-hover"
+              records={allClinics}
+              idAccessor="clinic_id"
+              onRowClick={(row) =>
+                navigate(`/admin/owners/${ownerId}/clinics/${row?.clinic_id}/doctors`, {
+                  state: { previousUrl: location.pathname },
+                })
+              }
+              columns={[
+                { accessor: "clinic_id", title: "ID" },
+                { accessor: "name",title: "Name" },
+                { accessor: "User.email", title:"Email" },
+                { accessor: "phone" , title:"Phone" },
+                { accessor: "address", title: "Address" },
+                {
+                  accessor: "Actions",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <Tippy content="Block/Unblock">
+                      <label
+                        className="w-[46px] h-[22px] relative"
+                        onClick={(e) => {
                           e.stopPropagation();
-                          if (activeStatus[rowData.id]) {
-                            showBlockAlert(rowData.id);
-                          } else {
-                            showUnblockAlert(rowData.id);
-                          }
+                          showBlockAlert();
                         }}
-                      />
-                      <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                    </label>
-                  </Tippy>
-                ),
-              },
-            ]}
-            totalRecords={rowData.length}
-            recordsPerPage={pageSize}
-            page={page}
-            onPageChange={(p) => setPage(p)}
-            recordsPerPageOptions={PAGE_SIZES}
-            onRecordsPerPageChange={setPageSize}
-            minHeight={200}
-            paginationText={({ from, to, totalRecords }) =>
-              `Showing  ${from} to ${to} of ${totalRecords} entries`
-            }
-          />
-        </div>
+                      >
+                        <input
+                          type="checkbox"
+                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                          id={`custom_switch_checkbox_${rowData.clinic_id}`} // Unique ID
+                          checked={true}
+                          readOnly
+                        />
+                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                      </label>
+                    </Tippy>
+                  ),
+                },
+              ]}
+              totalRecords={totalClinics}
+              recordsPerPage={pageSize}
+              page={page}
+              onPageChange={(p) => setPage(p)}
+              recordsPerPageOptions={PAGE_SIZES}
+              onRecordsPerPageChange={setPageSize}
+              minHeight={200}
+              paginationText={({ from, to, totalRecords }) =>
+                `Showing  ${from} to ${to} of ${totalRecords} entries`
+              }
+            />
+          </div>
+        )}
       </div>
     </div>
   );

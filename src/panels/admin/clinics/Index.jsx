@@ -227,10 +227,8 @@ const Clinics = () => {
               className="whitespace-nowrap table-hover"
               records={allClinics}
               idAccessor="clinic_id"
-              onRowClick={() =>
-                navigate("/admin/clinics/doctors", {
-                  state: { previousUrl: location.pathname },
-                })
+              onRowClick={(row) =>
+                navigate(`/admin/clinics/${row.clinic_id}/doctors`)
               }
               columns={[
                 {

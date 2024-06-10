@@ -5,6 +5,7 @@ import IconX from "../../../../components/Icon/IconX";
 import BasicDetails from "./addDoctor/BasicDetails";
 import SelectDays from "./addDoctor/SelectDays";
 import Credentials from "./addDoctor/Credentials";
+import IconLoader from "../../../../components/Icon/IconLoader";
 
 const AddDoctor = ({
   open,
@@ -13,10 +14,18 @@ const AddDoctor = ({
   handleFileChange,
   input,
   setInput,
+  activeTab,
+  setActiveTab,
   timeSlotInput,
+  clinicId,
   setTimeSlotInput,
+  formSubmit,
 }) => {
-  const [activeTab, setActiveTab] = useState(1);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    formSubmit();
+  };
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -112,6 +121,7 @@ const AddDoctor = ({
                         <SelectDays
                           input={input}
                           setInput={setInput}
+                          clinicId={clinicId}
                           timeSlotInput={timeSlotInput}
                           setTimeSlotInput={setTimeSlotInput}
                         />
@@ -136,9 +146,19 @@ const AddDoctor = ({
                     <button
                       type="button"
                       className="btn btn-primary ltr:ml-auto rtl:mr-auto"
-                      onClick={() => setActiveTab(activeTab === 1 ? 2 : 3)}
+                      onClick={(e) =>
+                        activeTab === 3
+                          ? handleSubmit(e)
+                          : setActiveTab(activeTab === 1 ? 2 : 3)
+                      }
                     >
-                      {activeTab === 3 ? "Finish" : "Next"}
+                      {buttonLoading ? (
+                        <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-2 rtl:mr-2 shrink-0" />
+                      ) : activeTab === 3 ? (
+                        "Finish"
+                      ) : (
+                        "Next"
+                      )}
                     </button>
                   </div>
                 </div>

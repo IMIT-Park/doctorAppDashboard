@@ -3,7 +3,7 @@ import AnimateHeight from "react-animate-height";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
 
-const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput }) => {
+const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }) => {
   const [active, setActive] = useState("");
   const [sameForAll, setSameForAll] = useState(false);
 
@@ -18,15 +18,24 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput }) => {
   ];
 
   useEffect(() => {
-    // Initialize with a default time slot for each day
+    // Initialize time slots
     const initialTimeSlots = {};
     days.forEach((day) => {
-      initialTimeSlots[day.id] = [
-        { startTime: "", endTime: "", noOfConsultationsPerDay: 0 },
-      ];
+      initialTimeSlots[day.id] = input.timeSlots
+        .filter((slot) => slot.day_id === day.id)
+        .map((slot) => ({
+          ...slot,
+          clinic_id: clinicId,
+        }));
+      // If no pre-existing time slots, initialize with an empty slot
+      if (initialTimeSlots[day.id].length === 0) {
+        initialTimeSlots[day.id] = [
+          { startTime: "", endTime: "", noOfConsultationsPerDay: 0, clinic_id: clinicId },
+        ];
+      }
     });
     setTimeSlotInput(initialTimeSlots);
-  }, []);
+  }, [clinicId, input.timeSlots, setTimeSlotInput]);
 
   const togglePara = (value) => {
     setActive((oldValue) => (oldValue === value ? "" : value));
@@ -37,6 +46,7 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput }) => {
       startTime: "",
       endTime: "",
       noOfConsultationsPerDay: 0,
+      clinic_id: clinicId,
     };
     setTimeSlotInput((prev) => ({
       ...prev,
@@ -60,6 +70,7 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput }) => {
       updatedInputTimeSlots[timeSlotIndex] = {
         ...updatedInputTimeSlots[timeSlotIndex],
         [field]: value,
+        clinic_id: clinicId, // Ensure clinic_id is included
       };
     } else {
       updatedInputTimeSlots.push({
@@ -68,6 +79,7 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput }) => {
         endTime: updatedTimeSlots[index].endTime,
         noOfConsultationsPerDay:
           updatedTimeSlots[index].noOfConsultationsPerDay,
+        clinic_id: clinicId, // Ensure clinic_id is included
       });
     }
 
@@ -80,7 +92,7 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput }) => {
       const firstDayTimeSlots = timeSlotInput["0"];
       const updatedTimeSlots = {};
       days.forEach((day) => {
-        updatedTimeSlots[day.id] = firstDayTimeSlots;
+        updatedTimeSlots[day.id] = firstDayTimeSlots.map(slot => ({ ...slot, clinic_id: clinicId }));
       });
       setTimeSlotInput(updatedTimeSlots);
 
@@ -92,6 +104,7 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput }) => {
             startTime: slot.startTime,
             endTime: slot.endTime,
             noOfConsultationsPerDay: slot.noOfConsultationsPerDay,
+            clinic_id: clinicId, // Ensure clinic_id is included
           });
         });
       });

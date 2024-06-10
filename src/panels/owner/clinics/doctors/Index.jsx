@@ -25,7 +25,7 @@ const Doctors = () => {
     dispatch(setPageTitle("Doctors"));
   });
   const [page, setPage] = useState(1);
-  const PAGE_SIZES = [5, 20, 30, 50, 100];
+  const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
@@ -35,6 +35,7 @@ const Doctors = () => {
   const [loading, setLoading] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [clinicDetails, setClinicDetails] = useState({});
+  const [activeTab, setActiveTab] = useState(1);
   const [input, setInput] = useState({
     name: "",
     phone: "",
@@ -134,7 +135,7 @@ const Doctors = () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getalldr/2?pageSize=${pageSize}&page=${page}`
+        `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
       );
       setTotalDoctors(response?.data?.Doctors?.count);
       setAllDoctors(response?.data?.Doctors?.rows);
@@ -274,10 +275,16 @@ const Doctors = () => {
       !input.qualification ||
       !input.specialization ||
       !input.fees ||
+      !input.photo ||
       !input.password ||
       !input.confirmPassword
     ) {
       showMessage("Please fill in all required fields", "warning");
+      return true;
+    }
+
+    if (input.password !== input.confirmPassword) {
+      showMessage("Passwords are not match", "warning");
       return true;
     }
 
@@ -293,7 +300,11 @@ const Doctors = () => {
       specialization: input.specialization,
       fees: input.fees,
       visibility: input.visibility,
+      password: input.password,
     };
+
+    const formData = new FormData();
+    formData.append("image_url[]", input.photo);
 
     setButtonLoading(true);
     try {
@@ -304,12 +315,28 @@ const Doctors = () => {
 
       console.log(response);
 
-      // if (response.status === 200) {
-      //   setButtonLoading(false);
-      //   showMessage("Doctor added successfully.", "success");
-      //   fetchData();
-      //   closeAddDoctorModal();
-      // }
+      if (response.status === 201) {
+        const doctorId = response.data.Doctor.doctor_id;
+
+        const additionalResponse1 = await NetworkHandler.makePostRequest(
+          `/v1/doctor/upload/${doctorId}`,
+          formData
+        );
+
+        console.log(additionalResponse1);
+
+        // Call the second additional API
+        const additionalResponse2 = await NetworkHandler.makePostRequest(
+          `/v1/doctor/createtimeSlots/${doctorId}`,
+           {timeslots: input.timeSlots}
+        );
+
+        console.log(additionalResponse2);
+
+        fetchData();
+
+        showMessage("Doctor added successfully.", "success");
+      }
     } catch (error) {
       showMessage("An error occurred. Please try again.", "error");
       setButtonLoading(false);
@@ -328,12 +355,11 @@ const Doctors = () => {
     }
     try {
       const locationData = JSON.parse(googleLocation);
-      
+
       const { lat, long } = locationData;
 
-
       if (lat && long) {
-        const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        const googleMapsUrl = `https://www.google.com/maps?q=${lat},${long}`;
         window.open(googleMapsUrl, "_blank");
       } else {
         showMessage("Invalid location data", "error");
@@ -344,8 +370,8 @@ const Doctors = () => {
     }
   };
 
-  console.log(clinicDetails);
 
+  console.log(input);
   return (
     <div>
       <ScrollToTop />
@@ -604,8 +630,12 @@ const Doctors = () => {
         handleFileChange={handleFileChange}
         input={input}
         setInput={setInput}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        clinicId={clinicId}
         timeSlotInput={timeSlotInput}
         setTimeSlotInput={setTimeSlotInput}
+        formSubmit={addDoctor}
       />
     </div>
   );

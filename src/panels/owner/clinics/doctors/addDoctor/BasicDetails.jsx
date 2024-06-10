@@ -3,11 +3,25 @@ import IconPlus from "../../../../../components/Icon/IconPlus";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
 
-const BasicDetails = ({input,setInput,handleFileChange}) => {
-    const handleCheckboxChange = (e) => {
-        setInput({ ...input, visibility: !e.target.checked });
-      };
-    
+const BasicDetails = ({ input, setInput, handleFileChange }) => {
+  const handleCheckboxChange = (e) => {
+    setInput({ ...input, visibility: !e.target.checked });
+  };
+
+
+  const handleDateOfBirthChange = (selectedDates) => {
+    const dateOfBirth = selectedDates[0];
+    let formattedDateOfBirth = "";
+  
+    if (dateOfBirth) {
+      const [day, month, year] = dateOfBirth.toLocaleDateString().split("/");
+      formattedDateOfBirth = `${year}-${month}-${day}`;
+    }
+  
+    setInput({ ...input, dateOfBirth: formattedDateOfBirth });
+  };
+  
+
   return (
     <div>
       <div className="flex flex-col justify-center items-center pt-8">
@@ -97,7 +111,8 @@ const BasicDetails = ({input,setInput,handleFileChange}) => {
           className="form-input"
           placeholder="Select Date of Birth"
           value={input.dateOfBirth}
-          onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
+          // onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
+          onChange={handleDateOfBirthChange}
         />
       </div>
       <div className="mb-5">

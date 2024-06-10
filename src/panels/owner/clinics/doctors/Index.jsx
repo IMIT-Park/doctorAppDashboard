@@ -13,6 +13,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import IconMenuScrumboard from "../../../../components/Icon/Menu/IconMenuScrumboard";
 import AddDoctor from "./AddDoctor";
 import NetworkHandler, { imageBaseUrl } from "../../../../utils/NetworkHandler";
+import IconMenuContacts from "../../../../components/Icon/Menu/IconMenuContacts";
 
 const Doctors = () => {
   const dispatch = useDispatch();
@@ -50,6 +51,7 @@ const Doctors = () => {
     password: "",
     confirmPassword: "",
   });
+  const [timeSlotInput, setTimeSlotInput] = useState({});
 
   useEffect(() => {
     setPage(1);
@@ -283,7 +285,6 @@ const Doctors = () => {
       clinic_id: clinicId,
       name: input.name,
       email: input.email,
-      phone: input.phone,
       address: input.address,
       phone: input.phone,
       gender: input.gender,
@@ -316,6 +317,34 @@ const Doctors = () => {
       setButtonLoading(false);
     }
   };
+
+  // Function to handle "Get Location" button click
+  const handleGetLocation = () => {
+    const googleLocation = clinicDetails.googleLocation;
+
+    if (!googleLocation) {
+      showMessage("Location information is not available", "error");
+      return;
+    }
+    try {
+      const locationData = JSON.parse(googleLocation);
+      
+      const { lat, long } = locationData;
+
+
+      if (lat && long) {
+        const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        window.open(googleMapsUrl, "_blank");
+      } else {
+        showMessage("Invalid location data", "error");
+      }
+    } catch (error) {
+      console.error("Failed to parse location data", error);
+      showMessage("Invalid location data", "error");
+    }
+  };
+
+  console.log(clinicDetails);
 
   return (
     <div>
@@ -423,6 +452,14 @@ const Doctors = () => {
                   <div className="text-white-dark">Phone :</div>
                   <div>{clinicDetails?.phone || ""}</div>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleGetLocation}
+                  className="btn btn-success mt-2"
+                >
+                  <IconMenuContacts className="mr-1 w-5" />
+                  Get Location
+                </button>
               </div>
             </div>
           </>
@@ -567,6 +604,8 @@ const Doctors = () => {
         handleFileChange={handleFileChange}
         input={input}
         setInput={setInput}
+        timeSlotInput={timeSlotInput}
+        setTimeSlotInput={setTimeSlotInput}
       />
     </div>
   );

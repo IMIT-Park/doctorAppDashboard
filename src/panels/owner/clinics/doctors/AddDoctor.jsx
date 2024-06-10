@@ -13,9 +13,10 @@ const AddDoctor = ({
   handleFileChange,
   input,
   setInput,
+  timeSlotInput,
+  setTimeSlotInput,
 }) => {
   const [activeTab, setActiveTab] = useState(1);
-
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -108,7 +109,12 @@ const AddDoctor = ({
                     </div>
                     <div className="mb-5">
                       {activeTab === 2 && (
-                        <SelectDays input={input} setInput={setInput} />
+                        <SelectDays
+                          input={input}
+                          setInput={setInput}
+                          timeSlotInput={timeSlotInput}
+                          setTimeSlotInput={setTimeSlotInput}
+                        />
                       )}
                     </div>
                     <div className="mb-5">

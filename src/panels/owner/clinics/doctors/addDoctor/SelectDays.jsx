@@ -3,9 +3,8 @@ import AnimateHeight from "react-animate-height";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
 
-const SelectDays = ({ input, setInput }) => {
+const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput }) => {
   const [active, setActive] = useState("");
-  const [timeSlotInput, setTimeSlotInput] = useState({});
   const [sameForAll, setSameForAll] = useState(false);
 
   const days = [
@@ -110,6 +109,7 @@ const SelectDays = ({ input, setInput }) => {
     );
   };
 
+
   return (
     <div className="w-full">
       <div className="mt-4">
@@ -182,7 +182,7 @@ const SelectDays = ({ input, setInput }) => {
                                       }}
                                       className="form-input"
                                       placeholder="Select Time"
-                                      value={slot.startTime}
+                                      value={slot?.startTime || ""}
                                       onChange={(date) =>
                                         handleTimeSlotChange(
                                           day.id,
@@ -202,7 +202,7 @@ const SelectDays = ({ input, setInput }) => {
                                       }}
                                       className="form-input"
                                       placeholder="Select Time"
-                                      value={slot.endTime}
+                                      value={slot.endTime || ""}
                                       onChange={(date) =>
                                         handleTimeSlotChange(
                                           day.id,
@@ -220,7 +220,7 @@ const SelectDays = ({ input, setInput }) => {
                                     <input
                                       type="number"
                                       className="form-input w-36"
-                                      value={slot.noOfConsultationsPerDay}
+                                      value={slot.noOfConsultationsPerDay || 0}
                                       onChange={(e) =>
                                         handleTimeSlotChange(
                                           day.id,

@@ -16,7 +16,7 @@ const Doctors = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { clinicId } = useParams();
+  const { ownerId, clinicId } = useParams();
 
   useEffect(() => {
     dispatch(setPageTitle("Doctors"));
@@ -31,7 +31,6 @@ const Doctors = () => {
   // const [clinicInfo, setClinicInfo] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [clinicDetails, setClinicDetails] = useState({});
-
 
   useEffect(() => {
     setPage(1);
@@ -68,7 +67,7 @@ const Doctors = () => {
     } catch (error) {
       console.log(error);
       setDetailsLoading(false);
-    }finally{
+    } finally {
       setDetailsLoading(false);
     }
   };
@@ -82,7 +81,6 @@ const Doctors = () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
-        // `/v1/doctor/getalldr/1?pageSize=${pageSize}&page=${page}`
       );
       setTotalDoctors(response?.data?.Doctors?.count);
       setAllDoctors(response?.data?.Doctors?.rows);
@@ -222,7 +220,7 @@ const Doctors = () => {
           </li>
           <li className="before:content-['/'] before:mr-2">
             <Link
-              to={`/admin/owners/${clinicId}/clinics`}
+              to={`/admin/owners/${ownerId}/clinics`}
               className="text-primary hover:underline"
             >
               Clinics
@@ -336,7 +334,6 @@ const Doctors = () => {
               </span>
             </Tippy>
           </div>
-          
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -385,7 +382,11 @@ const Doctors = () => {
                 { accessor: "specialization", title: "Specialization" },
                 { accessor: "address", title: "Address" },
                 { accessor: "fees", title: "Fees" },
-                { accessor: "visibility", title: "Visibility", render: (row) => (row.visibility ? "Visible" : "Hidden"), },
+                {
+                  accessor: "visibility",
+                  title: "Visibility",
+                  render: (row) => (row.visibility ? "Visible" : "Hidden"),
+                },
                 {
                   accessor: "Actions",
                   textAlignment: "center",

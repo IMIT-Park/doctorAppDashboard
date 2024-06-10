@@ -38,6 +38,8 @@ const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
 // <--------------> clinic panel imports starts here<-------------->
 const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
 const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/index"));
+const ClinicDoctor = lazy(() => import("../panels/clinic/doctors/SingleView"));
+const ClinicLeaves = lazy(() => import("../panels/clinic/leaves/Index"));
 
 // <--------------> clinic panel imports ends here <-------------->
 
@@ -224,6 +226,21 @@ const routes = [
     layout: "default",
   },
 
+   // clinicDoctors SingleView
+   {
+    path: "/clinic/doctors/:doctorId/doctor",
+    element: <ClinicDoctor />,
+    layout: "default",
+  },
+
+  
+
+  // clinicDoctors
+  {
+    path: "/clinic/leaves",
+    element: <ClinicLeaves />,
+    layout: "default",
+  },
   // <--------------> clinic panel ends here <-------------->
 
   // <--------------> doctor panel starts here <-------------->

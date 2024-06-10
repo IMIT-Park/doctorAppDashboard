@@ -1,48 +1,40 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { DataTable } from "mantine-datatable";
-import CountUp from "react-countup";
 import { setPageTitle } from "../../../store/themeConfigSlice";
+import { DataTable } from "mantine-datatable";
+import Swal from "sweetalert2";
+import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
-import IconEdit from "../../../components/Icon/IconEdit";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import AddDoctor from "./AddDoctor";
-import AddDoctorModalDetail from "./AddDoctorModalDetail";
-import DeleteDoctor from "./DeleteDoctor";
-import DoctorPassword from "./DoctorPassword";
-import IconEye from "../../../components/Icon/IconEye";
-import ScrollToTop from "../../../components/ScrollToTop";
-import IconSearch from "../../../components/Icon/IconSearch";
 import IconLoader from "../../../components/Icon/IconLoader";
+import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import IconSearch from "../../../components/Icon/IconSearch";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import { useNavigate } from "react-router-dom";
+import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
+import AddLeave from "./AddLeaveModal";
 
 const rowData = [];
-const ClinicDoctor = () => {
+
+const ClinicDoctorLeave = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    dispatch(setPageTitle("ownerDoctor"));
+    dispatch(setPageTitle("Doctors"));
   });
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const initialRecords = rowData.slice(0, pageSize);
-  const [addDoctorModal, setaddDoctorModal] = useState(false);
-  const [addDoctorModalDetail, setAddDoctorModalDetail] = useState(false);
-  const [addDoctorPasswordModal, setAddDoctorPasswordModal] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [data, setData] = useState({ password: "", confirmPassword: "" });
-  const [buttonLoading, setButtonLoading] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
-
   const [search, setSearch] = useState("");
-  const [totalDoctors, setTotalDoctors] = useState(0);
-  const [allDoctors, setAllDoctors] = useState([]);
+  const [totalLeaves, setTotalLeaves] = useState(0);
+  const [allLeaves, setAllLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [buttonLoading, setButtonLoading] = useState(false);
+  
+  const [addLeaveModal,setAddLeaveModal] =useState(false);
 
   useEffect(() => {
     setPage(1);
@@ -53,84 +45,101 @@ const ClinicDoctor = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0"); // Ensure two digits for day
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Ensure two digits for month
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+  const openAddLeaveModal =() =>{
+    setAddLeaveModal(true)
   }
 
-  const openAddDoctorModal = () => {
-    setaddDoctorModal(true);
-  };
+  const closeAddLeaveModal =() =>{
+    setAddLeaveModal(false);
+  }
 
-  const closeAddDoctorModal = () => {
-    setaddDoctorModal(false);
-  };
-
-  const closeAddDoctorModalDetail = () => {
-    setAddDoctorModalDetail(false);
-    setaddDoctorModal(true);
-  };
-
-  const openAddDoctorModalDetail = () => {
-    setAddDoctorModalDetail(true);
-  };
-
-  const handleSelectDays = () => {
-    closeAddDoctorModal();
-    openAddDoctorModalDetail();
-  };
-
-  const doctorPasswordModal = () => {
-    setAddDoctorPasswordModal(true);
-  };
-
-  const closeDoctorPasswordModal = () => {
-    setAddDoctorPasswordModal(false);
-    setAddDoctorModalDetail(true);
-  };
-
-  const handleDoctorPassword = () => {
-    setAddDoctorModalDetail(false);
-    doctorPasswordModal();
-  };
-
-  const saveDoctor = () => {
-    alert("Success");
-  };
-
-  // handle Delete Modal
-  const openDeleteConfirmModal = () => {
-    setDeleteModal(true);
-  };
-  const closeDeleteConfirmModal = () => {
-    setDeleteModal(false);
-  };
-
-  // fetch Doctors function
-  const fetchData = async () => {
+  //  block or unblock handler
+  const handleActiveUser = async (userId) => {
     try {
-      const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getall?pageSize=${pageSize}&page=${page}`
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/auth/activate/${userId}`
       );
-      console.log(response?.data?.Clinic);
-      setTotalDoctors(response.data?.Doctors?.count);
-      setAllDoctors(response.data?.Doctors?.rows);
-      setLoading(false);
+      fetchData();
     } catch (error) {
-      console.log(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
+      showMessage("An error occurred. Please try again.", "error");
     }
   };
 
+  const showDoctorBlockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to block this Doctor!",
+      showCancelButton: true,
+      confirmButtonText: "Block",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        handleActiveUser(id);
+        Swal.fire({
+          title: "Blocked!",
+          text: "The Doctor has been blocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
+
+  const showDoctorUnblockAlert = (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "You want to unblock this Doctor!",
+      showCancelButton: true,
+      confirmButtonText: "Unblock",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    }).then((result) => {
+      if (result.value) {
+        handleActiveUser(id);
+        Swal.fire({
+          title: "Unblocked!",
+          text: "The Doctor has been unblocked.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
+      }
+    });
+  };
+
+
+//   // fetch Doctors function
+//   const fetchData = async () => {
+//     try {
+//       const response = await NetworkHandler.makeGetRequest(
+//         `/v1/doctor/getall?pageSize=${pageSize}&page=${page}`
+//       );
+//       console.log(response?.data?.Clinic);
+//       setTotalDoctors(response.data?.Doctors?.count);
+//       setAllDoctors(response.data?.Doctors?.rows);
+//       setLoading(false);
+//     } catch (error) {
+//       console.log(error);
+//       setLoading(false);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
   // fetching Loans
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
+//   useEffect(() => {
+//     fetchData();
+//   }, [page, pageSize]);
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
 
   return (
     <div>
@@ -171,16 +180,14 @@ const ClinicDoctor = () => {
       </div>
 
       <div className="panel">
-        
-
-        <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
+      <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              Doctors
+              Leaves
             </h5>
             <Tippy content="Total Doctors">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
+                {/* <CountUp start={0} end={totalDoctors} duration={3}></CountUp> */}
               </span>
             </Tippy>
           </div>
@@ -214,10 +221,10 @@ const ClinicDoctor = () => {
             <button
               type="button"
               className="btn btn-primary"
-              onClick={openAddDoctorModal}
+              onClick={openAddLeaveModal}
             >
               <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
-              Add Doctor
+              New Leave
             </button>
           </Tippy>
         </div>
@@ -237,7 +244,7 @@ const ClinicDoctor = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allDoctors}
-              onRowClick={(row) => navigate(`/clinic/doctors/${row.doctor_id}/doctor`)}
+              // onRowClick={() => navigate("/admin/owners/clinics/doctors/doctor")}
               columns={[
                 {
                   accessor: "No",
@@ -321,31 +328,13 @@ const ClinicDoctor = () => {
           </div>
         )}
       </div>
-      <AddDoctor
-        addDoctorModal={addDoctorModal}
-        setaddDoctorModal={setaddDoctorModal}
-        buttonLoading={buttonLoading}
-        saveDoctor={saveDoctor}
-        handleSelectDays={handleSelectDays}
-        closeAddDoctorModal={closeAddDoctorModal}
-      />
-      <AddDoctorModalDetail
-        addDoctorModalDetail={addDoctorModalDetail}
-        closeAddDoctorModalDetail={closeAddDoctorModalDetail}
-        buttonLoading={buttonLoading}
-        handleDoctorPassword={handleDoctorPassword}
-      />
-      <DeleteDoctor open={deleteModal} closeModal={closeDeleteConfirmModal} />
-      <DoctorPassword
-        addDoctorPasswordModal={addDoctorPasswordModal}
-        closeDoctorPasswordModal={closeDoctorPasswordModal}
-        showPassword={showPassword}
-        setShowPassword={setShowPassword}
-        data={data}
-        setData={setData}
-      />
+      <AddLeave
+      addLeaveModal={addLeaveModal}
+      setAddLeaveModal={setAddLeaveModal}
+      closeAddLeaveModal={closeAddLeaveModal}
+      buttonLoading={buttonLoading}/>
     </div>
   );
 };
 
-export default ClinicDoctor;
+export default ClinicDoctorLeave;

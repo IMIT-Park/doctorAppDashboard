@@ -31,8 +31,11 @@ const Clinics = () => {
   const [allClinics, setAllClinics] = useState([]);
   const [totalClinics, setTotalClinics] = useState(0);
   const [addModal, setAddModal] = useState(false);
+  const [editModal,setEditModal] = useState(false);
+  const [currentClinicId,setCurrentClinicId] = useState("");
   // const [deleteModal, setDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [activeStatus, setActiveStatus] = useState({});
   const [input, setInput] = useState({
     name: "",
@@ -40,10 +43,11 @@ const Clinics = () => {
     username: "",
     phone: "",
     address: "",
-    place:"",
+    place: "",
     password: "",
     confirmPassword: "",
-    picture: "",
+    picture: null,
+    defaultPicture: null,
     googleLocation: {},
   });
 
@@ -59,12 +63,13 @@ const Clinics = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
-      setInput({ ...input, picture: file });
+      setInput({ ...input, picture: file, defaultPicture: URL.createObjectURL(file) });
     } else {
       setInput({ ...input, picture: null });
     }
   };
-
+  
+  
   const handleRemoveImage = () => {
     setInput({ ...input, picture: null });
   };
@@ -83,7 +88,7 @@ const Clinics = () => {
       console.log("Geolocation is not available");
     }
   };
-  
+
   // fetch function
   const fetchData = async () => {
     try {
@@ -123,11 +128,42 @@ const Clinics = () => {
       confirmPassword: "",
       phone: "",
       address: "",
-      place:"",
+      place: "",
       banner_img_url: "",
       googleLocation: "",
-
     });
+  };
+
+  const openEditModal = (clinic) => {
+    setInput({
+      name: clinic.name,
+      email: clinic.User.email,
+      username: clinic.User.user_name,
+      phone: clinic.phone,
+      address: clinic.address,
+      place: clinic.place,
+      picture: null,
+      // picture: clinic.banner_img_url,
+      googleLocation: JSON.parse(clinic.googleLocation),
+      defaultPicture: imageBaseUrl + clinic?.banner_img_url || null,
+    });
+    setCurrentClinicId(clinic.clinic_id);
+    setEditModal(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModal(false);
+    setInput({
+      name: "",
+      email: "",
+      username: "",
+      phone: "",
+      address: "",
+      place: "",
+      picture: "",
+      googleLocation: {},
+    });
+    setCurrentClinicId(null);
   };
 
   // handle Delete Modal
@@ -158,49 +194,115 @@ const Clinics = () => {
       padding: "10px 20px",
     });
   };
-  
 
+  // Function to create a new clinic
+  const createClinic = async () => {
+    if (
+      !input.name ||
+      !input.email ||
+      !input.username ||
+      !input.phone ||
+      !input.address ||
+      !input.place ||
+      !input.password ||
+      !input.picture ||
+      !input.googleLocation ||
+      !input.confirmPassword
+    ) {
+      showMessage("Please fill in all required fields", "warning");
+      return true;
+    }
 
+    setButtonLoading(true);
 
-
-
-   // Function to create a new clinic
-   const createClinic = async () => {
-    // Create a FormData object
     const formData = new FormData();
-  
-    formData.append('name', input.name);
-    formData.append('email', input.email);
-    formData.append('user_name', input.username);
-    formData.append('phone', input.phone);
-    formData.append('address', input.address);
-    formData.append('place', input.place);
-    formData.append('image_url[]', input.picture);
-    formData.append('password', input.password);
-    formData.append('googleLocation', input.googleLocation);
-  
+    formData.append("name", input.name);
+    formData.append("email", input.email);
+    formData.append("user_name", input.username);
+    formData.append("phone", input.phone);
+    formData.append("address", input.address);
+    formData.append("place", input.place);
+
+    formData.append("googleLocation", JSON.stringify(input.googleLocation));
+    if (input.picture) {
+      formData.append("image_url[]", input.picture);
+    }
+    formData.append("password", input.password);
     try {
       const response = await NetworkHandler.makePostRequest(
-        "/api/v1/clinic/createClinic",
+        "/v1/clinic/createClinic",
         formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
-  
-
-      console.log(response);
-      // showMessage("Clinic created successfully", "success");
-  
-      // fetchData();
+      if (response.status === 201) {
+        setButtonLoading(false);
+        showMessage("Clinic added successfully.", "success");
+        fetchData();
+        closeAddModal();
+      }
     } catch (error) {
-      // Handle error
-      showMessage("Failed to create clinic", "error");
+      if (error?.response?.status === 403) {
+        showMessage("User Already Exist.", "error");
+      } else {
+        showMessage("An error occurred. Please try again.", "error");
+      }
+      setButtonLoading(false);
+    } finally {
+      setButtonLoading(false);
     }
   };
-  
+
+
+  const updateClinic = async () => {
+    if (
+      !input.name ||
+      !input.email ||
+      !input.username ||
+      !input.phone ||
+      !input.address ||
+      !input.place ||
+      !input.googleLocation
+    ) {
+      showMessage("Please fill in all required fields", "warning");
+      return true;
+    }
+
+    setButtonLoading(true);
+
+    const formData = new FormData();
+    formData.append("name", input.name);
+    formData.append("email", input.email);
+    formData.append("user_name", input.username);
+    formData.append("phone", input.phone);
+    formData.append("address", input.address);
+    formData.append("place", input.place);
+    formData.append("googleLocation", JSON.stringify(input.googleLocation));
+    if (input.picture) {
+      formData.append("image_url[]", input.picture);
+    }
+
+    try {
+      const response = await NetworkHandler.makePutRequest(
+        `/v1/clinic/edit/${currentClinicId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      if (response.status === 200) {
+        setButtonLoading(false);
+        showMessage("Clinic updated successfully.", "success");
+        fetchData();
+        closeEditModal();
+      }
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+      setButtonLoading(false);
+    } finally {
+      setButtonLoading(false);
+    }
+  };
+
+ 
+
 
   const showBlockAlert = (id) => {
     Swal.fire({
@@ -246,8 +348,7 @@ const Clinics = () => {
     });
   };
 
- 
-console.log(input);
+  console.log(input);
 
   return (
     <div>
@@ -286,7 +387,7 @@ console.log(input);
           </div>
         </div>
       </div>
-      
+
       <div className="panel mt-1">
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="flex items-center gap-1">
@@ -308,101 +409,114 @@ console.log(input);
               >
                 <IconPlus className="ltr:mr-2 rtl:ml-2" />
                 Add Clinic
+              
               </button>
             </Tippy>
+           
           </div>
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <div className="datatables">
-  <DataTable
-    noRecordsText="No Clinics to show"
-    noRecordsIcon={
-      <span className="mb-2">
-        <img src={emptyBox} alt="" className="w-10" />
-      </span>
-    }
-    mih={180}
-    highlightOnHover
-    className="whitespace-nowrap table-hover"
-    records={allClinics}
-    idAccessor="clinic_id"
-    onRowClick={(row) => navigate(`/owner/clinics/${row.clinic_id}/doctors`)}
-    columns={[
-      {
-        accessor: "",
-        title: "ID",
-        render: (rowData, index) => (
-          <span>{(page - 1) * pageSize + index + 1}</span>
-        ),
-      },
-            { accessor: "name", title: "Name" },
-      { accessor: "phone", title: "Phone" },
-      { accessor: "address", title: "Address" },
-      { accessor: "place", title: "Place" },
-      { accessor: "User.email", title: "Email" },
+            <DataTable
+              noRecordsText="No Clinics to show"
+              noRecordsIcon={
+                <span className="mb-2">
+                  <img src={emptyBox} alt="" className="w-10" />
+                </span>
+              }
+              mih={180}
+              highlightOnHover
+              className="whitespace-nowrap table-hover"
+              records={allClinics}
+              idAccessor="clinic_id"
+              onRowClick={(row) =>
+                navigate(`/owner/clinics/${row.clinic_id}/doctors`)
+              }
+              columns={[
+                {
+                  accessor: "",
+                  title: "ID",
+                  render: (rowData, index) => (
+                    <span>{(page - 1) * pageSize + index + 1}</span>
+                  ),
+                },
+                { accessor: "name", title: "Name" },
+                { accessor: "phone", title: "Phone" },
+                { accessor: "address", title: "Address" },
+                { accessor: "place", title: "Place" },
+                { accessor: "User.email", title: "Email" },
 
-      {
-        accessor: "banner_img_url",
-        title: "Banner Image",
-        render: (rowData) => (
-          <img src={imageBaseUrl+rowData.banner_img_url} alt="Banner" className="w-10" />
-        ),
-      },
-      {
-        accessor: "googleLocation",
-        title: "Google Location",
-        render: (rowData) => {
-          const location = JSON.parse(rowData.googleLocation);
-          const { lat, long } = location;
-          const googleMapsURL = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
-          return (
-            <a href={googleMapsURL} target="_blank" rel="noopener noreferrer">
-              View on Google Maps
-            </a>
-          );
-        },
-      },
-      {
-        accessor: "Actions",
-        textAlignment: "center",
-        render: (rowData) => (
-          <div className="flex gap-4 items-center w-max mx-auto">
-            <Tippy content="Edit">
-              <button
-                className="flex hover:text-info"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addUser();
-                }}
-              >
-                <IconEdit className="w-4.5 h-4.5" />
-              </button>
-            </Tippy>
-            <Tippy content="Block/Unblock">
-                      <label
-                        className="w-[46px] h-[22px] relative"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (rowData?.User?.status) {
-                            showBlockAlert(rowData?.user_id);
-                          } else {
-                            showUnblockAlert(rowData?.user_id);
-                          }
-                        }}
+                {
+                  accessor: "banner_img_url",
+                  title: "Banner Image",
+                  render: (rowData) => (
+                    <img
+                      src={imageBaseUrl + rowData.banner_img_url}
+                      alt="Banner"
+                      className="w-10"
+                    />
+                  ),
+                },
+                {
+                  accessor: "googleLocation",
+                  title: "Google Location",
+                  render: (rowData) => {
+                    const location = JSON.parse(rowData.googleLocation);
+                    const { lat, long } = location;
+                    const googleMapsURL = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
+                    return (
+                      <a
+                        href={googleMapsURL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600  hover:text-blue-700"
+
                       >
-                        <input
-                          type="checkbox"
-                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox${rowData.User.user_id}`}
-                          checked={rowData.User.status}
-                          readOnly
-                        />
-                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                      </label>
-                    </Tippy>
-            {/* <Tippy content="Delete">
+                        View on Google Maps
+                      </a>
+                    );
+                  },
+                },
+                {
+                  accessor: "Actions",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="flex gap-4 items-center w-max mx-auto">
+                      <Tippy content="Edit">
+                        <button
+                          className="flex hover:text-info"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditModal(rowData);                          }}
+                        >
+                          <IconEdit className="w-4.5 h-4.5" />
+                        </button>
+                      </Tippy>
+                      <Tippy content="Block/Unblock">
+                        <label
+                          className="w-[46px] h-[22px] relative"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (rowData?.User?.status) {
+                              showBlockAlert(rowData?.user_id);
+                            } else {
+                              showUnblockAlert(rowData?.user_id);
+                            }
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                            id={`custom_switch_checkbox${rowData.User.user_id}`}
+                            checked={rowData.User.status}
+                            readOnly
+                          />
+                          <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                        </label>
+                      </Tippy>
+                      {/* <Tippy content="Delete">
               <button
                 type="button"
                 className="flex hover:text-danger"
@@ -432,16 +546,28 @@ console.log(input);
           </div>
         )}
       </div>
-      {/* add sales person modal */}
+      {/* add clinic modal */}
       <AddClinic
         open={addModal}
         closeModal={closeAddModal}
         handleFileChange={handleFileChange}
         handleRemoveImage={handleRemoveImage}
-        createClinic={createClinic} // Pass the createClinic function as a prop
         data={input}
         setData={setInput}
         handleSubmit={createClinic}
+        buttonLoading={buttonLoading}
+      />
+      {/* edit clinic modal */}
+       <AddClinic
+        open={editModal}
+        closeModal={closeEditModal}
+        handleFileChange={handleFileChange}
+        handleRemoveImage={handleRemoveImage}
+        data={input}
+        setData={setInput}
+        handleSubmit={updateClinic}
+        buttonLoading={buttonLoading}
+        isEdit = {true}
       />
 
       {/* delete sales person modal */}

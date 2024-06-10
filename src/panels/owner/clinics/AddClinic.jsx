@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import MaskedInput from "react-text-mask";
@@ -15,21 +15,23 @@ const AddClinic = ({
   onSubmit,
   handleSubmit,
   handleRemoveImage,
+  buttonLoading,
+  isEdit,
 }) => {
-
+  
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
 
   const handlePasswordChange = (e) => {
-    setData({...data,password:e.target.value});
+    setData({ ...data, password: e.target.value });
     // Clear the error when password is changed
     setPasswordError("");
   };
 
   const handleConfirmPasswordChange = (e) => {
-    setData({...data,confirmPassword:e.target.value});
+    setData({ ...data, confirmPassword: e.target.value });
     if (e.target.value !== data.password) {
       setPasswordError("Passwords do not match");
     } else {
@@ -46,16 +48,31 @@ const AddClinic = ({
     handleSubmit();
   };
 
+  useEffect(() => {
+    // Parse googleLocation if it is a string
+    if (typeof data.googleLocation === "string") {
+      try {
+        const parsedLocation = JSON.parse(data.googleLocation);
+        setData((prevData) => ({
+          ...prevData,
+          googleLocation: parsedLocation,
+        }));
+      } catch (error) {
+        console.error("Error parsing googleLocation", error);
+      }
+    }
+  }, [data.googleLocation]);
+
   const getLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
           const long = position.coords.longitude;
-          const googleLocation = JSON.stringify({ lat, long }); // Format latitude and longitude into a JSON string
-          setLatitude(lat);
-          setLongitude(long);
-          setData({ ...data, googleLocation }); // Update data with the formatted Google location
+          setData((prevData) => ({
+            ...prevData,
+            googleLocation: { lat, long },
+          }));
         },
         (error) => {
           console.error("Error getting location", error);
@@ -66,7 +83,6 @@ const AddClinic = ({
       alert("Geolocation is not supported by this browser.");
     }
   };
-  
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -107,7 +123,7 @@ const AddClinic = ({
                   <IconX />
                 </button>
                 <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  Add Clinic
+                  {isEdit ? "Edit Clinic" : "Add Clinic"}
                 </div>
                 <div className="p-5">
                   <form onSubmit={handleSubmitAdd}>
@@ -119,7 +135,9 @@ const AddClinic = ({
                         placeholder="Enter First Name"
                         className="form-input"
                         value={data.name}
-                        onChange={(e) => setData({ ...data, name: e.target.value })}
+                        onChange={(e) =>
+                          setData({ ...data, name: e.target.value })
+                        }
                       />
                     </div>
 
@@ -131,7 +149,9 @@ const AddClinic = ({
                         placeholder="Enter Email"
                         className="form-input"
                         value={data.email}
-                        onChange={(e) => setData({ ...data, email: e.target.value })}
+                        onChange={(e) =>
+                          setData({ ...data, email: e.target.value })
+                        }
                       />
                     </div>
 
@@ -143,35 +163,23 @@ const AddClinic = ({
                         placeholder="Username"
                         className="form-input"
                         value={data.username}
-                        onChange={(e) => setData({ ...data, username: e.target.value })}
+                        onChange={(e) =>
+                          setData({ ...data, username: e.target.value })
+                        }
                       />
                     </div>
 
                     <div className="mb-5">
                       <label htmlFor="number">Phone Number</label>
-                      <MaskedInput
-                        id="phoneMask"
-                        type="text"
-                        placeholder="Enter Phone Number"
+                      <input
+                        id="phone"
+                        type="number"
+                        placeholder="Phone Number"
                         className="form-input"
-                        mask={[
-                          "+",
-                          "9",
-                          "1",
-                          " ",
-                          /[0-9]/,
-                          /[0-9]/,
-                          /[0-9]/,
-                          /[0-9]/,
-                          /[0-9]/,
-                          /[0-9]/,
-                          /[0-9]/,
-                          /[0-9]/,
-                          /[0-9]/,
-                          /[0-9]/,
-                        ]}
                         value={data.phone}
-                        onChange={(e) => setData({ ...data, phone: e.target.value })}
+                        onChange={(e) =>
+                          setData({ ...data, phone: e.target.value })
+                        }
                       />
                     </div>
 
@@ -183,7 +191,9 @@ const AddClinic = ({
                         placeholder="Address"
                         className="form-input"
                         value={data.address}
-                        onChange={(e) => setData({ ...data, address: e.target.value })}
+                        onChange={(e) =>
+                          setData({ ...data, address: e.target.value })
+                        }
                       />
                     </div>
 
@@ -195,7 +205,9 @@ const AddClinic = ({
                         placeholder="Place"
                         className="form-input"
                         value={data.place}
-                        onChange={(e) => setData({ ...data, place: e.target.value })}
+                        onChange={(e) =>
+                          setData({ ...data, place: e.target.value })
+                        }
                       />
                     </div>
 
@@ -211,57 +223,72 @@ const AddClinic = ({
                           type="file"
                           className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
                           accept="image/*"
-                          onChange={(e) => setData({ ...data, picture: e.target.files[0] })}
+                          onChange={(e) =>
+                            setData({ ...data, picture: e.target.files[0] })
+                          }
                         />
                       </label>
-                      {data?.picture && (
+                      {data.picture ?  (
+                        <div className="mt-2 relative">
+                        <img
+                          src={URL.createObjectURL(data.picture)}
+                          alt="Selected"
+                          className="max-w-full h-auto"
+                        />
+                        <button
+                          type="button"
+                          className="
+                          absolute top-1 right-1 btn btn-dark w-9 h-9 p-0 rounded-full"
+                          onClick={handleRemoveImage}
+                        >
+                          <IconX />
+                        </button>
+                      </div>
+                      )
+                      : data.defaultPicture && (
                         <div className="mt-2 relative">
                           <img
-                            src={URL.createObjectURL(data?.picture)}
+                            src={data.defaultPicture}
                             alt="Selected"
                             className="max-w-full h-auto"
                           />
-                          <button
-                            type="button"
-                            className="
-                            absolute top-1 right-1 btn btn-dark w-9 h-9 p-0 rounded-full"
-                            onClick={handleRemoveImage}
-                          >
-                            <IconX />
-                          </button>
                         </div>
                       )}
                     </div>
+                    {!isEdit && (
+                      <>
+                        <div className="mb-5">
+                          <label htmlFor="password">Password</label>
+                          <input
+                            id="password"
+                            type="password"
+                            placeholder="Enter Password"
+                            className="form-input"
+                            value={data.password}
+                            onChange={handlePasswordChange}
+                          />
+                        </div>
 
-                    <div className="mb-5">
-                      <label htmlFor="password">Password</label>
-                      <input
-                        id="password"
-                        type="password"
-                        placeholder="Enter Password"
-                        className="form-input"
-                        value={data.password}
-                        onChange={handlePasswordChange}
-                      />
-                    </div>
-
-                    <div className="mb-5">
-                      <label htmlFor="confirm-password">Confirm Password</label>
-                      <input
-                        id="confirm-password"
-                        type="password"
-                        placeholder="Confirm Password"
-                        className="form-input"
-                        value={data.confirmPassword}
-                        onChange={handleConfirmPasswordChange}
-                      />
-                      {passwordError && (
-                        <p className="text-red-500 text-sm mt-2">
-                          {passwordError}
-                        </p>
-                      )}
-                    </div>
-
+                        <div className="mb-5">
+                          <label htmlFor="confirm-password">
+                            Confirm Password
+                          </label>
+                          <input
+                            id="confirm-password"
+                            type="password"
+                            placeholder="Confirm Password"
+                            className="form-input"
+                            value={data.confirmPassword}
+                            onChange={handleConfirmPasswordChange}
+                          />
+                          {passwordError && (
+                            <p className="text-red-500 text-sm mt-2">
+                              {passwordError}
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    )}
                     <div className="mb-5">
                       <button
                         type="button"
@@ -270,9 +297,10 @@ const AddClinic = ({
                       >
                         Get Current Location
                       </button>
-                      {latitude !== null && longitude !== null && (
-                        <p>
-                          Latitude: {latitude}, Longitude: {longitude}
+                      {data.googleLocation.lat && data.googleLocation.long && (
+                        <p className="mt-2">
+                          Latitude: {data.googleLocation.lat}, Longitude:{" "}
+                          {data.googleLocation.long}
                         </p>
                       )}
                     </div>
@@ -289,7 +317,13 @@ const AddClinic = ({
                         type="submit"
                         className="btn btn-primary ltr:ml-4 rtl:mr-4"
                       >
-                        Add
+                        {buttonLoading ? (
+                          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-2 rtl:mr-2 shrink-0" />
+                        ) : isEdit ? (
+                          "Edit"
+                        ) : (
+                          "Add"
+                        )}
                       </button>
                     </div>
                   </form>

@@ -12,43 +12,50 @@ const AddClinic = ({
   saveUser,
   data,
   setData,
+  onSubmit,
+  handleSubmit,
   handleRemoveImage,
 }) => {
-  const [password, setPassword] = useState("");
+
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
 
   const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+    setData({...data,password:e.target.value});
     // Clear the error when password is changed
     setPasswordError("");
   };
 
   const handleConfirmPasswordChange = (e) => {
-    setConfirmPassword(e.target.value);
-    if (e.target.value !== password) {
+    setData({...data,confirmPassword:e.target.value});
+    if (e.target.value !== data.password) {
       setPasswordError("Passwords do not match");
     } else {
       setPasswordError("");
     }
   };
 
-  const handleSubmit = () => {
-    if (password !== confirmPassword) {
+  const handleSubmitAdd = (e) => {
+    e.preventDefault();
+    if (data.password !== data.confirmPassword) {
       setPasswordError("Passwords do not match");
       return;
     }
-    saveUser();
+    handleSubmit();
   };
-console.log(data)
+
   const getLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setLatitude(position.coords.latitude);
-          setLongitude(position.coords.longitude);
+          const lat = position.coords.latitude;
+          const long = position.coords.longitude;
+          const googleLocation = JSON.stringify({ lat, long }); // Format latitude and longitude into a JSON string
+          setLatitude(lat);
+          setLongitude(long);
+          setData({ ...data, googleLocation }); // Update data with the formatted Google location
         },
         (error) => {
           console.error("Error getting location", error);
@@ -103,7 +110,7 @@ console.log(data)
                   Add Clinic
                 </div>
                 <div className="p-5">
-                  <form>
+                  <form onSubmit={handleSubmitAdd}>
                     <div className="mb-5">
                       <label htmlFor="first-name">Name</label>
                       <input
@@ -111,6 +118,8 @@ console.log(data)
                         type="text"
                         placeholder="Enter First Name"
                         className="form-input"
+                        value={data.name}
+                        onChange={(e) => setData({ ...data, name: e.target.value })}
                       />
                     </div>
 
@@ -121,8 +130,23 @@ console.log(data)
                         type="email"
                         placeholder="Enter Email"
                         className="form-input"
+                        value={data.email}
+                        onChange={(e) => setData({ ...data, email: e.target.value })}
                       />
                     </div>
+
+                    <div className="mb-5">
+                      <label htmlFor="username">Username</label>
+                      <input
+                        id="username"
+                        type="text"
+                        placeholder="Username"
+                        className="form-input"
+                        value={data.username}
+                        onChange={(e) => setData({ ...data, username: e.target.value })}
+                      />
+                    </div>
+
                     <div className="mb-5">
                       <label htmlFor="number">Phone Number</label>
                       <MaskedInput
@@ -146,6 +170,32 @@ console.log(data)
                           /[0-9]/,
                           /[0-9]/,
                         ]}
+                        value={data.phone}
+                        onChange={(e) => setData({ ...data, phone: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="mb-5">
+                      <label htmlFor="address">Address</label>
+                      <input
+                        id="address"
+                        type="text"
+                        placeholder="Address"
+                        className="form-input"
+                        value={data.address}
+                        onChange={(e) => setData({ ...data, address: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="mb-5">
+                      <label htmlFor="place">Place</label>
+                      <input
+                        id="place"
+                        type="text"
+                        placeholder="Place"
+                        className="form-input"
+                        value={data.place}
+                        onChange={(e) => setData({ ...data, place: e.target.value })}
                       />
                     </div>
 
@@ -160,8 +210,8 @@ console.log(data)
                           id="fileInput"
                           type="file"
                           className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
-                          onChange={handleFileChange}
                           accept="image/*"
+                          onChange={(e) => setData({ ...data, picture: e.target.files[0] })}
                         />
                       </label>
                       {data?.picture && (
@@ -190,7 +240,7 @@ console.log(data)
                         type="password"
                         placeholder="Enter Password"
                         className="form-input"
-                        value={password}
+                        value={data.password}
                         onChange={handlePasswordChange}
                       />
                     </div>
@@ -202,7 +252,7 @@ console.log(data)
                         type="password"
                         placeholder="Confirm Password"
                         className="form-input"
-                        value={confirmPassword}
+                        value={data.confirmPassword}
                         onChange={handleConfirmPasswordChange}
                       />
                       {passwordError && (
@@ -236,9 +286,8 @@ console.log(data)
                         Cancel
                       </button>
                       <button
-                        type="button"
+                        type="submit"
                         className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                        onClick={handleSubmit}
                       >
                         Add
                       </button>

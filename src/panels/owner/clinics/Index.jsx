@@ -16,6 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AddClinic from "./AddClinic";
 // import DeleteClinic from "./DeleteClinic";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
+import { data } from "autoprefixer";
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -39,9 +40,11 @@ const Clinics = () => {
     username: "",
     phone: "",
     address: "",
-    picture: null,
+    place:"",
     password: "",
     confirmPassword: "",
+    picture: "",
+    googleLocation: {},
   });
 
   useEffect(() => {
@@ -120,6 +123,10 @@ const Clinics = () => {
       confirmPassword: "",
       phone: "",
       address: "",
+      place:"",
+      banner_img_url: "",
+      googleLocation: "",
+
     });
   };
 
@@ -152,24 +159,48 @@ const Clinics = () => {
     });
   };
   
+
+
+
+
+
    // Function to create a new clinic
-   const createClinic = async (clinicData) => {
+   const createClinic = async () => {
+    // Create a FormData object
+    const formData = new FormData();
+  
+    formData.append('name', input.name);
+    formData.append('email', input.email);
+    formData.append('user_name', input.username);
+    formData.append('phone', input.phone);
+    formData.append('address', input.address);
+    formData.append('place', input.place);
+    formData.append('image_url[]', input.picture);
+    formData.append('password', input.password);
+    formData.append('googleLocation', input.googleLocation);
+  
     try {
       const response = await NetworkHandler.makePostRequest(
         "/api/v1/clinic/createClinic",
-        clinicData
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
       );
+  
 
-      // Handle successful creation
-      showMessage("Clinic created successfully", "success");
-
-      // Fetch data again to update the clinic list
-      fetchData();
+      console.log(response);
+      // showMessage("Clinic created successfully", "success");
+  
+      // fetchData();
     } catch (error) {
       // Handle error
       showMessage("Failed to create clinic", "error");
     }
   };
+  
 
   const showBlockAlert = (id) => {
     Swal.fire({
@@ -216,7 +247,7 @@ const Clinics = () => {
   };
 
  
-
+console.log(input);
 
   return (
     <div>
@@ -409,8 +440,8 @@ const Clinics = () => {
         handleRemoveImage={handleRemoveImage}
         createClinic={createClinic} // Pass the createClinic function as a prop
         data={input}
-        setData={setInput} // Pass the setData function to update input state
-
+        setData={setInput}
+        handleSubmit={createClinic}
       />
 
       {/* delete sales person modal */}

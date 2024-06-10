@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
@@ -10,7 +10,13 @@ import IconCopy from "../../../components/Icon/IconCopy";
 import Swal from "sweetalert2";
 
 const ShowSalesPerson = ({ open, closeModal,details }) => {
-  const [message1, setMessage1] = useState(details ? "http://www.admin-dashboard.com/"+details.salespersoncode : "http://www.admin-dashboard.com");
+  const [message1, setMessage1] = useState("");
+
+  useEffect(() => {
+    if (details) {
+      setMessage1(`http://www.admin-dashboard.com/${details.salespersoncode}`);
+    }
+  }, [details]);
 
   const showMessage = (message = "") => {
     const toast = Swal.mixin({
@@ -26,6 +32,8 @@ const ShowSalesPerson = ({ open, closeModal,details }) => {
       padding: "10px 20px",
     });
   };
+
+  if (!details) return null;
 
 
   console.log(details);

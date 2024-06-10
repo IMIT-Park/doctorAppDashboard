@@ -333,6 +333,7 @@ const Sales = () => {
               className="whitespace-nowrap table-hover"
               records={allSalesPerson}
               idAccessor="salesperson_id"
+              onRowClick={(row)=> navigate(`/admin/sales/${row.salesperson_id}/owners`)}
               columns={[
                 {
                   accessor: "salesperson_id",

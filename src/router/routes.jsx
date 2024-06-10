@@ -21,6 +21,7 @@ const AdminDoctors = lazy(() => import("../panels/admin/doctors/Index"));
 const AdminDoctor = lazy(() => import("../panels/admin/doctors/SinglePage"));
 const AdminReports = lazy(() => import("../panels/admin/reports/Index"));
 const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
+const AdminSalesOwners = lazy(() => import("../panels/admin/Sales-team/owners/Index"));
 const AdminMessages = lazy(() => import("../panels/admin/messages/Index"));
 const AdminSubscriptionPlans = lazy(() =>
   import("../panels/admin/subscription-plans/Index")
@@ -175,6 +176,13 @@ const routes = [
     element: <AdminSales />,
     layout: "default",
   },
+
+    // sales-team  -> owners
+    {
+      path: "/admin/sales/:salesId/owners",
+      element: <AdminSalesOwners />,
+      layout: "default",
+    },
 
   // subscription-plans
   {

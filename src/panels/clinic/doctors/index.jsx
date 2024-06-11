@@ -44,6 +44,10 @@ const ClinicDoctor = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
+
+ 
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
@@ -111,11 +115,14 @@ const ClinicDoctor = () => {
 
   // fetch Doctors function
   const fetchData = async () => {
+
+    const clinicId = userData?.UserClinic[0]?.clinic_id;
+    console.log("clinicId:", clinicId);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getall?pageSize=${pageSize}&page=${page}`
+        `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
       );
-      console.log(response?.data?.Clinic);
+      // console.log(response?.data?.Clinic);
       setTotalDoctors(response.data?.Doctors?.count);
       setAllDoctors(response.data?.Doctors?.rows);
       setLoading(false);

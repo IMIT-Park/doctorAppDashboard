@@ -70,6 +70,8 @@ const Sidebar = () => {
       setCurrentMenu("clinic-doctors");
     } else if (location.pathname === "/clinic/leaves") {
       setCurrentMenu("clinic-leaves");
+    } else if (location.pathname === "/clinic/profile") {
+      setCurrentMenu("clinic-profile");
     } else if (location.pathname === "/doctor/dashboard") {
       setCurrentMenu("doctor-dashboard");
     } else if (location.pathname === "/sales/dashboard") {
@@ -175,6 +177,24 @@ const Sidebar = () => {
                 </li>
 
                 <li className="nav-item">
+                  <NavLink to="/clinic/profile" className="group">
+                    <div className="flex items-center">
+                      <IconMenuDashboard
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "clinic-profile"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Profile"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+
+
+                <li className="nav-item">
                   <NavLink to="/clinic/doctors" className="group">
                     <div className="flex items-center">
                       <IconMenuDashboard
@@ -226,6 +246,7 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
 
+                
 
               </ul>
             ) : role === 4 ? (

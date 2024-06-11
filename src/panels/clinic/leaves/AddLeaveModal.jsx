@@ -5,6 +5,7 @@ import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
 import IconPlus from "../../../components/Icon/IconPlus";
 import IconX from "../../../components/Icon/IconX";
+import axios from "axios";
 
 const AddLeave = ({
   addLeaveModal,
@@ -12,8 +13,33 @@ const AddLeave = ({
   saveDoctor,
   buttonLoading,
   closeAddLeaveModal,
+  allDoctorNames,
 }) => {
-    
+
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
+
+
+  const [leaveType, setLeaveType] = useState("Full Day");
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const handleDateChange = async ([date]) => {
+    const clinicId = userData?.UserClinic[0]?.clinic_id;
+    setSelectedDate(date); 
+    try {
+      const formattedDate = date.toISOString().split('T')[0]; // Format date to YYYY-MM-DD
+      const response = await axios.post(
+        `https://36ee-2405-201-f018-10d6-8d1f-d396-2fe5-6909.ngrok-free.app/api/v1/doctor/getTimeSlot/${clinicId}`,
+        { date: formattedDate }
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error fetching time slots:', error);
+    }
+  };
+  
+
   const handleSubmit = () => {
     saveDoctor();
   };
@@ -49,7 +75,7 @@ const AddLeave = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-7xl text-black dark:text-white-dark">
+              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-5xl text-black dark:text-white-dark">
                 <button
                   type="button"
                   onClick={closeAddLeaveModal}
@@ -57,39 +83,40 @@ const AddLeave = ({
                 >
                   <IconX />
                 </button>
-                <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
+                <div className="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
                   New Leave
                 </div>
                 <div className="p-5">
                   <form>
-                    <div className="mb-5">
+                  <div className="mb-8">
                       <label htmlFor="ChooseDoctor">Choose Doctor</label>
                       <select
-                        id="Choose Doctor"
+                        id="ChooseDoctor"
                         className="form-select text-white-dark"
                         required
-                        //   value={input.ChooseDoctor}
-                        //   onChange={(e) => setInput({ ...input, ChooseDoctor: e.target.value })}
                       >
-                        <option>Choose Doctor</option>
-                        <option value="Male">Dr.Jasil</option>
-                        <option value="Female">Dr.Allen</option>
-                        <option value="Other">Dr.Simi</option>
-                        <option value="Other">Dr.Jimlat</option>
+                        <option value="">Choose Doctor</option>
+                        {allDoctorNames.map((doctor) => (
+                          <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                            {doctor.name}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
                     <div className="mb-5">
                       <label htmlFor="mds-name">Select Duration</label>
 
-                      <div className="flex items-center flex-wrap gap-3 justify-stretch mb-5 mt-5">
+                      <div className="flex items-center flex-wrap gap-3 justify-stretch mb-8 mt-3">
                         <div>
                           <label className="inline-flex">
                             <input
                               type="radio"
                               name="default_radio"
-                              className="form-radio"
-                              defaultChecked
+                              className="form-radio text-success"
+                              value="Full Day"
+                              checked={leaveType === "Full Day"}
+                              onChange={() => setLeaveType("Full Day")}
                             />
                             <span>Full Day</span>
                           </label>
@@ -100,6 +127,9 @@ const AddLeave = ({
                               type="radio"
                               name="default_radio"
                               className="form-radio text-success"
+                              value="Multiple"
+                              checked={leaveType === "Multiple"}
+                              onChange={() => setLeaveType("Multiple")}
                             />
                             <span>Multiple</span>
                           </label>
@@ -109,7 +139,10 @@ const AddLeave = ({
                             <input
                               type="radio"
                               name="default_radio"
-                              className="form-radio text-secondary"
+                              className="form-radio text-success"
+                              value="By Shift"
+                              checked={leaveType === "By Shift"}
+                              onChange={() => setLeaveType("By Shift")}
                             />
                             <span>By Shift</span>
                           </label>
@@ -117,44 +150,137 @@ const AddLeave = ({
                       </div>
                     </div>
 
-                    <div className="mb-5">
-                      <label htmlFor="date">Date</label>
-                      <Flatpickr
-                        options={{
-                          dateFormat: "d-m-Y",
-                          position: "auto left",
-                        }}
-                        className="form-input"
-                        placeholder="Select Date"
-                        //   value={input.dateOfBirth}
-                        //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
-                      />
-                    </div>
+                    {leaveType == "Full Day" && (
+                      <div className="mb-5">
+                         <label htmlFor="gender">Date</label>
+                         <div>
+                            <Flatpickr
+                              options={{
+                                dateFormat: "d-m-Y",
+                                position: "auto left",
+                              }}
+                              className="form-input mb-5"
+                              placeholder="Select Date"
+                              value={selectedDate}
+                              onChange={handleDateChange}
+                            />
+                          </div>
+                        {/* <div className="space-y-2">
+                          {[
+                            "Sunday",
+                            "Monday",
+                            "Tuesday",
+                            "Wednesday",
+                            "Thursday",
+                            "Friday",
+                            "Saturday",
+                          ].map((day) => (
+                            <div key={day}>
+                              <label className="inline-flex">
+                                <input
+                                  type="checkbox"
+                                  className="form-checkbox text-secondary"
+                                />
+                                <span>{day}</span>
+                              </label>
+                              <div className="flex items-center ml-5">
+                                <p className="text-sm text-gray-500">
+                                  Time slot
+                                </p>
+                                <span className="badge badge-outline-dark text-gray-500 ml-2">
+                                  10AM-12PM
+                                </span>
+                                <span className="badge badge-outline-dark text-gray-500 ml-2">
+                                  1PM-3PM
+                                </span>
+                              </div>
+                              <hr className="my-4" />
+                            </div>
+                          ))}
+                        </div> */}
+                      </div>
+                    )}
 
-                    <div className="mb-5">
-                    <label htmlFor="date">You can select multiple dates.</label>
-                    <Flatpickr
-                        options={{
-                          dateFormat: "d-m-Y",
-                          position: "auto left",
-                        }}
-                        className="form-input"
-                        placeholder="Select Date"
-                        //   value={input.dateOfBirth}
-                        //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
-                      />
-                   <p className="mt-2">To</p>
-                   <Flatpickr
-                        options={{
-                          dateFormat: "d-m-Y",
-                          position: "auto left",
-                        }}
-                        className="form-input"
-                        placeholder="Select Date"
-                        //   value={input.dateOfBirth}
-                        //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
-                      />
-                    </div>
+                    {leaveType === "Multiple" && (
+                      <div className="mb-5">
+                        <label htmlFor="date">
+                          You can select multiple dates.
+                        </label>
+                        <div className="flex items-center flex-wrap gap-3 justify-self-start mb-12 mt-3">
+                          <div>
+                            <p className="mt-2">From</p>
+                          </div>
+                          <div>
+                            <Flatpickr
+                              options={{
+                                dateFormat: "d-m-Y",
+                                position: "auto left",
+                              }}
+                              className="form-input"
+                              placeholder="Select Date"
+                              //   value={input.dateOfBirth}
+                              //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
+                            />
+                          </div>
+                          <div>
+                            <p className="mt-2">To</p>
+                          </div>
+                          <div>
+                            <Flatpickr
+                              options={{
+                                dateFormat: "d-m-Y",
+                                position: "auto left",
+                              }}
+                              className="form-input"
+                              placeholder="Select Date"
+                              //   value={input.dateOfBirth}
+                              //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {leaveType === "By Shift" && (
+                      <div className="mb-5">
+                          <label htmlFor="gender">Date</label>
+                         <div>
+                            <Flatpickr
+                              options={{
+                                dateFormat: "d-m-Y",
+                                position: "auto left",
+                              }}
+                              className="form-input mb-5"
+                              placeholder="Select Date"
+                              //   value={input.dateOfBirth}
+                              //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
+                            />
+                          </div>
+                        {/* <label htmlFor="date">You can select Time slots.</label> */}
+                        {/* {daysOfWeek.map(day => (
+                          <div key={day}>
+                            <p className="text-lg">{day}</p>
+                            <div className="inline-flex items-center">
+                              <input
+                                type="checkbox"
+                                className="form-checkbox m-2"
+                              />
+                              <span className="badge badge-outline-dark text-gray-500 mr-2">
+                                10AM-12PM
+                              </span>
+                              <input
+                                type="checkbox"
+                                className="form-checkbox m-2"
+                              />
+                              <span className="badge badge-outline-dark text-gray-500">
+                                1PM-3PM
+                              </span>
+                            </div>
+                            <hr className="my-4"/>
+                          </div>
+                        ))} */}
+                      </div>
+                    )}
 
                     <div className="mb-5">
                       <label htmlFor="desc">Reason for absence</label>
@@ -202,5 +328,3 @@ const AddLeave = ({
 };
 
 export default AddLeave;
-
-

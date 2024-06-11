@@ -41,7 +41,7 @@ const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
 const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/index"));
 const ClinicDoctor = lazy(() => import("../panels/clinic/doctors/SingleView"));
 const ClinicLeaves = lazy(() => import("../panels/clinic/leaves/Index"));
-
+const ClinicProfile = lazy(()=> import("../panels/clinic/profile/ClinicProfile"));
 // <--------------> clinic panel imports ends here <-------------->
 
 // <--------------> doctor panel imports starts here<-------------->
@@ -247,6 +247,13 @@ const routes = [
   {
     path: "/clinic/leaves",
     element: <ClinicLeaves />,
+    layout: "default",
+  },
+  
+   // clinicprofile
+   {
+    path: "/clinic/profile",
+    element: <ClinicProfile />,
     layout: "default",
   },
   // <--------------> clinic panel ends here <-------------->

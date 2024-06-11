@@ -3,7 +3,13 @@ import AnimateHeight from "react-animate-height";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
 
-const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }) => {
+const SelectDays = ({
+  input,
+  setInput,
+  timeSlotInput,
+  setTimeSlotInput,
+  clinicId,
+}) => {
   const [active, setActive] = useState("");
   const [sameForAll, setSameForAll] = useState(false);
 
@@ -18,7 +24,6 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }
   ];
 
   useEffect(() => {
-    // Initialize time slots
     const initialTimeSlots = {};
     days.forEach((day) => {
       initialTimeSlots[day.id] = input.timeSlots
@@ -27,10 +32,15 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }
           ...slot,
           clinic_id: clinicId,
         }));
-      // If no pre-existing time slots, initialize with an empty slot
       if (initialTimeSlots[day.id].length === 0) {
         initialTimeSlots[day.id] = [
-          { startTime: "", endTime: "", noOfConsultationsPerDay: 0, clinic_id: clinicId },
+          {
+            id: Date.now(),
+            startTime: "",
+            endTime: "",
+            noOfConsultationsPerDay: 0,
+            clinic_id: clinicId,
+          },
         ];
       }
     });
@@ -43,6 +53,7 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }
 
   const handleAddTimeSlot = (dayId) => {
     const newTimeSlot = {
+      id: Date.now(),
       startTime: "",
       endTime: "",
       noOfConsultationsPerDay: 0,
@@ -60,56 +71,31 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }
     setTimeSlotInput((prev) => ({ ...prev, [dayId]: updatedTimeSlots }));
 
     const updatedInputTimeSlots = [...input.timeSlots];
+    const slotId = updatedTimeSlots[index].id;
+
     const timeSlotIndex = updatedInputTimeSlots.findIndex(
-      (slot) =>
-        slot.day_id === dayId &&
-        slot.startTime === updatedTimeSlots[index].startTime
+      (slot) => slot.id === slotId
     );
 
     if (timeSlotIndex !== -1) {
       updatedInputTimeSlots[timeSlotIndex] = {
         ...updatedInputTimeSlots[timeSlotIndex],
         [field]: value,
-        clinic_id: clinicId, // Ensure clinic_id is included
+        clinic_id: clinicId,
       };
     } else {
       updatedInputTimeSlots.push({
+        id: slotId,
         day_id: dayId,
         startTime: updatedTimeSlots[index].startTime,
         endTime: updatedTimeSlots[index].endTime,
         noOfConsultationsPerDay:
           updatedTimeSlots[index].noOfConsultationsPerDay,
-        clinic_id: clinicId, // Ensure clinic_id is included
+        clinic_id: clinicId,
       });
     }
 
     setInput({ ...input, timeSlots: updatedInputTimeSlots });
-  };
-
-  const handleSameForAll = () => {
-    setSameForAll(!sameForAll);
-    if (!sameForAll) {
-      const firstDayTimeSlots = timeSlotInput["0"];
-      const updatedTimeSlots = {};
-      days.forEach((day) => {
-        updatedTimeSlots[day.id] = firstDayTimeSlots.map(slot => ({ ...slot, clinic_id: clinicId }));
-      });
-      setTimeSlotInput(updatedTimeSlots);
-
-      const updatedInputTimeSlots = [];
-      days.forEach((day) => {
-        firstDayTimeSlots.forEach((slot) => {
-          updatedInputTimeSlots.push({
-            day_id: day.id,
-            startTime: slot.startTime,
-            endTime: slot.endTime,
-            noOfConsultationsPerDay: slot.noOfConsultationsPerDay,
-            clinic_id: clinicId, // Ensure clinic_id is included
-          });
-        });
-      });
-      setInput({ ...input, timeSlots: updatedInputTimeSlots });
-    }
   };
 
   const hasValues = (dayId) => {
@@ -121,7 +107,6 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }
       )
     );
   };
-
 
   return (
     <div className="w-full">
@@ -153,13 +138,6 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }
                         onClick={() => togglePara(day.id)}
                       >
                         <span>{day.name}</span>
-                        {/* <div
-                          className={`ml-2 w-4 h-4 rounded-full border ${
-                            active === day.id
-                              ? " bg-primary"
-                              : "border-gray-400"
-                          }`}
-                        /> */}
                         <div
                           className={`ml-2 w-4 h-4 rounded-full border ${
                             hasValues(day.id) ? "bg-primary" : "border-gray-400"
@@ -186,42 +164,30 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }
                                   className="pb-1 flex flex-col justify-start border-b border-blue-950"
                                 >
                                   <div className="grid grid-cols-1 sm:flex justify-between gap-5">
-                                    <Flatpickr
-                                      options={{
-                                        noCalendar: true,
-                                        enableTime: true,
-                                        dateFormat: "h:i K",
-                                        position: "auto left",
-                                      }}
+                                    <input
+                                      type="time"
                                       className="form-input"
-                                      placeholder="Select Time"
                                       value={slot?.startTime || ""}
-                                      onChange={(date) =>
+                                      onChange={(e) =>
                                         handleTimeSlotChange(
                                           day.id,
                                           index,
                                           "startTime",
-                                          date[0]
+                                          e.target.value
                                         )
                                       }
                                     />
                                     <p className="mt-2">To</p>
-                                    <Flatpickr
-                                      options={{
-                                        noCalendar: true,
-                                        enableTime: true,
-                                        dateFormat: "h:i K",
-                                        position: "auto left",
-                                      }}
+                                    <input
+                                      type="time"
                                       className="form-input"
-                                      placeholder="Select Time"
                                       value={slot.endTime || ""}
-                                      onChange={(date) =>
+                                      onChange={(e) =>
                                         handleTimeSlotChange(
                                           day.id,
                                           index,
                                           "endTime",
-                                          date[0]
+                                          e.target.value
                                         )
                                       }
                                     />
@@ -255,21 +221,6 @@ const SelectDays = ({ input, setInput,timeSlotInput, setTimeSlotInput,clinicId }
                             >
                               Add Another
                             </button>
-                            {dayIndex === 0 && (
-                              <div className="mb-5">
-                                <label className="inline-flex cursor-pointer">
-                                  <input
-                                    type="checkbox"
-                                    className="form-checkbox"
-                                    checked={sameForAll}
-                                    onChange={handleSameForAll}
-                                  />
-                                  <span className="text-white-dark relative checked:bg-none">
-                                    Same for all selected days
-                                  </span>
-                                </label>
-                              </div>
-                            )}
                           </div>
                         </AnimateHeight>
                       </div>

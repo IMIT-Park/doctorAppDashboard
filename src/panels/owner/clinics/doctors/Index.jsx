@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -12,8 +12,12 @@ import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import IconMenuScrumboard from "../../../../components/Icon/Menu/IconMenuScrumboard";
 import AddDoctor from "./AddDoctor";
-import NetworkHandler, { imageBaseUrl } from "../../../../utils/NetworkHandler";
+import NetworkHandler, { imageBaseUrl, websiteUrl } from "../../../../utils/NetworkHandler";
 import IconMenuContacts from "../../../../components/Icon/Menu/IconMenuContacts";
+import IconDownload from "../../../../components/Icon/IconDownload";
+import QRCode from "qrcode.react";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import IconCopy from "../../../../components/Icon/IconCopy";
 
 const Doctors = () => {
   const dispatch = useDispatch();
@@ -53,6 +57,22 @@ const Doctors = () => {
     confirmPassword: "",
   });
   const [timeSlotInput, setTimeSlotInput] = useState({});
+
+  const qrUrl = `${websiteUrl}${clinicId}`;
+  // Qr downloader
+
+  const downloadQRCode = () => {
+    const canvas = document.getElementById("qrcode-canvas");
+    const pngUrl = canvas
+      .toDataURL("image/png")
+      .replace("image/png", "image/octet-stream");
+    let downloadLink = document.createElement("a");
+    downloadLink.href = pngUrl;
+    downloadLink.download = "qrcode.png";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
 
   useEffect(() => {
     setPage(1);
@@ -105,6 +125,7 @@ const Doctors = () => {
       password: "",
       confirmPassword: "",
     });
+    setActiveTab(1);
     setaddDoctorModal(false);
   };
 
@@ -283,6 +304,11 @@ const Doctors = () => {
       return true;
     }
 
+    if (!input.timeSlots || input.timeSlots.length === 0) {
+      showMessage("Please add at least one time slot", "warning");
+      return true;
+    }
+
     if (input.password !== input.confirmPassword) {
       showMessage("Passwords are not match", "warning");
       return true;
@@ -325,10 +351,15 @@ const Doctors = () => {
 
         console.log(additionalResponse1);
 
+        input.timeSlots.forEach((slot) => {
+          slot.startTime += ":00";
+          slot.endTime += ":00";
+        });
+
         // Call the second additional API
         const additionalResponse2 = await NetworkHandler.makePostRequest(
           `/v1/doctor/createtimeSlots/${doctorId}`,
-           {timeslots: input.timeSlots}
+          { timeslots: input.timeSlots }
         );
 
         console.log(additionalResponse2);
@@ -336,6 +367,7 @@ const Doctors = () => {
         fetchData();
 
         showMessage("Doctor added successfully.", "success");
+        closeAddDoctorModal();
       }
     } catch (error) {
       showMessage("An error occurred. Please try again.", "error");
@@ -353,10 +385,24 @@ const Doctors = () => {
       showMessage("Location information is not available", "error");
       return;
     }
-    try {
-      const locationData = JSON.parse(googleLocation);
 
-      const { lat, long } = locationData;
+    try {
+      const decodedLocation = googleLocation.replace(/\\/g, "");
+
+      const cleanedGoogleLocation =
+        decodedLocation.startsWith('"') && decodedLocation.endsWith('"')
+          ? decodedLocation.slice(1, -1)
+          : decodedLocation;
+
+      const locationData = JSON.parse(cleanedGoogleLocation);
+
+      const cleanedLocationData = {};
+      Object.keys(locationData).forEach((key) => {
+        const trimmedKey = key.trim();
+        cleanedLocationData[trimmedKey] = locationData[key];
+      });
+
+      const { lat, long } = cleanedLocationData;
 
       if (lat && long) {
         const googleMapsUrl = `https://www.google.com/maps?q=${lat},${long}`;
@@ -370,8 +416,6 @@ const Doctors = () => {
     }
   };
 
-
-  console.log(input);
   return (
     <div>
       <ScrollToTop />
@@ -486,6 +530,48 @@ const Doctors = () => {
                   <IconMenuContacts className="mr-1 w-5" />
                   Get Location
                 </button>
+                <div className="w-full flex items-start gap-3 flex-wrap mt-5">
+                  <div className="flex flex-col items-center bg-[#f1f2f3] dark:bg-[#060818] rounded p-2">
+                    <QRCode id="qrcode-canvas" value={qrUrl} size={220} />
+                    <button
+                      type="button"
+                      className="mt-2 btn btn-primary w-fit"
+                      onClick={downloadQRCode}
+                    >
+                      <IconDownload className="mr-2" />
+                      Download
+                    </button>
+                  </div>
+
+                  <div className="bg-[#f1f2f3] p-2 rounded dark:bg-[#060818] w-full max-w-80">
+                    <form>
+                      <input
+                        type="text"
+                        defaultValue={qrUrl}
+                        className="form-input"
+                        readOnly
+                      />
+                      <div className="mt-1">
+                        <CopyToClipboard
+                          text={qrUrl}
+                          onCopy={(text, result) => {
+                            if (result) {
+                              showMessage("Copied Successfullly");
+                            }
+                          }}
+                        >
+                          <button
+                            type="button"
+                            className="btn btn-primary px-2 ml-auto"
+                          >
+                            <IconCopy className="ltr:mr-2 rtl:ml-2" />
+                            Copy
+                          </button>
+                        </CopyToClipboard>
+                      </div>
+                    </form>
+                  </div>
+                </div>
               </div>
             </div>
           </>

@@ -3,6 +3,10 @@ import axios from "axios";
 export const baseUrl = "https://doctorbackend.gitdr.com/api";
 export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
 
+// website url
+export const websiteUrl = "http://localhost:3000/clinic/";
+
+
 class NetworkHandler {
   #axios = axios.create({
     baseURL: baseUrl,

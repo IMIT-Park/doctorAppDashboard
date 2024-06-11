@@ -12,7 +12,10 @@ import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import IconMenuScrumboard from "../../../../components/Icon/Menu/IconMenuScrumboard";
 import AddDoctor from "./AddDoctor";
-import NetworkHandler, { imageBaseUrl, websiteUrl } from "../../../../utils/NetworkHandler";
+import NetworkHandler, {
+  imageBaseUrl,
+  websiteUrl,
+} from "../../../../utils/NetworkHandler";
 import IconMenuContacts from "../../../../components/Icon/Menu/IconMenuContacts";
 import IconDownload from "../../../../components/Icon/IconDownload";
 import QRCode from "qrcode.react";

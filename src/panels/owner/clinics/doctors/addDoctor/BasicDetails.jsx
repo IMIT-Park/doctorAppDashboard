@@ -1,26 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import IconPlus from "../../../../../components/Icon/IconPlus";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
+import NetworkHandler from "../../../../../utils/NetworkHandler";
 
 const BasicDetails = ({ input, setInput, handleFileChange }) => {
+  const [specializations, setSpecializations] = useState([]);
+
   const handleCheckboxChange = (e) => {
     setInput({ ...input, visibility: !e.target.checked });
   };
 
-
   const handleDateOfBirthChange = (selectedDates) => {
     const dateOfBirth = selectedDates[0];
     let formattedDateOfBirth = "";
-  
+
     if (dateOfBirth) {
       const [day, month, year] = dateOfBirth.toLocaleDateString().split("/");
       formattedDateOfBirth = `${year}-${month}-${day}`;
     }
-  
+
     setInput({ ...input, dateOfBirth: formattedDateOfBirth });
   };
-  
+
+  const fetchSpecialization = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        "/v1/doctor/specializations"
+      );
+      setSpecializations(response?.data?.specializations);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // fetch clinic details
+  useEffect(() => {
+    fetchSpecialization();
+  }, []);
 
   return (
     <div>
@@ -102,17 +119,13 @@ const BasicDetails = ({ input, setInput, handleFileChange }) => {
       </div>
 
       <div className="mb-5">
-        <label htmlFor="gender">Date of Birth</label>
-        <Flatpickr
-          options={{
-            dateFormat: "d-m-Y",
-            position: "auto left",
-          }}
+        <label htmlFor="dateOfBirth">Date of Birth</label>
+        <input
+        id="dateOfBirth"
+          type="date"
           className="form-input"
-          placeholder="Select Date of Birth"
           value={input.dateOfBirth}
-          // onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
-          onChange={handleDateOfBirthChange}
+          onChange={(e) => setInput({ ...input, dateOfBirth: e.target.value })}
         />
       </div>
       <div className="mb-5">
@@ -133,11 +146,10 @@ const BasicDetails = ({ input, setInput, handleFileChange }) => {
       </div>
       <div className="mb-5">
         <label htmlFor="dr-specialization">Specialization</label>
-        <input
+        <select
           id="dr-specialization"
-          type="text"
-          placeholder="Enter Specialization"
-          className="form-input"
+          className="form-select text-white-dark"
+          required
           value={input.specialization}
           onChange={(e) =>
             setInput({
@@ -145,7 +157,14 @@ const BasicDetails = ({ input, setInput, handleFileChange }) => {
               specialization: e.target.value,
             })
           }
-        />
+        >
+          <option>Select Specializtion</option>
+          {specializations?.map((specialization) => (
+            <option key={specialization?.id} value={specialization?.name}>
+              {specialization?.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="mb-5">

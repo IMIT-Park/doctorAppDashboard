@@ -99,6 +99,7 @@ const Clinics = () => {
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
+  
   // handle add modal
   const openAddModal = () => {
     setAddModal(true);
@@ -320,7 +321,7 @@ const Clinics = () => {
       showMessage("An error occurred. Please try again.", "error");
     }
   };
-  
+
   const showBlockAlert = (id) => {
     Swal.fire({
       icon: "warning",

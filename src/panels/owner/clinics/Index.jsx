@@ -1,8 +1,7 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import IconEdit from "../../../components/Icon/IconEdit";
 import Swal from "sweetalert2";
 import IconPlus from "../../../components/Icon/IconPlus";
@@ -12,15 +11,18 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AddClinic from "./AddClinic";
-// import DeleteClinic from "./DeleteClinic";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import { data } from "autoprefixer";
+import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 
 const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
+  const ownerId = userData?.UserOwner?.[0]?.owner_id || 0;
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
@@ -31,10 +33,9 @@ const Clinics = () => {
   const [allClinics, setAllClinics] = useState([]);
   const [totalClinics, setTotalClinics] = useState(0);
   const [addModal, setAddModal] = useState(false);
-  const [editModal,setEditModal] = useState(false);
-  const [currentClinicId,setCurrentClinicId] = useState("");
-  // const [deleteModal, setDeleteModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [editModal, setEditModal] = useState(false);
+  const [currentClinicId, setCurrentClinicId] = useState("");
+  const [loading, setLoading] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [activeStatus, setActiveStatus] = useState({});
   const [input, setInput] = useState({
@@ -63,41 +64,27 @@ const Clinics = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
-      setInput({ ...input, picture: file, defaultPicture: URL.createObjectURL(file) });
+      setInput({
+        ...input,
+        picture: file,
+        defaultPicture: URL.createObjectURL(file),
+      });
     } else {
       setInput({ ...input, picture: null });
     }
   };
-  
-  
+
   const handleRemoveImage = () => {
     setInput({ ...input, picture: null });
   };
 
-  const getCurrentLocation = () => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        setInput({
-          ...input,
-          googleLocation: JSON.stringify({ lat: latitude, long: longitude }),
-        });
-      });
-    } else {
-      // Handle when geolocation is not available
-      console.log("Geolocation is not available");
-    }
-  };
-
   // fetch function
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/clinic/getall?pageSize=${pageSize}&page=${page}`
+        `/v1/clinic/getallclinics/${ownerId}?page=${page}&pagesize=${pageSize}`
       );
-      console.log(response?.data);
-      console.log(response?.data?.Clinic?.rows);
-
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
       setLoading(false);
@@ -166,19 +153,41 @@ const Clinics = () => {
     setCurrentClinicId(null);
   };
 
-  // handle Delete Modal
-  // const openDeleteConfirmModal = () => {
-  //   setDeleteModal(true);
-  // };
-  // const closeDeleteConfirmModal = () => {
-  //   setDeleteModal(false);
-  // };
+  const handleGetLocation = (googleLocation) => {
+    if (!googleLocation) {
+      showMessage("Location information is not available", "error");
+      return;
+    }
 
-  // const deleteUser = () => {
-  //   showMessage("User has been deleted successfully.");
-  //   setDeleteModal(false);
-  // };
+    try {
+      const decodedLocation = googleLocation.replace(/\\/g, "");
 
+      const cleanedGoogleLocation =
+        decodedLocation.startsWith('"') && decodedLocation.endsWith('"')
+          ? decodedLocation.slice(1, -1)
+          : decodedLocation;
+
+      const locationData = JSON.parse(cleanedGoogleLocation);
+
+      const cleanedLocationData = {};
+      Object.keys(locationData).forEach((key) => {
+        const trimmedKey = key.trim();
+        cleanedLocationData[trimmedKey] = locationData[key];
+      });
+
+      const { lat, long } = cleanedLocationData;
+
+      if (lat && long) {
+        const googleMapsUrl = `https://www.google.com/maps?q=${lat},${long}`;
+        window.open(googleMapsUrl, "_blank");
+      } else {
+        showMessage("Invalid location data", "error");
+      }
+    } catch (error) {
+      console.error("Failed to parse location data", error);
+      showMessage("Invalid location data", "error");
+    }
+  };
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
       toast: true,
@@ -252,7 +261,6 @@ const Clinics = () => {
     }
   };
 
-
   const updateClinic = async () => {
     if (
       !input.name ||
@@ -301,9 +309,18 @@ const Clinics = () => {
     }
   };
 
- 
-
-
+  //  block or unblock handler
+  const handleActiveUser = async (userId) => {
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/auth/activate/${userId}`
+      );
+      fetchData();
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+    }
+  };
+  
   const showBlockAlert = (id) => {
     Swal.fire({
       icon: "warning",
@@ -347,8 +364,6 @@ const Clinics = () => {
       }
     });
   };
-
-  console.log(input);
 
   return (
     <div>
@@ -409,10 +424,8 @@ const Clinics = () => {
               >
                 <IconPlus className="ltr:mr-2 rtl:ml-2" />
                 Add Clinic
-              
               </button>
             </Tippy>
-           
           </div>
         </div>
         {loading ? (
@@ -462,22 +475,19 @@ const Clinics = () => {
                 {
                   accessor: "googleLocation",
                   title: "Google Location",
-                  render: (rowData) => {
-                    const location = JSON.parse(rowData.googleLocation);
-                    const { lat, long } = location;
-                    const googleMapsURL = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
-                    return (
-                      <a
-                        href={googleMapsURL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600  hover:text-blue-700"
-
-                      >
-                        View on Google Maps
-                      </a>
-                    );
-                  },
+                  render: (rowData) => (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleGetLocation(rowData.googleLocation);
+                      }}
+                      className="btn btn-success btn-sm"
+                    >
+                      <IconMenuContacts className="mr-1 w-4" />
+                      View Location
+                    </button>
+                  ),
                 },
                 {
                   accessor: "Actions",
@@ -489,7 +499,8 @@ const Clinics = () => {
                           className="flex hover:text-info"
                           onClick={(e) => {
                             e.stopPropagation();
-                            openEditModal(rowData);                          }}
+                            openEditModal(rowData);
+                          }}
                         >
                           <IconEdit className="w-4.5 h-4.5" />
                         </button>
@@ -558,7 +569,7 @@ const Clinics = () => {
         buttonLoading={buttonLoading}
       />
       {/* edit clinic modal */}
-       <AddClinic
+      <AddClinic
         open={editModal}
         closeModal={closeEditModal}
         handleFileChange={handleFileChange}
@@ -567,7 +578,7 @@ const Clinics = () => {
         setData={setInput}
         handleSubmit={updateClinic}
         buttonLoading={buttonLoading}
-        isEdit = {true}
+        isEdit={true}
       />
 
       {/* delete sales person modal */}

@@ -33,8 +33,14 @@ const ClinicDoctorLeave = () => {
   const [allLeaves, setAllLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [buttonLoading, setButtonLoading] = useState(false);
-  
-  const [addLeaveModal,setAddLeaveModal] =useState(false);
+
+  const [addLeaveModal, setAddLeaveModal] = useState(false);
+  const [allDoctorNames, setAllDoctorNames] = useState([]);
+
+
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
+
 
   useEffect(() => {
     setPage(1);
@@ -45,13 +51,13 @@ const ClinicDoctorLeave = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  const openAddLeaveModal =() =>{
-    setAddLeaveModal(true)
-  }
+  const openAddLeaveModal = () => {
+    setAddLeaveModal(true);
+  };
 
-  const closeAddLeaveModal =() =>{
+  const closeAddLeaveModal = () => {
     setAddLeaveModal(false);
-  }
+  };
 
   //  block or unblock handler
   const handleActiveUser = async (userId) => {
@@ -109,29 +115,68 @@ const ClinicDoctorLeave = () => {
     });
   };
 
+  // Get Leave by Clinic
+  const fetchData = async () => {
+    const clinicId = userData?.UserClinic[0]?.clinic_id;
+   
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/doctor/getleave/${clinicId}?pageSize=${pageSize}&page=${page}`
+      );
 
-//   // fetch Doctors function
-//   const fetchData = async () => {
-//     try {
-//       const response = await NetworkHandler.makeGetRequest(
-//         `/v1/doctor/getall?pageSize=${pageSize}&page=${page}`
-//       );
-//       console.log(response?.data?.Clinic);
-//       setTotalDoctors(response.data?.Doctors?.count);
-//       setAllDoctors(response.data?.Doctors?.rows);
-//       setLoading(false);
-//     } catch (error) {
-//       console.log(error);
-//       setLoading(false);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+      setTotalLeaves(response.data?.Leaves?.count);
+      setAllLeaves(response.data?.Leaves?.rows);
+    
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // fetching Loans
-//   useEffect(() => {
-//     fetchData();
-//   }, [page, pageSize]);
+  // fetching Leave
+  useEffect(() => {
+    fetchData();
+  }, [page, pageSize]);
+
+
+  const fetchDoctorData = async () => {
+    const clinicId = userData?.UserClinic[0]?.clinic_id;
+    let allDoctors = [];
+    let page = 1;
+    let hasMorePages = true;
+  
+    try {
+      while (hasMorePages) {
+        const response = await NetworkHandler.makeGetRequest(
+          `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
+        );
+  
+        const doctorData = response.data?.Doctors?.rows || [];
+        allDoctors = allDoctors.concat(doctorData);
+  
+        hasMorePages = doctorData.length === pageSize;
+        page += 1;
+      }
+  
+      setAllDoctorNames(allDoctors);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // fetching Doctors
+  useEffect(() => {
+    fetchDoctorData();
+  }, []);
+  
+
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -140,6 +185,15 @@ const ClinicDoctorLeave = () => {
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   }
+
+  const convertTo12HourFormat = (timeString) => {
+    const [hours, minutes] = timeString.split(":");
+    let hour = parseInt(hours, 10);
+    const period = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${minutes} ${period}`;
+  };
+
 
   return (
     <div>
@@ -180,19 +234,18 @@ const ClinicDoctorLeave = () => {
       </div>
 
       <div className="panel">
-      <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
+        <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
               Leaves
             </h5>
             <Tippy content="Total Doctors">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                {/* <CountUp start={0} end={totalDoctors} duration={3}></CountUp> */}
+                <CountUp start={0} end={totalLeaves} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
 
-          
           <div>
             <form
               onSubmit={(e) => handleSubmit(e)}
@@ -217,17 +270,17 @@ const ClinicDoctorLeave = () => {
           </div>
 
           <div className="flex  text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-          <Tippy content="Click to Add Doctor">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={openAddLeaveModal}
-            >
-              <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
-              New Leave
-            </button>
-          </Tippy>
-        </div>
+            <Tippy content="Click to Add Doctor">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={openAddLeaveModal}
+              >
+                <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
+                New Leave
+              </button>
+            </Tippy>
+          </div>
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -243,7 +296,8 @@ const ClinicDoctorLeave = () => {
               mih={180}
               highlightOnHover
               className="whitespace-nowrap table-hover"
-              records={allDoctors}
+              records={allLeaves}
+              idAccessor="leave_id"
               // onRowClick={() => navigate("/admin/owners/clinics/doctors/doctor")}
               columns={[
                 {
@@ -251,40 +305,59 @@ const ClinicDoctorLeave = () => {
                   title: "No",
                   render: (row, rowIndex) => rowIndex + 1,
                 },
-                // { accessor: "doctor_id", title: "ID" },
-
                 {
-                  accessor: "photo",
+                  accessor: "Doctor.photo",
                   title: "Photo",
                   render: (row) =>
-                    row?.photo ? (
-                      <img
-                        src={imageBaseUrl + row?.photo}
-                        alt="Doctor's photo"
-                        className="w-10 h-10 rounded-[50%]"
-                      />
-                    ) : (
-                      "---"
-                    ),
+                      row?.Doctor?.photo ? (
+                          <img
+                              src={imageBaseUrl + row?.Doctor?.photo}
+                              alt="Doctor's photo"
+                              className="w-10 h-10 rounded-[50%]"
+                          />
+                      ) : (
+                          "---"
+                      ),
+              },
+              
+
+                { accessor: "Doctor.name", title: "Name" },
+                { accessor: "Doctor.phone", title: "phone" },
+
+                {
+                  accessor: "leave_date",
+                  title: "Leave Date",
+                  render: (row) => formatDate(row?.leave_date),
                 },
 
-                { accessor: "name", title: "Name" },
-                { accessor: "phone", title: "Phone" },
-                { accessor: "gender", title: "Gender" },
-                {
-                  accessor: "dateOfBirth",
-                  title: "Date of Birth",
-                  render: (row) => formatDate(row?.dateOfBirth),
+               {
+                accessor: "DoctorTimeSlot", 
+                title: "Leave Slot",
+                
+                render: (row) => {
+                    if (row.DoctorTimeSlot) {
+                        const { startTime, endTime } = row.DoctorTimeSlot;                      
+                        const formattedStartTime = convertTo12HourFormat(startTime); 
+                        const formattedEndTime = convertTo12HourFormat(endTime);
+                        return (
+                            <span className="text-slate-900 dark:text-slate-50 font-normal border border-primary px-2 py-0.5 rounded-md">
+                                <time>
+                                    {`${formattedStartTime} - ${formattedEndTime}`}
+                                </time>
+                            </span>
+                        );
+                    } else {                      
+                        return ""; 
+                    }
+                }
                 },
-                { accessor: "qualification", title: "Qualification" },
-                { accessor: "specialization", title: "Specialization" },
-                { accessor: "address", title: "Address" },
-                { accessor: "fees", title: "Fees" },
-                {
-                  accessor: "visibility",
-                  title: "Visibility",
-                  render: (row) => (row.visibility ? "Visible" : "Hidden"),
-                },
+                { accessor: "DoctorTimeSlot.noOfConsultationsPerDay", title: "Number Of Consultations per day" },
+
+                // {
+                //   accessor: "visibility",
+                //   title: "Visibility",
+                //   render: (row) => (row.visibility ? "Visible" : "Hidden"),
+                // },
                 {
                   accessor: "Actions",
                   textAlignment: "center",
@@ -314,7 +387,7 @@ const ClinicDoctorLeave = () => {
                   ),
                 },
               ]}
-              totalRecords={totalDoctors}
+              totalRecords={totalLeaves}
               recordsPerPage={pageSize}
               page={page}
               onPageChange={(p) => setPage(p)}
@@ -329,10 +402,12 @@ const ClinicDoctorLeave = () => {
         )}
       </div>
       <AddLeave
-      addLeaveModal={addLeaveModal}
-      setAddLeaveModal={setAddLeaveModal}
-      closeAddLeaveModal={closeAddLeaveModal}
-      buttonLoading={buttonLoading}/>
+        addLeaveModal={addLeaveModal}
+        setAddLeaveModal={setAddLeaveModal}
+        closeAddLeaveModal={closeAddLeaveModal}
+        buttonLoading={buttonLoading}
+        allDoctorNames={allDoctorNames}
+      />
     </div>
   );
 };

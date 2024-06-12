@@ -4,6 +4,9 @@ import IconX from "../../../components/Icon/IconX";
 import MaskedInput from "react-text-mask";
 import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
+import IconLockDots from "../../../components/Icon/IconLockDots";
+import IconEye from "../../../components/Icon/IconEye";
+import IconCloseEye from "../../../components/Icon/IconCloseEye";
 
 const AddClinic = ({
   open,
@@ -18,11 +21,8 @@ const AddClinic = ({
   buttonLoading,
   isEdit,
 }) => {
-  
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
 
   const handlePasswordChange = (e) => {
     setData({ ...data, password: e.target.value });
@@ -47,6 +47,15 @@ const AddClinic = ({
     }
     handleSubmit();
   };
+
+  useEffect(() => {
+    if (data.email) {
+      setData((prevInput) => ({
+        ...prevInput,
+        user_name: data.email,
+      }));
+    }
+  }, [data.email]);
 
   useEffect(() => {
     // Parse googleLocation if it is a string
@@ -132,7 +141,7 @@ const AddClinic = ({
                       <input
                         id="first-name"
                         type="text"
-                        placeholder="Enter First Name"
+                        placeholder="Enter Name"
                         className="form-input"
                         value={data.name}
                         onChange={(e) =>
@@ -152,6 +161,7 @@ const AddClinic = ({
                         onChange={(e) =>
                           setData({ ...data, email: e.target.value })
                         }
+                        autoComplete="off"
                       />
                     </div>
 
@@ -162,9 +172,9 @@ const AddClinic = ({
                         type="text"
                         placeholder="Username"
                         className="form-input"
-                        value={data.username}
+                        value={data.user_name}
                         onChange={(e) =>
-                          setData({ ...data, username: e.target.value })
+                          setData({ ...data, user_name: e.target.value })
                         }
                       />
                     </div>
@@ -185,16 +195,16 @@ const AddClinic = ({
 
                     <div className="mb-5">
                       <label htmlFor="address">Address</label>
-                      <input
+                      <textarea
                         id="address"
-                        type="text"
-                        placeholder="Address"
-                        className="form-input"
+                        rows={3}
+                        placeholder="Enter Address"
+                        className="form-textarea resize-none min-h-[130px]"
                         value={data.address}
                         onChange={(e) =>
                           setData({ ...data, address: e.target.value })
                         }
-                      />
+                      ></textarea>
                     </div>
 
                     <div className="mb-5">
@@ -228,67 +238,34 @@ const AddClinic = ({
                           }
                         />
                       </label>
-                      {data.picture ?  (
-                        <div className="mt-2 relative">
-                        <img
-                          src={URL.createObjectURL(data.picture)}
-                          alt="Selected"
-                          className="max-w-full h-auto"
-                        />
-                        <button
-                          type="button"
-                          className="
-                          absolute top-1 right-1 btn btn-dark w-9 h-9 p-0 rounded-full"
-                          onClick={handleRemoveImage}
-                        >
-                          <IconX />
-                        </button>
-                      </div>
-                      )
-                      : data.defaultPicture && (
+                      {data.picture ? (
                         <div className="mt-2 relative">
                           <img
-                            src={data.defaultPicture}
+                            src={URL.createObjectURL(data.picture)}
                             alt="Selected"
                             className="max-w-full h-auto"
                           />
+                          <button
+                            type="button"
+                            className="
+                          absolute top-1 right-1 btn btn-dark w-9 h-9 p-0 rounded-full"
+                            onClick={handleRemoveImage}
+                          >
+                            <IconX />
+                          </button>
                         </div>
+                      ) : (
+                        data.defaultPicture && (
+                          <div className="mt-2 relative">
+                            <img
+                              src={data.defaultPicture}
+                              alt="Selected"
+                              className="max-w-full h-auto"
+                            />
+                          </div>
+                        )
                       )}
                     </div>
-                    {!isEdit && (
-                      <>
-                        <div className="mb-5">
-                          <label htmlFor="password">Password</label>
-                          <input
-                            id="password"
-                            type="password"
-                            placeholder="Enter Password"
-                            className="form-input"
-                            value={data.password}
-                            onChange={handlePasswordChange}
-                          />
-                        </div>
-
-                        <div className="mb-5">
-                          <label htmlFor="confirm-password">
-                            Confirm Password
-                          </label>
-                          <input
-                            id="confirm-password"
-                            type="password"
-                            placeholder="Confirm Password"
-                            className="form-input"
-                            value={data.confirmPassword}
-                            onChange={handleConfirmPasswordChange}
-                          />
-                          {passwordError && (
-                            <p className="text-red-500 text-sm mt-2">
-                              {passwordError}
-                            </p>
-                          )}
-                        </div>
-                      </>
-                    )}
                     <div className="mb-5">
                       <button
                         type="button"
@@ -304,6 +281,68 @@ const AddClinic = ({
                         </p>
                       )}
                     </div>
+                    {!isEdit && (
+                      <>
+                        <div className="mb-5">
+                          <label htmlFor="password">Password</label>
+                          <div className="relative text-white-dark">
+                            <input
+                              id="password"
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Enter Password"
+                              className="form-input ps-10 pr-9 placeholder:text-white-dark"
+                              value={data.password}
+                              onChange={handlePasswordChange}
+                            />
+                            <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                              <IconLockDots fill={true} />
+                            </span>
+                            <span
+                              title={
+                                showPassword ? "hide password" : "show password"
+                              }
+                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? <IconEye /> : <IconCloseEye />}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mb-5">
+                          <label htmlFor="confirm-password">
+                            Confirm Password
+                          </label>
+                          <div className="relative text-white-dark">
+                            <input
+                              id="Confirm Password"
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Enter Confirm Password"
+                              className="form-input ps-10 pr-9 placeholder:text-white-dark"
+                              value={data.confirmPassword}
+                              onChange={handleConfirmPasswordChange}
+                            />
+                            <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                              <IconLockDots fill={true} />
+                            </span>
+                            <span
+                              title={
+                                showPassword ? "hide password" : "show password"
+                              }
+                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? <IconEye /> : <IconCloseEye />}
+                            </span>
+                          </div>
+                          {passwordError && (
+                            <p className="text-red-500 text-sm mt-2">
+                              {passwordError}
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    )}
 
                     <div className="flex justify-end items-center mt-8">
                       <button

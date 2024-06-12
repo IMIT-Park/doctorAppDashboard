@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import AnimateHeight from "react-animate-height";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
+import IconX from "../../../../../components/Icon/IconX";
 
 const SelectDays = ({
   input,
@@ -11,7 +12,6 @@ const SelectDays = ({
   clinicId,
 }) => {
   const [active, setActive] = useState("");
-  const [sameForAll, setSameForAll] = useState(false);
 
   const days = [
     { name: "Sunday", id: "0" },
@@ -39,6 +39,7 @@ const SelectDays = ({
             startTime: "",
             endTime: "",
             noOfConsultationsPerDay: 0,
+            time_slot: 0,
             clinic_id: clinicId,
           },
         ];
@@ -51,17 +52,32 @@ const SelectDays = ({
     setActive((oldValue) => (oldValue === value ? "" : value));
   };
 
+  // time slot add function
   const handleAddTimeSlot = (dayId) => {
     const newTimeSlot = {
       id: Date.now(),
       startTime: "",
       endTime: "",
       noOfConsultationsPerDay: 0,
+      time_slot: 0,
       clinic_id: clinicId,
     };
     setTimeSlotInput((prev) => ({
       ...prev,
       [dayId]: [...(prev[dayId] || []), newTimeSlot],
+    }));
+  };
+
+  // time slot remove function
+  const handleRemoveTimeSlot = (dayId, slotId) => {
+    setTimeSlotInput((prev) => ({
+      ...prev,
+      [dayId]: prev[dayId].filter((slot) => slot.id !== slotId),
+    }));
+
+    setInput((prev) => ({
+      ...prev,
+      timeSlots: prev.timeSlots.filter((slot) => slot.id !== slotId),
     }));
   };
 
@@ -91,6 +107,7 @@ const SelectDays = ({
         endTime: updatedTimeSlots[index].endTime,
         noOfConsultationsPerDay:
           updatedTimeSlots[index].noOfConsultationsPerDay,
+        time_slot: updatedTimeSlots[index].time_slot,
         clinic_id: clinicId,
       });
     }
@@ -103,7 +120,11 @@ const SelectDays = ({
     return (
       slots &&
       slots.some(
-        (slot) => slot.startTime || slot.endTime || slot.noOfConsultationsPerDay
+        (slot) =>
+          slot.startTime ||
+          slot.endTime ||
+          slot.noOfConsultationsPerDay ||
+          slot.time_slot
       )
     );
   };
@@ -151,19 +172,28 @@ const SelectDays = ({
                           height={active === day.id ? "auto" : 0}
                         >
                           <div className="space-y-2 p-4 text-white-dark text-[13px] border-t border-[#d3d3d3] dark:border-[#1b2e4b]">
-                            <p className="text-sm font-small pb-5">
-                              <span className="bg-[#f3f2f2] dark:bg-[#121c2c] pl-3 py-1 pr-[10px] ">
-                                Select Time
-                              </span>
-                            </p>
-
                             {(timeSlotInput[day.id] || []).map(
                               (slot, index) => (
                                 <div
                                   key={index}
-                                  className="pb-1 flex flex-col justify-start border-b border-blue-950"
+                                  className="pb-1 flex flex-col justify-start border-b border-blue-950 mb-4 relative"
                                 >
-                                  <div className="grid grid-cols-1 sm:flex justify-between gap-5">
+                                  <button
+                                    type="button"
+                                    className="absolute -top-2 right-0 btn btn-outline-danger btn-sm"
+                                    onClick={() =>
+                                      handleRemoveTimeSlot(day.id, slot.id)
+                                    }
+                                  >
+                                    <IconX className="w-5 h-5" />
+                                  </button>
+                                  <p className="text-sm font-small pb-4">
+                                    <span className="bg-[#f3f2f2] dark:bg-[#121c2c] pl-3 py-1 pr-[10px] ">
+                                      Select Time
+                                    </span>
+                                  </p>
+                                  <div className="grid grid-cols-1 sm:flex justify-between gap-2">
+                                    <p className="mt-2">Start:</p>
                                     <input
                                       type="time"
                                       className="form-input"
@@ -176,8 +206,9 @@ const SelectDays = ({
                                           e.target.value
                                         )
                                       }
+                                      required
                                     />
-                                    <p className="mt-2">To</p>
+                                    <p className="mt-2">End:</p>
                                     <input
                                       type="time"
                                       className="form-input"
@@ -190,25 +221,50 @@ const SelectDays = ({
                                           e.target.value
                                         )
                                       }
+                                      required
                                     />
                                   </div>
-                                  <div className="my-3">
-                                    <label className="text-white-dark">
-                                      No of Consultations:
-                                    </label>
-                                    <input
-                                      type="number"
-                                      className="form-input w-36"
-                                      value={slot.noOfConsultationsPerDay || 0}
-                                      onChange={(e) =>
-                                        handleTimeSlotChange(
-                                          day.id,
-                                          index,
-                                          "noOfConsultationsPerDay",
-                                          e.target.value
-                                        )
-                                      }
-                                    />
+                                  <div className="my-4 flex items-start gap-3">
+                                    <div>
+                                      <label className="text-white-dark">
+                                        No. of Consultations:
+                                      </label>
+                                      <input
+                                        type="number"
+                                        className="form-input w-full"
+                                        value={
+                                          slot.noOfConsultationsPerDay || 0
+                                        }
+                                        onChange={(e) =>
+                                          handleTimeSlotChange(
+                                            day.id,
+                                            index,
+                                            "noOfConsultationsPerDay",
+                                            e.target.value
+                                          )
+                                        }
+                                        required
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-white-dark">
+                                        Time of Consultation:
+                                      </label>
+                                      <input
+                                        type="number"
+                                        className="form-input w-full"
+                                        value={slot.time_slot || 0}
+                                        onChange={(e) =>
+                                          handleTimeSlotChange(
+                                            day.id,
+                                            index,
+                                            "time_slot",
+                                            e.target.value
+                                          )
+                                        }
+                                        required
+                                      />
+                                    </div>
                                   </div>
                                 </div>
                               )

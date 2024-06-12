@@ -21,6 +21,8 @@ import IconDownload from "../../../../components/Icon/IconDownload";
 import QRCode from "qrcode.react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import IconCopy from "../../../../components/Icon/IconCopy";
+import IconEdit from "../../../../components/Icon/IconEdit";
+import AddClinic from "../AddClinic";
 
 const Doctors = () => {
   const dispatch = useDispatch();
@@ -36,10 +38,23 @@ const Doctors = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
-
+  const [editModal, setEditModal] = useState(false);
   const [addDoctorModal, setaddDoctorModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [clinicInput, setClinicInput] = useState({
+    name: "",
+    email: "",
+    username: "",
+    phone: "",
+    address: "",
+    place: "",
+    password: "",
+    confirmPassword: "",
+    picture: null,
+    defaultPicture: null,
+    googleLocation: {},
+  });
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [clinicDetails, setClinicDetails] = useState({});
   const [activeTab, setActiveTab] = useState(1);
@@ -63,7 +78,6 @@ const Doctors = () => {
 
   const qrUrl = `${websiteUrl}${clinicId}`;
   // Qr downloader
-
   const downloadQRCode = () => {
     const canvas = document.getElementById("qrcode-canvas");
     const pngUrl = canvas
@@ -100,6 +114,83 @@ const Doctors = () => {
       padding: "10px 20px",
     });
   };
+
+  const handleRemoveImage = () => {
+    setClinicInput({ ...clinicInput, picture: null });
+  };
+
+  // edit modal handler
+  const openEditModal = () => {
+    setClinicInput({
+      name: clinicDetails.name,
+      email: clinicDetails.User.email,
+      username: clinicDetails.User.user_name,
+      phone: clinicDetails.phone,
+      address: clinicDetails.address,
+      place: clinicDetails.place,
+      picture: null,
+      googleLocation: clinicDetails.googleLocation,
+      defaultPicture: imageBaseUrl + clinicDetails?.banner_img_url || null,
+    });
+    setEditModal(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModal(false);
+  };
+
+  // edit clinic function
+  const updateClinic = async () => {
+    if (
+      !clinicInput.name ||
+      !clinicInput.email ||
+      !clinicInput.username ||
+      !clinicInput.phone ||
+      !clinicInput.address ||
+      !clinicInput.place ||
+      !clinicInput.googleLocation
+    ) {
+      showMessage("Please fill in all required fields", "warning");
+      return true;
+    }
+
+    setButtonLoading(true);
+
+    const formData = new FormData();
+    formData.append("name", clinicInput.name);
+    formData.append("email", clinicInput.email);
+    formData.append("user_name", clinicInput.username);
+    formData.append("phone", clinicInput.phone);
+    formData.append("address", clinicInput.address);
+    formData.append("place", clinicInput.place);
+    formData.append(
+      "googleLocation",
+      JSON.stringify(clinicInput.googleLocation)
+    );
+    if (clinicInput.picture) {
+      formData.append("image_url[]", clinicInput.picture);
+    }
+
+    try {
+      const response = await NetworkHandler.makePutRequest(
+        `/v1/clinic/edit/${clinicId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      if (response.status === 200) {
+        setButtonLoading(false);
+        showMessage("Clinic updated successfully.", "success");
+        fetchClinicData();
+        closeEditModal();
+      }
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+      setButtonLoading(false);
+    } finally {
+      setButtonLoading(false);
+    }
+  };
+
   // doctor image picker
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -419,6 +510,7 @@ const Doctors = () => {
     }
   };
 
+
   return (
     <div>
       <ScrollToTop />
@@ -475,26 +567,34 @@ const Doctors = () => {
               <div className="text-2xl font-semibold capitalize">
                 {clinicDetails?.name || ""}
               </div>
-              <label
-                className="w-12 h-6 relative"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (clinicDetails?.User?.status) {
-                    showClinicBlockAlert(clinicDetails?.user_id);
-                  } else {
-                    showClinicUnblockAlert(clinicDetails?.user_id);
-                  }
-                }}
-              >
-                <input
-                  type="checkbox"
-                  className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                  id={`custom_switch_checkbox${clinicDetails?.clinic_id}`}
-                  checked={clinicDetails?.User?.status}
-                  readOnly
-                />
-                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-              </label>
+              <div className="flex flex-col items-center gap-4">
+                <label
+                  className="w-12 h-6 relative"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (clinicDetails?.User?.status) {
+                      showClinicBlockAlert(clinicDetails?.user_id);
+                    } else {
+                      showClinicUnblockAlert(clinicDetails?.user_id);
+                    }
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                    id={`custom_switch_checkbox${clinicDetails?.clinic_id}`}
+                    checked={clinicDetails?.User?.status}
+                    readOnly
+                  />
+                  <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                </label>
+                <button
+                  className="flex hover:text-info"
+                  onClick={openEditModal}
+                >
+                  <IconEdit className="w-6 h-6" />
+                </button>
+              </div>
             </div>
             <div className="w-full max-w-96 rounded-md overflow-hidden my-4">
               <img
@@ -712,6 +812,19 @@ const Doctors = () => {
         )}
       </div>
 
+      {/* edit clinic modal */}
+      <AddClinic
+        open={editModal}
+        closeModal={closeEditModal}
+        handleFileChange={handleFileChange}
+        handleRemoveImage={handleRemoveImage}
+        data={clinicInput}
+        setData={setClinicInput}
+        handleSubmit={updateClinic}
+        buttonLoading={buttonLoading}
+        isEdit={true}
+      />
+      {/* add doctor modal */}
       <AddDoctor
         open={addDoctorModal}
         closeAddDoctorModal={closeAddDoctorModal}

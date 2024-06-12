@@ -218,24 +218,6 @@ const ClinicDoctor = () => {
             </form>
           </div>
 
-          <div>
-            <form
-              //   onSubmit={(e) => handleSubmit(e)}
-            //   onSubmit={(e) => e.preventDefault()}
-              className="mx-auto w-full mb-2"
-            >
-              <div className="relative">
-                <select
-                  className="form-select shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-10 rtl:pl-11"
-                >
-                  <option value="">Choose...</option>
-                  <option value="walkin">WalkIn</option>
-                  <option value="emergency">Emergency</option>
-                </select>
-              </div>
-            </form>
-          </div>
-
           <div className="flex  text-gray-500 font-semibold dark:text-white-dark gap-y-4">
             <Tippy content="Click to Add Doctor">
               <button

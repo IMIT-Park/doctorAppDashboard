@@ -6,42 +6,121 @@ import "flatpickr/dist/flatpickr.css";
 import IconPlus from "../../../components/Icon/IconPlus";
 import IconX from "../../../components/Icon/IconX";
 import axios from "axios";
+import NetworkHandler from "../../../utils/NetworkHandler";
+import Swal from "sweetalert2";
 
 const AddLeave = ({
   addLeaveModal,
-  handleSaveLeave,
-  saveDoctor,
   buttonLoading,
   closeAddLeaveModal,
   allDoctorNames,
+  
 }) => {
-
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
 
-
   const [leaveType, setLeaveType] = useState("Full Day");
-  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const [selectedDate, setSelectedDate] = useState(null);
+  const days = [
+    { name: "Sunday", id: "0" },
+    { name: "Monday", id: "1" },
+    { name: "Tuesday", id: "2" },
+    { name: "Wednesday", id: "3" },
+    { name: "Thursday", id: "4" },
+    { name: "Friday", id: "5" },
+    { name: "Saturday", id: "6" },
+  ];
+  const [selectedDate, setSelectedDate] = useState("");
+  const [timeSlots, setTimeSlots] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [selectedDoctorId, setSelectedDoctorId] = useState("");
 
-  const handleDateChange = async ([date]) => {
-    const clinicId = userData?.UserClinic[0]?.clinic_id;
-    setSelectedDate(date); 
+  const handleDoctorChange = (e) => {
+    const selectedDoctorId = e.target.value;
+    setSelectedDoctorId(selectedDoctorId);
+    console.log("Selected Doctor ID:", selectedDoctorId); 
+  };
+
+  const handleDateChange = async (e) => {
+    const date = e.target.value;
+    setSelectedDate(date);
+    setErrorMessage(""); 
+    setTimeSlots([]); 
+    console.log("Selected Date:", date);
+    
     try {
-      const formattedDate = date.toISOString().split('T')[0]; // Format date to YYYY-MM-DD
-      const response = await axios.post(
-        `https://36ee-2405-201-f018-10d6-8d1f-d396-2fe5-6909.ngrok-free.app/api/v1/doctor/getTimeSlot/${clinicId}`,
-        { date: formattedDate }
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/getTimeSlot/${selectedDoctorId}`,
+        { date }
       );
-      console.log(response.data);
+      console.log("API Response:", response.data);
+
+      setTimeSlots(response.data.doctorTimeSlots);
+    
     } catch (error) {
-      console.error('Error fetching time slots:', error);
+      console.error("Error fetching time slots:", error);
+      if (error.response && error.response.status === 404) {
+        setErrorMessage("No Timeslots found for this day");
+      } else {
+        setErrorMessage("An error occurred while fetching timeslots");
+      }
     }
   };
-  
 
-  const handleSubmit = () => {
-    saveDoctor();
+  const getDayName = (dayId) => {
+    const day = days.find((d) => d.id === String(dayId));
+    return day ? day.name : "";
+  };
+
+  const convertTo12HourFormat = (timeString) => {
+    const [hours, minutes] = timeString.split(":");
+    let hour = parseInt(hours, 10);
+    const period = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${minutes} ${period}`;
+  };
+
+  const handleSaveLeave = async () => {
+
+    // Check if a doctor is selected
+    if (!selectedDoctorId) {
+      console.error("No doctor selected");
+      return;
+    }
+    
+    const leaveData = {
+      leaveslots: timeSlots.map((slot) => ({
+        clinic_id: userData?.UserClinic[0]?.clinic_id,
+        DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
+        leave_date: selectedDate,
+      })),
+    };
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
+        leaveData
+      );
+      showMessage("Leave added successfully.");
+      closeAddLeaveModal();
+      console.log("Leave slots created successfully:", response.data);
+    } catch (error) {
+      console.error("Error creating leave slots:", error);
+    }
+  };
+
+  const showMessage = (msg = "", type = "success") => {
+    const toast = Swal.mixin({
+      toast: true,
+      position: "top-right",
+      showConfirmButton: false,
+      showCloseButton: true,
+      timer: 3000,
+      customClass: { container: "toast" },
+    });
+    toast.fire({
+      icon: type,
+      title: msg,
+      padding: "10px 20px",
+    });
   };
 
   return (
@@ -88,16 +167,20 @@ const AddLeave = ({
                 </div>
                 <div className="p-5">
                   <form>
-                  <div className="mb-8">
+                    <div className="mb-8">
                       <label htmlFor="ChooseDoctor">Choose Doctor</label>
                       <select
                         id="ChooseDoctor"
                         className="form-select text-white-dark"
                         required
+                        onChange={handleDoctorChange}
                       >
                         <option value="">Choose Doctor</option>
                         {allDoctorNames.map((doctor) => (
-                          <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                          <option
+                            key={doctor.doctor_id}
+                            value={doctor.doctor_id}
+                          >
                             {doctor.name}
                           </option>
                         ))}
@@ -150,22 +233,42 @@ const AddLeave = ({
                       </div>
                     </div>
 
-                    {leaveType == "Full Day" && (
+                    {leaveType === "Full Day" && (
                       <div className="mb-5">
-                         <label htmlFor="gender">Date</label>
-                         <div>
-                            <Flatpickr
-                              options={{
-                                dateFormat: "d-m-Y",
-                                position: "auto left",
-                              }}
-                              className="form-input mb-5"
-                              placeholder="Select Date"
-                              value={selectedDate}
-                              onChange={handleDateChange}
-                            />
+                        <label htmlFor="Date">Date</label>
+                        <div>
+                          <input
+                            id="Date"
+                            type="date"
+                            className="form-input"
+                            value={selectedDate || ""}
+                            onChange={handleDateChange}
+                          />
+                        </div>
+                        {errorMessage && (
+                          <div className="text-red-500 mt-2">
+                            {errorMessage}
                           </div>
-                        {/* <div className="space-y-2">
+                        )}
+                        {timeSlots.length > 0 && (
+                          <div className="mt-5">
+                            <label>Doctor Time Slots:</label>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {timeSlots.map((slot) => (
+                                <div key={slot.DoctorTimeSlot_id}>
+                                  <div className="badge badge-outline-dark text-gray-500">
+                                    {getDayName(slot.day_id)}:{" "}
+                                    {convertTo12HourFormat(slot.startTime)} -{" "}
+                                    {convertTo12HourFormat(slot.endTime)}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {/* <div className="space-y-2">
                           {[
                             "Sunday",
                             "Monday",
@@ -198,8 +301,8 @@ const AddLeave = ({
                             </div>
                           ))}
                         </div> */}
-                      </div>
-                    )}
+                    {/* </div>
+                    )} */}
 
                     {leaveType === "Multiple" && (
                       <div className="mb-5">
@@ -243,19 +346,19 @@ const AddLeave = ({
 
                     {leaveType === "By Shift" && (
                       <div className="mb-5">
-                          <label htmlFor="gender">Date</label>
-                         <div>
-                            <Flatpickr
-                              options={{
-                                dateFormat: "d-m-Y",
-                                position: "auto left",
-                              }}
-                              className="form-input mb-5"
-                              placeholder="Select Date"
-                              //   value={input.dateOfBirth}
-                              //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
-                            />
-                          </div>
+                        <label htmlFor="gender">Date</label>
+                        <div>
+                          <Flatpickr
+                            options={{
+                              dateFormat: "d-m-Y",
+                              position: "auto left",
+                            }}
+                            className="form-input mb-5"
+                            placeholder="Select Date"
+                            //   value={input.dateOfBirth}
+                            //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
+                          />
+                        </div>
                         {/* <label htmlFor="date">You can select Time slots.</label> */}
                         {/* {daysOfWeek.map(day => (
                           <div key={day}>
@@ -282,19 +385,6 @@ const AddLeave = ({
                       </div>
                     )}
 
-                    <div className="mb-5">
-                      <label htmlFor="desc">Reason for absence</label>
-                      <textarea
-                        id="Remarks"
-                        rows={3}
-                        className="form-textarea resize-none min-h-[130px]"
-                        placeholder="Enter Reason"
-                        // value={data.remarks}
-                        // onChange={(e) =>
-                        //   setData({ ...data, Remarks: e.target.value })
-                        // }
-                      ></textarea>
-                    </div>
 
                     <div className="flex justify-end items-center mt-8">
                       <button

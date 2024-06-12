@@ -36,11 +36,9 @@ const ClinicDoctorLeave = () => {
 
   const [addLeaveModal, setAddLeaveModal] = useState(false);
   const [allDoctorNames, setAllDoctorNames] = useState([]);
-
-
+  const [timeSlots, setTimeSlots] = useState([]);
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
-
 
   useEffect(() => {
     setPage(1);
@@ -118,15 +116,15 @@ const ClinicDoctorLeave = () => {
   // Get Leave by Clinic
   const fetchData = async () => {
     const clinicId = userData?.UserClinic[0]?.clinic_id;
-   
+
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/doctor/getleave/${clinicId}?pageSize=${pageSize}&page=${page}`
       );
 
       setTotalLeaves(response.data?.Leaves?.count);
-      setAllLeaves(response.data?.Leaves?.rows);
-    
+      setAllLeaves(response.data?.doctorLeaveDetails);
+
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -141,26 +139,25 @@ const ClinicDoctorLeave = () => {
     fetchData();
   }, [page, pageSize]);
 
-
   const fetchDoctorData = async () => {
     const clinicId = userData?.UserClinic[0]?.clinic_id;
     let allDoctors = [];
     let page = 1;
     let hasMorePages = true;
-  
+
     try {
       while (hasMorePages) {
         const response = await NetworkHandler.makeGetRequest(
           `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
         );
-  
+
         const doctorData = response.data?.Doctors?.rows || [];
         allDoctors = allDoctors.concat(doctorData);
-  
+
         hasMorePages = doctorData.length === pageSize;
         page += 1;
       }
-  
+
       setAllDoctorNames(allDoctors);
       setLoading(false);
     } catch (error) {
@@ -170,13 +167,11 @@ const ClinicDoctorLeave = () => {
       setLoading(false);
     }
   };
-  
+
   // fetching Doctors
   useEffect(() => {
     fetchDoctorData();
   }, []);
-  
-
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -193,7 +188,6 @@ const ClinicDoctorLeave = () => {
     hour = hour % 12 || 12;
     return `${hour}:${minutes} ${period}`;
   };
-
 
   return (
     <div>
@@ -287,7 +281,7 @@ const ClinicDoctorLeave = () => {
         ) : (
           <div className="datatables">
             <DataTable
-              noRecordsText="No Doctors to show"
+              noRecordsText="No Leaves to show"
               noRecordsIcon={
                 <span className="mb-2">
                   <img src={emptyBox} alt="" className="w-10" />
@@ -306,52 +300,58 @@ const ClinicDoctorLeave = () => {
                   render: (row, rowIndex) => rowIndex + 1,
                 },
                 {
-                  accessor: "Doctor.photo",
+                  accessor: "doctorDetails.photo",
                   title: "Photo",
                   render: (row) =>
-                      row?.Doctor?.photo ? (
-                          <img
-                              src={imageBaseUrl + row?.Doctor?.photo}
-                              alt="Doctor's photo"
-                              className="w-10 h-10 rounded-[50%]"
-                          />
-                      ) : (
-                          "---"
-                      ),
-              },
-              
+                    row?.doctorDetails?.photo ? (
+                      <img
+                        src={imageBaseUrl + row?.doctorDetails?.photo}
+                        alt="Doctor's photo"
+                        className="w-10 h-10 rounded-[50%]"
+                      />
+                    ) : (
+                      "---"
+                    ),
+                },
 
-                { accessor: "Doctor.name", title: "Name" },
-                { accessor: "Doctor.phone", title: "phone" },
+                { accessor: "doctorDetails.name", title: "Name" },
+                { accessor: "doctorDetails.phone", title: "phone" },
 
                 {
                   accessor: "leave_date",
                   title: "Leave Date",
-                  render: (row) => formatDate(row?.leave_date),
+                  render: (row) => formatDate(row.leaveSlots[0]?.leave_date),
                 },
 
-               {
-                accessor: "DoctorTimeSlot", 
-                title: "Leave Slot",
-                
-                render: (row) => {
-                    if (row.DoctorTimeSlot) {
-                        const { startTime, endTime } = row.DoctorTimeSlot;                      
-                        const formattedStartTime = convertTo12HourFormat(startTime); 
-                        const formattedEndTime = convertTo12HourFormat(endTime);
-                        return (
-                            <span className="text-slate-900 dark:text-slate-50 font-normal border border-primary px-2 py-0.5 rounded-md">
-                                <time>
-                                    {`${formattedStartTime} - ${formattedEndTime}`}
-                                </time>
-                            </span>
-                        );
-                    } else {                      
-                        return ""; 
+                {
+                  accessor: "DoctorTimeSlot",
+                  title: "Leave Slot",
+
+                  render: (row) => {
+                    if (row.leaveSlots && row.leaveSlots.length > 0) {
+                      return (
+                        <div>
+                          {row.leaveSlots.map((leaveSlot, index) => (
+                              <div key={index} className="mb-3">
+                              <span className="text-slate-900 dark:text-slate-50 font-normal border border-primary px-2 py-0.5 rounded-md">
+                                <time>{formatDate(leaveSlot.leave_date)}</time>
+                              </span>
+                              <span className="text-slate-900 dark:text-slate-50 font-normal border border-primary px-2 py-0.5 rounded-md ml-2">
+                                <time>{convertTo12HourFormat(leaveSlot.DoctorTimeSlot.startTime)} - {convertTo12HourFormat(leaveSlot.DoctorTimeSlot.endTime)}</time>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    } else {
+                      return "";
                     }
-                }
+                  },
                 },
-                { accessor: "DoctorTimeSlot.noOfConsultationsPerDay", title: "Number Of Consultations per day" },
+                {
+                  accessor: "DoctorTimeSlot.noOfConsultationsPerDay",
+                  title: "Number Of Consultations per day",
+                },
 
                 // {
                 //   accessor: "visibility",

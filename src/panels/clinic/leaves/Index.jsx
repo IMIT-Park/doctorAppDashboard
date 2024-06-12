@@ -114,12 +114,12 @@ const ClinicDoctorLeave = () => {
   };
 
   // Get Leave by Clinic
-  const fetchData = async () => {
+  const fetchLeaveData = async () => {
     const clinicId = userData?.UserClinic[0]?.clinic_id;
 
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getleave/${clinicId}?pageSize=${pageSize}&page=${page}`
+        `/v1/doctor/getleave/${clinicId}`
       );
 
       setTotalLeaves(response.data?.Leaves?.count);
@@ -136,7 +136,7 @@ const ClinicDoctorLeave = () => {
 
   // fetching Leave
   useEffect(() => {
-    fetchData();
+    fetchLeaveData();
   }, [page, pageSize]);
 
   const fetchDoctorData = async () => {
@@ -317,24 +317,24 @@ const ClinicDoctorLeave = () => {
                 { accessor: "doctorDetails.name", title: "Name" },
                 { accessor: "doctorDetails.phone", title: "phone" },
 
-                {
-                  accessor: "leave_date",
-                  title: "Leave Date",
-                  render: (row) => formatDate(row.leaveSlots[0]?.leave_date),
-                },
+                // {
+                //   accessor: "leave_date",
+                //   title: "Leave Date",
+                //   render: (row) => formatDate(row.leaveSlots[0]?.leave_date),
+                // },
 
                 {
                   accessor: "DoctorTimeSlot",
-                  title: "Leave Slot",
+                  title: "Leave Date and Slot",
 
                   render: (row) => {
                     if (row.leaveSlots && row.leaveSlots.length > 0) {
                       return (
                         <div>
                           {row.leaveSlots.map((leaveSlot, index) => (
-                              <div key={index} className="mb-3">
-                              <span className="text-slate-900 dark:text-slate-50 font-normal border border-primary px-2 py-0.5 rounded-md">
-                                <time>{formatDate(leaveSlot.leave_date)}</time>
+                              <div key={index} className="mb-5">
+                              <span className="text-slate-900 dark:text-slate-50 font-normal   px-2 py-0.5 rounded-md">
+                                <time>{formatDate(leaveSlot.leave_date)} : </time>
                               </span>
                               <span className="text-slate-900 dark:text-slate-50 font-normal border border-primary px-2 py-0.5 rounded-md ml-2">
                                 <time>{convertTo12HourFormat(leaveSlot.DoctorTimeSlot.startTime)} - {convertTo12HourFormat(leaveSlot.DoctorTimeSlot.endTime)}</time>
@@ -348,55 +348,9 @@ const ClinicDoctorLeave = () => {
                     }
                   },
                 },
-                {
-                  accessor: "DoctorTimeSlot.noOfConsultationsPerDay",
-                  title: "Number Of Consultations per day",
-                },
-
-                // {
-                //   accessor: "visibility",
-                //   title: "Visibility",
-                //   render: (row) => (row.visibility ? "Visible" : "Hidden"),
-                // },
-                {
-                  accessor: "Actions",
-                  textAlignment: "center",
-                  render: (rowData) => (
-                    <Tippy content="Block/Unblock">
-                      <label
-                        className="w-[46px] h-[22px] relative"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (rowData?.status) {
-                            showDoctorBlockAlert(rowData?.user_id);
-                          } else {
-                            showDoctorUnblockAlert(rowData?.user_id);
-                          }
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox${rowData?.doctor_id}`}
-                          checked={rowData?.status}
-                          readOnly
-                        />
-                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                      </label>
-                    </Tippy>
-                  ),
-                },
+              
               ]}
-              totalRecords={totalLeaves}
-              recordsPerPage={pageSize}
-              page={page}
-              onPageChange={(p) => setPage(p)}
-              recordsPerPageOptions={PAGE_SIZES}
-              onRecordsPerPageChange={setPageSize}
-              minHeight={200}
-              paginationText={({ from, to, totalRecords }) =>
-                `Showing  ${from} to ${to} of ${totalRecords} entries`
-              }
+             
             />
           </div>
         )}
@@ -407,6 +361,7 @@ const ClinicDoctorLeave = () => {
         closeAddLeaveModal={closeAddLeaveModal}
         buttonLoading={buttonLoading}
         allDoctorNames={allDoctorNames}
+        fetchLeaveData={fetchLeaveData}
       />
     </div>
   );

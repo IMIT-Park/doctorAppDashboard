@@ -14,6 +14,7 @@ const AddLeave = ({
   buttonLoading,
   closeAddLeaveModal,
   allDoctorNames,
+  fetchLeaveData,
   
 }) => {
   const userDetails = sessionStorage.getItem("userData");
@@ -33,6 +34,18 @@ const AddLeave = ({
   const [timeSlots, setTimeSlots] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const resetForm = () => {
+    setLeaveType("Full Day");
+    setSelectedDate("");
+    setStartDate("");
+    setEndDate("");
+    setTimeSlots([]);
+    setErrorMessage("");
+    setSelectedDoctorId("");
+  };
 
   const handleDoctorChange = (e) => {
     const selectedDoctorId = e.target.value;
@@ -80,32 +93,61 @@ const AddLeave = ({
   };
 
   const handleSaveLeave = async () => {
-
-    // Check if a doctor is selected
     if (!selectedDoctorId) {
-      console.error("No doctor selected");
+      showBlockAlert("No doctor selected");
       return;
     }
-    
-    const leaveData = {
-      leaveslots: timeSlots.map((slot) => ({
-        clinic_id: userData?.UserClinic[0]?.clinic_id,
-        DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
-        leave_date: selectedDate,
-      })),
-    };
+
+    if (leaveType === "Full Day" && !selectedDate) {
+      showBlockAlert("No date selected");
+      return;
+    }
+
+    if (leaveType === "Full Day" && timeSlots.length === 0) {
+      showBlockAlert("No time slots selected");
+      return;
+    }
+
+    if (leaveType === "Multiple" && (!startDate || !endDate)) {
+      showBlockAlert("Please select a date range");
+      return;
+    }
+
     try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
-        leaveData
-      );
-      showMessage("Leave added successfully.");
+      if (leaveType === "Full Day") {
+        const leaveData = {
+          leaveslots: timeSlots.map((slot) => ({
+            clinic_id: userData?.UserClinic[0]?.clinic_id,
+            DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
+            leave_date: selectedDate,
+          })),
+        };
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
+          leaveData
+        );
+        showMessage("Leave added successfully.");
+      } else if (leaveType === "Multiple") {
+        const leaveData = {
+          clinic_id: userData?.UserClinic[0]?.clinic_id,
+          start_date: startDate,
+          end_date: endDate,
+        };
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
+          leaveData
+        );
+        showMessage("Bulk leave added successfully.");
+      }
+
       closeAddLeaveModal();
-      console.log("Leave slots created successfully:", response.data);
+      fetchLeaveData();
+      resetForm();
     } catch (error) {
       console.error("Error creating leave slots:", error);
     }
   };
+
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -118,6 +160,22 @@ const AddLeave = ({
     });
     toast.fire({
       icon: type,
+      title: msg,
+      padding: "10px 20px",
+    });
+  };
+
+  const showBlockAlert = (msg = "", type = "success") => {
+    const toast = Swal.mixin({
+      toast: true,
+      position: "top-right",
+      showConfirmButton: false,
+      showCloseButton: true,
+      timer: 3000,
+      customClass: { container: "toast" },
+    });
+    toast.fire({
+      icon: "warning",
       title: msg,
       padding: "10px 20px",
     });
@@ -157,7 +215,10 @@ const AddLeave = ({
               <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-5xl text-black dark:text-white-dark">
                 <button
                   type="button"
-                  onClick={closeAddLeaveModal}
+                  onClick={() => {
+                    closeAddLeaveModal();
+                    resetForm();
+                  }}
                   className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
                 >
                   <IconX />
@@ -268,42 +329,7 @@ const AddLeave = ({
                         )}
                       </div>
                     )}
-                    {/* <div className="space-y-2">
-                          {[
-                            "Sunday",
-                            "Monday",
-                            "Tuesday",
-                            "Wednesday",
-                            "Thursday",
-                            "Friday",
-                            "Saturday",
-                          ].map((day) => (
-                            <div key={day}>
-                              <label className="inline-flex">
-                                <input
-                                  type="checkbox"
-                                  className="form-checkbox text-secondary"
-                                />
-                                <span>{day}</span>
-                              </label>
-                              <div className="flex items-center ml-5">
-                                <p className="text-sm text-gray-500">
-                                  Time slot
-                                </p>
-                                <span className="badge badge-outline-dark text-gray-500 ml-2">
-                                  10AM-12PM
-                                </span>
-                                <span className="badge badge-outline-dark text-gray-500 ml-2">
-                                  1PM-3PM
-                                </span>
-                              </div>
-                              <hr className="my-4" />
-                            </div>
-                          ))}
-                        </div> */}
-                    {/* </div>
-                    )} */}
-
+                   
                     {leaveType === "Multiple" && (
                       <div className="mb-5">
                         <label htmlFor="date">
@@ -314,31 +340,25 @@ const AddLeave = ({
                             <p className="mt-2">From</p>
                           </div>
                           <div>
-                            <Flatpickr
-                              options={{
-                                dateFormat: "d-m-Y",
-                                position: "auto left",
-                              }}
-                              className="form-input"
-                              placeholder="Select Date"
-                              //   value={input.dateOfBirth}
-                              //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
-                            />
+                          <input
+                            id="StartDate"
+                            type="date"
+                            className="form-input "
+                            value={startDate || ""}
+                            onChange={(e) => setStartDate(e.target.value)}
+                          />
                           </div>
                           <div>
                             <p className="mt-2">To</p>
                           </div>
                           <div>
-                            <Flatpickr
-                              options={{
-                                dateFormat: "d-m-Y",
-                                position: "auto left",
-                              }}
-                              className="form-input"
-                              placeholder="Select Date"
-                              //   value={input.dateOfBirth}
-                              //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
-                            />
+                          <input
+                            id="EndDate"
+                            type="date"
+                            className="form-input"
+                            value={endDate || ""}
+                            onChange={(e) => setEndDate(e.target.value)}
+                          />
                           </div>
                         </div>
                       </div>
@@ -390,7 +410,10 @@ const AddLeave = ({
                       <button
                         type="button"
                         className="btn btn-outline-danger gap-2"
-                        onClick={closeAddLeaveModal}
+                        onClick={() => {
+                          closeAddLeaveModal();
+                          resetForm();
+                        }}
                       >
                         Cancel
                       </button>

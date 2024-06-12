@@ -23,6 +23,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import IconCopy from "../../../../components/Icon/IconCopy";
 import IconEdit from "../../../../components/Icon/IconEdit";
 import AddClinic from "../AddClinic";
+import { formatDate } from "../../../../utils/formatDate";
 
 const Doctors = () => {
   const dispatch = useDispatch();
@@ -370,14 +371,6 @@ const Doctors = () => {
     });
   };
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
-
   //  doctor adding function
   const addDoctor = async () => {
     if (
@@ -509,7 +502,6 @@ const Doctors = () => {
       showMessage("Invalid location data", "error");
     }
   };
-
 
   return (
     <div>
@@ -721,6 +713,7 @@ const Doctors = () => {
               className="whitespace-nowrap table-hover"
               records={allDoctors}
               idAccessor="doctor_id"
+              onRowClick={(row)=> navigate(`/owner/clinics/${clinicId}/doctors/${row?.doctor_id}`)}
               columns={[
                 {
                   accessor: "doctor_id",

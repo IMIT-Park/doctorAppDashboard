@@ -102,10 +102,11 @@ const LoginBoxed = () => {
 
       if (response.ok) {
         const data = await response.json();
-        const { accessToken, user } = data;
+        const { accessToken, refreshToken, user } = data;
 
         // Store data in sessionStorage
-        sessionStorage.setItem("accessToken", JSON.stringify(accessToken));
+        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("refreshToken", refreshToken);
         sessionStorage.setItem("userData", JSON.stringify(user));
         setLoading(false);
         setIsIncorrect(false);
@@ -120,7 +121,6 @@ const LoginBoxed = () => {
         } else {
           navigate("/admin/dashboard");
         }
-
       } else if (response.status === 401) {
         setShowAlert({
           show: true,
@@ -145,7 +145,6 @@ const LoginBoxed = () => {
       setLoading(false);
     }
   };
-
 
   const handleEmailKeyDown = (e) => {
     if (e.key === "Enter") {

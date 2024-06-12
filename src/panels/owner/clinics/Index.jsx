@@ -41,7 +41,7 @@ const Clinics = () => {
   const [input, setInput] = useState({
     name: "",
     email: "",
-    username: "",
+    user_name: "",
     phone: "",
     address: "",
     place: "",
@@ -99,7 +99,7 @@ const Clinics = () => {
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
-  
+
   // handle add modal
   const openAddModal = () => {
     setAddModal(true);
@@ -111,7 +111,7 @@ const Clinics = () => {
       ...input,
       name: "",
       email: "",
-      username: "",
+      user_name: "",
       password: "",
       confirmPassword: "",
       phone: "",
@@ -144,7 +144,7 @@ const Clinics = () => {
     setInput({
       name: "",
       email: "",
-      username: "",
+      user_name: "",
       phone: "",
       address: "",
       place: "",
@@ -210,7 +210,7 @@ const Clinics = () => {
     if (
       !input.name ||
       !input.email ||
-      !input.username ||
+      !input.user_name ||
       !input.phone ||
       !input.address ||
       !input.place ||
@@ -228,7 +228,7 @@ const Clinics = () => {
     const formData = new FormData();
     formData.append("name", input.name);
     formData.append("email", input.email);
-    formData.append("user_name", input.username);
+    formData.append("user_name", input.user_name);
     formData.append("phone", input.phone);
     formData.append("address", input.address);
     formData.append("place", input.place);
@@ -266,7 +266,7 @@ const Clinics = () => {
     if (
       !input.name ||
       !input.email ||
-      !input.username ||
+      !input.user_name ||
       !input.phone ||
       !input.address ||
       !input.place ||
@@ -281,7 +281,7 @@ const Clinics = () => {
     const formData = new FormData();
     formData.append("name", input.name);
     formData.append("email", input.email);
-    formData.append("user_name", input.username);
+    formData.append("user_name", input.user_name);
     formData.append("phone", input.phone);
     formData.append("address", input.address);
     formData.append("place", input.place);

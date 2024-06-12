@@ -66,7 +66,7 @@ const Doctors = () => {
     Swal.fire({
       icon: "success",
       title: "Success!",
-      text: "Booking Successfull!",
+      text: "Booked Successfull!",
       padding: "2em",
       customClass: "sweet-alerts",
     });
@@ -81,18 +81,18 @@ const Doctors = () => {
     setActive((oldValue) => (oldValue === value ? null : value));
   };
 
-  const handleTimeSelection = (time) => {
-    if (selectedTime === time) {
-      setIsTimeDisabled((prev) => !prev);
-    } else {
-      setSelectedTime(time);
-      setIsTimeDisabled(false);
-    }
-  };
-
   // const handleTimeSelection = (time) => {
-  //   setSelectedTime(time);
+  //   if (selectedTime === time) {
+  //     setIsTimeDisabled((prev) => !prev);
+  //   } else {
+  //     setSelectedTime(time);
+  //     setIsTimeDisabled(false);
+  //   }
   // };
+
+  const handleTimeSelection = (time) => {
+    setSelectedTime(time);
+  };
 
   const handleBookNow = () => {
     showAlert();
@@ -256,198 +256,60 @@ const Doctors = () => {
                       {time}
                     </div>
                   ))}
-                  {/* <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "10:00 AM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("10:00 AM")}
-                  >
-                    10:00 AM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "10:30 AM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("10:30 AM")}
-                  >
-                    10:30 AM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "11:00 AM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("11:00 AM")}
-                  >
-                    11:00 AM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "11:30 AM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("11:30 AM")}
-                  >
-                    11:30 AM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "12:00 AM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("12:00 AM")}
-                  >
-                    12:00 AM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "12:30 AM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("12:30 AM")}
-                  >
-                    12:30 AM
-                  </div> */}
                 </div>
               </div>
             </div>
+
             <div className="flex flex-col items-start my-6">
               <div className=" w-full p-2 pb-4">
                 <div className="w-full sm:w-20 p-1 font-semibold text-lg">
-                  Afernoon
+                  Afternoon
                 </div>
                 <div className="flex flex-wrap gap-6 sm:gap-6">
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "1:00 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("1:00 PM")}
-                  >
-                    1:00 PM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "1:30 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("1:30 PM")}
-                  >
-                    1:30 PM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "2:00 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("2:00 PM")}
-                  >
-                    2:00 PM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "2:30 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("2:30 PM")}
-                  >
-                    2:30 AM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "3:00 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("3:00 PM")}
-                  >
-                    3:00 PM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "3:30 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("3:30 PM")}
-                  >
-                    3:30 PM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "4:00 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("4:00 PM")}
-                  >
-                    4:00 PM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "4:30 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("4:30 PM")}
-                  >
-                    3:30 PM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "5:00 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("5:00 PM")}
-                  >
-                    5:00 PM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "5:30 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("5:30 PM")}
-                  >
-                    3:30 PM
-                  </div>
-                  <div
-                    className={` p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
-                      selectedTime === "6:00 PM" && !isTimeDisabled
-                        ? "bg-blue-500 text-white"
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSelection("6:00 PM")}
-                  >
-                    6:00 PM
-                  </div>
+                  {[
+                    "1:00 PM",
+                    "1:30 PM",
+                    "2:00 PM",
+                    "2:30 PM",
+                    "3:00 PM",
+                    "3:30 PM",
+                    "4:00 PM",
+                    "4:30 PM",
+                    "5:00 PM",
+                    "5:30 PM",
+                    "6:00 PM",
+                  ].map((time) => (
+                    <div
+                      key={time}
+                      className={`p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-400 ${
+                        selectedTime === time && !isTimeDisabled
+                          ? "bg-blue-500 text-white"
+                          : ""
+                      }`}
+                      onClick={() => handleTimeSelection(time)}
+                    >
+                      {time}
+                    </div>
+                  ))}
                 </div>
+                
               </div>
             </div>
             <div className="flex items-start my-6">
-              <div className=" w-full p-2 pb-4">
-                {/* <div className="w-20 p-1 font-semibold text-lg">Afernoon</div> */}
-                <div className="flex flex-wrap gap-2 mt-2 ml-3">
+              <div className="max-w-md mx-auto w-full p-2 pb-4">
+                <div className="flex flex-wrap gap-2 mt-2 ml-3 flex-col sm:flex-row justify-center sm:justify-start">
+                <div className="flex items-center">
                   <div className="border p-2 bg-blue-500"></div>
                   <div className="mr-6">Selected</div>
+                  </div>
+                  <div className="flex items-center">
                   <div className="border p-2 bg-gray-300"></div>
                   <div className="mr-6">Booked Slots</div>
+                  </div>
+                  <div className="flex items-center">
                   <div className="border p-2 bg-black"></div>
                   <div className="mr-6">Available Slots</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -464,7 +326,7 @@ const Doctors = () => {
               onClick={handleBookNow}
               // disabled={!selectedTime}
             >
-              Success message!
+              Book Now
             </button>
           </div>
         </div>

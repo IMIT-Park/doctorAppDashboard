@@ -19,9 +19,10 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import emptyBox from "/assets/images/empty-box.svg";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { useNavigate } from "react-router-dom";
+import AddPatients from "./AddPatients";
 
 const rowData = [];
-const ClinicDoctor = () => {
+const PatientsDetails = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(setPageTitle("ownerDoctor"));
@@ -30,8 +31,8 @@ const ClinicDoctor = () => {
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const initialRecords = rowData.slice(0, pageSize);
-  const [addDoctorModal, setaddDoctorModal] = useState(false);
-  const [addDoctorModalDetail, setAddDoctorModalDetail] = useState(false);
+  const [addPatientsModal, setAddPatientsModal] = useState(false);
+  // const [addDoctorModalDetail, setAddDoctorModalDetail] = useState(false);
   const [addDoctorPasswordModal, setAddDoctorPasswordModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [data, setData] = useState({ password: "", confirmPassword: "" });
@@ -39,8 +40,8 @@ const ClinicDoctor = () => {
   const [deleteModal, setDeleteModal] = useState(false);
 
   const [search, setSearch] = useState("");
-  const [totalDoctors, setTotalDoctors] = useState(0);
-  const [allDoctors, setAllDoctors] = useState([]);
+  const [totalPatients, setTotalPatients] = useState(0);
+  const [allPatients, setAllPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -56,14 +57,14 @@ const ClinicDoctor = () => {
 
   useEffect(() => {
     if (search) {
-      const filtered = allDoctors.filter((doctor) =>
+      const filtered = allPatients.filter((doctor) =>
         doctor.name.toLowerCase().includes(search.toLowerCase())
       );
       setFilteredPatients(filtered);
     } else {
-      setFilteredPatients(allDoctors);
+      setFilteredPatients(allPatients);
     }
-  }, [search, allDoctors]);
+  }, [search, allPatients]);
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -73,53 +74,53 @@ const ClinicDoctor = () => {
     return `${day}-${month}-${year}`;
   }
 
-  const openAddDoctorModal = () => {
-    setaddDoctorModal(true);
+  const openAddPatientsModal = () => {
+    setAddPatientsModal(true);
   };
 
-  const closeAddDoctorModal = () => {
-    setaddDoctorModal(false);
+  const closeAddPatientsModal = () => {
+    setAddPatientsModal(false);
   };
 
-  const closeAddDoctorModalDetail = () => {
-    setAddDoctorModalDetail(false);
-    setaddDoctorModal(true);
-  };
+  // const closeAddDoctorModalDetail = () => {
+  //   setAddDoctorModalDetail(false);
+  //   setaddDoctorModal(true);
+  // };
 
-  const openAddDoctorModalDetail = () => {
-    setAddDoctorModalDetail(true);
-  };
+  // const openAddDoctorModalDetail = () => {
+  //   setAddDoctorModalDetail(true);
+  // };
 
-  const handleSelectDays = () => {
-    closeAddDoctorModal();
-    openAddDoctorModalDetail();
-  };
+  // const handleSelectDays = () => {
+  //   closeAddDoctorModal();
+  //   openAddDoctorModalDetail();
+  // };
 
-  const doctorPasswordModal = () => {
-    setAddDoctorPasswordModal(true);
-  };
+  // const doctorPasswordModal = () => {
+  //   setAddDoctorPasswordModal(true);
+  // };
 
-  const closeDoctorPasswordModal = () => {
-    setAddDoctorPasswordModal(false);
-    setAddDoctorModalDetail(true);
-  };
+  // const closeDoctorPasswordModal = () => {
+  //   setAddDoctorPasswordModal(false);
+  //   setAddDoctorModalDetail(true);
+  // };
 
-  const handleDoctorPassword = () => {
-    setAddDoctorModalDetail(false);
-    doctorPasswordModal();
-  };
+  // const handleDoctorPassword = () => {
+  //   setAddDoctorModalDetail(false);
+  //   doctorPasswordModal();
+  // };
 
-  const saveDoctor = () => {
-    alert("Success");
-  };
+  // const saveDoctor = () => {
+  //   alert("Success");
+  // };
 
   // handle Delete Modal
-  const openDeleteConfirmModal = () => {
-    setDeleteModal(true);
-  };
-  const closeDeleteConfirmModal = () => {
-    setDeleteModal(false);
-  };
+  // const openDeleteConfirmModal = () => {
+  //   setDeleteModal(true);
+  // };
+  // const closeDeleteConfirmModal = () => {
+  //   setDeleteModal(false);
+  // };
 
   // fetch Doctors function
   const fetchData = async () => {
@@ -128,8 +129,8 @@ const ClinicDoctor = () => {
         `/v1/doctor/getall?pageSize=${pageSize}&page=${page}`
       );
       console.log(response?.data?.Clinic);
-      setTotalDoctors(response.data?.Doctors?.count);
-      setAllDoctors(response.data?.Doctors?.rows);
+      setTotalPatients(response.data?.Doctors?.count);
+      setAllPatients(response.data?.Doctors?.rows);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -190,7 +191,7 @@ const ClinicDoctor = () => {
             </h5>
             <Tippy content="Total Doctors">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
+                <CountUp start={0} end={totalPatients} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
@@ -223,7 +224,7 @@ const ClinicDoctor = () => {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={openAddDoctorModal}
+                onClick={openAddPatientsModal}
               >
                 <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
                 Add Patients
@@ -267,7 +268,7 @@ const ClinicDoctor = () => {
                 },
                 { accessor: "address", title: "Address" },
               ]}
-              totalRecords={totalDoctors}
+              totalRecords={totalPatients}
               recordsPerPage={pageSize}
               page={page}
               onPageChange={(p) => setPage(p)}
@@ -281,15 +282,15 @@ const ClinicDoctor = () => {
           </div>
         )}
       </div>
-      {/* <AddDoctor
-        addDoctorModal={addDoctorModal}
-        setaddDoctorModal={setaddDoctorModal}
+      <AddPatients
+        addPatientsModal={addPatientsModal}
+        setAddPatientsModal={setAddPatientsModal}
         buttonLoading={buttonLoading}
-        saveDoctor={saveDoctor}
-        handleSelectDays={handleSelectDays}
-        closeAddDoctorModal={closeAddDoctorModal}
+        // saveDoctor={saveDoctor}
+        // handleSelectDays={handleSelectDays}
+        closeAddPatientsModal={closeAddPatientsModal}
       />
-      <AddDoctorModalDetail
+      {/* <AddDoctorModalDetail
         addDoctorModalDetail={addDoctorModalDetail}
         closeAddDoctorModalDetail={closeAddDoctorModalDetail}
         buttonLoading={buttonLoading}
@@ -308,4 +309,4 @@ const ClinicDoctor = () => {
   );
 };
 
-export default ClinicDoctor;
+export default PatientsDetails;

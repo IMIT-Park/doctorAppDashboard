@@ -15,7 +15,6 @@ import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
 import AddLeave from "./AddLeaveModal";
 
-const rowData = [];
 
 const ClinicDoctorLeave = () => {
   const dispatch = useDispatch();
@@ -27,7 +26,6 @@ const ClinicDoctorLeave = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const initialRecords = rowData.slice(0, pageSize);
   const [search, setSearch] = useState("");
   const [totalLeaves, setTotalLeaves] = useState(0);
   const [allLeaves, setAllLeaves] = useState([]);
@@ -116,13 +114,13 @@ const ClinicDoctorLeave = () => {
   // Get Leave by Clinic
   const fetchLeaveData = async () => {
     const clinicId = userData?.UserClinic[0]?.clinic_id;
-
+    console.log(clinicId);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getleave/${clinicId}`
+        `/v1/doctor/getleave/${clinicId}?page=${page}&pageSize=${pageSize}`
       );
 
-      setTotalLeaves(response.data?.Leaves?.count);
+      setTotalLeaves(response.data?.count);
       setAllLeaves(response.data?.doctorLeaveDetails);
 
       setLoading(false);
@@ -332,7 +330,9 @@ const ClinicDoctorLeave = () => {
                       return (
                         <div>
                           {row.leaveSlots.map((leaveSlot, index) => (
-                              <div key={index} className="mb-5">
+                              <div key={index} className="mb-5"
+                             
+                              >
                               <span className="text-slate-900 dark:text-slate-50 font-normal   px-2 py-0.5 rounded-md">
                                 <time>{formatDate(leaveSlot.leave_date)} : </time>
                               </span>
@@ -350,7 +350,16 @@ const ClinicDoctorLeave = () => {
                 },
               
               ]}
-             
+              totalRecords={totalLeaves}
+              recordsPerPage={pageSize}
+              page={page}
+              onPageChange={(p) => setPage(p)}
+              recordsPerPageOptions={PAGE_SIZES}
+              onRecordsPerPageChange={setPageSize}
+              minHeight={200}
+              paginationText={({ from, to, totalRecords }) =>
+                `Showing ${from} to ${to} of ${totalRecords} entries`
+              }
             />
           </div>
         )}

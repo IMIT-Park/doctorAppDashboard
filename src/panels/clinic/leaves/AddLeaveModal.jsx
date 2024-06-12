@@ -15,7 +15,6 @@ const AddLeave = ({
   closeAddLeaveModal,
   allDoctorNames,
   fetchLeaveData,
-  
 }) => {
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
@@ -31,11 +30,11 @@ const AddLeave = ({
     { name: "Saturday", id: "6" },
   ];
   const [selectedDate, setSelectedDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [timeSlots, setTimeSlots] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
 
   const resetForm = () => {
     setLeaveType("Full Day");
@@ -50,16 +49,16 @@ const AddLeave = ({
   const handleDoctorChange = (e) => {
     const selectedDoctorId = e.target.value;
     setSelectedDoctorId(selectedDoctorId);
-    console.log("Selected Doctor ID:", selectedDoctorId); 
+    console.log("Selected Doctor ID:", selectedDoctorId);
   };
 
   const handleDateChange = async (e) => {
     const date = e.target.value;
     setSelectedDate(date);
-    setErrorMessage(""); 
-    setTimeSlots([]); 
+    setErrorMessage("");
+    setTimeSlots([]);
     console.log("Selected Date:", date);
-    
+
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/doctor/getTimeSlot/${selectedDoctorId}`,
@@ -68,7 +67,6 @@ const AddLeave = ({
       console.log("API Response:", response.data);
 
       setTimeSlots(response.data.doctorTimeSlots);
-    
     } catch (error) {
       console.error("Error fetching time slots:", error);
       if (error.response && error.response.status === 404) {
@@ -128,10 +126,10 @@ const AddLeave = ({
         );
         showMessage("Leave added successfully.");
       } else if (leaveType === "Multiple") {
-        const leaveData = {
-          clinic_id: userData?.UserClinic[0]?.clinic_id,
+        const leaveData = {        
           start_date: startDate,
           end_date: endDate,
+          clinic_id: userData?.UserClinic[0]?.clinic_id,
         };
         const response = await NetworkHandler.makePostRequest(
           `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
@@ -147,7 +145,6 @@ const AddLeave = ({
       console.error("Error creating leave slots:", error);
     }
   };
-
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -329,36 +326,34 @@ const AddLeave = ({
                         )}
                       </div>
                     )}
-                   
+
                     {leaveType === "Multiple" && (
                       <div className="mb-5">
-                        <label htmlFor="date">
-                          You can select multiple dates.
-                        </label>
+                        <label htmlFor="date">You can select multiple dates.</label>
                         <div className="flex items-center flex-wrap gap-3 justify-self-start mb-12 mt-3">
                           <div>
                             <p className="mt-2">From</p>
                           </div>
                           <div>
-                          <input
-                            id="StartDate"
-                            type="date"
-                            className="form-input "
-                            value={startDate || ""}
-                            onChange={(e) => setStartDate(e.target.value)}
-                          />
+                            <input
+                              id="StartDate"
+                              type="date"
+                              className="form-input"
+                              value={startDate || ""}
+                              onChange={(e) => setStartDate(e.target.value)}
+                            />
                           </div>
                           <div>
                             <p className="mt-2">To</p>
                           </div>
                           <div>
-                          <input
-                            id="EndDate"
-                            type="date"
-                            className="form-input"
-                            value={endDate || ""}
-                            onChange={(e) => setEndDate(e.target.value)}
-                          />
+                            <input
+                              id="EndDate"
+                              type="date"
+                              className="form-input"
+                              value={endDate || ""}
+                              onChange={(e) => setEndDate(e.target.value)}
+                            />
                           </div>
                         </div>
                       </div>
@@ -379,32 +374,8 @@ const AddLeave = ({
                             //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
                           />
                         </div>
-                        {/* <label htmlFor="date">You can select Time slots.</label> */}
-                        {/* {daysOfWeek.map(day => (
-                          <div key={day}>
-                            <p className="text-lg">{day}</p>
-                            <div className="inline-flex items-center">
-                              <input
-                                type="checkbox"
-                                className="form-checkbox m-2"
-                              />
-                              <span className="badge badge-outline-dark text-gray-500 mr-2">
-                                10AM-12PM
-                              </span>
-                              <input
-                                type="checkbox"
-                                className="form-checkbox m-2"
-                              />
-                              <span className="badge badge-outline-dark text-gray-500">
-                                1PM-3PM
-                              </span>
-                            </div>
-                            <hr className="my-4"/>
-                          </div>
-                        ))} */}
                       </div>
                     )}
-
 
                     <div className="flex justify-end items-center mt-8">
                       <button

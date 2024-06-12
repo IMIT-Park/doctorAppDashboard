@@ -24,6 +24,7 @@ const SinglePage = () => {
   const [doctorDetails, setDoctorDetails] = useState({});
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(null);
+  const [editDetailsModal, setEditDetailsModal] = useState(false);
 
   const togglePara = (value) => {
     setActive((oldValue) => (oldValue === value ? null : value));
@@ -116,6 +117,14 @@ const SinglePage = () => {
         });
       }
     });
+  };
+
+  const openEditDetailsModal = () => {
+    setEditDetailsModal(true);
+  };
+
+  const closeEditDetailsModal = () => {
+    setEditDetailsModal(false);
   };
 
   // Group time slots by day
@@ -319,41 +328,40 @@ const SinglePage = () => {
                 ))}
               </div>
             </div>
+
             <div className="mt-4">
               <h5 className="text-base font-semibold mb-1 dark:text-white-light">
                 Leaves:
               </h5>
               <div className="w-full border border-blue-500 rounded pt-2 pb-3 px-3">
-                {doctorDetails?.Drleave?.map((leave,index) => {
-                  const timeSlot =
-                    timeSlotsByDay[leave?.DoctorTimeSlot_id]?.[0];
+                {doctorDetails?.Drleave?.map((leave) => {
+                  const timeSlot = doctorDetails?.timeslots.find(
+                    (slot) => slot.DoctorTimeSlot_id === leave.DoctorTimeSlot_id
+                  );
                   return (
                     <div
                       key={leave.leave_id}
                       className="flex flex-col items-start gap-1"
                     >
                       <span className="badge bg-secondary rounded-none">
-                        {formatDate(leave?.leave_date)}
+                        {formatDate(leave.leave_date)}
                       </span>
-                      <div className="w-full flex items-start gap-2 flex-wrap">
-                        {timeSlot && (
-                          <span
-                            key={timeSlot.DoctorTimeSlot_id}
-                            className="text-slate-900 dark:text-slate-50 font-normal text-xs border border-primary px-2 py-0.5 rounded-md"
-                          >
+                      {timeSlot && (
+                        <div className="w-full flex items-start gap-2 flex-wrap">
+                          <span className="text-slate-900 dark:text-slate-50 font-normal text-xs border border-primary px-2 py-0.5 rounded-md">
                             {formatTime(timeSlot.startTime)} -{" "}
                             {formatTime(timeSlot.endTime)}
                           </span>
+                        </div>
+                      )}
+                      {doctorDetails?.Drleave.length > 1 &&
+                        doctorDetails?.Drleave.indexOf(leave) !==
+                          doctorDetails?.Drleave.length - 1 && (
+                          <div className="w-full h-[1px] bg-blue-500 my-4" />
                         )}
-                      </div>
-                      {doctorDetails?.Drleave?.length > 1 && index !== doctorDetails?.Drleave?.length - 1 && (
-            <div className="w-full h-[1px] bg-blue-500  my-4" />
-          )}
                     </div>
-                    
                   );
                 })}
-
               </div>
             </div>
           </>

@@ -131,14 +131,15 @@ const AddLeave = ({
           end_date: endDate,
           clinic_id: userData?.UserClinic[0]?.clinic_id,
         };
-        const response = await NetworkHandler.makePostRequest(
-          `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
-          leaveData
-        );
-        showMessage("Bulk leave added successfully.");
+        console.log(leaveData);
+        // const response = await NetworkHandler.makePostRequest(
+        //   `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
+        //   leaveData
+        // );
+        // showMessage("Bulk leave added successfully.");
       }
 
-      closeAddLeaveModal();
+      // closeAddLeaveModal();
       fetchLeaveData();
       resetForm();
     } catch (error) {

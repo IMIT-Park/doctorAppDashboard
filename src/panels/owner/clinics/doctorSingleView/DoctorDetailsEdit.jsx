@@ -1,21 +1,43 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../components/Icon/IconX";
-import IconLoader from "../../../components/Icon/IconLoader";
-import IconEye from "../../../components/Icon/IconEye";
-import IconCloseEye from "../../../components/Icon/IconCloseEye";
+import IconX from "../../../../components/Icon/IconX";
+import IconLoader from "../../../../components/Icon/IconLoader";
+import NetworkHandler from "../../../../utils/NetworkHandler";
 
 const DoctorDetailsEdit = ({
   open,
   closeModal,
   input,
   setInput,
+  buttonLoading,
   formSubmit,
 }) => {
+  const [specializations, setSpecializations] = useState([]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     formSubmit();
   };
+
+  const handleCheckboxChange = (e) => {
+    setInput({ ...input, visibility: !e.target.checked });
+  };
+
+  const fetchSpecialization = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        "/v1/doctor/specializations"
+      );
+      setSpecializations(response?.data?.specializations);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // fetch clinic details
+  useEffect(() => {
+    fetchSpecialization();
+  }, []);
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -60,164 +82,184 @@ const DoctorDetailsEdit = ({
                 </div>
                 <div className="p-5">
                   <form>
-                    <div className="mb-5">
-                      <label htmlFor="full-name">Full Name</label>
-                      <input
-                        id="full-name"
-                        type="text"
-                        placeholder="Enter Full Name"
-                        className="form-input"
-                        value={input?.name}
-                        onChange={(e) =>
-                          setInput({ ...input, name: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="mb-5">
-                      <label htmlFor="email">Email</label>
-                      <input
-                        id="email"
-                        type="email"
-                        placeholder="Enter Email"
-                        className="form-input"
-                        value={input?.email}
-                        onChange={handleEmailChange}
-                      />
-                      {emailError && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {emailError}
-                        </p>
-                      )}
-                    </div>
-                    <div className="mb-5">
-                      <label htmlFor="user-name">User Name</label>
-                      <input
-                        id="user-name"
-                        type="text"
-                        placeholder="Enter User Name"
-                        className="form-input"
-                        value={input?.user_name}
-                        onChange={(e) =>
-                          setInput({ ...input, user_name: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="mb-5">
-                      <label htmlFor="phone">Phone Number</label>
-                      <input
-                        id="phone"
-                        type="number"
-                        placeholder="Enter Phone Number"
-                        className="form-input"
-                        value={input?.phone}
-                        onChange={(e) =>
-                          setInput({ ...input, phone: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="mb-5">
-                      <label htmlFor="address">Address</label>
-                      <textarea
-                        id="location"
-                        rows={3}
-                        placeholder="Enter Address"
-                        className="form-textarea resize-none min-h-[130px]"
-                        value={input?.address}
-                        onChange={(e) =>
-                          setInput({ ...input, address: e.target.value })
-                        }
-                      ></textarea>
-                    </div>
+                    <div>
+                      <div className="mb-5">
+                        <label htmlFor="dr-name">Doctor Name</label>
+                        <input
+                          id="dr-name"
+                          type="text"
+                          placeholder="Enter Doctor Name"
+                          className="form-input"
+                          value={input.name}
+                          onChange={(e) =>
+                            setInput({ ...input, name: e.target.value })
+                          }
+                        />
+                      </div>
 
-                    {!isEditMode && (
-                      <>
-                        <div className="mb-5 relative">
-                          <label htmlFor="password">Password</label>
-                          <div className="relative">
-                            <input
-                              id="password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Enter Password"
-                              className="form-input pr-10"
-                              value={input?.password}
-                              onChange={(e) =>
-                                setInput({ ...input, password: e.target.value })
-                              }
-                            />
-                            <span
-                              title={
-                                showPassword ? "hide password" : "show password"
-                              }
-                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                              onClick={() => setShowPassword(!showPassword)}
+                      <div className="mb-5">
+                        <label htmlFor="dr-phone">Phone</label>
+                        <input
+                          id="dr-phone"
+                          type="number"
+                          placeholder="Enter Phone Number"
+                          className="form-input"
+                          value={input.phone}
+                          onChange={(e) =>
+                            setInput({ ...input, phone: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div className="mb-5">
+                        <label htmlFor="email">Email</label>
+                        <input
+                          id="email"
+                          type="email"
+                          placeholder="Enter Email"
+                          className="form-input"
+                          value={input.email}
+                          onChange={(e) =>
+                            setInput({ ...input, email: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="gender">Gender</label>
+                        <select
+                          id="gender"
+                          className="form-select text-white-dark"
+                          required
+                          value={input.gender}
+                          onChange={(e) =>
+                            setInput({ ...input, gender: e.target.value })
+                          }
+                        >
+                          <option>Select Gender</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+
+                      <div className="mb-5">
+                        <label htmlFor="dateOfBirth">Date of Birth</label>
+                        <input
+                          id="dateOfBirth"
+                          type="date"
+                          className="form-input"
+                          value={input.dateOfBirth}
+                          onChange={(e) =>
+                            setInput({ ...input, dateOfBirth: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="dr-qualification">Qualification</label>
+                        <input
+                          id="dr-qualification"
+                          type="text"
+                          placeholder="Enter Qualification"
+                          className="form-input"
+                          value={input.qualification}
+                          onChange={(e) =>
+                            setInput({
+                              ...input,
+                              qualification: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="dr-specialization">
+                          Specialization
+                        </label>
+                        <select
+                          id="dr-specialization"
+                          className="form-select text-white-dark"
+                          required
+                          value={input.specialization}
+                          onChange={(e) =>
+                            setInput({
+                              ...input,
+                              specialization: e.target.value,
+                            })
+                          }
+                        >
+                          <option>Select Specializtion</option>
+                          {specializations?.map((specialization) => (
+                            <option
+                              key={specialization?.id}
+                              value={specialization?.name}
                             >
-                              {showPassword ? <IconEye /> : <IconCloseEye />}
-                            </span>
-                          </div>
-                        </div>
+                              {specialization?.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
-                        <div className="mb-5 relative">
-                          <label htmlFor="confirm-password">
-                            Confirm Password
-                          </label>
-                          <div className="relative">
-                            <input
-                              id="confirm-password"
-                              type={showComfirmPassword ? "text" : "password"}
-                              placeholder="Enter Confirm Password"
-                              className="form-input pr-10"
-                              value={input?.confirmPassword}
-                              onChange={(e) =>
-                                setInput({
-                                  ...input,
-                                  confirmPassword: e.target.value,
-                                })
-                              }
-                            />
-                            <span
-                              title={
-                                showComfirmPassword
-                                  ? "hide confirm-password"
-                                  : "show confirm-password"
-                              }
-                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                              onClick={() =>
-                                setShowComfirmPassword(!showComfirmPassword)
-                              }
-                            >
-                              {showComfirmPassword ? (
-                                <IconEye />
-                              ) : (
-                                <IconCloseEye />
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
+                      <div className="mb-5">
+                        <label htmlFor="dr-fees">Fees</label>
+                        <input
+                          id="dr-fees"
+                          type="number"
+                          placeholder="Enter Fess"
+                          className="form-input"
+                          value={input.fees}
+                          onChange={(e) =>
+                            setInput({ ...input, fees: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="address">Address</label>
+                        <textarea
+                          id="address"
+                          rows={3}
+                          className="form-textarea resize-none min-h-[130px]"
+                          placeholder="Enter Address"
+                          value={input.address}
+                          onChange={(e) =>
+                            setInput({ ...input, address: e.target.value })
+                          }
+                        ></textarea>
+                      </div>
 
-                    <div className="flex justify-end items-center mt-8">
-                      <button
-                        type="button"
-                        className="btn btn-outline-danger"
-                        onClick={closeModal}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                        onClick={handleSubmit}
-                        disabled={buttonLoading}
-                      >
-                        {buttonLoading ? (
-                          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle" />
-                        ) : isEditMode ? (
-                          "Edit"
-                        ) : (
-                          "Add"
-                        )}
-                      </button>
+                      <div className="mb-5">
+                        <label className="inline-flex cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox"
+                            checked={!input.visibility}
+                            onChange={handleCheckboxChange}
+                          />
+                          <span className="text-white-dark relative checked:bg-none">
+                            Hide Profile in Website
+                          </span>
+                        </label>
+                      </div>
+
+                      <div className="flex justify-end items-center mt-8">
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger"
+                          onClick={closeModal}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                          onClick={handleSubmit}
+                          disabled={buttonLoading}
+                        >
+                          {buttonLoading ? (
+                            <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle" />
+                          ) : (
+                            "Edit"
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </form>
                 </div>

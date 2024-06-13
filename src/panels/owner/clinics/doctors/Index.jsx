@@ -24,6 +24,7 @@ import IconCopy from "../../../../components/Icon/IconCopy";
 import IconEdit from "../../../../components/Icon/IconEdit";
 import AddClinic from "../AddClinic";
 import { formatDate } from "../../../../utils/formatDate";
+import { showMessage } from "../../../../utils/showMessage";
 
 const Doctors = () => {
   const dispatch = useDispatch();
@@ -100,21 +101,6 @@ const Doctors = () => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
   }, [page, pageSize]);
-
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
-    });
-  };
 
   const handleRemoveImage = () => {
     setClinicInput({ ...clinicInput, picture: null });
@@ -556,8 +542,17 @@ const Doctors = () => {
         ) : (
           <>
             <div className="flex justify-between flex-wrap gap-4">
-              <div className="text-2xl font-semibold capitalize">
-                {clinicDetails?.name || ""}
+              <div>
+                <div className="text-2xl font-semibold capitalize">
+                  {clinicDetails?.name || ""}
+                </div>
+                <div className="w-full max-w-96 rounded-md overflow-hidden mt-4">
+                  <img
+                    src={imageBaseUrl + clinicDetails?.banner_img_url}
+                    className="w-full h-full object-cover"
+                    alt="Banner"
+                  />
+                </div>
               </div>
               <div className="flex flex-col items-center gap-4">
                 <label
@@ -587,13 +582,6 @@ const Doctors = () => {
                   <IconEdit className="w-6 h-6" />
                 </button>
               </div>
-            </div>
-            <div className="w-full max-w-96 rounded-md overflow-hidden my-4">
-              <img
-                src={imageBaseUrl + clinicDetails?.banner_img_url}
-                className="w-full h-full object-cover"
-                alt="Banner"
-              />
             </div>
             <div className="text-left sm:px-4">
               <div className="mt-5">
@@ -713,7 +701,9 @@ const Doctors = () => {
               className="whitespace-nowrap table-hover"
               records={allDoctors}
               idAccessor="doctor_id"
-              onRowClick={(row)=> navigate(`/owner/clinics/${clinicId}/doctors/${row?.doctor_id}`)}
+              onRowClick={(row) =>
+                navigate(`/owner/clinics/${clinicId}/doctors/${row?.doctor_id}`)
+              }
               columns={[
                 {
                   accessor: "doctor_id",

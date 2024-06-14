@@ -344,35 +344,44 @@ console.log(response);
               </div>
 
               <div className="section-content" style={{ marginTop: "10px" }}>
-                <p className="p-2">
-                  <strong>Name:</strong> {profileData?.name}
-                </p>
-                <p className="p-2">
-                  <strong>Email:</strong> {profileData?.email}
-                </p>
-                <p className="p-2">
-                  <strong>Phone:</strong> {profileData?.phone}
-                </p>
-                <p className="p-2">
-                  <strong>Address:</strong> {profileData?.address}
-                </p>
-                <p className="p-2">
-                  <strong>Place:</strong> {profileData?.place}
-                </p>
-                <p>
-                  {/* <strong>Owner:</strong> {profileData?.User?.user_name} */}
-                </p>
-              </div>
+  <div className="flex flex-col md:flex-row gap-4">
+    <div className="profile-section p-2 w-full md:w-1/2">
+      <div className="section-content">
+        <img
+          src={imageBaseUrl + profileData?.banner_img_url}
+          alt="Banner"
+          className="w-full max-w-[400px]"
+        />
+      </div>
+    </div>
+   <div className="profile-section p-2 w-full md:w-1/2">
+  <div className="section-content mt-5">
+    <p className="p-2">
+      <strong className="min-w-[105px] inline-block text-white-dark">Name</strong>  <span className="mx-2">:</span> <span className="dark:text-slate-300"> {profileData?.name}</span>
+    </p>
+    <p className="p-2">
+      <strong className="min-w-[105px] inline-block text-white-dark">Email</strong> <span className="mx-2">:</span> <span className="dark:text-slate-300">{profileData?.email}</span>
+    </p>
+    <p className="p-2">
+      <strong className="min-w-[105px] inline-block text-white-dark">Phone</strong> <span className="mx-2">:</span> <span className="dark:text-slate-300">{profileData?.phone}</span>
+    </p>
+    <p className="p-2">
+      <strong className="min-w-[105px] inline-block text-white-dark">Address</strong> <span className="mx-2">:</span> <span className="dark:text-slate-300">{profileData?.address}</span>
+    </p>
+    <p className="p-2">
+      <strong className="min-w-[105px] inline-block text-white-dark">Place</strong>  <span className="mx-2">:</span> <span className="dark:text-slate-300">{profileData?.place}</span>
+    </p>
+    <p>
+      {/* <strong>Owner:</strong> {profileData?.User?.user_name} */}
+    </p>
+  </div>
+</div>
+
+  </div>
+</div>
+
             </div>
-            <div className="profile-section p-2">
-              <div className="section-content">
-                <img
-                  src={imageBaseUrl + profileData?.banner_img_url}
-                  alt="Banner"
-                  className="w-full max-w-[400px]"
-                />
-              </div>
-            </div>
+          
             <div className="profile-section p-2">
               <button
                 type="button"

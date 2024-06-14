@@ -14,8 +14,8 @@ import IconSearch from "../../../components/Icon/IconSearch";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
 import AddLeave from "./AddLeaveModal";
-import { formatDate } from "@fullcalendar/core";
-
+import {formatDate} from "../../../utils/formatDate";
+import {formatTime} from "../../../utils/formatDate";
 
 const ClinicDoctorLeave = () => {
   const dispatch = useDispatch();
@@ -35,9 +35,10 @@ const ClinicDoctorLeave = () => {
 
   const [addLeaveModal, setAddLeaveModal] = useState(false);
   const [allDoctorNames, setAllDoctorNames] = useState([]);
-  const [timeSlots, setTimeSlots] = useState([]);
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
+
+  
 
   useEffect(() => {
     setPage(1);
@@ -172,15 +173,7 @@ const ClinicDoctorLeave = () => {
     fetchDoctorData();
   }, []);
 
- 
 
-  const formatTime = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    let hour = parseInt(hours, 10);
-    const period = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-    return `${hour}:${minutes} ${period}`;
-  };
 
   return (
     <div>

@@ -241,7 +241,7 @@ const LoginBoxed = () => {
 
             <div className="mx-auto w-full max-w-[440px]">
               <div className="mb-10">
-                <h1 className="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">
+                <h1 className="text-3xl font-extrabold uppercase !leading-snug text-[#006241] md:text-4xl">
                   Sign in
                 </h1>
                 <p className="text-base font-bold leading-normal text-white-dark">

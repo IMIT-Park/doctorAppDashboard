@@ -23,7 +23,7 @@ const Setting = () => {
             >
                 <button
                     type="button"
-                    className="bg-primary ltr:rounded-tl-full rtl:rounded-tr-full ltr:rounded-bl-full rtl:rounded-br-full absolute ltr:-left-12 rtl:-right-12 top-0 bottom-0 my-auto w-12 h-10 flex justify-center items-center text-white cursor-pointer"
+                    className="bg-[#006241] ltr:rounded-tl-full rtl:rounded-tr-full ltr:rounded-bl-full rtl:rounded-br-full absolute ltr:-left-12 rtl:-right-12 top-0 bottom-0 my-auto w-12 h-10 flex justify-center items-center text-white cursor-pointer"
                     onClick={() => setShowCustomizer(!showCustomizer)}
                 >
                     <IconSettings className="animate-[spin_3s_linear_infinite] w-5 h-5" />
@@ -39,17 +39,17 @@ const Setting = () => {
                         <h5 className="mb-1 text-base dark:text-white leading-none">Color Scheme</h5>
                         <p className="text-white-dark text-xs">Overall light or dark presentation.</p>
                         <div className="grid grid-cols-3 gap-2 mt-3">
-                            <button type="button" className={`${themeConfig.theme === 'light' ? 'btn-primary' : 'btn-outline-primary'} btn`} onClick={() => dispatch(toggleTheme('light'))}>
+                            <button type="button" className={`${themeConfig.theme === 'light' ? 'btn-green' : 'btn-outline-green'} btn`} onClick={() => dispatch(toggleTheme('light'))}>
                                 <IconSun className="w-5 h-5 shrink-0 ltr:mr-2 rtl:ml-2" />
                                 Light
                             </button>
 
-                            <button type="button" className={`${themeConfig.theme === 'dark' ? 'btn-primary' : 'btn-outline-primary'} btn`} onClick={() => dispatch(toggleTheme('dark'))}>
+                            <button type="button" className={`${themeConfig.theme === 'dark' ? 'btn-green' : 'btn-outline-green'} btn`} onClick={() => dispatch(toggleTheme('dark'))}>
                                 <IconMoon className="w-5 h-5 shrink-0 ltr:mr-2 rtl:ml-2" />
                                 Dark
                             </button>
 
-                            <button type="button" className={`${themeConfig.theme === 'system' ? 'btn-primary' : 'btn-outline-primary'} btn`} onClick={() => dispatch(toggleTheme('system'))}>
+                            <button type="button" className={`${themeConfig.theme === 'system' ? 'btn-green' : 'btn-outline-green'} btn`} onClick={() => dispatch(toggleTheme('system'))}>
                                 <IconLaptop className="w-5 h-5 shrink-0 ltr:mr-2 rtl:ml-2" />
                                 System
                             </button>
@@ -59,23 +59,23 @@ const Setting = () => {
                         <h5 className="mb-1 text-base dark:text-white leading-none">Navigation Position</h5>
                         <p className="text-white-dark text-xs">Select the primary navigation paradigm for your app.</p>
                         <div className="grid grid-cols-2 gap-2 mt-3">
-                            <button type="button" className={`${themeConfig.menu === 'vertical' ? 'btn-primary' : 'btn-outline-primary'} btn`} onClick={() => dispatch(toggleMenu('vertical'))}>
+                            <button type="button" className={`${themeConfig.menu === 'vertical' ? 'btn-green' : 'btn-outline-green'} btn`} onClick={() => dispatch(toggleMenu('vertical'))}>
                                 Non-Collapsible
                             </button>
 
                             <button
                                 type="button"
-                                className={`${themeConfig.menu === 'collapsible-vertical' ? 'btn-primary' : 'btn-outline-primary'} btn`}
+                                className={`${themeConfig.menu === 'collapsible-vertical' ? 'btn-green' : 'btn-outline-green'} btn`}
                                 onClick={() => dispatch(toggleMenu('collapsible-vertical'))}
                             >
                                 Collapsible
                             </button>
                         </div>
-                        <div className="mt-5 text-primary">
+                        <div className="mt-5 text-[#006241]">
                             <label className="inline-flex mb-0">
                                 <input
                                     type="checkbox"
-                                    className="form-checkbox"
+                                    className="form-checkbox form-checkbox-green"
                                     checked={themeConfig.semidark === true || themeConfig.semidark === 'true'}
                                     onChange={(e) => dispatch(toggleSemidark(e.target.checked))}
                                 />
@@ -86,13 +86,13 @@ const Setting = () => {
                     <div className="border border-dashed border-white-light dark:border-[#1b2e4b] rounded-md mb-3 p-3">
                         <h5 className="mb-1 text-base dark:text-white leading-none">Navbar Type</h5>
                         <p className="text-white-dark text-xs">Sticky or Floating.</p>
-                        <div className="mt-3 flex items-center gap-3 text-primary">
+                        <div className="mt-3 flex items-center gap-3 text-[#006241]">
                             <label className="inline-flex mb-0">
                                 <input
                                     type="radio"
                                     checked={themeConfig.navbar === 'navbar-sticky'}
                                     value="navbar-sticky"
-                                    className="form-radio"
+                                    className="form-radio form-radio-green"
                                     onChange={() => dispatch(toggleNavbar('navbar-sticky'))}
                                 />
                                 <span>Sticky</span>
@@ -102,7 +102,7 @@ const Setting = () => {
                                     type="radio"
                                     checked={themeConfig.navbar === 'navbar-floating'}
                                     value="navbar-floating"
-                                    className="form-radio"
+                                    className="form-radio form-radio-green"
                                     onChange={() => dispatch(toggleNavbar('navbar-floating'))}
                                 />
                                 <span>Floating</span>
@@ -112,7 +112,7 @@ const Setting = () => {
                                     type="radio"
                                     checked={themeConfig.navbar === 'navbar-static'}
                                     value="navbar-static"
-                                    className="form-radio"
+                                    className="form-radio form-radio-green"
                                     onChange={() => dispatch(toggleNavbar('navbar-static'))}
                                 />
                                 <span>Static</span>
@@ -123,7 +123,7 @@ const Setting = () => {
                         <h5 className="mb-1 text-base dark:text-white leading-none">Router Transition</h5>
                         <p className="text-white-dark text-xs">Animation of main content.</p>
                         <div className="mt-3">
-                            <select className="form-select border-primary text-primary" value={themeConfig.animation} onChange={(e) => dispatch(toggleAnimation(e.target.value))}>
+                            <select className="form-select form-select-green border-[#006241] text-[#006241]" value={themeConfig.animation} onChange={(e) => dispatch(toggleAnimation(e.target.value))}>
                                 <option value=" ">None</option>
                                 <option value="animate__fadeIn">Fade</option>
                                 <option value="animate__fadeInDown">Fade Down</option>

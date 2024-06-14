@@ -30,6 +30,7 @@ const SinglePage = () => {
   });
 
   const [doctorDetails, setDoctorDetails] = useState({});
+  // const [doctorLeaves, setDoctorLeaves] = useState([]);
   const [loading, setLoading] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [active, setActive] = useState(null);
@@ -95,9 +96,26 @@ const SinglePage = () => {
     }
   };
 
+  const fetchLeaveData = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/doctor/getdrleave/${doctorId}`
+      );
+      // setDoctorLeaves(response?.data?.doctorLeaveDetails);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // fetching doctor data
   useEffect(() => {
     fetchDoctorData();
+    fetchLeaveData();
   }, []);
 
   //  block or unblock handler
@@ -451,21 +469,87 @@ const SinglePage = () => {
     timeSlotsByDay[timeslot.day_id].push(timeslot);
   });
 
-  console.log(doctorDetails);
+  const doctorLeaves = [
+    {
+      leave_date: "2024-06-12T00:00:00.000Z",
+      timeslot_count: 1,
+      leaves: [
+        {
+          leave_id: 4,
+          DoctorTimeSlot_id: 20,
+          doctor_id: 4,
+          clinic_id: 1,
+          leave_date: "2024-06-12T00:00:00.000Z",
+          created_at: "2024-06-14T09:20:55.000Z",
+          updated_at: "2024-06-14T09:20:55.000Z",
+          deleted_at: null,
+          DoctorTimeSlot: {
+            DoctorTimeSlot_id: 20,
+            doctor_id: 4,
+            day_id: 3,
+            time_slot: 5,
+            startTime: "01:00:00",
+            endTime: "02:00:00",
+            clinic_id: 1,
+            noOfConsultationsPerDay: 10,
+            created_at: "2024-06-11T06:49:36.000Z",
+            updated_at: "2024-06-11T06:49:36.000Z",
+            deleted_at: null
+          }
+        }
+      ],
+      fullday: true
+    },
+    {
+      leave_date: "2024-06-18T00:00:00.000Z",
+      timeslot_count: 2,
+      leaves: [
+        {
+          leave_id: 6,
+          DoctorTimeSlot_id: 19,
+          doctor_id: 4,
+          clinic_id: 1,
+          leave_date: "2024-06-18T00:00:00.000Z",
+          created_at: "2024-06-14T09:21:17.000Z",
+          updated_at: "2024-06-14T09:21:17.000Z",
+          deleted_at: null,
+          DoctorTimeSlot: {
+            DoctorTimeSlot_id: 19,
+            doctor_id: 4,
+            day_id: 2,
+            time_slot: 5,
+            startTime: "01:00:00",
+            endTime: "02:00:00",
+            clinic_id: 1,
+            noOfConsultationsPerDay: 10,
+            created_at: "2024-06-11T06:49:36.000Z",
+            updated_at: "2024-06-11T06:49:36.000Z",
+            deleted_at: null
+          }
+        }
+      ],
+      fullday: false
+    }
+  ];
+
+
   return (
     <div>
       <ScrollToTop />
       <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
         <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
           <li>
-            <Link to="/owner/clinics" className="text-primary hover:underline">
+            <Link
+              to="/owner/clinics"
+              className="text-[#006241] hover:underline"
+            >
               Clinics
             </Link>
           </li>
           <li className="before:content-['/'] before:mr-2">
             <Link
               to={`/owner/clinics/${clinicId}/doctors`}
-              className="text-primary hover:underline"
+              className="text-[#006241] hover:underline"
             >
               Doctors
             </Link>
@@ -480,7 +564,7 @@ const SinglePage = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="flex justify-between flex-wrap gap-4 sm:px-4">
+            <div className="flex flex-wrap gap-6 min-[1159px]:gap-16 md:pr-20">
               <div className="relative">
                 {doctorDetails?.photo ? (
                   <img
@@ -501,11 +585,91 @@ const SinglePage = () => {
                   <IconEdit className="w-4" />
                 </button>
 
-                <div className="text-2xl font-semibold capitalize">
+                <div className="text-2xl dark:text-slate-300 font-semibold capitalize">
                   {doctorDetails?.name || ""}
                 </div>
               </div>
-              <div className="flex flex-col items-center gap-4">
+              <div className="flex items-start flex-col md:flex-row flex-wrap md:gap-10 w-full md:w-auto">
+                <div>
+                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
+                    <div className="text-white-dark min-w-[105px] flex justify-between">
+                      Address <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300 md:max-w-80">
+                      {doctorDetails?.address || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
+                    <div className="text-white-dark min-w-[105px] flex justify-between">
+                      Email <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300">
+                      {doctorDetails?.email || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
+                    <div className="text-white-dark min-w-[105px] flex justify-between">
+                      Phone <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300">
+                      {doctorDetails?.phone || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
+                    <div className="text-white-dark min-w-[105px] flex justify-between">
+                      Date of Birth <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300">
+                      {formatDate(doctorDetails?.dateOfBirth)}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
+                    <div className="text-white-dark min-w-[105px] flex justify-between">
+                      Fees <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300">
+                      {" "}
+                      {` ₹${doctorDetails?.fees}` || ""}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
+                    <div className="text-white-dark min-w-[105px] flex justify-between">
+                      Gender <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300">
+                      {doctorDetails?.gender || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
+                    <div className="text-white-dark min-w-[105px] flex justify-between">
+                      Qualification <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300">
+                      {doctorDetails?.qualification || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
+                    <div className="text-white-dark min-w-[105px] flex justify-between">
+                      Specialization <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300">
+                      {doctorDetails?.specialization || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                    <div className="text-white-dark min-w-[105px] flex justify-between">
+                      Profie Visibility <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300">
+                      {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute top-5 right-5 flex flex-col items-center gap-4">
                 <label
                   className="w-12 h-6 relative"
                   onClick={(e) => {
@@ -534,56 +698,14 @@ const SinglePage = () => {
                 </button>
               </div>
             </div>
-            <div className="text-left sm:px-4">
-              <div className="mt-3">
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Address :</div>
-                  <div>{doctorDetails?.address || ""}</div>
-                </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Email :</div>
-                  <div>{doctorDetails?.email || ""}</div>
-                </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Phone :</div>
-                  <div>{doctorDetails?.phone || ""}</div>
-                </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Date of Birth :</div>
-                  <div>{formatDate(doctorDetails?.dateOfBirth)}</div>
-                </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Fees :</div>
-                  <div> {` ₹${doctorDetails?.fees}` || ""}</div>
-                </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Gender :</div>
-                  <div>{doctorDetails?.gender || ""}</div>
-                </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Qualification :</div>
-                  <div>{doctorDetails?.qualification || ""}</div>
-                </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Specialization :</div>
-                  <div>{doctorDetails?.specialization || ""}</div>
-                </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Profie Visibility :</div>
-                  <div>
-                    {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="my-6">
-              <div className="flex items-end justify-between mb-2">
+            <div className="my-10">
+              <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
                 <h5 className="text-base font-semibold dark:text-white-light">
                   Available Days & Time Slots:
                 </h5>
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className="btn btn-green"
                   onClick={openAddTimeSlotModal}
                 >
                   <IconPlus className="ltr:mr-2 rtl:ml-2" />
@@ -599,7 +721,9 @@ const SinglePage = () => {
                           <button
                             type="button"
                             className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
-                              active === day.id ? "!text-primary" : ""
+                              active === day.id
+                                ? "!text-[#006241] dark:!text-[#4ec37bfb]"
+                                : ""
                             }`}
                             onClick={() => togglePara(day.id)}
                           >
@@ -621,46 +745,44 @@ const SinglePage = () => {
                                 {timeSlotsByDay[day.id].map((timeslot) => (
                                   <div
                                     key={timeslot.DoctorTimeSlot_id}
-                                    className="flex items-start flex-wrap gap-4 border border-slate-300 dark:border-slate-500 p-2"
+                                    className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
                                   >
-                                    <div>
-                                      <span className="text-slate-900 dark:text-slate-50 font-normal border border-primary px-2 py-0.5 rounded-md">
-                                        {formatTime(timeslot?.startTime)} -{" "}
-                                        {formatTime(timeslot?.endTime)}
-                                      </span>
-                                      <div className="flex items-center gap-1 mt-2">
-                                        <p>No. of consultations:</p>{" "}
-                                        <div className="text-slate-700 dark:text-slate-300">
-                                          {timeslot?.noOfConsultationsPerDay}
-                                        </div>
-                                      </div>
-                                      <div className="flex items-center gap-1">
-                                        <p>Consultation Time: </p>
-                                        <div className="text-slate-700 dark:text-slate-300">
-                                          {timeslot?.time_slot}
-                                        </div>
+                                    <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
+                                      {formatTime(timeslot?.startTime)} -{" "}
+                                      {formatTime(timeslot?.endTime)}
+                                    </span>
+                                    <div className="flex items-center gap-1">
+                                      <p>No. of Consultations:</p>{" "}
+                                      <div className="text-slate-700 dark:text-slate-300">
+                                        {timeslot?.noOfConsultationsPerDay}
                                       </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
+                                      <p>Consultation Time: </p>
+                                      <div className="text-slate-700 dark:text-slate-300">
+                                        {timeslot?.time_slot} Min
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-1 mt-1">
                                       <button
                                         type="button"
-                                        className="btn btn-primary w-7 h-7 p-0 rounded-full"
+                                        className="btn btn-primary btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
                                         onClick={() =>
                                           openEditTimeSlotModal(timeslot)
                                         }
                                       >
-                                        <IconEdit className="w-4" />
+                                        Edit
                                       </button>
                                       <button
                                         type="button"
-                                        className="btn btn-danger w-7 h-7 p-0 rounded-full"
+                                        className="btn btn-danger btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
                                         onClick={() =>
                                           openDeletTimeSlotModal(
                                             timeslot?.DoctorTimeSlot_id
                                           )
                                         }
                                       >
-                                        <IconTrashLines className="w-4" />
+                                        Delete
                                       </button>
                                     </div>
                                   </div>
@@ -680,41 +802,19 @@ const SinglePage = () => {
               <h5 className="text-base font-semibold mb-1 dark:text-white-light">
                 Leaves:
               </h5>
-              {doctorDetails?.Drleave && doctorDetails?.Drleave?.length > 0 ? (
-                <div className="w-full border border-blue-500 rounded pt-2 pb-3 px-3">
-                  {doctorDetails?.Drleave?.map((leave) => {
-                    const timeSlot = doctorDetails?.timeslots.find(
-                      (slot) =>
-                        slot.DoctorTimeSlot_id === leave.DoctorTimeSlot_id
-                    );
-                    return (
-                      <div
-                        key={leave.leave_id}
-                        className="flex flex-col items-start gap-1"
-                      >
-                        <span className="badge bg-secondary rounded-none">
-                          {formatDate(leave.leave_date)}
-                        </span>
-                        {timeSlot && (
-                          <div className="w-full flex items-start gap-2 flex-wrap">
-                            <span className="text-slate-900 dark:text-slate-50 font-normal text-xs border border-primary px-2 py-0.5 rounded-md">
-                              {formatTime(timeSlot.startTime)} -{" "}
-                              {formatTime(timeSlot.endTime)}
-                            </span>
-                          </div>
-                        )}
-                        {doctorDetails?.Drleave.length > 1 &&
-                          doctorDetails?.Drleave.indexOf(leave) !==
-                            doctorDetails?.Drleave.length - 1 && (
-                            <div className="w-full h-[1px] bg-blue-500 my-4" />
-                          )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="mt-1 text-gray-400">No leaves found</p>
-              )}
+              <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
+                {doctorLeaves?.map((leave,index)=>(
+                  <div key={leave?.leave_date + index} className="w-full flex items-center justify-between flex-wrap gap-2 py-6 border-b border-[#d3d3d3] dark:border-[#1b2e4b]">
+                    <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
+                      Full Day Leave
+                    </span>
+                    <div className="flex items-center gap-1 font-bold text-base text-slate-500">
+                      <span>{formatDate(leave?.leave_date)}</span>
+                      <span>(Slot: 1:00 PM - 2:30 PM)</span>
+                    </div>
+                  </div>
+                  ))}
+              </div>
             </div>
           </>
         )}

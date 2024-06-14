@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import IconPlus from "../../../../../components/Icon/IconPlus";
-import Flatpickr from "react-flatpickr";
-import "flatpickr/dist/flatpickr.css";
 import NetworkHandler from "../../../../../utils/NetworkHandler";
 
 const BasicDetails = ({ input, setInput, handleFileChange }) => {
@@ -11,17 +9,6 @@ const BasicDetails = ({ input, setInput, handleFileChange }) => {
     setInput({ ...input, visibility: !e.target.checked });
   };
 
-  const handleDateOfBirthChange = (selectedDates) => {
-    const dateOfBirth = selectedDates[0];
-    let formattedDateOfBirth = "";
-
-    if (dateOfBirth) {
-      const [day, month, year] = dateOfBirth.toLocaleDateString().split("/");
-      formattedDateOfBirth = `${year}-${month}-${day}`;
-    }
-
-    setInput({ ...input, dateOfBirth: formattedDateOfBirth });
-  };
 
   const fetchSpecialization = async () => {
     try {

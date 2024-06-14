@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 import IconPlus from "../../../components/Icon/IconPlus";
 import IconX from "../../../components/Icon/IconX";
+
+// onRowClick={(row) => navigate(`/clinic/bookings/${row.doctor_id}/doctor`)}
 
 const AddPatients = ({
   addPatientsModal,
@@ -21,6 +24,23 @@ const AddPatients = ({
 
   //   const handleSubmit = () => {
   //     saveDoctor();
+  // };
+
+  const navigate = useNavigate();
+  
+  // const showAlert = (async) => {
+  //   Swal.fire({
+  //     icon: "success",
+  //     title: "Success!",
+  //     text: "Added Successfull!",
+  //     padding: "2em",
+  //     customClass: "sweet-alerts",
+  //   });
+  // };
+
+  // const handleAddNow = () => {
+  //   showAlert();
+  //   // setSelectedTime(null);
   // };
 
   return (
@@ -67,32 +87,6 @@ const AddPatients = ({
                 </div>
                 <div className="p-5">
                   <form>
-                    {/* <div className="flex flex-col justify-center items-center">
-                      <div className="relative w-36 h-36 rounded-full dark:bg-[#121c2c] bg-gray-200 mb-5 flex justify-center items-center">
-                        <label 
-                          htmlFor="fileInput"
-                          className="cursor-pointer"
-                          title="Upload profile picture"
-                        >
-                          {drProfilePic ? (
-                            <img
-                              src={URL.createObjectURL(drProfilePic)}
-                              alt="Selected"
-                              className=" w-36 h-36 rounded-full object-cover"
-                            />
-                          ) : (
-                            <IconPlus className="text-slate-600 w-24 h-24" />
-                          )}
-                          <input
-                            id="fileInput"
-                            type="file"
-                            className="hidden"
-                            onChange={handleFileChange}
-                            accept="image/*"
-                          />
-                        </label> 
-                      </div>
-                    </div> */}
 
                     <div className="mb-5">
                       <label htmlFor="mds-name">Patient Name</label>
@@ -160,20 +154,6 @@ const AddPatients = ({
                     </div>
 
                     <div className="mb-5">
-                      <label htmlFor="mds-name">Clinic-ID</label>
-                      <input
-                        id="Clinic-ID"
-                        type="text"
-                        placeholder="Enter Clinic-ID"
-                        className="form-input"
-                        // value={data.dr_specialization}
-                        // onChange={(e) =>
-                        //   setData({ ...data, dr_specialization: e.target.value })
-                        // }
-                      />
-                    </div>
-
-                    <div className="mb-5">
                       <label htmlFor="desc">Remarks</label>
                       <textarea
                         id="Remarks"
@@ -195,12 +175,15 @@ const AddPatients = ({
                       >
                         Cancel
                       </button>
+                      
                       <button
                         type="button"
                         className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                        onClick={(row) => navigate(`/clinic/bookings/${row.doctor_id}/doctor`)}
                       >
                         Add
                       </button>
+
                     </div>
                   </form>
                 </div>

@@ -148,6 +148,7 @@ const AddLeave = ({
         closeAddLeaveModal();
         fetchLeaveData();
         resetForm();
+
     } catch (error) {
         console.error("Error creating leave slots:", error);
         if (error.response && error.response.status === 404) {

@@ -20,6 +20,7 @@ import emptyBox from "/assets/images/empty-box.svg";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { useNavigate } from "react-router-dom";
 import AddPatients from "./AddPatients";
+import ShowPatients from "./ShowPatients";
 
 const rowData = [];
 const PatientsDetails = () => {
@@ -40,11 +41,15 @@ const PatientsDetails = () => {
   const [deleteModal, setDeleteModal] = useState(false);
 
   const [search, setSearch] = useState("");
+  const [searchDate, setSearchDate] = useState("");
+  const [viewModal, setViewModal] = useState(false);
+  const [singleDetails, setSingleDetails] = useState({});
   const [totalPatients, setTotalPatients] = useState(0);
   const [allPatients, setAllPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
 
   useEffect(() => {
     setPage(1);
@@ -80,6 +85,15 @@ const PatientsDetails = () => {
 
   const closeAddPatientsModal = () => {
     setAddPatientsModal(false);
+  };
+
+  const openViewModal = (user) => {
+    setSingleDetails(user);
+    setViewModal(true);
+  };
+
+  const closeViewModal = () => {
+    setViewModal(false);
   };
 
   // const closeAddDoctorModalDetail = () => {
@@ -205,9 +219,34 @@ const PatientsDetails = () => {
               <div className="relative">
                 <input
                   value={search}
+                  type="text"
                   placeholder="Search Patients..."
                   className="form-input shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
-                  onChange={(e) => setSearch(e.target.value)}
+                  // onChange={(e) => setSearch(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-primary absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                >
+                  <IconSearch className="mx-auto" />
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div>
+            <form
+              //   onSubmit={(e) => handleSubmit(e)}
+              onSubmit={(e) => e.preventDefault()}
+              className="mx-auto w-full mb-2"
+            >
+              <div className="relative">
+                <input
+                  value={searchDate}
+                  type="number"
+                  placeholder="Search Dates..."
+                  className="form-input shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
+                  // onChange={(e) => setSearchDate(e.target.value)}
                 />
                 <button
                   type="submit"
@@ -232,6 +271,8 @@ const PatientsDetails = () => {
             </Tippy>
           </div>
         </div>
+
+
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
@@ -247,8 +288,8 @@ const PatientsDetails = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={filteredPatients}
-              onRowClick={(row) =>
-                navigate(`/clinic/bookings/${row.doctor_id}/doctor`)
+              onClick={(row) =>
+                openViewModal(row)
               }
               columns={[
                 {
@@ -266,7 +307,10 @@ const PatientsDetails = () => {
                   title: "Date of Birth",
                   render: (row) => formatDate(row?.dateOfBirth),
                 },
-                { accessor: "address", title: "Address" },
+                { accessor: "patientId", title: "Patient Id" },
+                { accessor: "doctors", title: "Doctors" },
+                { accessor: "type", title: "Type" },
+
               ]}
               totalRecords={totalPatients}
               recordsPerPage={pageSize}
@@ -289,6 +333,11 @@ const PatientsDetails = () => {
         // saveDoctor={saveDoctor}
         // handleSelectDays={handleSelectDays}
         closeAddPatientsModal={closeAddPatientsModal}
+      />
+      <ShowPatients
+      open={viewModal}
+      closeModal={closeViewModal}
+      details={singleDetails}
       />
       {/* <AddDoctorModalDetail
         addDoctorModalDetail={addDoctorModalDetail}

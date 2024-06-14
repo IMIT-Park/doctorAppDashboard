@@ -105,46 +105,19 @@ const Patients = () => {
       <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
         <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
           <li>
-            <Link to="/clinic/doctors" className="text-primary hover:underline">
-              Clinics
+            <Link to="/clinic/bookings" className="text-primary hover:underline">
+              Doctors
             </Link>
           </li>
           <li className="before:content-['/'] before:mr-2">
-            <span>Doctors</span>
+            <Link to="/clinic/bookings/:doctor_id/patients" className="text-primary hover:underline">
+              Patients
+            </Link>
+          </li>
+          <li className="before:content-['/'] before:mr-2">
+            <span>Booking</span>
           </li>
         </ul>
-        <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div>
       </div>
 
       <div className="panel mb-1">
@@ -197,24 +170,12 @@ const Patients = () => {
           </div>
         </div>
         <div className="w-full flex justify-center mt-4">
-          <form className="w-full max-w-xs mx-auto flex justify-center">
+          <form className="w-full max-w-xs ml-auto flex justify-center">
             <div className="relative">
               <select className="form-select  bg-white  h-11 w-full sm:w-56 mt-6 mb-3 placeholder:tracking-wider ltr:pr-10 rtl:pl-11">
                 <option value="">Choose The Type...</option>
                 <option value="walkin">WalkIn</option>
                 <option value="emergency">Emergency</option>
-              </select>
-            </div>
-          </form>
-          <form className="w-full max-w-xs mx-auto flex justify-center">
-            <div className="relative">
-              <select className="form-select  bg-white h-11 w-full sm:w-56 mt-6 mb-3 placeholder:tracking-wider ltr:pr-10 rtl:pl-11">
-                <option value="">Choose Your Doctor...</option>
-                <option value="Doctor 1">Dr.Raj</option>
-                <option value="Doctor 2">Dr. Saj</option>
-                <option value="Doctor 3">Dr. Maj</option>
-                <option value="Doctor 4">Dr. Kaj</option>
-                <option value="Doctor 5">Dr.Baj</option>
               </select>
             </div>
           </form>

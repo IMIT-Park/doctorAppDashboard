@@ -8,6 +8,9 @@ import IconX from "../../../components/Icon/IconX";
 import axios from "axios";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import Swal from "sweetalert2";
+import {formatTime} from "../../../utils/formatTime";
+import {formatDate} from "../../../utils/formatDate";
+
 
 const AddLeave = ({
   addLeaveModal,
@@ -86,14 +89,7 @@ const AddLeave = ({
     return day ? day.name : "";
   };
 
-  const convertTo12HourFormat = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    let hour = parseInt(hours, 10);
-    const period = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-    return `${hour}:${minutes} ${period}`;
-  };
-
+  
   const handleSaveLeave = async () => {
     if (!selectedDoctorId) {
       showBlockAlert("No doctor selected");
@@ -156,6 +152,7 @@ const AddLeave = ({
     }
   };
 
+
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
       toast: true,
@@ -188,13 +185,7 @@ const AddLeave = ({
     });
   };
 
-  const formatTime = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    let hour = parseInt(hours, 10);
-    const period = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-    return `${hour}:${minutes} ${period}`;
-  };
+ 
 
   return (
     <Transition appear show={addLeaveModal} as={Fragment}>
@@ -382,13 +373,13 @@ const AddLeave = ({
                     )}
 
                     {leaveType === "By Shift" && (
-                      <div className="mb-8 flex flex-col  gap-5 justify-between ">
+                      <div className="mb-8 flex flex-col gap-5 justify-between">
                         <div>
                           <label htmlFor="Date">Date</label>
                           <input
                             id="Date"
                             type="date"
-                            className="form-input"
+                            className="form-input w-full max-w-[calc(50% - 3)]"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
                           />
@@ -398,19 +389,31 @@ const AddLeave = ({
                             </div>
                           )}
                         </div>
-                        
+
                         <div className="w-full">
                           {timeSlots.length > 0 && (
                             <div className="mt-5 w-full">
                               <label>Doctor Time Slots:</label>
                               <div className="flex flex-wrap mt-2">
                                 {timeSlots.map((slot) => (
-                                  <div key={slot.DoctorTimeSlot_id}>
-                                    <div className="badge badge-outline-dark text-gray-500">
+                                  <div
+                                    key={slot.DoctorTimeSlot_id}
+                                    className="flex items-center mb-2"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      id={`slot-${slot.DoctorTimeSlot_id}`}
+                                      value={slot.DoctorTimeSlot_id}
+                                      className="form-checkbox mr-2 ml-2"
+                                    />
+                                    <label
+                                      htmlFor={`slot-${slot.DoctorTimeSlot_id}`}
+                                      className="badge badge-outline-dark text-gray-500 p-2 text-lg"
+                                    >
                                       {getDayName(slot.day_id)}:{" "}
                                       {formatTime(slot.startTime)} -{" "}
                                       {formatTime(slot.endTime)}
-                                    </div>
+                                    </label>
                                   </div>
                                 ))}
                               </div>

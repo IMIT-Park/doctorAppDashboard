@@ -14,6 +14,7 @@ import IconSearch from "../../../components/Icon/IconSearch";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
 import AddLeave from "./AddLeaveModal";
+import { formatDate } from "@fullcalendar/core";
 
 
 const ClinicDoctorLeave = () => {
@@ -171,15 +172,9 @@ const ClinicDoctorLeave = () => {
     fetchDoctorData();
   }, []);
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
+ 
 
-  const convertTo12HourFormat = (timeString) => {
+  const formatTime = (timeString) => {
     const [hours, minutes] = timeString.split(":");
     let hour = parseInt(hours, 10);
     const period = hour >= 12 ? "PM" : "AM";
@@ -337,7 +332,7 @@ const ClinicDoctorLeave = () => {
                                 <time>{formatDate(leaveSlot.leave_date)} : </time>
                               </span>
                               <span className="text-slate-900 dark:text-slate-50 font-normal border border-primary px-2 py-0.5 rounded-md ml-2">
-                                <time>{convertTo12HourFormat(leaveSlot.DoctorTimeSlot.startTime)} - {convertTo12HourFormat(leaveSlot.DoctorTimeSlot.endTime)}</time>
+                                <time>{formatTime(leaveSlot.DoctorTimeSlot.startTime)} - {formatTime(leaveSlot.DoctorTimeSlot.endTime)}</time>
                               </span>
                             </div>
                           ))}

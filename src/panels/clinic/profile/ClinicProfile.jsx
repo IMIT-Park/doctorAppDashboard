@@ -5,15 +5,21 @@ import Swal from "sweetalert2";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import IconEdit from "../../../components/Icon/IconEdit";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import { Link, useNavigate } from "react-router-dom"; // Ensure useNavigate is imported
-import NetworkHandler, { imageBaseUrl, websiteUrl } from "../../../utils/NetworkHandler";
+import NetworkHandler, {
+  imageBaseUrl,
+  websiteUrl,
+} from "../../../utils/NetworkHandler";
 import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import IconDownload from "../../../components/Icon/IconDownload";
 import QRCode from "qrcode.react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import IconCopy from "../../../components/Icon/IconCopy";
+import IconPlus from "../../../components/Icon/IconPlus";
+import AddClinic from "../../owner/clinics/AddClinic";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -31,6 +37,122 @@ const ClinicProfile = () => {
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
   const [totalDoctors, setTotalDoctors] = useState(0);
+  const [editModal, setEditModal] = useState(false);
+  const [currentClinicId, setCurrentClinicId] = useState("");
+  const [buttonLoading,setButtonLoading] = useState(false)
+
+  const [input, setInput] = useState({
+    name: "",
+    email: "",
+    username: "",
+    phone: "",
+    address: "",
+    place: "",
+    password: "",
+    confirmPassword: "",
+    picture: null,
+    defaultPicture: null,
+    googleLocation: {},
+  });
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setInput({
+        picture: file,
+        defaultPicture: URL.createObjectURL(file),
+      });
+    } else {
+      setInput({ ...input, picture: null });
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setInput({ ...input, picture: null });
+  };
+
+  const openEditModal = (clinic) => {
+    setInput({
+      name: clinic.name,
+      email: clinic.User.email,
+      username: clinic.User.user_name,
+      phone: clinic.phone,
+      address: clinic.address,
+      place: clinic.place,
+      picture: null,
+      // picture: clinic.banner_img_url,
+      googleLocation: JSON.parse(clinic.googleLocation),
+      defaultPicture: imageBaseUrl + clinic?.banner_img_url || null,
+    });
+    setCurrentClinicId(clinic.clinic_id);
+    setEditModal(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModal(false);
+    setInput({
+      name: "",
+      email: "",
+      username: "",
+      phone: "",
+      address: "",
+      place: "",
+      picture: "",
+      googleLocation: {},
+    });
+    setCurrentClinicId(null);
+  };
+
+  const updateClinic = async () => {
+    if (
+      !input.name ||
+      !input.email ||
+      !input.username ||
+      !input.phone ||
+      !input.address ||
+      !input.place ||
+      !input.googleLocation
+    ) {
+      showMessage("Please fill in all required fields", "warning");
+      return true;
+    }
+
+    setButtonLoading(true);
+
+    const formData = new FormData();
+    formData.append("name", input.name);
+    formData.append("email", input.email);
+    formData.append("user_name", input.username);
+    formData.append("phone", input.phone);
+    formData.append("address", input.address);
+    formData.append("place", input.place);
+    formData.append("googleLocation", JSON.stringify(input.googleLocation));
+    if (input.picture) {
+      formData.append("image_url[]", input.picture);
+    }
+
+    try {
+          const response = await NetworkHandler.makePutRequest(
+        `/v1/clinic/edit/${currentClinicId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+console.log(response);
+      if (response.status === 200) {
+        showMessage("Clinic updated successfully", "success");
+        fetchProfileData();
+        closeEditModal();
+      } else {
+        throw new Error("Failed to update clinic");
+      }
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+      // console.error("Update clinic error:", error);
+    } finally {
+      setButtonLoading(false);
+    }
+  };
+
 
   const fetchProfileData = async () => {
     try {
@@ -44,7 +166,7 @@ const ClinicProfile = () => {
         response.data.Clinic
       ) {
         setProfileData(response.data.Clinic);
-        setTotalDoctors(response.data.Clinic.doctors ? response.data.Clinic.doctors.length : 0);
+        // setTotalDoctors(response.data.Clinic.doctors.length);
         setLoading(false);
       } else {
         throw new Error("Failed to fetch clinic data");
@@ -54,7 +176,6 @@ const ClinicProfile = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchProfileData();
   }, []);
@@ -121,7 +242,7 @@ const ClinicProfile = () => {
     });
   };
 
-  // Block or unblock handler
+  //  block or unblock handler
   const handleActiveUser = async (userId) => {
     try {
       const response = await NetworkHandler.makePostRequest(
@@ -132,7 +253,6 @@ const ClinicProfile = () => {
       showMessage("An error occurred. Please try again.", "error");
     }
   };
-
   const showBlockAlert = (id) => {
     Swal.fire({
       icon: "warning",
@@ -154,7 +274,6 @@ const ClinicProfile = () => {
       }
     });
   };
-
   const showUnblockAlert = (id) => {
     Swal.fire({
       icon: "warning",
@@ -182,40 +301,6 @@ const ClinicProfile = () => {
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
-        <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div>
-      </div>
 
       <div className="panel">
         {loading ? (
@@ -248,6 +333,16 @@ const ClinicProfile = () => {
                   <span className="bg-[#EBEDF2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
                 </label>
               </div>
+
+              <div className="flex items-start justify-end gap-2 flex-wrap m-4">
+                {/* Edit Button */}
+                <Tippy content="Edit">
+                  <button onClick={() => openEditModal(profileData)}>
+                    <IconEdit className="mr-1 w-8" />
+                  </button>
+                </Tippy>
+              </div>
+
               <div className="section-content" style={{ marginTop: "10px" }}>
                 <p className="p-2">
                   <strong>Name:</strong> {profileData?.name}
@@ -313,7 +408,7 @@ const ClinicProfile = () => {
                       text={qrUrl}
                       onCopy={(text, result) => {
                         if (result) {
-                          showMessage("Copied Successfully");
+                          showMessage("Copied Successfullly");
                         }
                       }}
                     >
@@ -329,9 +424,48 @@ const ClinicProfile = () => {
                 </form>
               </div>
             </div>
+            {/* <div className="profile-section">
+              <div className="section-content">
+                <div className="doctor-item">
+                  <Tippy content="Block/Unblock">
+                    <label
+                      className="w-[46px] h-[22px] relative"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (doctor?.status) {
+                          showBlockAlert(doctor?.user_id);
+                        } else {
+                          showUnblockAlert(doctor?.user_id);
+                        }
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                        //   id={`custom_switch_checkbox${doctor?.doctor_id}`}
+                        //   checked={doctor?.status}
+                        readOnly
+                      />
+                      <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                    </label>
+                  </Tippy>
+                </div>
+              </div>
+            </div> */}
           </div>
         )}
       </div>
+      <AddClinic
+        open={editModal}
+        closeModal={closeEditModal}
+        handleFileChange={handleFileChange}
+        handleRemoveImage={handleRemoveImage}
+        data={input}
+        setData={setInput}
+        handleSubmit={updateClinic}
+        buttonLoading={buttonLoading}
+        isEdit={true}
+      />
     </div>
   );
 };

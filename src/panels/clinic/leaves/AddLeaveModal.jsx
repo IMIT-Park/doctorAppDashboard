@@ -90,6 +90,7 @@ const AddLeave = ({
     return `${hour}:${minutes} ${period}`;
   };
 
+  
   const handleSaveLeave = async () => {
     if (!selectedDoctorId) {
       showBlockAlert("No doctor selected");
@@ -131,13 +132,14 @@ const AddLeave = ({
           end_date: endDate,
           clinic_id: userData?.UserClinic[0]?.clinic_id,
         };
+        console.log(leaveData);
         const response = await NetworkHandler.makePostRequest(
           `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
           leaveData
         );
         showMessage("Bulk leave added successfully.");
       }
-
+  
       closeAddLeaveModal();
       fetchLeaveData();
       resetForm();
@@ -145,6 +147,7 @@ const AddLeave = ({
       console.error("Error creating leave slots:", error);
     }
   };
+
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -330,11 +333,11 @@ const AddLeave = ({
                     {leaveType === "Multiple" && (
                       <div className="mb-5">
                         <label htmlFor="date">You can select multiple dates.</label>
-                        <div className="flex items-center flex-wrap gap-3 justify-self-start mb-12 mt-3">
+                        <div className="flex items-center flex-wrap gap-3 justify-between mb-12 mt-3">
                           <div>
                             <p className="mt-2">From</p>
                           </div>
-                          <div>
+                          <div className="w-full">
                             <input
                               id="StartDate"
                               type="date"
@@ -346,7 +349,7 @@ const AddLeave = ({
                           <div>
                             <p className="mt-2">To</p>
                           </div>
-                          <div>
+                          <div className="w-full">
                             <input
                               id="EndDate"
                               type="date"

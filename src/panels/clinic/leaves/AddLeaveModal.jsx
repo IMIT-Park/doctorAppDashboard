@@ -60,22 +60,27 @@ const AddLeave = ({
     console.log("Selected Date:", date);
 
     try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/doctor/getTimeSlot/${selectedDoctorId}`,
-        { date }
-      );
-      console.log("API Response:", response.data);
+        const response = await NetworkHandler.makePostRequest(
+            `/v1/doctor/getTimeSlot/${selectedDoctorId}`,
+            { date }
+        );
+        console.log("API Response:", response.data);
 
-      setTimeSlots(response.data.doctorTimeSlots);
+        if (response.data.doctorTimeSlots.count === 0) {
+            setErrorMessage("No Timeslots found for this day");
+        } else {
+            setTimeSlots(response.data.doctorTimeSlots?.rows);
+        }
     } catch (error) {
-      console.error("Error fetching time slots:", error);
-      if (error.response && error.response.status === 404) {
-        setErrorMessage("No Timeslots found for this day");
-      } else {
-        setErrorMessage("An error occurred while fetching timeslots");
-      }
+        console.error("Error fetching time slots:", error);
+        if (error.response && error.response.status === 404) {
+            setErrorMessage("No Timeslots found for this day");
+        } else {
+            setErrorMessage("An error occurred while fetching timeslots");
+        }
     }
-  };
+};
+
 
   const getDayName = (dayId) => {
     const day = days.find((d) => d.id === String(dayId));
@@ -90,62 +95,70 @@ const AddLeave = ({
     return `${hour}:${minutes} ${period}`;
   };
 
+  
   const handleSaveLeave = async () => {
     if (!selectedDoctorId) {
-      showBlockAlert("No doctor selected");
-      return;
+        showBlockAlert("No doctor selected");
+        return;
     }
 
     if (leaveType === "Full Day" && !selectedDate) {
-      showBlockAlert("No date selected");
-      return;
+        showBlockAlert("No date selected");
+        return;
     }
 
     if (leaveType === "Full Day" && timeSlots.length === 0) {
-      showBlockAlert("No time slots selected");
-      return;
+        showBlockAlert("No time slots selected");
+        return;
     }
 
     if (leaveType === "Multiple" && (!startDate || !endDate)) {
-      showBlockAlert("Please select a date range");
-      return;
+        showBlockAlert("Please select a date range");
+        return;
     }
 
     try {
-      if (leaveType === "Full Day") {
-        const leaveData = {
-          leaveslots: timeSlots.map((slot) => ({
-            clinic_id: userData?.UserClinic[0]?.clinic_id,
-            DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
-            leave_date: selectedDate,
-          })),
-        };
-        const response = await NetworkHandler.makePostRequest(
-          `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
-          leaveData
-        );
-        showMessage("Leave added successfully.");
-      } else if (leaveType === "Multiple") {
-        const leaveData = {        
-          start_date: startDate,
-          end_date: endDate,
-          clinic_id: userData?.UserClinic[0]?.clinic_id,
-        };
-        console.log(leaveData);
-        // const response = await NetworkHandler.makePostRequest(
-        //   `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
-        //   leaveData
-        // );
-        // showMessage("Bulk leave added successfully.");
-      }
+        if (leaveType === "Full Day") {
+            const leaveData = {
+                leaveslots: timeSlots.map((slot) => ({
+                    clinic_id: userData?.UserClinic[0]?.clinic_id,
+                    DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
+                    leave_date: selectedDate,
+                })),
+            };
+            const response = await NetworkHandler.makePostRequest(
+                `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
+                leaveData
+            );
+            showMessage("Leave added successfully.");
+        } else if (leaveType === "Multiple") {
+            const leaveData = {
+                startDate: startDate,
+                endDate: endDate,
+                clinic_id: userData?.UserClinic[0]?.clinic_id,
+            };
+            console.log(leaveData);
+            const response = await NetworkHandler.makePostRequest(
+                `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
+                leaveData
+            );
+            console.log(response);
+            showMessage("Bulk leave added successfully.");
+        }
+        closeAddLeaveModal();
+        fetchLeaveData();
+        resetForm();
 
-      // closeAddLeaveModal();
-      fetchLeaveData();
-      resetForm();
     } catch (error) {
-      console.error("Error creating leave slots:", error);
+        console.error("Error creating leave slots:", error);
+        if (error.response && error.response.status === 404) {
+            showBlockAlert("Leave already taken on the date");
+        } else {
+            showBlockAlert("An error occurred while creating leave slots");
+        }
     }
-  };
+};
+
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -317,8 +330,8 @@ const AddLeave = ({
                                 <div key={slot.DoctorTimeSlot_id}>
                                   <div className="badge badge-outline-dark text-gray-500">
                                     {getDayName(slot.day_id)}:{" "}
-                                    {convertTo12HourFormat(slot.startTime)} -{" "}
-                                    {convertTo12HourFormat(slot.endTime)}
+                                    {formatTime(slot.startTime)} -{" "}
+                                    {formatTime(slot.endTime)}
                                   </div>
                                 </div>
                               ))}
@@ -331,11 +344,11 @@ const AddLeave = ({
                     {leaveType === "Multiple" && (
                       <div className="mb-5">
                         <label htmlFor="date">You can select multiple dates.</label>
-                        <div className="flex items-center flex-wrap gap-3 justify-self-start mb-12 mt-3">
+                        <div className="flex items-center flex-wrap gap-3 justify-between mb-12 mt-3">
                           <div>
                             <p className="mt-2">From</p>
                           </div>
-                          <div>
+                          <div className="w-full">
                             <input
                               id="StartDate"
                               type="date"
@@ -347,7 +360,7 @@ const AddLeave = ({
                           <div>
                             <p className="mt-2">To</p>
                           </div>
-                          <div>
+                          <div className="w-full">
                             <input
                               id="EndDate"
                               type="date"

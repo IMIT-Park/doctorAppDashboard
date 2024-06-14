@@ -5,25 +5,16 @@ import CountUp from "react-countup";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
-import IconEdit from "../../../components/Icon/IconEdit";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
-// import AddDoctor from "./AddDoctor";
-// import AddDoctorModalDetail from "./AddDoctorModalDetail";
-// import DeleteDoctor from "./DeleteDoctor";
-// import DoctorPassword from "./DoctorPassword";
-import IconEye from "../../../components/Icon/IconEye";
 import ScrollToTop from "../../../components/ScrollToTop";
 import IconSearch from "../../../components/Icon/IconSearch";
 import IconLoader from "../../../components/Icon/IconLoader";
 import emptyBox from "/assets/images/empty-box.svg";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { useNavigate } from "react-router-dom";
-import AddPatients from "./AddPatients";
-import ShowPatients from "./ShowPatients";
+import ShowPatients from "./SearchPatientsModal";
 
 const rowData = [];
-const PatientsDetails = () => {
+const ClinicBookingDoctor = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(setPageTitle("ownerDoctor"));
@@ -32,25 +23,19 @@ const PatientsDetails = () => {
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const initialRecords = rowData.slice(0, pageSize);
-  const [addPatientsModal, setAddPatientsModal] = useState(false);
-  // const [addDoctorModalDetail, setAddDoctorModalDetail] = useState(false);
-  const [addDoctorPasswordModal, setAddDoctorPasswordModal] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [data, setData] = useState({ password: "", confirmPassword: "" });
-  const [buttonLoading, setButtonLoading] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
 
   const [search, setSearch] = useState("");
-  const [searchDate, setSearchDate] = useState("");
-  const [viewModal, setViewModal] = useState(false);
-  const [singleDetails, setSingleDetails] = useState({});
-  const [totalPatients, setTotalPatients] = useState(0);
-  const [allPatients, setAllPatients] = useState([]);
-  const [filteredPatients, setFilteredPatients] = useState([]);
+  const [totalDoctors, setTotalDoctors] = useState(0);
+  const [allDoctors, setAllDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchModal, setSearchModal] = useState(false);
+  const [singleDetails, setSingleDetails] = useState({});
   const navigate = useNavigate();
 
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
 
+ 
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
@@ -60,17 +45,6 @@ const PatientsDetails = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  useEffect(() => {
-    if (search) {
-      const filtered = allPatients.filter((doctor) =>
-        doctor.name.toLowerCase().includes(search.toLowerCase())
-      );
-      setFilteredPatients(filtered);
-    } else {
-      setFilteredPatients(allPatients);
-    }
-  }, [search, allPatients]);
-
   function formatDate(dateString) {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, "0"); // Ensure two digits for day
@@ -79,72 +53,28 @@ const PatientsDetails = () => {
     return `${day}-${month}-${year}`;
   }
 
-  const openAddPatientsModal = () => {
-    setAddPatientsModal(true);
-  };
-
-  const closeAddPatientsModal = () => {
-    setAddPatientsModal(false);
-  };
-
-  const openViewModal = (user) => {
+  const openSearchModal = (user) => {
     setSingleDetails(user);
-    setViewModal(true);
+    setSearchModal(true);
   };
 
-  const closeViewModal = () => {
-    setViewModal(false);
+  const closeSearchModal = () => {
+    setSearchModal(false);
   };
 
-  // const closeAddDoctorModalDetail = () => {
-  //   setAddDoctorModalDetail(false);
-  //   setaddDoctorModal(true);
-  // };
-
-  // const openAddDoctorModalDetail = () => {
-  //   setAddDoctorModalDetail(true);
-  // };
-
-  // const handleSelectDays = () => {
-  //   closeAddDoctorModal();
-  //   openAddDoctorModalDetail();
-  // };
-
-  // const doctorPasswordModal = () => {
-  //   setAddDoctorPasswordModal(true);
-  // };
-
-  // const closeDoctorPasswordModal = () => {
-  //   setAddDoctorPasswordModal(false);
-  //   setAddDoctorModalDetail(true);
-  // };
-
-  // const handleDoctorPassword = () => {
-  //   setAddDoctorModalDetail(false);
-  //   doctorPasswordModal();
-  // };
-
-  // const saveDoctor = () => {
-  //   alert("Success");
-  // };
-
-  // handle Delete Modal
-  // const openDeleteConfirmModal = () => {
-  //   setDeleteModal(true);
-  // };
-  // const closeDeleteConfirmModal = () => {
-  //   setDeleteModal(false);
-  // };
 
   // fetch Doctors function
   const fetchData = async () => {
+
+    const clinicId = userData?.UserClinic[0]?.clinic_id;
+    console.log("clinicId:", clinicId);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getall?pageSize=${pageSize}&page=${page}`
+        `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
       );
-      console.log(response?.data?.Clinic);
-      setTotalPatients(response.data?.Doctors?.count);
-      setAllPatients(response.data?.Doctors?.rows);
+      // console.log(response?.data?.Clinic);
+      setTotalDoctors(response.data?.Doctors?.count);
+      setAllDoctors(response.data?.Doctors?.rows);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -162,67 +92,35 @@ const PatientsDetails = () => {
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
-        <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div>
-      </div>
 
       <div className="panel">
+        
+
         <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              Patients
+              Doctors
             </h5>
             <Tippy content="Total Doctors">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalPatients} duration={3}></CountUp>
+                <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
 
+          
           <div>
             <form
-              //   onSubmit={(e) => handleSubmit(e)}
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={(e) => handleSubmit(e)}
               className="mx-auto w-full mb-2"
             >
               <div className="relative">
                 <input
-                  value={search}
                   type="text"
-                  placeholder="Search Patients..."
+                  value={search}
+                  placeholder="Search Doctor..."
                   className="form-input shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
-                  // onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => setSearch(e.target.value)}
                 />
                 <button
                   type="submit"
@@ -232,47 +130,8 @@ const PatientsDetails = () => {
                 </button>
               </div>
             </form>
-          </div>
-
-          <div>
-            <form
-              //   onSubmit={(e) => handleSubmit(e)}
-              onSubmit={(e) => e.preventDefault()}
-              className="mx-auto w-full mb-2"
-            >
-              <div className="relative">
-                <input
-                  value={searchDate}
-                  type="number"
-                  placeholder="Search Dates..."
-                  className="form-input shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
-                  // onChange={(e) => setSearchDate(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  className="btn btn-primary absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
-                >
-                  <IconSearch className="mx-auto" />
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div className="flex  text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Doctor">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={openAddPatientsModal}
-              >
-                <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
-                Add Patients
-              </button>
-            </Tippy>
           </div>
         </div>
-
-
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
@@ -287,10 +146,9 @@ const PatientsDetails = () => {
               mih={180}
               highlightOnHover
               className="whitespace-nowrap table-hover"
-              records={filteredPatients}
-              onClick={(row) =>
-                openViewModal(row)
-              }
+              records={allDoctors}
+              onRowClick={(row) => navigate(`/clinic/bookings/${row?.doctor_id}/patients`)}
+              // onRowClick={(row)=> openSearchModal(row)}
               columns={[
                 {
                   accessor: "No",
@@ -298,6 +156,21 @@ const PatientsDetails = () => {
                   render: (row, rowIndex) => rowIndex + 1,
                 },
                 // { accessor: "doctor_id", title: "ID" },
+
+                {
+                  accessor: "photo",
+                  title: "Photo",
+                  render: (row) =>
+                    row?.photo ? (
+                      <img
+                        src={imageBaseUrl + row?.photo}
+                        alt="Doctor's photo"
+                        className="w-10 h-10 rounded-[50%]"
+                      />
+                    ) : (
+                      "---"
+                    ),
+                },
 
                 { accessor: "name", title: "Name" },
                 { accessor: "phone", title: "Phone" },
@@ -307,12 +180,17 @@ const PatientsDetails = () => {
                   title: "Date of Birth",
                   render: (row) => formatDate(row?.dateOfBirth),
                 },
-                { accessor: "patientId", title: "Patient Id" },
-                { accessor: "doctors", title: "Doctors" },
-                { accessor: "type", title: "Type" },
-
+                { accessor: "qualification", title: "Qualification" },
+                { accessor: "specialization", title: "Specialization" },
+                { accessor: "address", title: "Address" },
+                { accessor: "fees", title: "Fees" },
+                {
+                  accessor: "visibility",
+                  title: "Visibility",
+                  render: (row) => (row.visibility ? "Visible" : "Hidden"),
+                },
               ]}
-              totalRecords={totalPatients}
+              totalRecords={totalDoctors}
               recordsPerPage={pageSize}
               page={page}
               onPageChange={(p) => setPage(p)}
@@ -326,36 +204,13 @@ const PatientsDetails = () => {
           </div>
         )}
       </div>
-      <AddPatients
-        addPatientsModal={addPatientsModal}
-        setAddPatientsModal={setAddPatientsModal}
-        buttonLoading={buttonLoading}
-        // saveDoctor={saveDoctor}
-        // handleSelectDays={handleSelectDays}
-        closeAddPatientsModal={closeAddPatientsModal}
-      />
       <ShowPatients
-      open={viewModal}
-      closeModal={closeViewModal}
+      open={searchModal}
+      closeModal={closeSearchModal}
       details={singleDetails}
       />
-      {/* <AddDoctorModalDetail
-        addDoctorModalDetail={addDoctorModalDetail}
-        closeAddDoctorModalDetail={closeAddDoctorModalDetail}
-        buttonLoading={buttonLoading}
-        handleDoctorPassword={handleDoctorPassword}
-      />
-      <DeleteDoctor open={deleteModal} closeModal={closeDeleteConfirmModal} />
-      <DoctorPassword
-        addDoctorPasswordModal={addDoctorPasswordModal}
-        closeDoctorPasswordModal={closeDoctorPasswordModal}
-        showPassword={showPassword}
-        setShowPassword={setShowPassword}
-        data={data}
-        setData={setData}
-      /> */}
     </div>
   );
 };
 
-export default PatientsDetails;
+export default ClinicBookingDoctor;

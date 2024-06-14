@@ -8,8 +8,9 @@ import IconPhone from "../../../components/Icon/IconPhone";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import IconCopy from "../../../components/Icon/IconCopy";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
-const ShowPatients = ({ open, closeModal,details }) => {
+const SearchPatientsModal = ({ open, closeModal,details }) => {
   const [message1, setMessage1] = useState("");
 
   useEffect(() => {
@@ -18,6 +19,8 @@ const ShowPatients = ({ open, closeModal,details }) => {
     setMessage1(``);
     }
   }, [details]);
+
+  const navigate = useNavigate();
 
   const showMessage = (message = "") => {
     const toast = Swal.mixin({
@@ -77,11 +80,21 @@ const ShowPatients = ({ open, closeModal,details }) => {
                 >
                   <IconX />
                 </button>
-                <div className="flex items-center flex-wrap gap-2 text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
+                {/* <div className="flex items-center flex-wrap gap-2 text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
                   <div className="ltr:mr-3 rtl:ml-3">{}Name</div> 
-                </div>
+                </div> */}
                 <div className="p-5">
-                  <ul className="flex flex-col space-y-4 font-semibold text-white-dark">
+
+                <div className="mb-5 mt-16">
+                        <form>
+                            <input type="tel" placeholder="Enter Phone Number" className="form-input" required />
+                            <button type="submit" className="btn btn-primary mt-6 ml-auto mr-auto" onClick={() => navigate(`PatientsDetails`)}>
+                                Submit
+                            </button>
+                        </form>
+                    </div>
+
+                  {/* <ul className="flex flex-col space-y-4 font-semibold text-white-dark">
                     <li>
                       <button className="flex items-center gap-2">
                         <IconMail className="w-5 h-5 shrink-0" />
@@ -100,7 +113,7 @@ const ShowPatients = ({ open, closeModal,details }) => {
                       <IconMapPin className="shrink-0" />
                       {}Location
                     </li>
-                  </ul>
+                  </ul> */}
 
                   {/* <div className="bg-[#f1f2f3] p-2 rounded dark:bg-[#060818] mt-5">
                     <form>
@@ -134,7 +147,7 @@ const ShowPatients = ({ open, closeModal,details }) => {
                   <div className="ltr:text-right rtl:text-left mt-8">
                     <button
                       type="button"
-                      className="btn btn-outline-danger"
+                      className="btn btn-outline-danger ml-auto"
                       onClick={closeModal}
                     >
                       Close
@@ -150,4 +163,4 @@ const ShowPatients = ({ open, closeModal,details }) => {
   );
 };
 
-export default ShowPatients;
+export default SearchPatientsModal;

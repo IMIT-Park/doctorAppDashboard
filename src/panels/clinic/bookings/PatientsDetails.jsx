@@ -18,7 +18,7 @@ import IconSearch from "../../../components/Icon/IconSearch";
 import IconLoader from "../../../components/Icon/IconLoader";
 import emptyBox from "/assets/images/empty-box.svg";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import AddPatients from "./AddPatients";
 import ShowPatients from "./SearchPatientsModal";
 
@@ -163,39 +163,17 @@ const PatientsDetails = () => {
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
-        {/* <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div> */}
+      <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
+        <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
+          <li>
+            <Link to="/clinic/bookings" className="text-primary hover:underline">
+              Doctors
+            </Link>
+          </li>
+          <li className="before:content-['/'] before:mr-2">
+            <span>Patients</span>
+          </li>
+        </ul>
       </div>
 
       <div className="panel">
@@ -286,8 +264,6 @@ const PatientsDetails = () => {
                   title: "Date of Birth",
                   render: (row) => formatDate(row?.dateOfBirth),
                 },
-                { accessor: "doctors", title: "Doctors" },
-                { accessor: "type", title: "Type" },
 
               ]}
               totalRecords={totalPatients}

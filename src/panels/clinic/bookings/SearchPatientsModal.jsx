@@ -1,22 +1,15 @@
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
-import IconLoader from "../../../components/Icon/IconLoader";
-import IconMapPin from "../../../components/Icon/IconMapPin";
-import IconMail from "../../../components/Icon/IconMail";
-import IconPhone from "../../../components/Icon/IconPhone";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import IconCopy from "../../../components/Icon/IconCopy";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
-const SearchPatientsModal = ({ open, closeModal,details }) => {
-  const [message1, setMessage1] = useState("");
+const SearchPatientsModal = ({ open, closeModal, details }) => {
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     if (details) {
-    //   setMessage1(`http://www.admin-dashboard.com/${details.salespersoncode}`);
-    setMessage1(``);
+      setPhoneNumber("");
     }
   }, [details]);
 
@@ -37,18 +30,19 @@ const SearchPatientsModal = ({ open, closeModal,details }) => {
     });
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const doctorId = details?.doctor_id; // Assuming `details` contains `doctor_id`
+    if (doctorId) {
+      navigate(`/clinic/bookings/${doctorId}/patients`);
+    }
+  };
+
   if (!details) return null;
 
-
-  console.log(details);
   return (
     <Transition appear show={open} as={Fragment}>
-      <Dialog
-        as="div"
-        open={open}
-        onClose={closeModal}
-        className="relative z-[51]"
-      >
+      <Dialog as="div" open={open} onClose={closeModal} className="relative z-[51]">
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -80,70 +74,25 @@ const SearchPatientsModal = ({ open, closeModal,details }) => {
                 >
                   <IconX />
                 </button>
-                {/* <div className="flex items-center flex-wrap gap-2 text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  <div className="ltr:mr-3 rtl:ml-3">{}Name</div> 
-                </div> */}
                 <div className="p-5">
-
-                <div className="mb-5 mt-16">
-                        <form>
-                            <input type="tel" placeholder="Enter Phone Number" className="form-input" required />
-                            <button type="submit" className="btn btn-primary mt-6 ml-auto mr-auto" onClick={() => navigate(`PatientsDetails`)}>
-                                Submit
-                            </button>
-                        </form>
-                    </div>
-
-                  {/* <ul className="flex flex-col space-y-4 font-semibold text-white-dark">
-                    <li>
-                      <button className="flex items-center gap-2">
-                        <IconMail className="w-5 h-5 shrink-0" />
-                        <span className="text-primary truncate">
-                        {}Email
-                        </span>
-                      </button>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <IconPhone className="w-5 h-5 shrink-0" />
-                      <span className="whitespace-nowrap" dir="ltr">
-                      {}Phone
-                      </span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <IconMapPin className="shrink-0" />
-                      {}Location
-                    </li>
-                  </ul> */}
-
-                  {/* <div className="bg-[#f1f2f3] p-2 rounded dark:bg-[#060818] mt-5">
-                    <form>
+                  <div className="mb-5 mt-16">
+                    <form onSubmit={handleSubmit}>
                       <input
-                        type="text"
-                        value={message1}
+                        type="tel"
+                        placeholder="Enter Your Phone Number"
                         className="form-input"
-                        onChange={(e) => setMessage1(e.target.value)}
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        required
                       />
-                      <div className="mt-1">
-                        <CopyToClipboard
-                          text={message1}
-                          onCopy={(text, result) => {
-                            if (result) {
-                              showMessage();
-                            }
-                          }}
-                        >
-                          <button
-                            type="button"
-                            className="btn btn-primary px-2 ml-auto"
-                          >
-                            <IconCopy className="ltr:mr-2 rtl:ml-2" />
-                            Copy
-                          </button>
-                        </CopyToClipboard>
-                      </div>
+                      <button
+                        type="submit"
+                        className="btn btn-primary mt-6 ml-auto mr-auto"
+                      >
+                        Submit
+                      </button>
                     </form>
-                  </div> */}
-
+                  </div>
                   <div className="ltr:text-right rtl:text-left mt-8">
                     <button
                       type="button"

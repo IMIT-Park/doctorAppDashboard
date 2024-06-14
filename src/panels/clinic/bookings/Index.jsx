@@ -10,7 +10,7 @@ import IconSearch from "../../../components/Icon/IconSearch";
 import IconLoader from "../../../components/Icon/IconLoader";
 import emptyBox from "/assets/images/empty-box.svg";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import ShowPatients from "./SearchPatientsModal";
 
 const rowData = [];
@@ -92,7 +92,13 @@ const ClinicBookingDoctor = () => {
   return (
     <div>
       <ScrollToTop />
-
+      <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
+        <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
+        <li className="mr-2">
+            <span>Doctors</span>
+          </li>
+        </ul>
+      </div>
       <div className="panel">
         
 
@@ -147,8 +153,8 @@ const ClinicBookingDoctor = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allDoctors}
-              onRowClick={(row) => navigate(`/clinic/bookings/${row?.doctor_id}/patients`)}
-              // onRowClick={(row)=> openSearchModal(row)}
+              // onRowClick={(row) => navigate(`/clinic/bookings/${row?.doctor_id}/patients`)}
+              onRowClick={(row)=> openSearchModal(row)}
               columns={[
                 {
                   accessor: "No",

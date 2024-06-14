@@ -28,20 +28,20 @@ const AddPatients = ({
 
   const navigate = useNavigate();
   
-  // const showAlert = (async) => {
-  //   Swal.fire({
-  //     icon: "success",
-  //     title: "Success!",
-  //     text: "Added Successfull!",
-  //     padding: "2em",
-  //     customClass: "sweet-alerts",
-  //   });
-  // };
+  const showAlert = (async) => {
+    Swal.fire({
+      icon: "success",
+      title: "Success!",
+      text: "Added Successfull!",
+      padding: "2em",
+      customClass: "sweet-alerts",
+    });
+  };
 
-  // const handleAddNow = () => {
-  //   showAlert();
-  //   // setSelectedTime(null);
-  // };
+  const handleAddNow = () => {
+    showAlert();
+    // setSelectedTime(null);
+  };
 
   return (
     <Transition appear show={addPatientsModal} as={Fragment}>
@@ -179,7 +179,8 @@ const AddPatients = ({
                       <button
                         type="button"
                         className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                        onClick={(row) => navigate(`/clinic/bookings/${row.doctor_id}/doctor`)}
+                        onClick={handleAddNow}
+                        // onClick={(row) => navigate(`/clinic/bookings/${row.doctor_id}/doctor`)}
                       >
                         Add
                       </button>

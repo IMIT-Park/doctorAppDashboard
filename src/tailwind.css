@@ -277,6 +277,13 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     @apply cursor-not-allowed opacity-60;
   }
 
+  .btn-green {
+    @apply border-[#006241] bg-[#006241] text-white shadow-[#00624162];
+  }
+  .btn-outline-green {
+    @apply border-[#006241] text-[#006241] shadow-none hover:bg-[#006241] hover:text-white;
+  }
+
   .btn-primary {
     @apply border-primary bg-primary text-white shadow-primary/60;
   }
@@ -365,6 +372,10 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     @apply w-full rounded-md border border-white-light bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-primary focus:ring-transparent dark:border-[#17263c] dark:bg-[#121e32] dark:text-white-dark dark:focus:border-primary;
   }
 
+  .form-select-green {
+    @apply  border-white-light bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-[#006241] focus:ring-transparent dark:border-[#123228] dark:bg-[#121e32] dark:text-white-dark dark:focus:border-[#006241];
+  }
+
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -439,6 +450,11 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
   .form-checkbox {
     @apply h-5 w-5 cursor-pointer rounded border-2 border-white-light bg-transparent text-primary !shadow-none !outline-none !ring-0 !ring-offset-0 checked:bg-[length:90%_90%] disabled:cursor-not-allowed disabled:bg-[#eee] ltr:mr-1.5 rtl:ml-1.5
       dark:border-[#253b5c] dark:checked:border-transparent dark:disabled:bg-[#1b2e4b];
+  }
+
+  .form-radio-green,
+  .form-checkbox-green {
+    @apply text-[#006241];
   }
 
   .form-checkbox.outline-primary:checked {

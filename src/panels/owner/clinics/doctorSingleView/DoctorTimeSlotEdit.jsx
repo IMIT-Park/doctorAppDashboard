@@ -67,7 +67,7 @@ const DoctorTimeSlotEdit = ({
                       {!isEdit && (
                         <select
                           id="ctnSelect1"
-                          className="form-select text-white-dark"
+                          className="form-select form-select-green text-white-dark"
                           required
                           value={selectedDay}
                           onChange={(e) => setSelectedDay(e.target.value)}

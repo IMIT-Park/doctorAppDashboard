@@ -60,27 +60,26 @@ const AddLeave = ({
     console.log("Selected Date:", date);
 
     try {
-        const response = await NetworkHandler.makePostRequest(
-            `/v1/doctor/getTimeSlot/${selectedDoctorId}`,
-            { date }
-        );
-        console.log("API Response:", response.data);
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/getTimeSlot/${selectedDoctorId}`,
+        { date }
+      );
+      console.log("API Response:", response.data);
 
-        if (response.data.doctorTimeSlots.count === 0) {
-            setErrorMessage("No Timeslots found for this day");
-        } else {
-            setTimeSlots(response.data.doctorTimeSlots?.rows);
-        }
+      if (response.data.doctorTimeSlots.count === 0) {
+        setErrorMessage("No Timeslots found for this day");
+      } else {
+        setTimeSlots(response.data.doctorTimeSlots?.rows);
+      }
     } catch (error) {
-        console.error("Error fetching time slots:", error);
-        if (error.response && error.response.status === 404) {
-            setErrorMessage("No Timeslots found for this day");
-        } else {
-            setErrorMessage("An error occurred while fetching timeslots");
-        }
+      console.error("Error fetching time slots:", error);
+      if (error.response && error.response.status === 404) {
+        setErrorMessage("No Timeslots found for this day");
+      } else {
+        setErrorMessage("An error occurred while fetching timeslots");
+      }
     }
-};
-
+  };
 
   const getDayName = (dayId) => {
     const day = days.find((d) => d.id === String(dayId));
@@ -95,70 +94,67 @@ const AddLeave = ({
     return `${hour}:${minutes} ${period}`;
   };
 
-  
   const handleSaveLeave = async () => {
     if (!selectedDoctorId) {
-        showBlockAlert("No doctor selected");
-        return;
+      showBlockAlert("No doctor selected");
+      return;
     }
 
     if (leaveType === "Full Day" && !selectedDate) {
-        showBlockAlert("No date selected");
-        return;
+      showBlockAlert("No date selected");
+      return;
     }
 
     if (leaveType === "Full Day" && timeSlots.length === 0) {
-        showBlockAlert("No time slots selected");
-        return;
+      showBlockAlert("No time slots selected");
+      return;
     }
 
     if (leaveType === "Multiple" && (!startDate || !endDate)) {
-        showBlockAlert("Please select a date range");
-        return;
+      showBlockAlert("Please select a date range");
+      return;
     }
 
     try {
-        if (leaveType === "Full Day") {
-            const leaveData = {
-                leaveslots: timeSlots.map((slot) => ({
-                    clinic_id: userData?.UserClinic[0]?.clinic_id,
-                    DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
-                    leave_date: selectedDate,
-                })),
-            };
-            const response = await NetworkHandler.makePostRequest(
-                `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
-                leaveData
-            );
-            showMessage("Leave added successfully.");
-        } else if (leaveType === "Multiple") {
-            const leaveData = {
-                startDate: startDate,
-                endDate: endDate,
-                clinic_id: userData?.UserClinic[0]?.clinic_id,
-            };
-            console.log(leaveData);
-            const response = await NetworkHandler.makePostRequest(
-                `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
-                leaveData
-            );
-            console.log(response);
-            showMessage("Bulk leave added successfully.");
-        }
-        closeAddLeaveModal();
-        fetchLeaveData();
-        resetForm();
-
+      if (leaveType === "Full Day") {
+        const leaveData = {
+          leaveslots: timeSlots.map((slot) => ({
+            clinic_id: userData?.UserClinic[0]?.clinic_id,
+            DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
+            leave_date: selectedDate,
+          })),
+        };
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
+          leaveData
+        );
+        showMessage("Leave added successfully.");
+      } else if (leaveType === "Multiple") {
+        const leaveData = {
+          startDate: startDate,
+          endDate: endDate,
+          clinic_id: userData?.UserClinic[0]?.clinic_id,
+        };
+        console.log(leaveData);
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
+          leaveData
+        );
+        console.log(response);
+        showMessage("Bulk leave added successfully.");
+      }
+      closeAddLeaveModal();
+      fetchLeaveData();
+      resetForm();
     } catch (error) {
-        console.error("Error creating leave slots:", error);
-        if (error.response && error.response.status === 404) {
-            showBlockAlert("Leave already taken on the date");
-        } else {
-            showBlockAlert("An error occurred while creating leave slots");
-        }
+      console.error("Error creating leave slots:", error);
+      if (error.response && error.response.status === 404) {
+        showBlockAlert("Leave already taken on the date");
+      } else {
+        showBlockAlert("An error occurred while creating leave slots");
+      }
     }
-};
-
+  };
 
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
@@ -190,6 +186,14 @@ const AddLeave = ({
       title: msg,
       padding: "10px 20px",
     });
+  };
+
+  const formatTime = (timeString) => {
+    const [hours, minutes] = timeString.split(":");
+    let hour = parseInt(hours, 10);
+    const period = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${minutes} ${period}`;
   };
 
   return (
@@ -237,78 +241,82 @@ const AddLeave = ({
                 <div className="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
                   New Leave
                 </div>
-                <div className="p-5">
+                <div className="p-5 ">
                   <form>
-                    <div className="mb-8">
-                      <label htmlFor="ChooseDoctor">Choose Doctor</label>
-                      <select
-                        id="ChooseDoctor"
-                        className="form-select text-white-dark"
-                        required
-                        onChange={handleDoctorChange}
-                      >
-                        <option value="">Choose Doctor</option>
-                        {allDoctorNames.map((doctor) => (
-                          <option
-                            key={doctor.doctor_id}
-                            value={doctor.doctor_id}
-                          >
-                            {doctor.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <div className="mb-8 flex items-center flex-col md:flex-row justify-between gap-8">
+                      <div className="w-full">
+                        <label htmlFor="ChooseDoctor" className="block mb-5">
+                          Choose Doctor
+                        </label>
+                        <select
+                          id="ChooseDoctor"
+                          className="form-select text-white-dark w-full"
+                          required
+                          onChange={handleDoctorChange}
+                        >
+                          <option value="">Choose Doctor</option>
+                          {allDoctorNames.map((doctor) => (
+                            <option
+                              key={doctor.doctor_id}
+                              value={doctor.doctor_id}
+                            >
+                              {doctor.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
-                    <div className="mb-5">
-                      <label htmlFor="mds-name">Select Duration</label>
-
-                      <div className="flex items-center flex-wrap gap-3 justify-stretch mb-8 mt-3">
-                        <div>
-                          <label className="inline-flex">
-                            <input
-                              type="radio"
-                              name="default_radio"
-                              className="form-radio text-success"
-                              value="Full Day"
-                              checked={leaveType === "Full Day"}
-                              onChange={() => setLeaveType("Full Day")}
-                            />
-                            <span>Full Day</span>
-                          </label>
-                        </div>
-                        <div>
-                          <label className="inline-flex">
-                            <input
-                              type="radio"
-                              name="default_radio"
-                              className="form-radio text-success"
-                              value="Multiple"
-                              checked={leaveType === "Multiple"}
-                              onChange={() => setLeaveType("Multiple")}
-                            />
-                            <span>Multiple</span>
-                          </label>
-                        </div>
-                        <div>
-                          <label className="inline-flex">
-                            <input
-                              type="radio"
-                              name="default_radio"
-                              className="form-radio text-success"
-                              value="By Shift"
-                              checked={leaveType === "By Shift"}
-                              onChange={() => setLeaveType("By Shift")}
-                            />
-                            <span>By Shift</span>
-                          </label>
+                      <div className="w-full">
+                        <label className="block mb-5">Select Duration</label>
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <label className="inline-flex items-center">
+                              <input
+                                type="radio"
+                                name="leave_type"
+                                className="form-radio text-success"
+                                value="Full Day"
+                                checked={leaveType === "Full Day"}
+                                onChange={() => setLeaveType("Full Day")}
+                              />
+                              <span className="mr-4">Full Day</span>
+                            </label>
+                          </div>
+                          <div>
+                            <label className="inline-flex items-center">
+                              <input
+                                type="radio"
+                                name="leave_type"
+                                className="form-radio text-success"
+                                value="Multiple"
+                                checked={leaveType === "Multiple"}
+                                onChange={() => setLeaveType("Multiple")}
+                              />
+                              <span className="mr-4">Multiple</span>
+                            </label>
+                          </div>
+                          <div>
+                            <label className="inline-flex items-center">
+                              <input
+                                type="radio"
+                                name="leave_type"
+                                className="form-radio text-success"
+                                value="By Shift"
+                                checked={leaveType === "By Shift"}
+                                onChange={() => setLeaveType("By Shift")}
+                              />
+                              <span className="">By Shift</span>
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     {leaveType === "Full Day" && (
-                      <div className="mb-5">
-                        <label htmlFor="Date">Date</label>
-                        <div>
+                      <div className="mb-8 flex items-center flex-col md:flex-row justify-between gap-8">
+                        <div className="w-full">
+                          <label htmlFor="Date">Date</label>
+
                           <input
                             id="Date"
                             type="date"
@@ -317,15 +325,17 @@ const AddLeave = ({
                             onChange={handleDateChange}
                           />
                         </div>
-                        {errorMessage && (
-                          <div className="text-red-500 mt-2">
-                            {errorMessage}
-                          </div>
-                        )}
-                        {timeSlots.length > 0 && (
+                        <div className="w-full">
+                          {errorMessage && (
+                            <div className="text-red-500 mt-2">
+                              {errorMessage}
+                            </div>
+                          )}
+                        </div>
+                        {/* {timeSlots.length > 0 && (
                           <div className="mt-5">
                             <label>Doctor Time Slots:</label>
-                            <div className="flex flex-wrap gap-2 mt-2">
+                            <div className="flex flex-wrap mt-2">
                               {timeSlots.map((slot) => (
                                 <div key={slot.DoctorTimeSlot_id}>
                                   <div className="badge badge-outline-dark text-gray-500">
@@ -337,18 +347,18 @@ const AddLeave = ({
                               ))}
                             </div>
                           </div>
-                        )}
+                        )} */}
                       </div>
                     )}
 
                     {leaveType === "Multiple" && (
                       <div className="mb-5">
-                        <label htmlFor="date">You can select multiple dates.</label>
-                        <div className="flex items-center flex-wrap gap-3 justify-between mb-12 mt-3">
-                          <div>
-                            <p className="mt-2">From</p>
-                          </div>
+                        <label htmlFor="date">
+                          You can select multiple dates.
+                        </label>
+                        <div className="mb-8 mt-2 flex items-center flex-col md:flex-row justify-between gap-8">
                           <div className="w-full">
+                            <p className="mt-2">From</p>
                             <input
                               id="StartDate"
                               type="date"
@@ -357,10 +367,8 @@ const AddLeave = ({
                               onChange={(e) => setStartDate(e.target.value)}
                             />
                           </div>
-                          <div>
-                            <p className="mt-2">To</p>
-                          </div>
                           <div className="w-full">
+                            <p className="mt-2">To</p>
                             <input
                               id="EndDate"
                               type="date"
@@ -374,24 +382,45 @@ const AddLeave = ({
                     )}
 
                     {leaveType === "By Shift" && (
-                      <div className="mb-5">
-                        <label htmlFor="gender">Date</label>
+                      <div className="mb-8 flex flex-col  gap-5 justify-between ">
                         <div>
-                          <Flatpickr
-                            options={{
-                              dateFormat: "d-m-Y",
-                              position: "auto left",
-                            }}
-                            className="form-input mb-5"
-                            placeholder="Select Date"
-                            //   value={input.dateOfBirth}
-                            //   onChange={([date]) => setInput({ ...input, dateOfBirth: date })}
+                          <label htmlFor="Date">Date</label>
+                          <input
+                            id="Date"
+                            type="date"
+                            className="form-input"
+                            value={selectedDate || ""}
+                            onChange={handleDateChange}
                           />
+                          {errorMessage && (
+                            <div className="text-red-500 mt-2">
+                              {errorMessage}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="w-full">
+                          {timeSlots.length > 0 && (
+                            <div className="mt-5 w-full">
+                              <label>Doctor Time Slots:</label>
+                              <div className="flex flex-wrap mt-2">
+                                {timeSlots.map((slot) => (
+                                  <div key={slot.DoctorTimeSlot_id}>
+                                    <div className="badge badge-outline-dark text-gray-500">
+                                      {getDayName(slot.day_id)}:{" "}
+                                      {formatTime(slot.startTime)} -{" "}
+                                      {formatTime(slot.endTime)}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
 
-                    <div className="flex justify-end items-center mt-8">
+                    <div className="flex justify-center items-center mt-8">
                       <button
                         type="button"
                         className="btn btn-outline-danger gap-2"
@@ -404,7 +433,7 @@ const AddLeave = ({
                       </button>
                       <button
                         type="button"
-                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                        className="btn btn-outline-primary ltr:ml-4 rtl:mr-4"
                         onClick={handleSaveLeave}
                       >
                         {buttonLoading ? (

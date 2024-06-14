@@ -357,7 +357,7 @@ const AddClinic = ({
                         className="btn btn-primary ltr:ml-4 rtl:mr-4"
                       >
                         {buttonLoading ? (
-                          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-2 rtl:mr-2 shrink-0" />
+                          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-0 rtl:mr-0 shrink-0" />
                         ) : isEdit ? (
                           "Edit"
                         ) : (

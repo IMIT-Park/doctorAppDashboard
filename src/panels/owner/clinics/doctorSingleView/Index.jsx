@@ -494,11 +494,11 @@ const SinglePage = () => {
             noOfConsultationsPerDay: 10,
             created_at: "2024-06-11T06:49:36.000Z",
             updated_at: "2024-06-11T06:49:36.000Z",
-            deleted_at: null
-          }
-        }
+            deleted_at: null,
+          },
+        },
       ],
-      fullday: true
+      fullday: true,
     },
     {
       leave_date: "2024-06-18T00:00:00.000Z",
@@ -524,14 +524,36 @@ const SinglePage = () => {
             noOfConsultationsPerDay: 10,
             created_at: "2024-06-11T06:49:36.000Z",
             updated_at: "2024-06-11T06:49:36.000Z",
-            deleted_at: null
-          }
-        }
+            deleted_at: null,
+          },
+        },
+        {
+          leave_id: 6,
+          DoctorTimeSlot_id: 20,
+          doctor_id: 4,
+          clinic_id: 1,
+          leave_date: "2024-06-18T00:00:00.000Z",
+          created_at: "2024-06-14T09:21:17.000Z",
+          updated_at: "2024-06-14T09:21:17.000Z",
+          deleted_at: null,
+          DoctorTimeSlot: {
+            DoctorTimeSlot_id: 20,
+            doctor_id: 4,
+            day_id: 2,
+            time_slot: 5,
+            startTime: "10:00:00",
+            endTime: "12:00:00",
+            clinic_id: 1,
+            noOfConsultationsPerDay: 10,
+            created_at: "2024-06-11T06:49:36.000Z",
+            updated_at: "2024-06-11T06:49:36.000Z",
+            deleted_at: null,
+          },
+        },
       ],
-      fullday: false
-    }
+      fullday: false,
+    },
   ];
-
 
   return (
     <div>
@@ -803,17 +825,31 @@ const SinglePage = () => {
                 Leaves:
               </h5>
               <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
-                {doctorLeaves?.map((leave,index)=>(
-                  <div key={leave?.leave_date + index} className="w-full flex items-center justify-between flex-wrap gap-2 py-6 border-b border-[#d3d3d3] dark:border-[#1b2e4b]">
+                {doctorLeaves?.map((leave, index) => (
+                  <div
+                    key={leave?.leave_date + index}
+                    className="w-full flex items-center justify-between flex-wrap gap-2 py-6 border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
+                  >
                     <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
-                      Full Day Leave
+                      {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
                     </span>
-                    <div className="flex items-center gap-1 font-bold text-base text-slate-500">
+                    <div className="flex items-center flex-wrap gap-1 font-bold text-base text-slate-500">
                       <span>{formatDate(leave?.leave_date)}</span>
-                      <span>(Slot: 1:00 PM - 2:30 PM)</span>
+                      {!leave?.fullday && (
+                        <div className="flex items-center flex-wrap ">
+                          {leave?.leaves?.map((slot, slotIndex) => (
+                            <span key={slot?.DoctorTimeSlot_id}>
+                              (Slot:{" "}
+                              {formatTime(slot?.DoctorTimeSlot?.startTime)} -{" "}
+                              {formatTime(slot?.DoctorTimeSlot?.endTime)})
+                              {slotIndex < leave.leaves.length - 1 && " , "}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
-                  ))}
+                ))}
               </div>
             </div>
           </>

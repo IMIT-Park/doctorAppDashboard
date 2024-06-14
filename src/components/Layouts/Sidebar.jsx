@@ -64,6 +64,8 @@ const Sidebar = () => {
       setCurrentMenu("owner-dashboard");
     } else if (location.pathname === "/owner/clinics") {
       setCurrentMenu("owner-clinics");
+    } else if (location.pathname === "/owner/subscription-plans") {
+      setCurrentMenu("owner-subscription-plans");
     } else if (location.pathname === "/clinic/dashboard") {
       setCurrentMenu("clinic-dashboard");
     } else if (location.pathname === "/clinic/doctors") {
@@ -152,6 +154,20 @@ const Sidebar = () => {
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Clinics"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/owner/subscription-plans" className="group">
+                    <div className="flex items-center">
+                      <IconMenuTodo
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "owner-subscription-plans" ? "!text-primary" : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Subscription Plans"}
                       </span>
                     </div>
                   </NavLink>

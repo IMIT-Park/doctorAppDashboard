@@ -45,14 +45,14 @@ const DeleteMessage = ({ open, closeModal }) => {
                   <IconX />
                 </button>
                 <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  Delete Report
+                  Delete Message
                 </div>
                 <div className="p-5 text-center">
                   <div className="text-white bg-danger ring-4 ring-danger/30 p-4 rounded-full w-fit mx-auto">
                     <IconTrashLines className="w-7 h-7 mx-auto" />
                   </div>
                   <div className="sm:w-full mx-auto mt-5">
-                    Are you sure you want to delete this Report?
+                    Are you sure you want to delete this Message?
                   </div>
 
                   <div className="flex justify-center items-center mt-8">
@@ -65,7 +65,7 @@ const DeleteMessage = ({ open, closeModal }) => {
                     </button>
                     <button
                       type="button"
-                      className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                      className="btn btn-green ltr:ml-4 rtl:mr-4"
                       onClick={handleSubmit}
                     >
                       Delete

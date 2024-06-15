@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -71,42 +71,10 @@ const Owners = () => {
               Owners
             </h5>
             <Tippy content="Total Users">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={totalOwners} duration={3}></CountUp>
               </span>
             </Tippy>
-          </div>
-          <div className="flex items-center flex-wrap gap-4">
-            <div className="flex items-start gap-1">
-              <h5 className="text-base font-semibold dark:text-white-light">
-                Active
-              </h5>
-              <label className="w-11 h-5 relative">
-                <input
-                  type="checkbox"
-                  className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                  id="custom_switch_checkbox_active"
-                  checked
-                  readOnly
-                />
-                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-              </label>
-            </div>
-            <div className="flex items-start gap-1">
-              <h5 className="text-base font-semibold dark:text-white-light">
-                Not Active
-              </h5>
-              <label className="w-11 h-5 relative">
-                <input
-                  type="checkbox"
-                  className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                  id="custom_switch_checkbox_active"
-                  checked={false}
-                  readOnly
-                />
-                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-              </label>
-            </div>
           </div>
         </div>
         {loading ? (

@@ -1,14 +1,9 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../store/themeConfigSlice";
-import Swal from "sweetalert2";
 import IconMail from "../../components/Icon/IconMail";
 import CountUp from "react-countup";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
 import IconLoader from "../../components/Icon/IconLoader";
-import ScrollToTop from "../../components/ScrollToTop";
-import emptyBox from "/assets/images/empty-box.svg";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import IconCopy from "../../components/Icon/IconCopy";
 import IconTwitter from "../../components/Icon/IconTwitter";
@@ -21,7 +16,8 @@ import IconMenuDatatables from "../../components/Icon/Menu/IconMenuDatatables";
 import Dropdown from "../../components/Dropdown";
 import IconHorizontalDots from "../../components/Icon/IconHorizontalDots";
 import ReactApexChart from "react-apexcharts";
-import NetworkHandler from "../../utils/NetworkHandler";
+import NetworkHandler, { dashboardUrl, websiteUrl } from "../../utils/NetworkHandler";
+import { showMessage } from "../../utils/showMessage";
 
 const Users = () => {
   const userDetails = sessionStorage.getItem("userData");
@@ -29,7 +25,7 @@ const Users = () => {
   const salespersonId = userData?.UserSalesperson?.[0]?.salesperson_id || 0;
 
   const [details, setDetails] = useState({});
-  const [message1, setMessage1] = useState("http://www.admin-dashboard.com");
+  const [message1, setMessage1] = useState("");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const isDark = useSelector(
@@ -39,22 +35,7 @@ const Users = () => {
 
   useEffect(() => {
     dispatch(setPageTitle("Dashboard"));
-  },[]);
-
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
-    });
-  };
+  }, []);
 
   const shareOnWhatsApp = () => {
     const url = message1;
@@ -348,10 +329,7 @@ const Users = () => {
         `/v1/salesperson/getsalesperson/${salespersonId}`
       );
       setDetails(response?.data?.salespersons);
-      setMessage1(
-        "http://www.admin-dashboard.com/" +
-          response?.data?.salespersons?.salespersoncode
-      );
+      setMessage1(websiteUrl + response?.data?.salespersons?.salespersoncode);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -415,7 +393,7 @@ const Users = () => {
                 <input
                   type="text"
                   value={message1}
-                  className="form-input"
+                  className="form-input form-input-green"
                   onChange={(e) => setMessage1(e.target.value)}
                 />
                 <div className="sm:flex space-y-2 sm:space-y-0 sm:space-x-2 rtl:space-x-reverse mt-5">
@@ -428,7 +406,7 @@ const Users = () => {
                     }}
                   >
                     <div className="flex justify-center w-full ">
-                      <button type="button" className="btn btn-primary ">
+                      <button type="button" className="btn btn-green ">
                         <IconCopy className="ltr:mr-2 rtl:ml-2" />
                         Copy from Input
                       </button>

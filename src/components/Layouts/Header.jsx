@@ -4,7 +4,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toggleTheme, toggleSidebar } from "../../store/themeConfigSlice";
 import Dropdown from "../Dropdown";
 import IconMenu from "../Icon/IconMenu";
-import IconSearch from "../Icon/IconSearch";
 import IconXCircle from "../Icon/IconXCircle";
 import IconSun from "../Icon/IconSun";
 import IconMoon from "../Icon/IconMoon";
@@ -12,7 +11,6 @@ import IconLaptop from "../Icon/IconLaptop";
 import IconInfoCircle from "../Icon/IconInfoCircle";
 import IconBellBing from "../Icon/IconBellBing";
 import IconUser from "../Icon/IconUser";
-import IconLockDots from "../Icon/IconLockDots";
 import IconLogout from "../Icon/IconLogout";
 import IconMailDot from "../Icon/IconMailDot";
 import IconArrowLeft from "../Icon/IconArrowLeft";
@@ -84,7 +82,6 @@ const Header = () => {
     setNotifications(notifications.filter((user) => user.id !== value));
   };
 
-  const [search, setSearch] = useState(false);
 
   const handleLogout = () => {
     sessionStorage.clear();

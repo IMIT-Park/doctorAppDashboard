@@ -311,22 +311,20 @@ const Messages = () => {
               Messages
             </h5>
             <Tippy content="Total Messages">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={rowData.length} duration={3}></CountUp>
               </span>
             </Tippy>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Send Message">
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-green"
                 onClick={() => openSendMessage()}
               >
                 <IconPencilPaper className="ltr:mr-2 rtl:ml-2" />
                 Send Message
               </button>
-            </Tippy>
           </div>
         </div>
         {/* <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" /> */}

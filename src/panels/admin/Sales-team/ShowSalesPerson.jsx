@@ -1,40 +1,24 @@
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
-import IconLoader from "../../../components/Icon/IconLoader";
 import IconMapPin from "../../../components/Icon/IconMapPin";
 import IconMail from "../../../components/Icon/IconMail";
 import IconPhone from "../../../components/Icon/IconPhone";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import IconCopy from "../../../components/Icon/IconCopy";
-import Swal from "sweetalert2";
+import { showMessage } from "../../../utils/showMessage";
+import { dashboardUrl, websiteUrl } from "../../../utils/NetworkHandler";
 
-const ShowSalesPerson = ({ open, closeModal,details }) => {
+const ShowSalesPerson = ({ open, closeModal, details }) => {
   const [message1, setMessage1] = useState("");
 
   useEffect(() => {
     if (details) {
-      setMessage1(`http://www.admin-dashboard.com/${details.salespersoncode}`);
+      setMessage1(websiteUrl + details.salespersoncode);
     }
   }, [details]);
 
-  const showMessage = (message = "") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top",
-      showConfirmButton: false,
-      timer: 3000,
-      showCloseButton: true,
-    });
-    toast.fire({
-      icon: "success",
-      title: message || "Copied successfully.",
-      padding: "10px 20px",
-    });
-  };
-
   if (!details) return null;
-
 
   console.log(details);
   return (
@@ -84,15 +68,15 @@ const ShowSalesPerson = ({ open, closeModal,details }) => {
                     <li>
                       <button className="flex items-center gap-2">
                         <IconMail className="w-5 h-5 shrink-0" />
-                        <span className="text-primary truncate">
-                        {details.email}
+                        <span className="text-[#006241] truncate">
+                          {details.email}
                         </span>
                       </button>
                     </li>
                     <li className="flex items-center gap-2">
                       <IconPhone className="w-5 h-5 shrink-0" />
                       <span className="whitespace-nowrap" dir="ltr">
-                      {details.phone}
+                        {details.phone}
                       </span>
                     </li>
                     <li className="flex items-center gap-2">
@@ -106,7 +90,7 @@ const ShowSalesPerson = ({ open, closeModal,details }) => {
                       <input
                         type="text"
                         value={message1}
-                        className="form-input"
+                        className="form-input form-input-green"
                         onChange={(e) => setMessage1(e.target.value)}
                       />
                       <div className="mt-1">
@@ -114,13 +98,13 @@ const ShowSalesPerson = ({ open, closeModal,details }) => {
                           text={message1}
                           onCopy={(text, result) => {
                             if (result) {
-                              showMessage();
+                              showMessage("Copied successfully.", "success");
                             }
                           }}
                         >
                           <button
                             type="button"
-                            className="btn btn-primary px-2 ml-auto"
+                            className="btn btn-green px-2 ml-auto"
                           >
                             <IconCopy className="ltr:mr-2 rtl:ml-2" />
                             Copy

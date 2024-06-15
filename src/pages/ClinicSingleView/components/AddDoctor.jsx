@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import IconX from "../../../../components/Icon/IconX";
-import BasicDetails from "./addDoctor/BasicDetails";
-import SelectDays from "./addDoctor/SelectDays";
-import Credentials from "./addDoctor/Credentials";
-import IconLoader from "../../../../components/Icon/IconLoader";
+import IconX from "../../../components/Icon/IconX";
+import BasicDetails from "./BasicDetails";
+import SelectDays from "./SelectDays";
+import Credentials from "./Credentials";
+import IconLoader from "../../../components/Icon/IconLoader";
 
 const AddDoctor = ({
   open,

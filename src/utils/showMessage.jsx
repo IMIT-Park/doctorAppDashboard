@@ -5,6 +5,7 @@ export const showMessage = (msg = "", type = "success") => {
       toast: true,
       position: "top",
       showConfirmButton: false,
+      showCloseButton:true,
       timer: 3000,
       customClass: { container: "toast" },
     });

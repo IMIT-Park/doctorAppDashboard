@@ -1,8 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../../components/Icon/IconX";
-import IconLoader from "../../../../components/Icon/IconLoader";
-import NetworkHandler from "../../../../utils/NetworkHandler";
+import IconX from "../../../components/Icon/IconX";
+import IconLoader from "../../../components/Icon/IconLoader";
+import NetworkHandler from "../../../utils/NetworkHandler";
 
 const DoctorDetailsEdit = ({
   open,

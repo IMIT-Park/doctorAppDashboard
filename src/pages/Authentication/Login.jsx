@@ -12,6 +12,7 @@ import IconCloseEye from "../../components/Icon/IconCloseEye";
 import { toggleTheme } from "../../store/themeConfigSlice";
 import IconX from "../../components/Icon/IconX";
 import IconLoader from "../../components/Icon/IconLoader";
+import { baseUrl } from "../../utils/NetworkHandler";
 
 const LoginBoxed = () => {
   const dispatch = useDispatch();
@@ -92,13 +93,10 @@ const LoginBoxed = () => {
     });
 
     try {
-      const response = await fetch(
-        "https://doctorbackend.gitdr.com/api/v1/auth/login",
-        {
-          method: "POST",
-          headers,
-        }
-      );
+      const response = await fetch(`${baseUrl}/v1/auth/login`, {
+        method: "POST",
+        headers,
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -199,7 +197,7 @@ const LoginBoxed = () => {
                   <button
                     className={`${
                       themeConfig.theme === "light" &&
-                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-[#3f9679] hover:bg-white-light/90 dark:hover:bg-dark/60"
                     }`}
                     onClick={() => {
                       dispatch(toggleTheme("dark"));
@@ -214,7 +212,7 @@ const LoginBoxed = () => {
                   <button
                     className={`${
                       themeConfig.theme === "dark" &&
-                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-[#3f9679] hover:bg-white-light/90 dark:hover:bg-dark/60"
                     }`}
                     onClick={() => {
                       dispatch(toggleTheme("system"));
@@ -227,7 +225,7 @@ const LoginBoxed = () => {
                   <button
                     className={`${
                       themeConfig.theme === "system" &&
-                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-[#3f9679] hover:bg-white-light/90 dark:hover:bg-dark/60"
                     }`}
                     onClick={() => {
                       dispatch(toggleTheme("light"));
@@ -259,7 +257,7 @@ const LoginBoxed = () => {
                       id="Email"
                       type="email"
                       placeholder="Enter Username"
-                      className="form-input ps-10 placeholder:text-white-dark"
+                      className="form-input form-input-green ps-10 placeholder:text-white-dark"
                       value={data.email}
                       onChange={(e) =>
                         setData({ ...data, email: e.target.value })
@@ -282,7 +280,7 @@ const LoginBoxed = () => {
                       id="Password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter Password"
-                      className="form-input ps-10 pr-9 placeholder:text-white-dark"
+                      className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
                       value={data.password}
                       onChange={(e) =>
                         setData({ ...data, password: e.target.value })
@@ -310,23 +308,10 @@ const LoginBoxed = () => {
                   className="flex cursor-pointer items-center w-fit"
                   onClick={() => navigate("/forgot-password")}
                 >
-                  <span className="text-white-dark hover:text-blue-600">
+                  <span className="text-white-dark hover:text-[#006241]">
                     Forgot Password ?
                   </span>
                 </label>
-                {/* <div>
-                  <select
-                    className="form-select text-white-dark"
-                    onChange={(e) => setRole(e.target.value)}
-                  >
-                    <option>Open this select menu</option>
-                    <option value="admin">Admin</option>
-                    <option value="owner">Owner</option>
-                    <option value="clinic">Clinic</option>
-                    <option value="doctor">Doctor</option>
-                    <option value="sales">Sales</option>
-                  </select>
-                </div> */}
                 <button
                   type="submit"
                   className="btn btn-gradient !mt-8 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"

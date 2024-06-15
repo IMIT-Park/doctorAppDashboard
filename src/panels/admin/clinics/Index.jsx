@@ -12,11 +12,17 @@ import emptyBox from "/assets/images/empty-box.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import IconSearch from "../../../components/Icon/IconSearch";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
+import { showMessage } from "../../../utils/showMessage";
+import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
+import { handleGetLocation } from "../../../utils/getLocation";
 
 const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
@@ -24,16 +30,10 @@ const Clinics = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-
-  const [activeStatus, setActiveStatus] = useState({});
-
   const [search, setSearch] = useState("");
   const [totalClinics, setTotalClinics] = useState(0);
   const [allClinics, setAllClinics] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const userDetails = sessionStorage.getItem("userData");
-  const userData = JSON.parse(userDetails);
 
   useEffect(() => {
     setPage(1);
@@ -50,7 +50,6 @@ const Clinics = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getall?pageSize=${pageSize}&page=${page}`
       );
-      console.log(response?.data?.Clinic);
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
       setLoading(false);
@@ -66,21 +65,6 @@ const Clinics = () => {
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
-
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
-    });
-  };
 
   //  block or unblock handler
   const handleActiveUser = async (userId) => {
@@ -98,7 +82,7 @@ const Clinics = () => {
     Swal.fire({
       icon: "warning",
       title: "Are you sure?",
-      text: "You want to block this Owner!",
+      text: "You want to block this Clinic!",
       showCancelButton: true,
       confirmButtonText: "Block",
       padding: "2em",
@@ -108,7 +92,7 @@ const Clinics = () => {
         handleActiveUser(id);
         Swal.fire({
           title: "Blocked!",
-          text: "The Owner has been blocked.",
+          text: "The Clinic has been blocked.",
           icon: "success",
           customClass: "sweet-alerts",
         });
@@ -120,7 +104,7 @@ const Clinics = () => {
     Swal.fire({
       icon: "warning",
       title: "Are you sure?",
-      text: "You want to unblock this Owner!",
+      text: "You want to unblock this Clinic!",
       showCancelButton: true,
       confirmButtonText: "Unblock",
       padding: "2em",
@@ -130,7 +114,7 @@ const Clinics = () => {
         handleActiveUser(id);
         Swal.fire({
           title: "Unblocked!",
-          text: "The Owner has been unblocked.",
+          text: "The Clinic has been unblocked.",
           icon: "success",
           customClass: "sweet-alerts",
         });
@@ -141,41 +125,6 @@ const Clinics = () => {
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
-        <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
       <div className="panel">
         <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
@@ -183,7 +132,7 @@ const Clinics = () => {
               Clinics
             </h5>
             <Tippy content="Total Clinics">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={totalClinics} duration={3}></CountUp>
               </span>
             </Tippy>
@@ -198,12 +147,12 @@ const Clinics = () => {
                   type="text"
                   value={search}
                   placeholder="Search Clinic..."
-                  className="form-input shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
+                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
                   onChange={(e) => setSearch(e.target.value)}
                 />
                 <button
                   type="submit"
-                  className="btn btn-primary absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                  className="btn btn-green absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
                 >
                   <IconSearch className="mx-auto" />
                 </button>
@@ -228,7 +177,9 @@ const Clinics = () => {
               records={allClinics}
               idAccessor="clinic_id"
               onRowClick={(row) =>
-                navigate(`/admin/clinics/${row.clinic_id}/doctors`)
+                navigate(`/clinics/${row?.clinic_id}`, {
+                  state: { previousUrl: location?.pathname },
+                })
               }
               columns={[
                 {
@@ -236,44 +187,29 @@ const Clinics = () => {
                   title: "No",
                   render: (row, rowIndex) => rowIndex + 1,
                 },
-                {
-                  accessor: "owner_id",
-                  title: "Owner Id",
-                },
                 { accessor: "name", title: "Name" },
+                { accessor: "email", title: "Email" },
                 { accessor: "phone" },
                 { accessor: "place", title: "Place" },
                 { accessor: "address", title: "Address" },
                 {
                   accessor: "googleLocation",
                   title: "Location",
-                  render: (rowData) => {
-                    const { lat, long } = JSON.parse(rowData.googleLocation);
-                    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
-                    return (
-                      <a
-                        href={mapUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline hover:text-blue-700"
-                      >
-                        Clinic Location
-                      </a>
-                    );
-                  },
-                },
-                {
-                  accessor: "banner_img_url",
-                  title: "Banner Image",
+                  textAlignment: "center",
                   render: (rowData) => (
-                    <img
-                      src={imageBaseUrl + rowData?.banner_img_url}
-                      alt="Banner"
-                      className="h-10 w-auto object-cover"
-                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleGetLocation(rowData.googleLocation);
+                      }}
+                      className="btn btn-success btn-sm py-1"
+                    >
+                      <IconMenuContacts className="mr-1 w-4" />
+                      View Location
+                    </button>
                   ),
                 },
-
                 {
                   accessor: "Actions",
                   textAlignment: "center",

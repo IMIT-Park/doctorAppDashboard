@@ -22,6 +22,7 @@ import emptyBox from "/assets/images/empty-box.svg";
 import { useNavigate } from "react-router-dom";
 import ViewReport from "./ViewReport";
 import DeleteReport from "./DeleteReport";
+import {formatDate} from "../../../utils/formatDate"
 
 const rowData = [
   {
@@ -158,13 +159,6 @@ const Reports = () => {
     });
   };
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
 
   return (
     <div>
@@ -176,7 +170,7 @@ const Reports = () => {
               Reports
             </h5>
             <Tippy content="Total Reports">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={rowData.length} duration={3}></CountUp>
               </span>
             </Tippy>

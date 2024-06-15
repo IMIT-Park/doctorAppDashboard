@@ -8,46 +8,62 @@ import "tippy.js/dist/tippy.css";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
 import IconEdit from "../../../components/Icon/IconEdit";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import AddDoctor from "./AddDoctor";
-import AddDoctorModalDetail from "./AddDoctorModalDetail";
-import DeleteDoctor from "./DeleteDoctor";
-import DoctorPassword from "./DoctorPassword";
 import IconEye from "../../../components/Icon/IconEye";
 import ScrollToTop from "../../../components/ScrollToTop";
 import IconSearch from "../../../components/Icon/IconSearch";
 import IconLoader from "../../../components/Icon/IconLoader";
 import emptyBox from "/assets/images/empty-box.svg";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { formatDate } from "../../../utils/formatDate";
+import { showMessage } from "../../../utils/showMessage";
+import AddDoctor from "../../../pages/ClinicSingleView/components/AddDoctor";
+import Swal from "sweetalert2";
 
 const rowData = [];
 const ClinicDoctor = () => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(setPageTitle("ownerDoctor"));
-  });
-  const [page, setPage] = useState(1);
-  const PAGE_SIZES = [10, 20, 30, 50, 100];
-  const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const initialRecords = rowData.slice(0, pageSize);
-  const [addDoctorModal, setaddDoctorModal] = useState(false);
-  const [addDoctorModalDetail, setAddDoctorModalDetail] = useState(false);
-  const [addDoctorPasswordModal, setAddDoctorPasswordModal] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [data, setData] = useState({ password: "", confirmPassword: "" });
-  const [buttonLoading, setButtonLoading] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
-
-  const [search, setSearch] = useState("");
-  const [totalDoctors, setTotalDoctors] = useState(0);
-  const [allDoctors, setAllDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
 
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
+  const clinicId = userData?.UserClinic[0]?.clinic_id;
 
- 
+  useEffect(() => {
+    dispatch(setPageTitle("Doctors"));
+  });
+
+  const [page, setPage] = useState(1);
+  const PAGE_SIZES = [10, 20, 30, 50, 100];
+  const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+  const [addDoctorModal, setaddDoctorModal] = useState(false);
+  const [data, setData] = useState({ password: "", confirmPassword: "" });
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [totalDoctors, setTotalDoctors] = useState(0);
+  const [allDoctors, setAllDoctors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(1);
+  const [input, setInput] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    gender: "",
+    dateOfBirth: "",
+    qualification: "",
+    specialization: "",
+    fees: "",
+    visibility: true,
+    photo: null,
+    timeSlots: [],
+    password: "",
+    confirmPassword: "",
+  });
+  const [timeSlotInput, setTimeSlotInput] = useState({});
+
+
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
@@ -57,72 +73,14 @@ const ClinicDoctor = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0"); // Ensure two digits for day
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Ensure two digits for month
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
-
-  const openAddDoctorModal = () => {
-    setaddDoctorModal(true);
-  };
-
-  const closeAddDoctorModal = () => {
-    setaddDoctorModal(false);
-  };
-
-  const closeAddDoctorModalDetail = () => {
-    setAddDoctorModalDetail(false);
-    setaddDoctorModal(true);
-  };
-
-  const openAddDoctorModalDetail = () => {
-    setAddDoctorModalDetail(true);
-  };
-
-  const handleSelectDays = () => {
-    closeAddDoctorModal();
-    openAddDoctorModalDetail();
-  };
-
-  const doctorPasswordModal = () => {
-    setAddDoctorPasswordModal(true);
-  };
-
-  const closeDoctorPasswordModal = () => {
-    setAddDoctorPasswordModal(false);
-    setAddDoctorModalDetail(true);
-  };
-
-  const handleDoctorPassword = () => {
-    setAddDoctorModalDetail(false);
-    doctorPasswordModal();
-  };
-
-  const saveDoctor = () => {
-    alert("Success");
-  };
-
-  // handle Delete Modal
-  const openDeleteConfirmModal = () => {
-    setDeleteModal(true);
-  };
-  const closeDeleteConfirmModal = () => {
-    setDeleteModal(false);
-  };
-
   // fetch Doctors function
   const fetchData = async () => {
+    setLoading(true);
 
-    const clinicId = userData?.UserClinic[0]?.clinic_id;
-    console.log("clinicId:", clinicId);
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
       );
-      // console.log(response?.data?.Clinic);
       setTotalDoctors(response.data?.Doctors?.count);
       setAllDoctors(response.data?.Doctors?.rows);
       setLoading(false);
@@ -134,52 +92,201 @@ const ClinicDoctor = () => {
     }
   };
 
-  // fetching Loans
+  // fetching Doctors
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
 
+
+   // doctor image picker
+   const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setInput({ ...input, photo: file });
+  };
+
+  const openAddDoctorModal = () => {
+    setaddDoctorModal(true);
+  };
+
+  const closeAddDoctorModal = () => {
+    setInput({
+      ...input,
+      name: "",
+      phone: "",
+      email: "",
+      address: "",
+      gender: "",
+      dateOfBirth: "",
+      qualification: "",
+      specialization: "",
+      fees: "",
+      visibility: true,
+      photo: null,
+      timeSlots: [],
+      password: "",
+      confirmPassword: "",
+    });
+    setActiveTab(1);
+    setaddDoctorModal(false);
+  };
+
+   //  doctor adding function
+   const addDoctor = async () => {
+    if (
+      !input.name ||
+      !input.phone ||
+      !input.email ||
+      !input.address ||
+      !input.gender ||
+      !input.dateOfBirth ||
+      !input.qualification ||
+      !input.specialization ||
+      !input.fees ||
+      !input.photo ||
+      !input.password ||
+      !input.confirmPassword
+    ) {
+      showMessage("Please fill in all required fields", "warning");
+      return true;
+    }
+
+    if (!input.timeSlots || input.timeSlots.length === 0) {
+      showMessage("Please add at least one time slot", "warning");
+      return true;
+    }
+
+    if (input.password !== input.confirmPassword) {
+      showMessage("Passwords are not match", "warning");
+      return true;
+    }
+
+    const basicDetails = {
+      clinic_id: clinicId,
+      name: input.name,
+      email: input.email,
+      address: input.address,
+      phone: input.phone,
+      gender: input.gender,
+      dateOfBirth: input.dateOfBirth,
+      qualification: input.qualification,
+      specialization: input.specialization,
+      fees: input.fees,
+      visibility: input.visibility,
+      password: input.password,
+    };
+
+    const formData = new FormData();
+    formData.append("image_url[]", input.photo);
+
+    setButtonLoading(true);
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        "/v1/doctor/createDoctor",
+        basicDetails
+      );
+
+      console.log(response);
+
+      if (response.status === 201) {
+        const doctorId = response.data.Doctor.doctor_id;
+
+        // Calling the add photo API
+        const additionalResponse1 = await NetworkHandler.makePostRequest(
+          `/v1/doctor/upload/${doctorId}`,
+          formData
+        );
+
+        console.log(additionalResponse1);
+
+        input.timeSlots.forEach((slot) => {
+          slot.startTime += ":00";
+          slot.endTime += ":00";
+        });
+
+        // Calling the add timeslot API
+        const additionalResponse2 = await NetworkHandler.makePostRequest(
+          `/v1/doctor/createtimeSlots/${doctorId}`,
+          { timeslots: input.timeSlots }
+        );
+
+        console.log(additionalResponse2);
+
+        fetchData();
+
+        showMessage("Doctor added successfully.", "success");
+        closeAddDoctorModal();
+      }
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+      setButtonLoading(false);
+    } finally {
+      setButtonLoading(false);
+    }
+  };
+
+
+
+    //  block or unblock handler
+    const handleActiveUser = async (userId) => {
+      try {
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/auth/activate/${userId}`
+        );
+        fetchData();
+      } catch (error) {
+        showMessage("An error occurred. Please try again.", "error");
+      }
+    };
+
+    const showDoctorBlockAlert = (id) => {
+      Swal.fire({
+        icon: "warning",
+        title: "Are you sure?",
+        text: "You want to block this Doctor!",
+        showCancelButton: true,
+        confirmButtonText: "Block",
+        padding: "2em",
+        customClass: "sweet-alerts",
+      }).then((result) => {
+        if (result.value) {
+          handleActiveUser(id);
+          Swal.fire({
+            title: "Blocked!",
+            text: "The Doctor has been blocked.",
+            icon: "success",
+            customClass: "sweet-alerts",
+          });
+        }
+      });
+    };
+  
+    const showDoctorUnblockAlert = (id) => {
+      Swal.fire({
+        icon: "warning",
+        title: "Are you sure?",
+        text: "You want to unblock this Doctor!",
+        showCancelButton: true,
+        confirmButtonText: "Unblock",
+        padding: "2em",
+        customClass: "sweet-alerts",
+      }).then((result) => {
+        if (result.value) {
+          handleActiveUser(id);
+          Swal.fire({
+            title: "Unblocked!",
+            text: "The Doctor has been unblocked.",
+            icon: "success",
+            customClass: "sweet-alerts",
+          });
+        }
+      });
+    };
+  
+
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
-        <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
       <div className="panel">
-        
-
         <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
@@ -192,7 +299,6 @@ const ClinicDoctor = () => {
             </Tippy>
           </div>
 
-          
           <div>
             <form
               onSubmit={(e) => handleSubmit(e)}
@@ -203,12 +309,12 @@ const ClinicDoctor = () => {
                   type="text"
                   value={search}
                   placeholder="Search Doctor..."
-                  className="form-input shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
+                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
                   onChange={(e) => setSearch(e.target.value)}
                 />
                 <button
                   type="submit"
-                  className="btn btn-primary absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                  className="btn btn-green absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
                 >
                   <IconSearch className="mx-auto" />
                 </button>
@@ -217,17 +323,15 @@ const ClinicDoctor = () => {
           </div>
 
           <div className="flex  text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-          <Tippy content="Click to Add Doctor">
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-green"
               onClick={openAddDoctorModal}
             >
               <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
               Add Doctor
             </button>
-          </Tippy>
-        </div>
+          </div>
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -244,14 +348,18 @@ const ClinicDoctor = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allDoctors}
-              onRowClick={(row) => navigate(`/clinic/doctors/${row.doctor_id}/doctor`)}
+              idAccessor="doctor_id"
+              onRowClick={(row) =>
+                navigate(`/clinics/${clinicId}/${row?.doctor_id}`, {
+                  state: { previousUrl: location?.pathname },
+                })
+              }
               columns={[
                 {
                   accessor: "No",
                   title: "No",
                   render: (row, rowIndex) => rowIndex + 1,
                 },
-                // { accessor: "doctor_id", title: "ID" },
 
                 {
                   accessor: "photo",
@@ -328,28 +436,21 @@ const ClinicDoctor = () => {
           </div>
         )}
       </div>
-      <AddDoctor
-        addDoctorModal={addDoctorModal}
-        setaddDoctorModal={setaddDoctorModal}
-        buttonLoading={buttonLoading}
-        saveDoctor={saveDoctor}
-        handleSelectDays={handleSelectDays}
+
+       {/* add doctor modal */}
+       <AddDoctor
+        open={addDoctorModal}
         closeAddDoctorModal={closeAddDoctorModal}
-      />
-      <AddDoctorModalDetail
-        addDoctorModalDetail={addDoctorModalDetail}
-        closeAddDoctorModalDetail={closeAddDoctorModalDetail}
         buttonLoading={buttonLoading}
-        handleDoctorPassword={handleDoctorPassword}
-      />
-      <DeleteDoctor open={deleteModal} closeModal={closeDeleteConfirmModal} />
-      <DoctorPassword
-        addDoctorPasswordModal={addDoctorPasswordModal}
-        closeDoctorPasswordModal={closeDoctorPasswordModal}
-        showPassword={showPassword}
-        setShowPassword={setShowPassword}
-        data={data}
-        setData={setData}
+        handleFileChange={handleFileChange}
+        input={input}
+        setInput={setInput}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        clinicId={clinicId}
+        timeSlotInput={timeSlotInput}
+        setTimeSlotInput={setTimeSlotInput}
+        formSubmit={addDoctor}
       />
     </div>
   );

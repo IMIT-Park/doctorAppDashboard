@@ -372,8 +372,10 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     @apply w-full rounded-md border border-white-light bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-primary focus:ring-transparent dark:border-[#17263c] dark:bg-[#121e32] dark:text-white-dark dark:focus:border-primary;
   }
 
+  .form-input-green,
+  .form-textarea-green,
   .form-select-green {
-    @apply  border-white-light bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-[#006241] focus:ring-transparent dark:border-[#123228] dark:bg-[#121e32] dark:text-white-dark dark:focus:border-[#006241];
+    @apply  bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-[#006241] focus:ring-transparent  dark:bg-[#121e32] dark:text-white-dark dark:focus:border-[#006241];
   }
 
   input[type="number"]::-webkit-inner-spin-button,

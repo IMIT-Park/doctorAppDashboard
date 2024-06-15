@@ -1,29 +1,42 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setPageTitle } from "../../../../store/themeConfigSlice";
+import { setPageTitle } from "../../store/themeConfigSlice";
 import Swal from "sweetalert2";
-import IconLoader from "../../../../components/Icon/IconLoader";
-import ScrollToTop from "../../../../components/ScrollToTop";
+import IconLoader from "../../components/Icon/IconLoader";
+import ScrollToTop from "../../components/ScrollToTop";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import IconCaretDown from "../../../../components/Icon/IconCaretDown";
+import IconCaretDown from "../../components/Icon/IconCaretDown";
 import AnimateHeight from "react-animate-height";
-import NetworkHandler, { imageBaseUrl } from "../../../../utils/NetworkHandler";
-import { formatDate, reverseformatDate } from "../../../../utils/formatDate";
-import { formatTime } from "../../../../utils/formatTime";
-import IconEdit from "../../../../components/Icon/IconEdit";
-import IconTrashLines from "../../../../components/Icon/IconTrashLines";
-import DoctorDetailsEdit from "./DoctorDetailsEdit";
-import { showMessage } from "../../../../utils/showMessage";
-import DoctorProfileEdit from "./DoctorProfileEdit";
-import DoctorTimeSlotEdit from "./DoctorTimeSlotEdit";
-import IconPlus from "../../../../components/Icon/IconPlus";
-import DeleteTimeslot from "./DeleteTimeslot";
+import NetworkHandler, { imageBaseUrl } from "../../utils/NetworkHandler";
+import { formatDate, reverseformatDate } from "../../utils/formatDate";
+import { formatTime } from "../../utils/formatTime";
+import IconEdit from "../../components/Icon/IconEdit";
+import { showMessage } from "../../utils/showMessage";
+import IconPlus from "../../components/Icon/IconPlus";
+import DeleteTimeslot from "./components/DeleteTimeslot";
+import DoctorDetailsEdit from "./components/DoctorDetailsEdit";
+import DoctorProfileEdit from "./components/DoctorProfileEdit";
+import DoctorTimeSlotEdit from "./components/DoctorTimeSlotEdit";
 
 const SinglePage = () => {
   const { clinicId, doctorId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const previousUrl = sessionStorage.getItem("doctorPreviousPage");
+
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
+  const isOwner = userData?.user_id === 1;
+
+  useEffect(() => {
+    if (location?.state?.previousUrl) {
+      sessionStorage.setItem(
+        "doctorPreviousPage",
+        location?.state?.previousUrl
+      );
+    }
+  }, [location?.state?.previousUrl]);
 
   useEffect(() => {
     dispatch(setPageTitle("Doctor"));
@@ -446,7 +459,6 @@ const SinglePage = () => {
         `/v1/doctor/deletebyId/${timeSlotId}`
       );
 
-      console.log(response);
       if (response.status === 201) {
         fetchDoctorData();
         showMessage("Timeslot Deleted successfully.", "success");
@@ -558,29 +570,13 @@ const SinglePage = () => {
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
-        <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
-          <li>
-            <Link
-              to="/owner/clinics"
-              className="text-[#006241] hover:underline"
-            >
-              Clinics
-            </Link>
-          </li>
-          <li className="before:content-['/'] before:mr-2">
-            <Link
-              to={`/owner/clinics/${clinicId}/doctors`}
-              className="text-[#006241] hover:underline"
-            >
-              Doctors
-            </Link>
-          </li>
-          <li className="before:content-['/'] before:mr-2">
-            <span>{clinicId}</span>
-          </li>
-        </ul>
-      </div>
+      <button
+        onClick={() => navigate(previousUrl)}
+        type="button"
+        className="btn btn-green btn-sm -mt-4 mb-4"
+      >
+        <IconCaretDown className="w-4 h-4 rotate-90" />
+      </button>
       <div className="panel mb-1">
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -599,14 +595,15 @@ const SinglePage = () => {
                     No photo
                   </div>
                 )}
-                <button
-                  type="button"
-                  className="absolute top-0 right-0 btn btn-dark w-8 h-8 p-0 rounded-full"
-                  onClick={openEditProfileModal}
-                >
-                  <IconEdit className="w-4" />
-                </button>
-
+                {!isOwner && (
+                  <button
+                    type="button"
+                    className="absolute top-0 right-0 btn btn-dark w-8 h-8 p-0 rounded-full"
+                    onClick={openEditProfileModal}
+                  >
+                    <IconEdit className="w-4" />
+                  </button>
+                )}
                 <div className="text-2xl dark:text-slate-300 font-semibold capitalize">
                   {doctorDetails?.name || ""}
                 </div>
@@ -712,12 +709,14 @@ const SinglePage = () => {
                   />
                   <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
                 </label>
-                <button
-                  className="flex hover:text-info"
-                  onClick={openEditDetailsModal}
-                >
-                  <IconEdit className="w-6 h-6" />
-                </button>
+                {!isOwner && (
+                  <button
+                    className="flex hover:text-info"
+                    onClick={openEditDetailsModal}
+                  >
+                    <IconEdit className="w-6 h-6" />
+                  </button>
+                )}
               </div>
             </div>
             <div className="my-10">
@@ -725,6 +724,7 @@ const SinglePage = () => {
                 <h5 className="text-base font-semibold dark:text-white-light">
                   Available Days & Time Slots:
                 </h5>
+                {!isOwner &&
                 <button
                   type="button"
                   className="btn btn-green"
@@ -732,7 +732,7 @@ const SinglePage = () => {
                 >
                   <IconPlus className="ltr:mr-2 rtl:ml-2" />
                   Add Time Slot
-                </button>
+                </button>}
               </div>
               <div className="space-y-2 font-semibold">
                 {days.map((day) => (
@@ -785,6 +785,7 @@ const SinglePage = () => {
                                         {timeslot?.time_slot} Min
                                       </div>
                                     </div>
+                                    {!isOwner &&
                                     <div className="flex items-center gap-1 mt-1">
                                       <button
                                         type="button"
@@ -806,7 +807,7 @@ const SinglePage = () => {
                                       >
                                         Delete
                                       </button>
-                                    </div>
+                                    </div>}
                                   </div>
                                 ))}
                               </div>

@@ -13,15 +13,14 @@ const Profile = lazy(() => import("../pages/Profile/Profile"));
 // <--------------> admin panel imports starts here<-------------->
 const AdminIndex = lazy(() => import("../panels/admin/Index"));
 const AdminOwners = lazy(() => import("../panels/admin/owners/Index"));
-const AdminOwnerClinics = lazy(() => import("../panels/admin/owners/Clinics"));
-const AdminOwnerDoctors = lazy(() => import("../panels/admin/owners/Doctors"));
+const AdminOwnerSingleView = lazy(() => import("../panels/admin/owners/OwnerSingleView"));
 const AdminClinics = lazy(() => import("../panels/admin/clinics/Index"));
-const AdminClinicDoctors = lazy(() => import("../panels/admin/clinics/Doctors"));
 const AdminDoctors = lazy(() => import("../panels/admin/doctors/Index"));
-const AdminDoctor = lazy(() => import("../panels/admin/doctors/SinglePage"));
 const AdminReports = lazy(() => import("../panels/admin/reports/Index"));
 const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
-const AdminSalesOwners = lazy(() => import("../panels/admin/Sales-team/owners/Index"));
+const AdminSalesOwners = lazy(() =>
+  import("../panels/admin/Sales-team/owners/Index")
+);
 const AdminMessages = lazy(() => import("../panels/admin/messages/Index"));
 const AdminSubscriptionPlans = lazy(() =>
   import("../panels/admin/subscription-plans/Index")
@@ -31,23 +30,28 @@ const AdminSubscriptionPlans = lazy(() =>
 // <--------------> owner panel imports starts here<-------------->
 const OwnerIndex = lazy(() => import("../panels/owner/Index"));
 const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
-const OwnerDoctors = lazy(() => import("../panels/owner/clinics/doctors/Index"));
-const OwnerDoctorSingleView = lazy(() => import("../panels/owner/clinics/doctorSingleView/Index"));
-const OwnerSubscriptionPlans = lazy(() => import("../panels/owner/subscription-plans/Index"))
+const OwnerSubscriptionPlans = lazy(() =>
+  import("../panels/owner/subscription-plans/Index")
+);
 
 // <--------------> owner panel imports ends here <-------------->
 
 // <--------------> clinic panel imports starts here<-------------->
 const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
 const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/index"));
-const ClinicDoctor = lazy(() => import("../panels/clinic/doctors/SingleView"));
 const ClinicLeaves = lazy(() => import("../panels/clinic/leaves/Index"));
 const ClinicBookings = lazy(() => import("../panels/clinic/bookings/Index"));
-const ClinicPatientSingleView = lazy(() => import("../panels/clinic/bookings/Patients"));
+const ClinicPatientSingleView = lazy(() =>
+  import("../panels/clinic/bookings/Patients")
+);
 
-const ClinicPatients = lazy(() => import("../panels/clinic/bookings/PatientsDetails"));
+const ClinicPatients = lazy(() =>
+  import("../panels/clinic/bookings/PatientsDetails")
+);
 
-const ClinicProfile = lazy(()=> import("../panels/clinic/profile/ClinicProfile"));
+const ClinicProfile = lazy(() =>
+  import("../panels/clinic/profile/ClinicProfile")
+);
 // <--------------> clinic panel imports ends here <-------------->
 
 // <--------------> doctor panel imports starts here<-------------->
@@ -57,8 +61,15 @@ const DoctorIndex = lazy(() => import("../panels/doctor/Index"));
 // <--------------> sales panel imports starts here<-------------->
 const SalesIndex = lazy(() => import("../panels/sales/Index"));
 const SalesOwners = lazy(() => import("../panels/sales/owners/Owners"));
-
 // <--------------> sales panel imports ends here <-------------->
+
+// <--------------> doctor single-view imports starts here <-------------->
+const ClinicSingleView = lazy(() => import("../pages/ClinicSingleView/Index"));
+// <--------------> doctor single-view imports ends here <-------------->
+
+// <--------------> doctor single-view imports starts here <-------------->
+const DoctorSingleView = lazy(() => import("../pages/DoctorSingleView/Index"));
+// <--------------> doctor single-view imports ends here <-------------->
 
 const routes = [
   // not found
@@ -109,57 +120,22 @@ const routes = [
 
   // owners -> clinics
   {
-    path: "/admin/owners/:ownerId/clinics",
-    element: <AdminOwnerClinics />,
+    path: "/admin/owners/:ownerId",
+    element: <AdminOwnerSingleView />,
     layout: "default",
   },
 
-  // owner -> clinics -> doctors
-  {
-    path: "/admin/owners/:ownerId/clinics/:clinicId/doctors",
-    element: <AdminOwnerDoctors />,
-    layout: "default",
-  },
-
-  // owner -> clinics -> doctors -> doctor
-  // {
-  //   path: "/admin/owners/clinics/doctors/doctor",
-  //   element: <AdminDoctor />,
-  //   layout: "default",
-  // },
-
-  // clinics
+  // all clinics
   {
     path: "/admin/clinics",
     element: <AdminClinics />,
     layout: "default",
   },
 
-  // clinics -> doctors
-  {
-    path: "/admin/clinics/:clinicId/doctors",
-    element: <AdminClinicDoctors />,
-    layout: "default",
-  },
-
-  // clinics -> doctors -> doctor
-  // {
-  //   path: "/admin/clinics/doctors/doctor",
-  //   element: <AdminClinicDoctors />,
-  //   layout: "default",
-  // },
-
-  // doctors
+  // all doctors
   {
     path: "/admin/doctors",
     element: <AdminDoctors />,
-    layout: "default",
-  },
-
-  // doctor profile
-  {
-    path: "/admin/doctors/doctor",
-    element: <AdminDoctor />,
     layout: "default",
   },
   // reports
@@ -183,12 +159,12 @@ const routes = [
     layout: "default",
   },
 
-    // sales-team  -> owners
-    {
-      path: "/admin/sales/:salesId/owners",
-      element: <AdminSalesOwners />,
-      layout: "default",
-    },
+  // sales-team  -> owners
+  {
+    path: "/admin/sales/:salesId",
+    element: <AdminSalesOwners />,
+    layout: "default",
+  },
 
   // subscription-plans
   {
@@ -214,26 +190,12 @@ const routes = [
     layout: "default",
   },
 
-  // Owner Doctors
+  //owner subscription plans
   {
-    path: "/owner/clinics/:clinicId/doctors",
-    element: <OwnerDoctors />,
+    path: "/owner/subscription-plans",
+    element: <OwnerSubscriptionPlans />,
     layout: "default",
   },
-
-// Owner -> Doctor Single-view
-{
-  path: "/owner/clinics/:clinicId/doctors/:doctorId",
-  element: <OwnerDoctorSingleView />,
-  layout: "default",
-},
-
-//owner subscription plans
-{
-  path: "/owner/subscription-plans",
-  element: <OwnerSubscriptionPlans />,
-  layout: "default",
-},
 
   // <--------------> owner panel ends here <-------------->
 
@@ -252,15 +214,6 @@ const routes = [
     element: <ClinicDoctors />,
     layout: "default",
   },
-
-   // clinicDoctors SingleView
-   {
-    path: "/clinic/doctors/:doctorId/doctor",
-    element: <ClinicDoctor />,
-    layout: "default",
-  },
-
-  
 
   // clinicDoctors
   {
@@ -283,17 +236,14 @@ const routes = [
     layout: "default",
   },
 
-
   {
     path: "/clinic/bookings/:doctorId/patients",
     element: <ClinicPatients />,
     layout: "default",
   },
 
-
-  
-   // clinicprofile
-   {
+  // clinicprofile
+  {
     path: "/clinic/profile",
     element: <ClinicProfile />,
     layout: "default",
@@ -326,6 +276,22 @@ const routes = [
   },
 
   // <--------------> sales panel ends here <-------------->
+
+  // <--------------> doctor single-view starts here <-------------->
+  {
+    path: "/clinics/:clinicId",
+    element: <ClinicSingleView />,
+    layout: "default",
+  },
+  // <--------------> doctor single-view ends here <-------------->
+
+  // <--------------> doctor single-view starts here <-------------->
+  {
+    path: "/clinics/:clinicId/:doctorId",
+    element: <DoctorSingleView />,
+    layout: "default",
+  },
+  // <--------------> doctor single-view ends here <-------------->
 ];
 
 export { routes };

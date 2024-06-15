@@ -47,7 +47,7 @@ const ViewReport = ({ open, closeModal }) => {
                   <div className="ltr:mr-3 rtl:ml-3">Reporter</div>
                 </div>
                 <div className="p-5">
-                  <p className="text-primary text-xs mb-1.5 font-bold">
+                  <p className="text-[#006241] text-xs mb-1.5 font-bold">
                     25 Sep 2020
                   </p>
                   <h5 className="text-[#3b3f5c] text-[15px] font-bold mb-2 dark:text-white-light">

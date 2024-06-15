@@ -9,15 +9,17 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import IconSearch from "../../../components/Icon/IconSearch";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
+import { formatDate } from "../../../utils/formatDate";
 
 const rowData = [];
 
 const Doctors = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     dispatch(setPageTitle("Doctors"));
@@ -25,7 +27,6 @@ const Doctors = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const initialRecords = rowData.slice(0, pageSize);
   const [search, setSearch] = useState("");
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
@@ -96,14 +97,12 @@ const Doctors = () => {
     });
   };
 
-
   // fetch Doctors function
   const fetchData = async () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/doctor/getall?pageSize=${pageSize}&page=${page}`
       );
-      console.log(response?.data?.Clinic);
       setTotalDoctors(response.data?.Doctors?.count);
       setAllDoctors(response.data?.Doctors?.rows);
       setLoading(false);
@@ -120,51 +119,9 @@ const Doctors = () => {
     fetchData();
   }, [page, pageSize]);
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
-
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
-        <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div>
-      </div>
 
       <div className="panel">
         <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
@@ -173,7 +130,7 @@ const Doctors = () => {
               Doctors
             </h5>
             <Tippy content="Total Doctors">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
               </span>
             </Tippy>
@@ -188,12 +145,12 @@ const Doctors = () => {
                   type="text"
                   value={search}
                   placeholder="Search Doctor..."
-                  className="form-input shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
+                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
                   onChange={(e) => setSearch(e.target.value)}
                 />
                 <button
                   type="submit"
-                  className="btn btn-primary absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                  className="btn btn-green absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
                 >
                   <IconSearch className="mx-auto" />
                 </button>
@@ -216,14 +173,18 @@ const Doctors = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allDoctors}
-              // onRowClick={() => navigate("/admin/owners/clinics/doctors/doctor")}
+              idAccessor="doctor_id"
+              onRowClick={(row) =>
+                navigate(`/clinics/${0}/${row?.doctor_id}`, {
+                  state: { previousUrl: location?.pathname },
+                })
+              }
               columns={[
                 {
                   accessor: "No",
                   title: "No",
                   render: (row, rowIndex) => rowIndex + 1,
                 },
-                // { accessor: "doctor_id", title: "ID" },
 
                 {
                   accessor: "photo",

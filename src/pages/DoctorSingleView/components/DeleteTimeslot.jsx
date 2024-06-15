@@ -1,8 +1,8 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../../components/Icon/IconX";
-import IconTrashLines from "../../../../components/Icon/IconTrashLines";
-import IconLoader from "../../../../components/Icon/IconLoader";
+import IconX from "../../../components/Icon/IconX";
+import IconTrashLines from "../../../components/Icon/IconTrashLines";
+import IconLoader from "../../../components/Icon/IconLoader";
 
 const DeleteTimeslot = ({ open, closeModal, buttonLoading, handleSubmit }) => {
   return (

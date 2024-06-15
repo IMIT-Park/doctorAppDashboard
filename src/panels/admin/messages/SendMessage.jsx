@@ -58,7 +58,7 @@ const SendMessage = ({ open, closeModal, input, setInput, formSubmit }) => {
                         id="full-name"
                         type="text"
                         placeholder="Enter Subject"
-                        className="form-input"
+                        className="form-input form-input-green"
                       />
                     </div>
 
@@ -68,7 +68,7 @@ const SendMessage = ({ open, closeModal, input, setInput, formSubmit }) => {
                         id="location"
                         rows={3}
                         placeholder="Enter Message"
-                        className="form-textarea resize-none min-h-[130px]"
+                        className="form-textarea form-textarea-green resize-none min-h-[130px]"
                       ></textarea>
                     </div>
 
@@ -82,7 +82,7 @@ const SendMessage = ({ open, closeModal, input, setInput, formSubmit }) => {
                       </button>
                       <button
                         type="button"
-                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                        className="btn btn-green ltr:ml-4 rtl:mr-4"
                         onClick={handleSubmit}
                       >
                         Send

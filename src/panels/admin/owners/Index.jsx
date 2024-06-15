@@ -1,20 +1,8 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import IconEye from "../../../components/Icon/IconEye";
-import IconEdit from "../../../components/Icon/IconEdit";
-import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../components/Icon/IconX";
 import Swal from "sweetalert2";
-import IconUserPlus from "../../../components/Icon/IconUserPlus";
-import MaskedInput from "react-text-mask";
-import IconCoffee from "../../../components/Icon/IconCoffee";
-import IconCalendar from "../../../components/Icon/IconCalendar";
-import IconMapPin from "../../../components/Icon/IconMapPin";
-import IconMail from "../../../components/Icon/IconMail";
-import IconPhone from "../../../components/Icon/IconPhone";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -50,28 +38,6 @@ const Owners = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  const addUser = () => {
-    setAddUserModal(true);
-  };
-
-  const saveUser = () => {
-    // if (!params.name) {
-    //     showMessage('Name is required.', 'error');
-    //     return true;
-    // }
-    showMessage("User has been saved successfully.");
-    setAddUserModal(false);
-  };
-
-  const deleteConfirm = () => {
-    setDeleteModal(true);
-  };
-
-  const deleteUser = () => {
-    showMessage("User has been deleted successfully.");
-    setDeleteModal(false);
-  };
-
   const showMessage = (msg = "", type = "success") => {
     const toast = Swal.mixin({
       toast: true,
@@ -89,10 +55,10 @@ const Owners = () => {
 
   // fetch function
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getallowner?page=${page}&pageSize=${pageSize}`
-        // `/v1/owner/getowner/2`
       );
       setTotalOwners(response?.data?.Owner?.count);
       setAllOwners(response?.data?.Owner?.rows);
@@ -170,49 +136,15 @@ const Owners = () => {
     <div>
       <ScrollToTop />
       <div className="panel">
-        <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
-          <div className="flex items-center gap-1">
-            <h5 className="font-semibold text-lg dark:text-white-light">
-              Owners
-            </h5>
-            <Tippy content="Total Owners">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalOwners} duration={3}></CountUp>
-              </span>
-            </Tippy>
-          </div>
-          <div className="flex items-center flex-wrap gap-4">
-            <div className="flex items-start gap-1">
-              <h5 className="text-base font-semibold dark:text-white-light">
-                Active
-              </h5>
-              <label className="w-11 h-5 relative">
-                <input
-                  type="checkbox"
-                  className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                  id="custom_switch_checkbox_active"
-                  checked
-                  readOnly
-                />
-                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-              </label>
-            </div>
-            <div className="flex items-start gap-1">
-              <h5 className="text-base font-semibold dark:text-white-light">
-                Blocked
-              </h5>
-              <label className="w-11 h-5 relative">
-                <input
-                  type="checkbox"
-                  className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                  id="custom_switch_checkbox_active"
-                  checked={false}
-                  readOnly
-                />
-                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-              </label>
-            </div>
-          </div>
+        <div className="flex items-center gap-1 mb-3">
+          <h5 className="font-semibold text-lg dark:text-white-light">
+            Owners
+          </h5>
+          <Tippy content="Total Owners">
+            <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
+              <CountUp start={0} end={totalOwners} duration={3}></CountUp>
+            </span>
+          </Tippy>
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -229,9 +161,7 @@ const Owners = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allOwners}
-              onRowClick={(row) =>
-                navigate(`/admin/owners/${row?.owner_id}/clinics`)
-              }
+              onRowClick={(row) => navigate(`/admin/owners/${row?.owner_id}`)}
               idAccessor="owner_id"
               columns={[
                 {
@@ -250,28 +180,30 @@ const Owners = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy content="Block/Unblock">
-                      <label
-                        className="w-[46px] h-[22px] relative"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (rowData?.User?.status) {
-                            showBlockAlert(rowData?.user_id);
-                          } else {
-                            showUnblockAlert(rowData?.user_id);
-                          }
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox${rowData.owner_id}`}
-                          checked={rowData?.User?.status}
-                          readOnly
-                        />
-                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                      </label>
-                    </Tippy>
+                    <div className="grid place-items-center">
+                      <Tippy content="Block/Unblock">
+                        <label
+                          className="w-[46px] h-[22px] relative"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (rowData?.User?.status) {
+                              showBlockAlert(rowData?.user_id);
+                            } else {
+                              showUnblockAlert(rowData?.user_id);
+                            }
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                            id={`custom_switch_checkbox${rowData.owner_id}`}
+                            checked={rowData?.User?.status}
+                            readOnly
+                          />
+                          <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                        </label>
+                      </Tippy>
+                    </div>
                   ),
                 },
               ]}

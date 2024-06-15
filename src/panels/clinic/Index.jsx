@@ -1,5 +1,5 @@
 import { setPageTitle } from "../../store/themeConfigSlice";
-import {saveAs} from 'file-saver';
+import { saveAs } from "file-saver";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Dropdown from "../../components/Dropdown";
@@ -277,11 +277,6 @@ const Index = () => {
     },
   };
 
-  const qrCode = "/assets/images/qr_code.jpg"
-  const downloadImg = ()=> {
-    saveAs(qrCode, 'QrCode.png')
-  }
-
   return (
     <div>
       <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -289,41 +284,13 @@ const Index = () => {
           <span>Dashboard</span>
         </li>
       </ul>
-
-      <div className="mb-5 flex items-center justify-center">
-        <div className="max-w-[23rem] w-full bg-white shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none">
-          <div className="py-8 px-7">
-            <div className="-mt-6 mb-6 -mx-4 rounded-tl rounded-tr overflow-hidden relative">
-              <img
-                src="/assets/images/qr_code.jpg"
-                alt="QrCode"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            {/* <h5 className="text-[#3b3f5c] text-xl font-semibold mb-4 dark:text-white-light">
-              CLI Based
-            </h5>
-            <p className="text-white-dark">
-              Etiam sed augue ac justo tincidunt posuere. Vivamus euismod eros,
-              nec risus malesuada.
-            </p> */}
-            <div className="flex justify-center w-full -mt-6">
-              <button type="button" className="btn btn-primary mt-6" onClick={downloadImg}>
-                <IconDownload className="mr-2"/>
-                Download
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6 text-white">
           {/* Total Doctors */}
           <div className="panel bg-gradient-to-r from-cyan-500 to-cyan-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-              Doctors
+                Doctors
               </div>
             </div>
             <div className="flex items-center mt-3">

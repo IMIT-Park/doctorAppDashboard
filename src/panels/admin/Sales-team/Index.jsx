@@ -1,8 +1,7 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import IconEdit from "../../../components/Icon/IconEdit";
 import Swal from "sweetalert2";
 import IconUserPlus from "../../../components/Icon/IconUserPlus";
@@ -12,11 +11,12 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AddSalesPerson from "./AddSalesPerson";
 import IconEye from "../../../components/Icon/IconEye";
 import ShowSalesPerson from "./ShowSalesPerson";
 import NetworkHandler from "../../../utils/NetworkHandler";
+import { showMessage } from "../../../utils/showMessage";
 
 const Sales = () => {
   const dispatch = useDispatch();
@@ -33,7 +33,6 @@ const Sales = () => {
   const [selectedSalesPerson, setSelectedSalesPerson] = useState(null);
   const [editSalesPersonModal, setEditSalesPersonModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
   const [totalSaleperson, setTotalSalesPerson] = useState(0);
   const [allSalesPerson, setAllSalesPerson] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,7 +79,7 @@ const Sales = () => {
     setEmailError("");
   };
 
-  //GET METHOD
+  // get all Sales-Persons function
   const fetchData = async () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
@@ -101,7 +100,7 @@ const Sales = () => {
     fetchData();
   }, [page, pageSize]);
 
-  //POST METHOD
+  //Add Sales Person function
   const saveSalesPerson = async () => {
     if (
       !input.name ||
@@ -145,7 +144,6 @@ const Sales = () => {
 
   const updateSalesPerson = async () => {
     if (!selectedSalesPerson) {
-      // Handle error: No salesperson selected for update
       showMessage("No salesperson selected for update", "error");
       return;
     }
@@ -170,7 +168,7 @@ const Sales = () => {
       if (response.status === 200) {
         showMessage("Salesperson has been updated successfully.");
         closeEditModal();
-        fetchData(); // Refetch data to update the UI
+        fetchData();
       } else {
         showMessage("Failed to update salesperson. Please try again.", "error");
       }
@@ -188,8 +186,8 @@ const Sales = () => {
       user_name: salesPerson.user_name,
       phone: salesPerson.phone,
       address: salesPerson.address,
-      password: "", // Assuming password should not be editable
-      confirmPassword: "", // Assuming password should not be editable
+      password: "",
+      confirmPassword: "",
     });
   };
 
@@ -205,22 +203,6 @@ const Sales = () => {
       address: "",
       password: "",
       confirmPassword: "",
-    });
-  };
-
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top-right",
-      showConfirmButton: false,
-      showCloseButton: true,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
     });
   };
 
@@ -249,7 +231,7 @@ const Sales = () => {
     Swal.fire({
       icon: "warning",
       title: "Are you sure?",
-      text: "You want to block this Owner!",
+      text: "You want to block this Sales Person!",
       showCancelButton: true,
       confirmButtonText: "Block",
       padding: "2em",
@@ -259,7 +241,7 @@ const Sales = () => {
         handleActiveUser(id);
         Swal.fire({
           title: "Blocked!",
-          text: "The Owner has been blocked.",
+          text: "The Sales Person has been blocked.",
           icon: "success",
           customClass: "sweet-alerts",
         });
@@ -271,7 +253,7 @@ const Sales = () => {
     Swal.fire({
       icon: "warning",
       title: "Are you sure?",
-      text: "You want to unblock this Owner!",
+      text: "You want to unblock this Sales Person!",
       showCancelButton: true,
       confirmButtonText: "Unblock",
       padding: "2em",
@@ -281,7 +263,7 @@ const Sales = () => {
         handleActiveUser(id);
         Swal.fire({
           title: "Unblocked!",
-          text: "The Owner has been unblocked.",
+          text: "The Sales Person has been unblocked.",
           icon: "success",
           customClass: "sweet-alerts",
         });
@@ -299,22 +281,20 @@ const Sales = () => {
               Sales Teams
             </h5>
             <Tippy content="Total Sales Team">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={totalSaleperson} duration={3} />
               </span>
             </Tippy>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Sales Person">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={openAddSalesPersonModal}
-              >
-                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                Add Sales Person
-              </button>
-            </Tippy>
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={openAddSalesPersonModal}
+            >
+              <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
+              Add Sales Person
+            </button>
           </div>
         </div>
         <div className="datatables">
@@ -333,7 +313,9 @@ const Sales = () => {
               className="whitespace-nowrap table-hover"
               records={allSalesPerson}
               idAccessor="salesperson_id"
-              onRowClick={(row)=> navigate(`/admin/sales/${row.salesperson_id}/owners`)}
+              onRowClick={(row) =>
+                navigate(`/admin/sales/${row.salesperson_id}`)
+              }
               columns={[
                 {
                   accessor: "salesperson_id",
@@ -349,7 +331,7 @@ const Sales = () => {
                   textAlignment: "center",
                   render: (user) => (
                     <div className="flex gap-4 items-center w-max mx-auto">
-                      <Tippy content="Unblocked/Blocked">
+                      <Tippy content="Block / Unblock">
                         <label
                           className="w-[46px] h-[22px] relative"
                           onClick={(e) => {
@@ -425,10 +407,9 @@ const Sales = () => {
         setShowComfirmPassword={setShowComfirmPassword}
         emailError={emailError}
         setEmailError={setEmailError}
-        // handleEmailChange={handleEmailChange}
       />
       <AddSalesPerson
-        open={editSalesPersonModal} // Ensure the open prop is provided here
+        open={editSalesPersonModal}
         closeModal={closeEditModal}
         input={input}
         setInput={setInput}

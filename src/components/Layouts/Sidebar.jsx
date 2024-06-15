@@ -163,7 +163,9 @@ const Sidebar = () => {
                     <div className="flex items-center">
                       <IconMenuTodo
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "owner-subscription-plans" ? "!text-primary" : ""
+                          currentMenu === "owner-subscription-plans"
+                            ? "!text-primary"
+                            : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
@@ -209,7 +211,6 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
 
-
                 <li className="nav-item">
                   <NavLink to="/clinic/doctors" className="group">
                     <div className="flex items-center">
@@ -244,15 +245,12 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
 
-
                 <li className="nav-item">
                   <NavLink to="/clinic/leaves" className="group">
                     <div className="flex items-center">
                       <IconMenuDashboard
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "clinic-leaves"
-                            ? "!text-primary"
-                            : ""
+                          currentMenu === "clinic-leaves" ? "!text-primary" : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
@@ -261,9 +259,6 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
-
-                
-
               </ul>
             ) : role === 4 ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
@@ -378,34 +373,6 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/admin/reports" className="group">
-                    <div className="flex items-center">
-                      <IconMenuDocumentation
-                        className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "admin-reports" ? "!text-primary" : ""
-                        }`}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Reports"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/admin/messages" className="group">
-                    <div className="flex items-center">
-                      <IconMenuChat
-                        className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "admin-doctors" ? "!text-primary" : ""
-                        }`}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Messages"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
                   <NavLink to="/admin/sales" className="group">
                     <div className="flex items-center">
                       <IconMenuUsers
@@ -429,6 +396,34 @@ const Sidebar = () => {
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Subscription Plans"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/messages" className="group">
+                    <div className="flex items-center">
+                      <IconMenuChat
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "admin-doctors" ? "!text-primary" : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Messages"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/reports" className="group">
+                    <div className="flex items-center">
+                      <IconMenuDocumentation
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "admin-reports" ? "!text-primary" : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Reports"}
                       </span>
                     </div>
                   </NavLink>

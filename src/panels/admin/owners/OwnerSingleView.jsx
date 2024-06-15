@@ -11,8 +11,11 @@ import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import IconCaretDown from "../../../components/Icon/IconCaretDown";
+import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
+import { handleGetLocation } from "../../../utils/getLocation";
 
-const Clinics = () => {
+const OwnerSingleView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,7 +33,6 @@ const Clinics = () => {
   const [loading, setLoading] = useState(false);
   const [ownerInfo, setOwnerInfo] = useState({});
   const [detailsLoading, setDetailsLoading] = useState(false);
-  // const [ownerDetails, setOwnerDetails] = useState({});
 
   useEffect(() => {
     setPage(1);
@@ -56,8 +58,8 @@ const Clinics = () => {
     });
   };
 
-   //GET METHOD
-   const fetchData = async () => {
+  //GET METHOD
+  const fetchData = async () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
@@ -81,26 +83,26 @@ const Clinics = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getowner/${ownerId}`
       );
-      setOwnerInfo(response.data?.Owner); // Set owner information in state
+      setOwnerInfo(response.data?.Owner);
       setDetailsLoading(false);
     } catch (error) {
       console.log(error);
       setDetailsLoading(false);
-    } finally{
+    } finally {
       setDetailsLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchOwnerInfo();
-  }, //[ownerId, page, pageSize]
-  []);
+  useEffect(
+    () => {
+      fetchOwnerInfo();
+    }, //[ownerId, page, pageSize]
+    []
+  );
 
   useEffect(() => {
     fetchData();
-  }, [page, pageSize]
-  );
-
+  }, [page, pageSize]);
 
   //  block or unblock handler
   const handleActiveUser = async (userId) => {
@@ -203,61 +205,23 @@ const Clinics = () => {
     });
   };
 
-  console.log(ownerInfo);
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
-        <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
-          <li>
-            <Link to="/admin/owners" className="text-primary hover:underline">
-              Owners
-            </Link>
-          </li>
-          <li className="before:content-['/'] before:mr-2">
-            <span>Clinics</span>
-          </li>
-        </ul>
-        <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active1" // Unique ID
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_blocked1" // Unique ID
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div>
-      </div>
+      <button
+        onClick={() => navigate("/admin/owners")}
+        type="button"
+        className="btn btn-green btn-sm -mt-4 mb-4"
+      >
+        <IconCaretDown className="w-4 h-4 rotate-90" />
+      </button>
       <div className="panel mb-1">
         {detailsLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
             <div className="flex justify-between flex-wrap gap-4 sm:px-4">
-              <div className="text-2xl font-semibold capitalize">
+              <div className="text-2xl font-semibold capitalize dark:text-slate-300">
                 {ownerInfo?.name || ""}
               </div>
               <label
@@ -283,17 +247,25 @@ const Clinics = () => {
             </div>
             <div className="text-left sm:px-4">
               <div className="mt-5">
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Address :</div>
-                  <div>{ownerInfo?.address}</div>
+                <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 sm:mb-1">
+                  <div className="text-white-dark min-w-16 flex items-end justify-between">
+                    Address <span>:</span>
+                  </div>
+                  <div className="dark:text-slate-300">
+                    {ownerInfo?.address}
+                  </div>
                 </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Email :</div>
-                  <div>{ownerInfo?.email}</div>
+                <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 sm:mb-1">
+                  <div className="text-white-dark min-w-16 flex items-end justify-between">
+                    Email <span>:</span>
+                  </div>
+                  <div className="dark:text-slate-300">{ownerInfo?.email}</div>
                 </div>
-                <div className="flex items-center sm:gap-2 flex-wrap">
-                  <div className="text-white-dark">Phone :</div>
-                  <div>{ownerInfo?.phone}</div>
+                <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                  <div className="text-white-dark min-w-16 flex items-end justify-between">
+                    Phone <span>:</span>
+                  </div>
+                  <div className="dark:text-slate-300">{ownerInfo?.phone}</div>
                 </div>
               </div>
             </div>
@@ -308,7 +280,7 @@ const Clinics = () => {
               Clinics
             </h5>
             <Tippy content="Total Clinics">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={totalClinics} duration={3}></CountUp>
               </span>
             </Tippy>
@@ -330,9 +302,17 @@ const Clinics = () => {
               className="whitespace-nowrap table-hover"
               records={allClinics}
               idAccessor="clinic_id"
-              onRowClick={(row)=> navigate(`/admin/owners/${ownerId}/clinics/${row?.clinic_id}/doctors`)}
+              onRowClick={(row) =>
+                navigate(`/clinics/${row?.clinic_id}`, {
+                  state: { previousUrl: location?.pathname },
+                })
+              }
               columns={[
-                { accessor: "clinic_id", title: "ID" },
+                {
+                  accessor: "clinic_id",
+                  title: "No.",
+                  render: (row, rowIndex) => rowIndex + 1,
+                },
                 { accessor: "name", title: "Name" },
                 { accessor: "phone", title: "Phone" },
                 { accessor: "address", title: "Address" },
@@ -340,34 +320,22 @@ const Clinics = () => {
 
                 { accessor: "place", title: "Place" },
                 {
-                  accessor: "banner_img_url",
-                  title: "Banner Image",
-                  render: (rowData) => (
-                    <img
-                      src={imageBaseUrl + rowData.banner_img_url}
-                      alt="Banner"
-                      className="w-10"
-                    />
-                  ),
-                },
-                {
                   accessor: "googleLocation",
-                  title: "Google Location",
-                  render: (rowData) => {
-                    const location = JSON.parse(rowData.googleLocation);
-                    const { lat, long } = location;
-                    const googleMapsURL = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
-                    return (
-                      <a
-                        href={googleMapsURL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        View on Google Maps
-                      </a>
-                    );
-                  },
+                  title: "Location",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleGetLocation(rowData.googleLocation);
+                      }}
+                      className="btn btn-success btn-sm py-1"
+                    >
+                      <IconMenuContacts className="mr-1 w-4" />
+                      View Location
+                    </button>
+                  ),
                 },
                 {
                   accessor: "Actions",
@@ -416,4 +384,4 @@ const Clinics = () => {
   );
 };
 
-export default Clinics;
+export default OwnerSingleView;

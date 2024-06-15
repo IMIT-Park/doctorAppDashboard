@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../../components/Icon/IconX";
-import IconLoader from "../../../../components/Icon/IconLoader";
+import IconX from "../../../components/Icon/IconX";
+import IconLoader from "../../../components/Icon/IconLoader";
 
 const DoctorTimeSlotEdit = ({
   open,

@@ -11,14 +11,17 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AddClinic from "./AddClinic";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
+import { showMessage } from "../../../utils/showMessage";
+import { handleGetLocation } from "../../../utils/getLocation";
 
 const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
@@ -131,7 +134,6 @@ const Clinics = () => {
       address: clinic.address,
       place: clinic.place,
       picture: null,
-      // picture: clinic.banner_img_url,
       googleLocation: JSON.parse(clinic.googleLocation),
       defaultPicture: imageBaseUrl + clinic?.banner_img_url || null,
     });
@@ -152,57 +154,6 @@ const Clinics = () => {
       googleLocation: {},
     });
     setCurrentClinicId(null);
-  };
-
-  const handleGetLocation = (googleLocation) => {
-    if (!googleLocation) {
-      showMessage("Location information is not available", "error");
-      return;
-    }
-
-    try {
-      const decodedLocation = googleLocation.replace(/\\/g, "");
-
-      const cleanedGoogleLocation =
-        decodedLocation.startsWith('"') && decodedLocation.endsWith('"')
-          ? decodedLocation.slice(1, -1)
-          : decodedLocation;
-
-      const locationData = JSON.parse(cleanedGoogleLocation);
-
-      const cleanedLocationData = {};
-      Object.keys(locationData).forEach((key) => {
-        const trimmedKey = key.trim();
-        cleanedLocationData[trimmedKey] = locationData[key];
-      });
-
-      const { lat, long } = cleanedLocationData;
-
-      if (lat && long) {
-        const googleMapsUrl = `https://www.google.com/maps?q=${lat},${long}`;
-        window.open(googleMapsUrl, "_blank");
-      } else {
-        showMessage("Invalid location data", "error");
-      }
-    } catch (error) {
-      console.error("Failed to parse location data", error);
-      showMessage("Invalid location data", "error");
-    }
-  };
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top-right",
-      showConfirmButton: false,
-      showCloseButton: true,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
-    });
   };
 
   // Function to create a new clinic
@@ -411,7 +362,9 @@ const Clinics = () => {
               records={allClinics}
               idAccessor="clinic_id"
               onRowClick={(row) =>
-                navigate(`/owner/clinics/${row.clinic_id}/doctors`)
+                navigate(`/clinics/${row?.clinic_id}`, {
+                  state: { previousUrl: location?.pathname },
+                })
               }
               columns={[
                 {
@@ -426,21 +379,10 @@ const Clinics = () => {
                 { accessor: "address", title: "Address" },
                 { accessor: "place", title: "Place" },
                 { accessor: "User.email", title: "Email" },
-
-                {
-                  accessor: "banner_img_url",
-                  title: "Banner Image",
-                  render: (rowData) => (
-                    <img
-                      src={imageBaseUrl + rowData.banner_img_url}
-                      alt="Banner"
-                      className="w-10"
-                    />
-                  ),
-                },
                 {
                   accessor: "googleLocation",
-                  title: "Google Location",
+                  title: "Location",
+                  textAlignment:"center",
                   render: (rowData) => (
                     <button
                       type="button"
@@ -448,7 +390,7 @@ const Clinics = () => {
                         e.stopPropagation();
                         handleGetLocation(rowData.googleLocation);
                       }}
-                      className="btn btn-success btn-sm"
+                      className="btn btn-success btn-sm py-1"
                     >
                       <IconMenuContacts className="mr-1 w-4" />
                       View Location

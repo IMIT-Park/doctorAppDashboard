@@ -15,7 +15,7 @@ import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
 import AddLeave from "./AddLeaveModal";
 import {formatDate} from "../../../utils/formatDate";
-import {formatTime} from "../../../utils/formatDate";
+import {formatTime} from "../../../utils/formatTime";
 
 const ClinicDoctorLeave = () => {
   const dispatch = useDispatch();

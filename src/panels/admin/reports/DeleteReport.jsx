@@ -65,7 +65,7 @@ const DeleteReport = ({ open, closeModal }) => {
                     </button>
                     <button
                       type="button"
-                      className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                      className="btn btn-green ltr:ml-4 rtl:mr-4"
                       onClick={handleSubmit}
                     >
                       Delete

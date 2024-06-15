@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import IconPlus from "../../../../../components/Icon/IconPlus";
-import NetworkHandler from "../../../../../utils/NetworkHandler";
+import IconPlus from "../../../components/Icon/IconPlus";
+import NetworkHandler from "../../../utils/NetworkHandler";
 
 const BasicDetails = ({ input, setInput, handleFileChange }) => {
   const [specializations, setSpecializations] = useState([]);

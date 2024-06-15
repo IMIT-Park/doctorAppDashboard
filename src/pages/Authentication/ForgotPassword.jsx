@@ -7,9 +7,8 @@ import IconSun from "../../components/Icon/IconSun";
 import IconMoon from "../../components/Icon/IconMoon";
 import IconLaptop from "../../components/Icon/IconLaptop";
 import { toggleTheme } from "../../store/themeConfigSlice";
-import IconX from "../../components/Icon/IconX";
 import IconLoader from "../../components/Icon/IconLoader";
-import NetworkHandler from "../../utils/NetworkHandler";
+import { baseUrl } from "../../utils/NetworkHandler";
 import Swal from "sweetalert2";
 
 const ForgotPassword = () => {
@@ -35,7 +34,7 @@ const ForgotPassword = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://doctorbackend.gitdr.com/api/v1/auth/forgotPasword",
+        `${baseUrl}/v1/auth/forgotPasword`,
         {
           method: "POST",
           headers: {
@@ -116,7 +115,7 @@ const ForgotPassword = () => {
                   <button
                     className={`${
                       themeConfig.theme === "light" &&
-                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-[#3f9679] hover:bg-white-light/90 dark:hover:bg-dark/60"
                     }`}
                     onClick={() => {
                       dispatch(toggleTheme("dark"));
@@ -131,7 +130,7 @@ const ForgotPassword = () => {
                   <button
                     className={`${
                       themeConfig.theme === "dark" &&
-                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-[#3f9679] hover:bg-white-light/90 dark:hover:bg-dark/60"
                     }`}
                     onClick={() => {
                       dispatch(toggleTheme("system"));
@@ -144,7 +143,7 @@ const ForgotPassword = () => {
                   <button
                     className={`${
                       themeConfig.theme === "system" &&
-                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-[#3f9679] hover:bg-white-light/90 dark:hover:bg-dark/60"
                     }`}
                     onClick={() => {
                       dispatch(toggleTheme("light"));
@@ -174,7 +173,7 @@ const ForgotPassword = () => {
                       id="email"
                       type="email"
                       placeholder="Enter Email"
-                      className="form-input ps-10 placeholder:text-white-dark"
+                      className="form-input form-input-green ps-10 placeholder:text-white-dark"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
@@ -196,7 +195,7 @@ const ForgotPassword = () => {
                 </button>
                 <label className="flex items-center justify-center">
                   <span
-                    className="text-white-dark hover:text-blue-600 cursor-pointer"
+                    className="text-white-dark hover:text-[#006241] cursor-pointer"
                     onClick={() => navigate("/")}
                   >
                     Back to Login

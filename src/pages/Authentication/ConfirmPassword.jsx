@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { setPageTitle } from "../../store/themeConfigSlice";
-import IconMail from "../../components/Icon/IconMail";
 import IconLockDots from "../../components/Icon/IconLockDots";
 import IconSun from "../../components/Icon/IconSun";
 import IconMoon from "../../components/Icon/IconMoon";
@@ -12,6 +11,7 @@ import IconCloseEye from "../../components/Icon/IconCloseEye";
 import { toggleTheme } from "../../store/themeConfigSlice";
 import IconX from "../../components/Icon/IconX";
 import IconLoader from "../../components/Icon/IconLoader";
+import { baseUrl } from "../../utils/NetworkHandler";
 
 const LoginBoxed = () => {
   const dispatch = useDispatch();
@@ -96,7 +96,7 @@ const LoginBoxed = () => {
 
     try {
       const response = await fetch(
-        "https://doctorbackend.gitdr.com/api/v1/auth/updatePassword",
+        `${baseUrl}/v1/auth/updatePassword`,
         {
           method: "POST",
           headers: {
@@ -183,7 +183,7 @@ const LoginBoxed = () => {
                   <button
                     className={`${
                       themeConfig.theme === "light" &&
-                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-[#3f9679] hover:bg-white-light/90 dark:hover:bg-dark/60"
                     }`}
                     onClick={() => {
                       dispatch(toggleTheme("dark"));
@@ -198,7 +198,7 @@ const LoginBoxed = () => {
                   <button
                     className={`${
                       themeConfig.theme === "dark" &&
-                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-[#3f9679] hover:bg-white-light/90 dark:hover:bg-dark/60"
                     }`}
                     onClick={() => {
                       dispatch(toggleTheme("system"));
@@ -211,7 +211,7 @@ const LoginBoxed = () => {
                   <button
                     className={`${
                       themeConfig.theme === "system" &&
-                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                      "flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-[#3f9679] hover:bg-white-light/90 dark:hover:bg-dark/60"
                     }`}
                     onClick={() => {
                       dispatch(toggleTheme("light"));
@@ -241,7 +241,7 @@ const LoginBoxed = () => {
                       id="NewPassword"
                       type={showPassword ? "text" : "password"}
                       placeholder="New Password"
-                      className="form-input ps-10 pr-9 placeholder:text-white-dark"
+                      className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
                       value={data.newPassword}
                       onChange={(e) =>
                         setData({ ...data, newPassword: e.target.value })
@@ -271,7 +271,7 @@ const LoginBoxed = () => {
                       id="ConfirmPassword"
                       type={showPassword ? "text" : "password"}
                       placeholder="Confirm Password"
-                      className="form-input ps-10 pr-9 placeholder:text-white-dark"
+                      className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
                       value={data.confirmPassword}
                       onChange={(e) =>
                         setData({ ...data, confirmPassword: e.target.value })

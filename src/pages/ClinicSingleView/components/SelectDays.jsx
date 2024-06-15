@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import AnimateHeight from "react-animate-height";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
-import IconX from "../../../../../components/Icon/IconX";
+import IconX from "../../../components/Icon/IconX";
 
 const SelectDays = ({
   input,

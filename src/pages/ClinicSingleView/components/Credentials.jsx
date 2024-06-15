@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "flatpickr/dist/flatpickr.css";
-import IconLockDots from "../../../../../components/Icon/IconLockDots";
-import IconEye from "../../../../../components/Icon/IconEye";
-import IconCloseEye from "../../../../../components/Icon/IconCloseEye";
+import IconLockDots from "../../../components/Icon/IconLockDots";
+import IconEye from "../../../components/Icon/IconEye";
+import IconCloseEye from "../../../components/Icon/IconCloseEye";
 
 const Credentials = ({ input, setInput }) => {
   const [showPassword, setShowPassword] = useState(false);

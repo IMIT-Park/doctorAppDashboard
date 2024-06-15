@@ -97,7 +97,7 @@ const AddSalesPerson = ({
                         id="full-name"
                         type="text"
                         placeholder="Enter Full Name"
-                        className="form-input"
+                        className="form-input form-input-green"
                         value={input?.name}
                         onChange={(e) =>
                           setInput({ ...input, name: e.target.value })
@@ -110,7 +110,7 @@ const AddSalesPerson = ({
                         id="email"
                         type="email"
                         placeholder="Enter Email"
-                        className="form-input"
+                        className="form-input form-input-green"
                         value={input?.email}
                         onChange={handleEmailChange}
                       />
@@ -126,7 +126,7 @@ const AddSalesPerson = ({
                         id="user-name"
                         type="text"
                         placeholder="Enter User Name"
-                        className="form-input"
+                        className="form-input form-input-green"
                         value={input?.user_name}
                         onChange={(e) =>
                           setInput({ ...input, user_name: e.target.value })
@@ -139,7 +139,7 @@ const AddSalesPerson = ({
                         id="phone"
                         type="number"
                         placeholder="Enter Phone Number"
-                        className="form-input"
+                        className="form-input form-input-green"
                         value={input?.phone}
                         onChange={(e) =>
                           setInput({ ...input, phone: e.target.value })
@@ -152,7 +152,7 @@ const AddSalesPerson = ({
                         id="location"
                         rows={3}
                         placeholder="Enter Address"
-                        className="form-textarea resize-none min-h-[130px]"
+                        className="form-textarea form-textarea-green resize-none min-h-[130px]"
                         value={input?.address}
                         onChange={(e) =>
                           setInput({ ...input, address: e.target.value })
@@ -169,7 +169,7 @@ const AddSalesPerson = ({
                               id="password"
                               type={showPassword ? "text" : "password"}
                               placeholder="Enter Password"
-                              className="form-input pr-10"
+                              className="form-input form-input-green pr-10"
                               value={input?.password}
                               onChange={(e) =>
                                 setInput({ ...input, password: e.target.value })
@@ -196,7 +196,7 @@ const AddSalesPerson = ({
                               id="confirm-password"
                               type={showComfirmPassword ? "text" : "password"}
                               placeholder="Enter Confirm Password"
-                              className="form-input pr-10"
+                              className="form-input form-input-green pr-10"
                               value={input?.confirmPassword}
                               onChange={(e) =>
                                 setInput({
@@ -237,7 +237,7 @@ const AddSalesPerson = ({
                       </button>
                       <button
                         type="button"
-                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                        className="btn btn-green ltr:ml-4 rtl:mr-4"
                         onClick={handleSubmit}
                         disabled={buttonLoading}
                       >

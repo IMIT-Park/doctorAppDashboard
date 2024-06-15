@@ -1,36 +1,48 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setPageTitle } from "../../../../store/themeConfigSlice";
+import { setPageTitle } from "../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
 import Swal from "sweetalert2";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import IconLoader from "../../../../components/Icon/IconLoader";
-import ScrollToTop from "../../../../components/ScrollToTop";
+import IconLoader from "../../components/Icon/IconLoader";
+import ScrollToTop from "../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import IconMenuScrumboard from "../../../../components/Icon/Menu/IconMenuScrumboard";
-import AddDoctor from "./AddDoctor";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import IconMenuScrumboard from "../../components/Icon/Menu/IconMenuScrumboard";
+import AddDoctor from "./components/AddDoctor";
 import NetworkHandler, {
   imageBaseUrl,
   websiteUrl,
-} from "../../../../utils/NetworkHandler";
-import IconMenuContacts from "../../../../components/Icon/Menu/IconMenuContacts";
-import IconDownload from "../../../../components/Icon/IconDownload";
+} from "../../utils/NetworkHandler";
+import IconMenuContacts from "../../components/Icon/Menu/IconMenuContacts";
+import IconDownload from "../../components/Icon/IconDownload";
 import QRCode from "qrcode.react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import IconCopy from "../../../../components/Icon/IconCopy";
-import IconEdit from "../../../../components/Icon/IconEdit";
-import AddClinic from "../AddClinic";
-import { formatDate } from "../../../../utils/formatDate";
-import { showMessage } from "../../../../utils/showMessage";
+import IconCopy from "../../components/Icon/IconCopy";
+import IconEdit from "../../components/Icon/IconEdit";
+import AddClinic from "../../panels/owner/clinics/AddClinic";
+import { formatDate } from "../../utils/formatDate";
+import { showMessage } from "../../utils/showMessage";
+import IconCaretDown from "../../components/Icon/IconCaretDown";
+import { handleGetLocation } from "../../utils/getLocation";
 
-const Doctors = () => {
+const ClinicSingleView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { clinicId } = useParams();
+  const previousUrl = sessionStorage.getItem("clinicPreviousPage");
+
+  useEffect(() => {
+    if (location?.state?.previousUrl) {
+      sessionStorage.setItem(
+        "clinicPreviousPage",
+        location?.state?.previousUrl
+      );
+    }
+  }, [location?.state?.previousUrl]);
 
   useEffect(() => {
     dispatch(setPageTitle("Doctors"));
@@ -417,6 +429,7 @@ const Doctors = () => {
       if (response.status === 201) {
         const doctorId = response.data.Doctor.doctor_id;
 
+        // Calling the add photo API
         const additionalResponse1 = await NetworkHandler.makePostRequest(
           `/v1/doctor/upload/${doctorId}`,
           formData
@@ -429,7 +442,7 @@ const Doctors = () => {
           slot.endTime += ":00";
         });
 
-        // Call the second additional API
+        // Calling the add timeslot API
         const additionalResponse2 = await NetworkHandler.makePostRequest(
           `/v1/doctor/createtimeSlots/${doctorId}`,
           { timeslots: input.timeSlots }
@@ -450,92 +463,16 @@ const Doctors = () => {
     }
   };
 
-  // Function to handle "Get Location" button click
-  const handleGetLocation = () => {
-    const googleLocation = clinicDetails.googleLocation;
-
-    if (!googleLocation) {
-      showMessage("Location information is not available", "error");
-      return;
-    }
-
-    try {
-      const decodedLocation = googleLocation.replace(/\\/g, "");
-
-      const cleanedGoogleLocation =
-        decodedLocation.startsWith('"') && decodedLocation.endsWith('"')
-          ? decodedLocation.slice(1, -1)
-          : decodedLocation;
-
-      const locationData = JSON.parse(cleanedGoogleLocation);
-
-      const cleanedLocationData = {};
-      Object.keys(locationData).forEach((key) => {
-        const trimmedKey = key.trim();
-        cleanedLocationData[trimmedKey] = locationData[key];
-      });
-
-      const { lat, long } = cleanedLocationData;
-
-      if (lat && long) {
-        const googleMapsUrl = `https://www.google.com/maps?q=${lat},${long}`;
-        window.open(googleMapsUrl, "_blank");
-      } else {
-        showMessage("Invalid location data", "error");
-      }
-    } catch (error) {
-      console.error("Failed to parse location data", error);
-      showMessage("Invalid location data", "error");
-    }
-  };
-
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
-        <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
-          <li>
-            <Link to="/owner/clinics" className="text-primary hover:underline">
-              Clinics
-            </Link>
-          </li>
-          <li className="before:content-['/'] before:mr-2">
-            <span>Doctors</span>
-          </li>
-        </ul>
-        <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div>
-      </div>
+      <button
+        onClick={() => navigate(previousUrl)}
+        type="button"
+        className="btn btn-green btn-sm -mt-4 mb-4"
+      >
+        <IconCaretDown className="w-4 h-4 rotate-90" />
+      </button>
       <div className="panel mb-1">
         {detailsLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -607,11 +544,13 @@ const Doctors = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={handleGetLocation}
+                  onClick={() =>
+                    handleGetLocation(clinicDetails?.googleLocation)
+                  }
                   className="btn btn-success mt-2"
                 >
                   <IconMenuContacts className="mr-1 w-5" />
-                  Get Location
+                  View Location
                 </button>
                 <div className="w-full flex items-start gap-3 flex-wrap mt-5">
                   <div className="flex flex-col items-center bg-[#f1f2f3] dark:bg-[#060818] rounded p-2">
@@ -676,7 +615,7 @@ const Doctors = () => {
             <Tippy content="Click to Add Doctor">
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-green"
                 onClick={openAddDoctorModal}
               >
                 <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
@@ -702,7 +641,9 @@ const Doctors = () => {
               records={allDoctors}
               idAccessor="doctor_id"
               onRowClick={(row) =>
-                navigate(`/owner/clinics/${clinicId}/doctors/${row?.doctor_id}`)
+                navigate(`/clinics/${clinicId}/${row?.doctor_id}`, {
+                  state: { previousUrl: location?.pathname },
+                })
               }
               columns={[
                 {
@@ -826,4 +767,4 @@ const Doctors = () => {
   );
 };
 
-export default Doctors;
+export default ClinicSingleView;

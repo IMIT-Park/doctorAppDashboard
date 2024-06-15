@@ -1,8 +1,7 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-
 import Swal from "sweetalert2";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
@@ -10,13 +9,15 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NetworkHandler from "../../../../utils/NetworkHandler";
+import IconCaretDown from "../../../../components/Icon/IconCaretDown";
+import { showMessage } from "../../../../utils/showMessage";
 
 const Owners = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { salesId } = useParams(); 
+  const { salesId } = useParams();
 
   useEffect(() => {
     dispatch(setPageTitle("Owners"));
@@ -37,49 +38,12 @@ const Owners = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  const addUser = () => {
-    setAddUserModal(true);
-  };
-
-  const saveUser = () => {
-    // if (!params.name) {
-    //     showMessage('Name is required.', 'error');
-    //     return true;
-    // }
-    showMessage("User has been saved successfully.");
-    setAddUserModal(false);
-  };
-
-  const deleteConfirm = () => {
-    setDeleteModal(true);
-  };
-
-  const deleteUser = () => {
-    showMessage("User has been deleted successfully.");
-    setDeleteModal(false);
-  };
-
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
-    });
-  };
-
   // fetch function
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/salesperson/getsalespersonid/${10}?page=${page}&pageSize=${pageSize}`
+        `/v1/salesperson/getsalespersonid/${salesId}?page=${page}&pageSize=${pageSize}`
       );
       setTotalOwners(response?.data?.Owner?.count);
       setAllOwners(response?.data?.Owner?.rows);
@@ -153,52 +117,29 @@ const Owners = () => {
     });
   };
 
+  console.log(allOwners);
+
   return (
     <div>
       <ScrollToTop />
+      <button
+        onClick={() => navigate("/admin/sales")}
+        type="button"
+        className="btn btn-green btn-sm -mt-4 mb-4"
+      >
+        <IconCaretDown className="w-4 h-4 rotate-90" />
+      </button>
       <div className="panel">
         <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              Ownerssss
+              Owners
             </h5>
             <Tippy content="Total Owners">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
                 <CountUp start={0} end={totalOwners} duration={3}></CountUp>
               </span>
             </Tippy>
-          </div>
-          <div className="flex items-center flex-wrap gap-4">
-            <div className="flex items-start gap-1">
-              <h5 className="text-base font-semibold dark:text-white-light">
-                Active
-              </h5>
-              <label className="w-11 h-5 relative">
-                <input
-                  type="checkbox"
-                  className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                  id="custom_switch_checkbox_active"
-                  checked
-                  readOnly
-                />
-                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-              </label>
-            </div>
-            <div className="flex items-start gap-1">
-              <h5 className="text-base font-semibold dark:text-white-light">
-                Blocked
-              </h5>
-              <label className="w-11 h-5 relative">
-                <input
-                  type="checkbox"
-                  className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                  id="custom_switch_checkbox_active"
-                  checked={false}
-                  readOnly
-                />
-                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-              </label>
-            </div>
           </div>
         </div>
         {loading ? (
@@ -234,28 +175,30 @@ const Owners = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy content="Block/Unblock">
-                      <label
-                        className="w-[46px] h-[22px] relative"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (rowData?.User?.status) {
-                            showBlockAlert(rowData?.user_id);
-                          } else {
-                            showUnblockAlert(rowData?.user_id);
-                          }
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox${rowData.owner_id}`}
-                          checked={rowData?.User?.status}
-                          readOnly
-                        />
-                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                      </label>
-                    </Tippy>
+                    <div className="grid place-items-center">
+                      <Tippy content="Block/Unblock">
+                        <label
+                          className="w-[46px] h-[22px] relative"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (rowData?.User?.status) {
+                              showBlockAlert(rowData?.user_id);
+                            } else {
+                              showUnblockAlert(rowData?.user_id);
+                            }
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                            id={`custom_switch_checkbox${rowData.owner_id}`}
+                            checked={rowData?.User?.status}
+                            readOnly
+                          />
+                          <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                        </label>
+                      </Tippy>
+                    </div>
                   ),
                 },
               ]}

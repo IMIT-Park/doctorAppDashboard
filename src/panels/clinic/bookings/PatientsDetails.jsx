@@ -205,7 +205,7 @@ const PatientsDetails = () => {
                 />
                 <button
                   type="submit"
-                  className="btn btn-primary absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                  className="btn btn-green absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
                 >
                   <IconSearch className="mx-auto" />
                 </button>
@@ -217,7 +217,7 @@ const PatientsDetails = () => {
             <Tippy content="Click to Add Doctor">
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-green"
                 onClick={openAddPatientsModal}
               >
                 <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />

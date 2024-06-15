@@ -130,7 +130,7 @@ const ClinicBookingDoctor = () => {
                 />
                 <button
                   type="submit"
-                  className="btn btn-primary absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                  className="btn btn-green absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
                 >
                   <IconSearch className="mx-auto" />
                 </button>

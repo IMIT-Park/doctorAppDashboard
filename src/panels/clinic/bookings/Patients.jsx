@@ -296,7 +296,7 @@ const Patients = () => {
           <div className="flex items-center justify-center">
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-green"
               onClick={handleBookNow}
               // disabled={!selectedTime}
             >

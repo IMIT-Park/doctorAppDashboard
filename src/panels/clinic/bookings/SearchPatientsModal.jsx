@@ -87,7 +87,7 @@ const SearchPatientsModal = ({ open, closeModal, details }) => {
                       />
                       <button
                         type="submit"
-                        className="btn btn-primary mt-6 ml-auto mr-auto"
+                        className="btn btn-green mt-6 ml-auto mr-auto"
                       >
                         Submit
                       </button>

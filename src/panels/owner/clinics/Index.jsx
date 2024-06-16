@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
 import IconEdit from "../../../components/Icon/IconEdit";
-import Swal from "sweetalert2";
 import IconPlus from "../../../components/Icon/IconPlus";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
@@ -17,6 +16,7 @@ import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { showMessage } from "../../../utils/showMessage";
 import { handleGetLocation } from "../../../utils/getLocation";
+import useBlockUnblock from "../../../utils/useBlockUnblock";
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -40,7 +40,6 @@ const Clinics = () => {
   const [currentClinicId, setCurrentClinicId] = useState("");
   const [loading, setLoading] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const [activeStatus, setActiveStatus] = useState({});
   const [input, setInput] = useState({
     name: "",
     email: "",
@@ -261,61 +260,9 @@ const Clinics = () => {
     }
   };
 
-  //  block or unblock handler
-  const handleActiveUser = async (userId) => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/activate/${userId}`
-      );
-      fetchData();
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  };
-
-  const showBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Owner!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Owner has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Owner!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Unblocked!",
-          text: "The Owner has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
+  // block and unblock handler
+  const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
+    useBlockUnblock(fetchData);
 
   return (
     <div>
@@ -333,16 +280,14 @@ const Clinics = () => {
             </Tippy>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Clinic">
-              <button
-                type="button"
-                className="btn btn-green"
-                onClick={() => openAddModal()}
-              >
-                <IconPlus className="ltr:mr-2 rtl:ml-2" />
-                Add Clinic
-              </button>
-            </Tippy>
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={() => openAddModal()}
+            >
+              <IconPlus className="ltr:mr-2 rtl:ml-2" />
+              Add Clinic
+            </button>
           </div>
         </div>
         {loading ? (
@@ -382,7 +327,7 @@ const Clinics = () => {
                 {
                   accessor: "googleLocation",
                   title: "Location",
-                  textAlignment:"center",
+                  textAlignment: "center",
                   render: (rowData) => (
                     <button
                       type="button"
@@ -413,16 +358,18 @@ const Clinics = () => {
                           <IconEdit className="w-4.5 h-4.5" />
                         </button>
                       </Tippy>
-                      <Tippy content="Block/Unblock">
+                      <Tippy
+                        content={rowData?.User?.status ? "Block" : "Unblock"}
+                      >
                         <label
                           className="w-[46px] h-[22px] relative"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (rowData?.User?.status) {
-                              showBlockAlert(rowData?.user_id);
-                            } else {
-                              showUnblockAlert(rowData?.user_id);
-                            }
+                            showClinicAlert(
+                              rowData?.user_id,
+                              rowData?.User?.status ? "block" : "activate",
+                              "clinic"
+                            );
                           }}
                         >
                           <input

@@ -11,6 +11,7 @@ import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { useNavigate } from "react-router-dom";
 import NetworkHandler from "../../../utils/NetworkHandler";
+import useBlockUnblock from "../../../utils/useBlockUnblock";
 
 const Owners = () => {
   const dispatch = useDispatch();
@@ -76,61 +77,9 @@ const Owners = () => {
     fetchData();
   }, [page, pageSize]);
 
-  //  block or unblock handler
-  const handleActiveUser = async (userId) => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/activate/${userId}`
-      );
-      fetchData();
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  };
-
-  const showBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Owner!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Owner has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Owner!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Unblocked!",
-          text: "The Owner has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
+  // block and unblock handler
+  const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =
+    useBlockUnblock(fetchData);
 
   return (
     <div>
@@ -181,16 +130,18 @@ const Owners = () => {
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="grid place-items-center">
-                      <Tippy content="Block/Unblock">
+                      <Tippy
+                        content={rowData?.User?.status ? "Block" : "Unblock"}
+                      >
                         <label
                           className="w-[46px] h-[22px] relative"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (rowData?.User?.status) {
-                              showBlockAlert(rowData?.user_id);
-                            } else {
-                              showUnblockAlert(rowData?.user_id);
-                            }
+                            showOwnerAlert(
+                              rowData?.user_id,
+                              rowData?.User?.status ? "block" : "activate",
+                              "owner"
+                            );
                           }}
                         >
                           <input

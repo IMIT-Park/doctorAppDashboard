@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../store/themeConfigSlice";
-import Swal from "sweetalert2";
 import IconLoader from "../../components/Icon/IconLoader";
 import ScrollToTop from "../../components/ScrollToTop";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import IconCaretDown from "../../components/Icon/IconCaretDown";
 import AnimateHeight from "react-animate-height";
 import NetworkHandler, { imageBaseUrl } from "../../utils/NetworkHandler";
@@ -17,6 +16,10 @@ import DeleteTimeslot from "./components/DeleteTimeslot";
 import DoctorDetailsEdit from "./components/DoctorDetailsEdit";
 import DoctorProfileEdit from "./components/DoctorProfileEdit";
 import DoctorTimeSlotEdit from "./components/DoctorTimeSlotEdit";
+import AddLeave from "./components/AddLeave";
+import useBlockUnblock from "../../utils/useBlockUnblock";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 
 const SinglePage = () => {
   const { clinicId, doctorId } = useParams();
@@ -76,6 +79,7 @@ const SinglePage = () => {
   });
   const [timeSlotId, setTimeSlotId] = useState("");
   const [selectedDay, setSelectedDay] = useState("");
+  const [addLeaveModal, setAddLeaveModal] = useState(false);
 
   const togglePara = (value) => {
     setActive((oldValue) => (oldValue === value ? null : value));
@@ -130,62 +134,6 @@ const SinglePage = () => {
     fetchDoctorData();
     fetchLeaveData();
   }, []);
-
-  //  block or unblock handler
-  const handleActiveUser = async (userId) => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/activate/${userId}`
-      );
-      fetchDoctorData();
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  };
-
-  const showDoctorBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Doctor!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Doctor has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showDoctorUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Doctor!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Unblocked!",
-          text: "The Doctor has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
 
   // edit details modal handler
   const openEditDetailsModal = () => {
@@ -481,6 +429,14 @@ const SinglePage = () => {
     timeSlotsByDay[timeslot.day_id].push(timeslot);
   });
 
+  const openAddLeaveModal = () => {
+    setAddLeaveModal(true);
+  };
+
+  const closeAddLeaveModal = () => {
+    setAddLeaveModal(false);
+  };
+
   const doctorLeaves = [
     {
       leave_date: "2024-06-12T00:00:00.000Z",
@@ -566,6 +522,10 @@ const SinglePage = () => {
       fullday: false,
     },
   ];
+
+  // block and unblock handler
+  const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
+    useBlockUnblock(fetchDoctorData);
 
   return (
     <div>
@@ -689,26 +649,28 @@ const SinglePage = () => {
                 </div>
               </div>
               <div className="absolute top-5 right-5 flex flex-col items-center gap-4">
-                <label
-                  className="w-12 h-6 relative"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (doctorDetails?.status) {
-                      showDoctorBlockAlert(doctorDetails?.user_id);
-                    } else {
-                      showDoctorUnblockAlert(doctorDetails?.user_id);
-                    }
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                    id={`custom_switch_checkbox${doctorDetails?.clinic_id}`}
-                    checked={doctorDetails?.status}
-                    readOnly
-                  />
-                  <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                </label>
+                <Tippy content={doctorDetails?.status ? "Block" : "Unblock"}>
+                  <label
+                    className="w-12 h-6 relative"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      showDoctorAlert(
+                        doctorDetails?.user_id,
+                        doctorDetails?.status ? "block" : "activate",
+                        "doctor"
+                      );
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                      id={`custom_switch_checkbox${doctorDetails?.clinic_id}`}
+                      checked={doctorDetails?.status}
+                      readOnly
+                    />
+                    <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                  </label>
+                </Tippy>
                 {!isOwner && (
                   <button
                     className="flex hover:text-info"
@@ -724,15 +686,16 @@ const SinglePage = () => {
                 <h5 className="text-base font-semibold dark:text-white-light">
                   Available Days & Time Slots:
                 </h5>
-                {!isOwner &&
-                <button
-                  type="button"
-                  className="btn btn-green"
-                  onClick={openAddTimeSlotModal}
-                >
-                  <IconPlus className="ltr:mr-2 rtl:ml-2" />
-                  Add Time Slot
-                </button>}
+                {!isOwner && (
+                  <button
+                    type="button"
+                    className="btn btn-green"
+                    onClick={openAddTimeSlotModal}
+                  >
+                    <IconPlus className="ltr:mr-2 rtl:ml-2" />
+                    Add Time Slot
+                  </button>
+                )}
               </div>
               <div className="space-y-2 font-semibold">
                 {days.map((day) => (
@@ -785,29 +748,30 @@ const SinglePage = () => {
                                         {timeslot?.time_slot} Min
                                       </div>
                                     </div>
-                                    {!isOwner &&
-                                    <div className="flex items-center gap-1 mt-1">
-                                      <button
-                                        type="button"
-                                        className="btn btn-primary btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
-                                        onClick={() =>
-                                          openEditTimeSlotModal(timeslot)
-                                        }
-                                      >
-                                        Edit
-                                      </button>
-                                      <button
-                                        type="button"
-                                        className="btn btn-danger btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
-                                        onClick={() =>
-                                          openDeletTimeSlotModal(
-                                            timeslot?.DoctorTimeSlot_id
-                                          )
-                                        }
-                                      >
-                                        Delete
-                                      </button>
-                                    </div>}
+                                    {!isOwner && (
+                                      <div className="flex items-center gap-1 mt-1">
+                                        <button
+                                          type="button"
+                                          className="btn btn-primary btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
+                                          onClick={() =>
+                                            openEditTimeSlotModal(timeslot)
+                                          }
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          type="button"
+                                          className="btn btn-danger btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
+                                          onClick={() =>
+                                            openDeletTimeSlotModal(
+                                              timeslot?.DoctorTimeSlot_id
+                                            )
+                                          }
+                                        >
+                                          Delete
+                                        </button>
+                                      </div>
+                                    )}
                                   </div>
                                 ))}
                               </div>
@@ -822,9 +786,21 @@ const SinglePage = () => {
             </div>
 
             <div className="mt-4">
-              <h5 className="text-base font-semibold mb-1 dark:text-white-light">
-                Leaves:
-              </h5>
+              <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
+                <h5 className="text-base font-semibold mb-1 dark:text-white-light">
+                  Leaves:
+                </h5>
+                {!isOwner && (
+                  <button
+                    type="button"
+                    className="btn btn-green"
+                    onClick={openAddLeaveModal}
+                  >
+                    <IconPlus className="ltr:mr-2 rtl:ml-2" />
+                    Add Leave
+                  </button>
+                )}
+              </div>
               <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
                 {doctorLeaves?.map((leave, index) => (
                   <div
@@ -906,6 +882,13 @@ const SinglePage = () => {
         closeModal={closeDeletTimeSlotModal}
         buttonLoading={buttonLoading}
         handleSubmit={deleteDoctorTimeSlot}
+      />
+
+      {/* add leave modal */}
+      <AddLeave
+        open={addLeaveModal}
+        closeModal={closeAddLeaveModal}
+        buttonLoading={buttonLoading}
       />
     </div>
   );

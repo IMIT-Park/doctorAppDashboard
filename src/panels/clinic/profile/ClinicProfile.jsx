@@ -23,7 +23,7 @@ import AddClinic from "../../owner/clinics/AddClinic";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(setPageTitle("Profile"));
@@ -39,7 +39,7 @@ const ClinicProfile = () => {
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [editModal, setEditModal] = useState(false);
   const [currentClinicId, setCurrentClinicId] = useState("");
-  const [buttonLoading,setButtonLoading] = useState(false)
+  const [buttonLoading, setButtonLoading] = useState(false);
 
   const [input, setInput] = useState({
     name: "",
@@ -132,12 +132,11 @@ const ClinicProfile = () => {
     }
 
     try {
-          const response = await NetworkHandler.makePutRequest(
+      const response = await NetworkHandler.makePutRequest(
         `/v1/clinic/edit/${currentClinicId}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-console.log(response);
       if (response.status === 200) {
         showMessage("Clinic updated successfully", "success");
         fetchProfileData();
@@ -153,7 +152,6 @@ console.log(response);
     }
   };
 
-
   const fetchProfileData = async () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
@@ -166,7 +164,6 @@ console.log(response);
         response.data.Clinic
       ) {
         setProfileData(response.data.Clinic);
-        // setTotalDoctors(response.data.Clinic.doctors.length);
         setLoading(false);
       } else {
         throw new Error("Failed to fetch clinic data");
@@ -344,44 +341,73 @@ console.log(response);
               </div>
 
               <div className="section-content" style={{ marginTop: "10px" }}>
-  <div className="flex flex-col md:flex-row gap-4">
-    <div className="profile-section p-2 w-full md:w-1/2">
-      <div className="section-content">
-        <img
-          src={imageBaseUrl + profileData?.banner_img_url}
-          alt="Banner"
-          className="w-full max-w-[400px]"
-        />
-      </div>
-    </div>
-   <div className="profile-section p-2 w-full md:w-1/2">
-  <div className="section-content mt-5">
-    <p className="p-2">
-      <strong className="min-w-[105px] inline-block text-white-dark">Name</strong>  <span className="mx-2">:</span> <span className="dark:text-slate-300"> {profileData?.name}</span>
-    </p>
-    <p className="p-2">
-      <strong className="min-w-[105px] inline-block text-white-dark">Email</strong> <span className="mx-2">:</span> <span className="dark:text-slate-300">{profileData?.email}</span>
-    </p>
-    <p className="p-2">
-      <strong className="min-w-[105px] inline-block text-white-dark">Phone</strong> <span className="mx-2">:</span> <span className="dark:text-slate-300">{profileData?.phone}</span>
-    </p>
-    <p className="p-2">
-      <strong className="min-w-[105px] inline-block text-white-dark">Address</strong> <span className="mx-2">:</span> <span className="dark:text-slate-300">{profileData?.address}</span>
-    </p>
-    <p className="p-2">
-      <strong className="min-w-[105px] inline-block text-white-dark">Place</strong>  <span className="mx-2">:</span> <span className="dark:text-slate-300">{profileData?.place}</span>
-    </p>
-    <p>
-      {/* <strong>Owner:</strong> {profileData?.User?.user_name} */}
-    </p>
-  </div>
-</div>
-
-  </div>
-</div>
-
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="profile-section p-2 w-full md:w-1/2">
+                    <div className="section-content">
+                      <img
+                        src={imageBaseUrl + profileData?.banner_img_url}
+                        alt="Banner"
+                        className="w-full max-w-[400px]"
+                      />
+                    </div>
+                  </div>
+                  <div className="profile-section p-2 w-full md:w-1/2">
+                    <div className="section-content mt-5">
+                      <p className="p-2">
+                        <strong className="min-w-[105px] inline-block text-white-dark">
+                          Name
+                        </strong>{" "}
+                        <span className="mx-2">:</span>{" "}
+                        <span className="dark:text-slate-300">
+                          {" "}
+                          {profileData?.name}
+                        </span>
+                      </p>
+                      <p className="p-2">
+                        <strong className="min-w-[105px] inline-block text-white-dark">
+                          Email
+                        </strong>{" "}
+                        <span className="mx-2">:</span>{" "}
+                        <span className="dark:text-slate-300">
+                          {profileData?.email}
+                        </span>
+                      </p>
+                      <p className="p-2">
+                        <strong className="min-w-[105px] inline-block text-white-dark">
+                          Phone
+                        </strong>{" "}
+                        <span className="mx-2">:</span>{" "}
+                        <span className="dark:text-slate-300">
+                          {profileData?.phone}
+                        </span>
+                      </p>
+                      <p className="p-2">
+                        <strong className="min-w-[105px] inline-block text-white-dark">
+                          Address
+                        </strong>{" "}
+                        <span className="mx-2">:</span>{" "}
+                        <span className="dark:text-slate-300">
+                          {profileData?.address}
+                        </span>
+                      </p>
+                      <p className="p-2">
+                        <strong className="min-w-[105px] inline-block text-white-dark">
+                          Place
+                        </strong>{" "}
+                        <span className="mx-2">:</span>{" "}
+                        <span className="dark:text-slate-300">
+                          {profileData?.place}
+                        </span>
+                      </p>
+                      <p>
+                        {/* <strong>Owner:</strong> {profileData?.User?.user_name} */}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          
+
             <div className="profile-section p-2">
               <button
                 type="button"

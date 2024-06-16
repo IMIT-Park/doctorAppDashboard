@@ -20,6 +20,7 @@ import AddLeave from "./components/AddLeave";
 import useBlockUnblock from "../../utils/useBlockUnblock";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import useFetchData from "../../customHooks/useFetchData";
 
 const SinglePage = () => {
   const { clinicId, doctorId } = useParams();
@@ -45,9 +46,6 @@ const SinglePage = () => {
     dispatch(setPageTitle("Doctor"));
   });
 
-  const [doctorDetails, setDoctorDetails] = useState({});
-  // const [doctorLeaves, setDoctorLeaves] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [active, setActive] = useState(null);
   const [editDetailsModal, setEditDetailsModal] = useState(false);
@@ -96,44 +94,20 @@ const SinglePage = () => {
   ];
 
   // fetch doctor data function
-  const fetchDoctorData = async () => {
-    setLoading(true);
-    try {
-      const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getbyId/${doctorId}`
-      );
+  const {
+    data: doctorData,
+    loading: detailsLoading,
+    refetch: fetchDoctorData,
+  } = useFetchData(`/v1/doctor/getbyId/${doctorId}`, {}, [doctorId]);
+  const doctorDetails = doctorData?.Doctor;
 
-      setDoctorDetails(response?.data?.Doctor);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchLeaveData = async () => {
-    setLoading(true);
-    try {
-      const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getdrleave/${doctorId}`
-      );
-      // setDoctorLeaves(response?.data?.doctorLeaveDetails);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // fetching doctor data
-  useEffect(() => {
-    fetchDoctorData();
-    fetchLeaveData();
-  }, []);
+  // fetch leaves data function
+  // const {
+  //   data: doctorLeavesData,
+  //   loading: leavesLoading,
+  //   refetch: fetchLeaveData,
+  // } = useFetchData(`/v1/doctor/getdrleave/${doctorId}`, {}, [doctorId]);
+  // const doctorLeaves = doctorLeavesData?.leaveDetails;
 
   // edit details modal handler
   const openEditDetailsModal = () => {
@@ -538,7 +512,7 @@ const SinglePage = () => {
         <IconCaretDown className="w-4 h-4 rotate-90" />
       </button>
       <div className="panel mb-1">
-        {loading ? (
+        {detailsLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
@@ -697,92 +671,94 @@ const SinglePage = () => {
                   </button>
                 )}
               </div>
-              <div className="space-y-2 font-semibold">
-                {days.map((day) => (
-                  <div key={day.id}>
-                    {timeSlotsByDay[day.id] && (
-                      <div>
-                        <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
-                          <button
-                            type="button"
-                            className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
-                              active === day.id
-                                ? "!text-[#006241] dark:!text-[#4ec37bfb]"
-                                : ""
-                            }`}
-                            onClick={() => togglePara(day.id)}
-                          >
-                            {day.name}
-                            <div
-                              className={`ltr:ml-auto rtl:mr-auto ${
-                                active === day.id ? "rotate-180" : ""
+              {doctorDetails?.timeslots && (
+                <div className="space-y-2 font-semibold">
+                  {days.map((day) => (
+                    <div key={day.id}>
+                      {timeSlotsByDay[day.id] && (
+                        <div>
+                          <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
+                            <button
+                              type="button"
+                              className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
+                                active === day.id
+                                  ? "!text-[#006241] dark:!text-[#4ec37bfb]"
+                                  : ""
                               }`}
+                              onClick={() => togglePara(day.id)}
                             >
-                              <IconCaretDown />
-                            </div>
-                          </button>
-                          <div>
-                            <AnimateHeight
-                              duration={300}
-                              height={active === day.id ? "auto" : 0}
-                            >
-                              <div className="p-4 text-white-dark text-[13px] border-t border-[#d3d3d3] dark:border-[#1b2e4b] flex items-center justify-start flex-wrap gap-3 sm:gap-4">
-                                {timeSlotsByDay[day.id].map((timeslot) => (
-                                  <div
-                                    key={timeslot.DoctorTimeSlot_id}
-                                    className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
-                                  >
-                                    <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
-                                      {formatTime(timeslot?.startTime)} -{" "}
-                                      {formatTime(timeslot?.endTime)}
-                                    </span>
-                                    <div className="flex items-center gap-1">
-                                      <p>No. of Consultations:</p>{" "}
-                                      <div className="text-slate-700 dark:text-slate-300">
-                                        {timeslot?.noOfConsultationsPerDay}
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                      <p>Consultation Time: </p>
-                                      <div className="text-slate-700 dark:text-slate-300">
-                                        {timeslot?.time_slot} Min
-                                      </div>
-                                    </div>
-                                    {!isOwner && (
-                                      <div className="flex items-center gap-1 mt-1">
-                                        <button
-                                          type="button"
-                                          className="btn btn-primary btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
-                                          onClick={() =>
-                                            openEditTimeSlotModal(timeslot)
-                                          }
-                                        >
-                                          Edit
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="btn btn-danger btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
-                                          onClick={() =>
-                                            openDeletTimeSlotModal(
-                                              timeslot?.DoctorTimeSlot_id
-                                            )
-                                          }
-                                        >
-                                          Delete
-                                        </button>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
+                              {day.name}
+                              <div
+                                className={`ltr:ml-auto rtl:mr-auto ${
+                                  active === day.id ? "rotate-180" : ""
+                                }`}
+                              >
+                                <IconCaretDown />
                               </div>
-                            </AnimateHeight>
+                            </button>
+                            <div>
+                              <AnimateHeight
+                                duration={300}
+                                height={active === day.id ? "auto" : 0}
+                              >
+                                <div className="p-4 text-white-dark text-[13px] border-t border-[#d3d3d3] dark:border-[#1b2e4b] flex items-center justify-start flex-wrap gap-3 sm:gap-4">
+                                  {timeSlotsByDay[day.id].map((timeslot) => (
+                                    <div
+                                      key={timeslot.DoctorTimeSlot_id}
+                                      className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
+                                    >
+                                      <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
+                                        {formatTime(timeslot?.startTime)} -{" "}
+                                        {formatTime(timeslot?.endTime)}
+                                      </span>
+                                      <div className="flex items-center gap-1">
+                                        <p>No. of Consultations:</p>{" "}
+                                        <div className="text-slate-700 dark:text-slate-300">
+                                          {timeslot?.noOfConsultationsPerDay}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <p>Consultation Time: </p>
+                                        <div className="text-slate-700 dark:text-slate-300">
+                                          {timeslot?.time_slot} Min
+                                        </div>
+                                      </div>
+                                      {!isOwner && (
+                                        <div className="flex items-center gap-1 mt-1">
+                                          <button
+                                            type="button"
+                                            className="btn btn-primary btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
+                                            onClick={() =>
+                                              openEditTimeSlotModal(timeslot)
+                                            }
+                                          >
+                                            Edit
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn btn-danger btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
+                                            onClick={() =>
+                                              openDeletTimeSlotModal(
+                                                timeslot?.DoctorTimeSlot_id
+                                              )
+                                            }
+                                          >
+                                            Delete
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </AnimateHeight>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="mt-4">
@@ -801,33 +777,37 @@ const SinglePage = () => {
                   </button>
                 )}
               </div>
-              <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
-                {doctorLeaves?.map((leave, index) => (
-                  <div
-                    key={leave?.leave_date + index}
-                    className="w-full flex items-center justify-between flex-wrap gap-2 py-6 border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
-                  >
-                    <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
-                      {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
-                    </span>
-                    <div className="flex items-center flex-wrap gap-1 font-bold text-base text-slate-500">
-                      <span>{formatDate(leave?.leave_date)}</span>
-                      {!leave?.fullday && (
-                        <div className="flex items-center flex-wrap ">
-                          {leave?.leaves?.map((slot, slotIndex) => (
-                            <span key={slot?.DoctorTimeSlot_id}>
-                              (Slot:{" "}
-                              {formatTime(slot?.DoctorTimeSlot?.startTime)} -{" "}
-                              {formatTime(slot?.DoctorTimeSlot?.endTime)})
-                              {slotIndex < leave.leaves.length - 1 && " , "}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+              {doctorLeaves && doctorLeaves?.length > 0 ? (
+                <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
+                  {doctorLeaves?.map((leave, index) => (
+                    <div
+                      key={leave?.leave_date + index}
+                      className="w-full flex items-center justify-between flex-wrap gap-2 py-6 border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
+                    >
+                      <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
+                        {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
+                      </span>
+                      <div className="flex items-center flex-wrap gap-1 font-bold text-base text-slate-500">
+                        <span>{formatDate(leave?.leave_date)}</span>
+                        {!leave?.fullday && (
+                          <div className="flex items-center flex-wrap ">
+                            {leave?.leaves?.map((slot, slotIndex) => (
+                              <span key={slot?.DoctorTimeSlot_id}>
+                                (Slot:{" "}
+                                {formatTime(slot?.DoctorTimeSlot?.startTime)} -{" "}
+                                {formatTime(slot?.DoctorTimeSlot?.endTime)})
+                                {slotIndex < leave.leaves.length - 1 && " , "}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-xs text-gray-600">No Leaves Found</div>
+              )}
             </div>
           </>
         )}

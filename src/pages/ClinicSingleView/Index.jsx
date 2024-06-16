@@ -24,6 +24,7 @@ import IconCaretDown from "../../components/Icon/IconCaretDown";
 import { handleGetLocation } from "../../utils/getLocation";
 import useBlockUnblock from "../../utils/useBlockUnblock";
 import QRCodeComponent from "../../components/QRCodeComponent";
+import useFetchData from "../../customHooks/useFetchData";
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -48,12 +49,9 @@ const ClinicSingleView = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const [totalDoctors, setTotalDoctors] = useState(0);
-  const [allDoctors, setAllDoctors] = useState([]);
   const [editModal, setEditModal] = useState(false);
   const [addDoctorModal, setaddDoctorModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [clinicInput, setClinicInput] = useState({
     name: "",
     email: "",
@@ -67,8 +65,6 @@ const ClinicSingleView = () => {
     defaultPicture: null,
     googleLocation: {},
   });
-  const [detailsLoading, setDetailsLoading] = useState(false);
-  const [clinicDetails, setClinicDetails] = useState({});
   const [activeTab, setActiveTab] = useState(1);
   const [input, setInput] = useState({
     name: "",
@@ -97,6 +93,34 @@ const ClinicSingleView = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
+  // fetch clinic data function
+  const {
+    data: clinicData,
+    loading: detailsLoading,
+    refetch: fetchClinicData,
+  } = useFetchData(`/v1/clinic/getbyId/${clinicId}`, {}, [clinicId]);
+  const clinicDetails = clinicData?.Clinic;
+
+  // fetch doctors data function
+  const {
+    data: doctorData,
+    loading: doctorLoading,
+    refetch: fetchDoctorData,
+  } = useFetchData(
+    `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`,
+    {},
+    [clinicId, page, pageSize]
+  );
+  const totalDoctors = doctorData?.Doctors?.count || 0;
+  const allDoctors = doctorData?.Doctors?.rows || [];
+
+  // doctor image picker
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setInput({ ...input, photo: file });
+  };
+
+  // remove image function
   const handleRemoveImage = () => {
     setClinicInput({ ...clinicInput, picture: null });
   };
@@ -173,12 +197,6 @@ const ClinicSingleView = () => {
     }
   };
 
-  // doctor image picker
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setInput({ ...input, photo: file });
-  };
-
   const openAddDoctorModal = () => {
     setaddDoctorModal(true);
   };
@@ -204,52 +222,6 @@ const ClinicSingleView = () => {
     setActiveTab(1);
     setaddDoctorModal(false);
   };
-
-  // fetch clinic details function
-  const fetchClinicData = async () => {
-    setDetailsLoading(true);
-    try {
-      const response = await NetworkHandler.makeGetRequest(
-        `/v1/clinic/getbyId/${clinicId}`
-      );
-      setClinicDetails(response?.data?.Clinic);
-      setDetailsLoading(false);
-    } catch (error) {
-      console.log(error);
-      setDetailsLoading(false);
-    } finally {
-      setDetailsLoading(false);
-    }
-  };
-
-  // fetch clinic details
-  useEffect(() => {
-    fetchClinicData();
-  }, []);
-
-  // fetch doctors function
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
-      );
-      setTotalDoctors(response?.data?.Doctors?.count);
-      setAllDoctors(response?.data?.Doctors?.rows);
-
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // fetching doctors
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
 
   //  doctor adding function
   const addDoctor = async () => {
@@ -326,7 +298,7 @@ const ClinicSingleView = () => {
           { timeslots: input.timeSlots }
         );
 
-        fetchData();
+        fetchDoctorData();
 
         showMessage("Doctor added successfully.", "success");
         closeAddDoctorModal();
@@ -343,7 +315,7 @@ const ClinicSingleView = () => {
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchClinicData);
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
-    useBlockUnblock(fetchData);
+    useBlockUnblock(fetchDoctorData);
 
   return (
     <div>
@@ -459,48 +431,6 @@ const ClinicSingleView = () => {
                   <IconMenuContacts className="mr-1 w-5" />
                   View Location
                 </button>
-                {/* <div className="w-full flex items-start gap-3 flex-wrap mt-5">
-                  <div className="flex flex-col items-center bg-[#f1f2f3] dark:bg-[#060818] rounded p-2">
-                    <QRCode id="qrcode-canvas" value={qrUrl} size={220} />
-                    <button
-                      type="button"
-                      className="mt-2 btn btn-green w-fit"
-                      onClick={downloadQRCode}
-                    >
-                      <IconDownload className="mr-2" />
-                      Download
-                    </button>
-                  </div>
-
-                  <div className="bg-[#f1f2f3] p-2 rounded dark:bg-[#060818] w-full max-w-80">
-                    <form>
-                      <input
-                        type="text"
-                        defaultValue={qrUrl}
-                        className="form-input form-input-green"
-                        readOnly
-                      />
-                      <div className="mt-1">
-                        <CopyToClipboard
-                          text={qrUrl}
-                          onCopy={(text, result) => {
-                            if (result) {
-                              showMessage("Copied Successfullly");
-                            }
-                          }}
-                        >
-                          <button
-                            type="button"
-                            className="btn btn-green px-2 ml-auto"
-                          >
-                            <IconCopy className="ltr:mr-2 rtl:ml-2" />
-                            Copy
-                          </button>
-                        </CopyToClipboard>
-                      </div>
-                    </form>
-                  </div>
-                </div> */}
                 <QRCodeComponent qrUrl={qrUrl} />
               </div>
             </div>
@@ -532,7 +462,7 @@ const ClinicSingleView = () => {
             </Tippy>
           </div>
         </div>
-        {loading ? (
+        {doctorLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <div className="datatables">

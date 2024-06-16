@@ -49,6 +49,10 @@ const ClinicPatients = lazy(() =>
   import("../panels/clinic/bookings/PatientsDetails")
 );
 
+const ClinicChats = lazy(() =>
+  import("../panels/clinic/chats/Index")
+);
+
 const ClinicProfile = lazy(() =>
   import("../panels/clinic/profile/ClinicProfile")
 );
@@ -239,6 +243,12 @@ const routes = [
   {
     path: "/clinic/bookings/:doctorId/patients",
     element: <ClinicPatients />,
+    layout: "default",
+  },
+
+  {
+    path: "/clinic/chats",
+    element: <ClinicChats />,
     layout: "default",
   },
 

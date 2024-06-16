@@ -13,6 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import IconSearch from "../../../components/Icon/IconSearch";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { formatDate } from "../../../utils/formatDate";
+import useBlockUnblock from "../../../utils/useBlockUnblock";
 
 const rowData = [];
 
@@ -41,62 +42,6 @@ const Doctors = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  //  block or unblock handler
-  const handleActiveUser = async (userId) => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/activate/${userId}`
-      );
-      fetchData();
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  };
-
-  const showDoctorBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Doctor!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Doctor has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showDoctorUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Doctor!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Unblocked!",
-          text: "The Doctor has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
   // fetch Doctors function
   const fetchData = async () => {
     try {
@@ -118,6 +63,10 @@ const Doctors = () => {
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
+
+  // block and unblock handler
+  const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
+    useBlockUnblock(fetchData);
 
   return (
     <div>
@@ -222,16 +171,16 @@ const Doctors = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy content="Block/Unblock">
+                    <Tippy content={rowData?.status ? "Block" : "Unblock"}>
                       <label
                         className="w-[46px] h-[22px] relative"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (rowData?.status) {
-                            showDoctorBlockAlert(rowData?.user_id);
-                          } else {
-                            showDoctorUnblockAlert(rowData?.user_id);
-                          }
+                          showDoctorAlert(
+                            rowData?.user_id,
+                            rowData?.status ? "block" : "activate",
+                            "doctor"
+                          );
                         }}
                       >
                         <input

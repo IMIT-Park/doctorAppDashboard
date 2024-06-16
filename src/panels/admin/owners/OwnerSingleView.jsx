@@ -14,6 +14,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import IconCaretDown from "../../../components/Icon/IconCaretDown";
 import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { handleGetLocation } from "../../../utils/getLocation";
+import useBlockUnblock from "../../../utils/useBlockUnblock";
 
 const OwnerSingleView = () => {
   const dispatch = useDispatch();
@@ -42,21 +43,6 @@ const OwnerSingleView = () => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
   }, [page, pageSize]);
-
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
-    });
-  };
 
   //GET METHOD
   const fetchData = async () => {
@@ -104,106 +90,11 @@ const OwnerSingleView = () => {
     fetchData();
   }, [page, pageSize]);
 
-  //  block or unblock handler
-  const handleActiveUser = async (userId) => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/activate/${userId}`
-      );
-      fetchOwnerInfo();
-      fetchData();
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  };
-
-  const showOwnerBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Owner!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Owner has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showOwnerUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Owner!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Owner has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Clinic!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Clinic has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Clinic!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Clinic has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
+  // block and unblock handler
+  const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =
+    useBlockUnblock(fetchOwnerInfo);
+  const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
+    useBlockUnblock(fetchData);
 
   return (
     <div>
@@ -224,26 +115,28 @@ const OwnerSingleView = () => {
               <div className="text-2xl font-semibold capitalize dark:text-slate-300">
                 {ownerInfo?.name || ""}
               </div>
-              <label
-                className="w-12 h-6 relative"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (ownerInfo?.User?.status) {
-                    showOwnerBlockAlert(ownerInfo?.user_id);
-                  } else {
-                    showOwnerUnblockAlert(ownerInfo?.user_id);
-                  }
-                }}
-              >
-                <input
-                  type="checkbox"
-                  className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                  id={`custom_switch_checkbox_owner${ownerInfo?.owner_id}`} // Unique ID
-                  checked={ownerInfo?.User?.status}
-                  readOnly
-                />
-                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-              </label>
+              <Tippy content={ownerInfo?.User?.status ? "Block" : "Unblock"}>
+                <label
+                  className="w-12 h-6 relative"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    showOwnerAlert(
+                      ownerInfo?.user_id,
+                      ownerInfo?.User?.status ? "block" : "activate",
+                      "owner"
+                    );
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                    id={`custom_switch_checkbox_owner${ownerInfo?.owner_id}`} // Unique ID
+                    checked={ownerInfo?.User?.status}
+                    readOnly
+                  />
+                  <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                </label>
+              </Tippy>
             </div>
             <div className="text-left sm:px-4">
               <div className="mt-5">
@@ -341,16 +234,18 @@ const OwnerSingleView = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy content="Block/Unblock">
+                    <Tippy
+                      content={rowData?.User?.status ? "Block" : "Unblock"}
+                    >
                       <label
                         className="w-[46px] h-[22px] relative"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (rowData?.User?.status) {
-                            showBlockAlert(rowData?.user_id);
-                          } else {
-                            showUnblockAlert(rowData?.user_id);
-                          }
+                          showClinicAlert(
+                            rowData?.user_id,
+                            rowData?.User?.status ? "block" : "activate",
+                            "clinic"
+                          );
                         }}
                       >
                         <input

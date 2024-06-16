@@ -63,9 +63,9 @@ const SalesIndex = lazy(() => import("../panels/sales/Index"));
 const SalesOwners = lazy(() => import("../panels/sales/owners/Owners"));
 // <--------------> sales panel imports ends here <-------------->
 
-// <--------------> doctor single-view imports starts here <-------------->
+// <--------------> clinic single-view imports starts here <-------------->
 const ClinicSingleView = lazy(() => import("../pages/ClinicSingleView/Index"));
-// <--------------> doctor single-view imports ends here <-------------->
+// <--------------> clinic single-view imports ends here <-------------->
 
 // <--------------> doctor single-view imports starts here <-------------->
 const DoctorSingleView = lazy(() => import("../pages/DoctorSingleView/Index"));

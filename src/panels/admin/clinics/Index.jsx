@@ -15,6 +15,7 @@ import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
 import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { handleGetLocation } from "../../../utils/getLocation";
+import useBlockUnblock from "../../../utils/useBlockUnblock";
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -66,61 +67,9 @@ const Clinics = () => {
     fetchData();
   }, [page, pageSize]);
 
-  //  block or unblock handler
-  const handleActiveUser = async (userId) => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/activate/${userId}`
-      );
-      fetchData();
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  };
-
-  const showBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Clinic!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Clinic has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Clinic!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Unblocked!",
-          text: "The Clinic has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
+  // block and unblock handler
+  const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
+    useBlockUnblock(fetchData);
 
   return (
     <div>
@@ -214,16 +163,18 @@ const Clinics = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy content="Block/Unblock">
+                    <Tippy
+                      content={rowData?.User?.status ? "Block" : "Unblock"}
+                    >
                       <label
                         className="w-[46px] h-[22px] relative"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (rowData?.User?.status) {
-                            showBlockAlert(rowData?.user_id);
-                          } else {
-                            showUnblockAlert(rowData?.user_id);
-                          }
+                          showClinicAlert(
+                            rowData?.user_id,
+                            rowData?.User?.status ? "block" : "activate",
+                            "clinic"
+                          );
                         }}
                       >
                         <input

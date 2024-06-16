@@ -19,6 +19,7 @@ import { formatDate } from "../../../utils/formatDate";
 import { showMessage } from "../../../utils/showMessage";
 import AddDoctor from "../../../pages/ClinicSingleView/components/AddDoctor";
 import Swal from "sweetalert2";
+import useBlockUnblock from "../../../utils/useBlockUnblock";
 
 const rowData = [];
 const ClinicDoctor = () => {
@@ -63,7 +64,6 @@ const ClinicDoctor = () => {
   });
   const [timeSlotInput, setTimeSlotInput] = useState({});
 
-
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
@@ -97,9 +97,8 @@ const ClinicDoctor = () => {
     fetchData();
   }, [page, pageSize]);
 
-
-   // doctor image picker
-   const handleFileChange = (e) => {
+  // doctor image picker
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     setInput({ ...input, photo: file });
   };
@@ -130,8 +129,8 @@ const ClinicDoctor = () => {
     setaddDoctorModal(false);
   };
 
-   //  doctor adding function
-   const addDoctor = async () => {
+  //  doctor adding function
+  const addDoctor = async () => {
     if (
       !input.name ||
       !input.phone ||
@@ -196,8 +195,6 @@ const ClinicDoctor = () => {
           formData
         );
 
-        console.log(additionalResponse1);
-
         input.timeSlots.forEach((slot) => {
           slot.startTime += ":00";
           slot.endTime += ":00";
@@ -208,8 +205,6 @@ const ClinicDoctor = () => {
           `/v1/doctor/createtimeSlots/${doctorId}`,
           { timeslots: input.timeSlots }
         );
-
-        console.log(additionalResponse2);
 
         fetchData();
 
@@ -224,64 +219,9 @@ const ClinicDoctor = () => {
     }
   };
 
-
-
-    //  block or unblock handler
-    const handleActiveUser = async (userId) => {
-      try {
-        const response = await NetworkHandler.makePostRequest(
-          `/v1/auth/activate/${userId}`
-        );
-        fetchData();
-      } catch (error) {
-        showMessage("An error occurred. Please try again.", "error");
-      }
-    };
-
-    const showDoctorBlockAlert = (id) => {
-      Swal.fire({
-        icon: "warning",
-        title: "Are you sure?",
-        text: "You want to block this Doctor!",
-        showCancelButton: true,
-        confirmButtonText: "Block",
-        padding: "2em",
-        customClass: "sweet-alerts",
-      }).then((result) => {
-        if (result.value) {
-          handleActiveUser(id);
-          Swal.fire({
-            title: "Blocked!",
-            text: "The Doctor has been blocked.",
-            icon: "success",
-            customClass: "sweet-alerts",
-          });
-        }
-      });
-    };
-  
-    const showDoctorUnblockAlert = (id) => {
-      Swal.fire({
-        icon: "warning",
-        title: "Are you sure?",
-        text: "You want to unblock this Doctor!",
-        showCancelButton: true,
-        confirmButtonText: "Unblock",
-        padding: "2em",
-        customClass: "sweet-alerts",
-      }).then((result) => {
-        if (result.value) {
-          handleActiveUser(id);
-          Swal.fire({
-            title: "Unblocked!",
-            text: "The Doctor has been unblocked.",
-            icon: "success",
-            customClass: "sweet-alerts",
-          });
-        }
-      });
-    };
-  
+  // block and unblock handler
+  const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
+    useBlockUnblock(fetchData);
 
   return (
     <div>
@@ -397,16 +337,16 @@ const ClinicDoctor = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy content="Block/Unblock">
+                    <Tippy content={rowData?.status ? "Block" : "Unblock"}>
                       <label
                         className="w-[46px] h-[22px] relative"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (rowData?.status) {
-                            showDoctorBlockAlert(rowData?.user_id);
-                          } else {
-                            showDoctorUnblockAlert(rowData?.user_id);
-                          }
+                          showDoctorAlert(
+                            rowData?.user_id,
+                            rowData?.status ? "block" : "activate",
+                            "doctor"
+                          );
                         }}
                       >
                         <input
@@ -437,8 +377,8 @@ const ClinicDoctor = () => {
         )}
       </div>
 
-       {/* add doctor modal */}
-       <AddDoctor
+      {/* add doctor modal */}
+      <AddDoctor
         open={addDoctorModal}
         closeAddDoctorModal={closeAddDoctorModal}
         buttonLoading={buttonLoading}

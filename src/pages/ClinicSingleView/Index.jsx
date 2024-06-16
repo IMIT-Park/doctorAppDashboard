@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import Swal from "sweetalert2";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -17,16 +16,14 @@ import NetworkHandler, {
   websiteUrl,
 } from "../../utils/NetworkHandler";
 import IconMenuContacts from "../../components/Icon/Menu/IconMenuContacts";
-import IconDownload from "../../components/Icon/IconDownload";
-import QRCode from "qrcode.react";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import IconCopy from "../../components/Icon/IconCopy";
 import IconEdit from "../../components/Icon/IconEdit";
 import AddClinic from "../../panels/owner/clinics/AddClinic";
 import { formatDate } from "../../utils/formatDate";
 import { showMessage } from "../../utils/showMessage";
 import IconCaretDown from "../../components/Icon/IconCaretDown";
 import { handleGetLocation } from "../../utils/getLocation";
+import useBlockUnblock from "../../utils/useBlockUnblock";
+import QRCodeComponent from "../../components/QRCodeComponent";
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -34,6 +31,7 @@ const ClinicSingleView = () => {
   const location = useLocation();
   const { clinicId } = useParams();
   const previousUrl = sessionStorage.getItem("clinicPreviousPage");
+  const qrUrl = `${websiteUrl}${clinicId}`;
 
   useEffect(() => {
     if (location?.state?.previousUrl) {
@@ -89,21 +87,6 @@ const ClinicSingleView = () => {
     confirmPassword: "",
   });
   const [timeSlotInput, setTimeSlotInput] = useState({});
-
-  const qrUrl = `${websiteUrl}${clinicId}`;
-  // Qr downloader
-  const downloadQRCode = () => {
-    const canvas = document.getElementById("qrcode-canvas");
-    const pngUrl = canvas
-      .toDataURL("image/png")
-      .replace("image/png", "image/octet-stream");
-    let downloadLink = document.createElement("a");
-    downloadLink.href = pngUrl;
-    downloadLink.download = "qrcode.png";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-  };
 
   useEffect(() => {
     setPage(1);
@@ -268,107 +251,6 @@ const ClinicSingleView = () => {
     fetchData();
   }, [page, pageSize]);
 
-  //  block or unblock handler
-  const handleActiveUser = async (userId) => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/activate/${userId}`
-      );
-      fetchClinicData();
-      fetchData();
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  };
-
-  const showClinicBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Clinic!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Clinic has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showClinicUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Clinic!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Unblocked!",
-          text: "The Clinic has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showDoctorBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Doctor!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Doctor has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showDoctorUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Doctor!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Unblocked!",
-          text: "The Doctor has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
   //  doctor adding function
   const addDoctor = async () => {
     if (
@@ -424,8 +306,6 @@ const ClinicSingleView = () => {
         basicDetails
       );
 
-      console.log(response);
-
       if (response.status === 201) {
         const doctorId = response.data.Doctor.doctor_id;
 
@@ -434,8 +314,6 @@ const ClinicSingleView = () => {
           `/v1/doctor/upload/${doctorId}`,
           formData
         );
-
-        console.log(additionalResponse1);
 
         input.timeSlots.forEach((slot) => {
           slot.startTime += ":00";
@@ -447,8 +325,6 @@ const ClinicSingleView = () => {
           `/v1/doctor/createtimeSlots/${doctorId}`,
           { timeslots: input.timeSlots }
         );
-
-        console.log(additionalResponse2);
 
         fetchData();
 
@@ -462,6 +338,12 @@ const ClinicSingleView = () => {
       setButtonLoading(false);
     }
   };
+
+  // block and unblock handler
+  const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
+    useBlockUnblock(fetchClinicData);
+  const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
+    useBlockUnblock(fetchData);
 
   return (
     <div>
@@ -480,38 +362,43 @@ const ClinicSingleView = () => {
           <>
             <div className="flex justify-between flex-wrap gap-4">
               <div>
-                <div className="text-2xl font-semibold capitalize">
-                  {clinicDetails?.name || ""}
-                </div>
-                <div className="w-full max-w-96 rounded-md overflow-hidden mt-4">
+                <div className="w-full max-w-96 rounded-md overflow-hidden">
                   <img
                     src={imageBaseUrl + clinicDetails?.banner_img_url}
                     className="w-full h-full object-cover"
                     alt="Banner"
                   />
                 </div>
+                <div className="text-2xl font-semibold capitalize mt-2">
+                  {clinicDetails?.name || ""}
+                </div>
               </div>
+
               <div className="flex flex-col items-center gap-4">
-                <label
-                  className="w-12 h-6 relative"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (clinicDetails?.User?.status) {
-                      showClinicBlockAlert(clinicDetails?.user_id);
-                    } else {
-                      showClinicUnblockAlert(clinicDetails?.user_id);
-                    }
-                  }}
+                <Tippy
+                  content={clinicDetails?.User?.status ? "Block" : "Unblock"}
                 >
-                  <input
-                    type="checkbox"
-                    className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                    id={`custom_switch_checkbox${clinicDetails?.clinic_id}`}
-                    checked={clinicDetails?.User?.status}
-                    readOnly
-                  />
-                  <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                </label>
+                  <label
+                    className="w-12 h-6 relative"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      showClinicAlert(
+                        clinicDetails?.User?.user_id,
+                        clinicDetails?.User?.status ? "block" : "activate",
+                        "clinic"
+                      );
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                      id={`custom_switch_checkbox${clinicDetails?.clinic_id}`}
+                      checked={clinicDetails?.User?.status}
+                      readOnly
+                    />
+                    <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                  </label>
+                </Tippy>
                 <button
                   className="flex hover:text-info"
                   onClick={openEditModal}
@@ -520,44 +407,64 @@ const ClinicSingleView = () => {
                 </button>
               </div>
             </div>
-            <div className="text-left sm:px-4">
+            <div className="text-left">
               <div className="mt-5">
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Address :</div>
-                  <div>{clinicDetails?.address || ""}</div>
+                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                    Address <span>:</span>
+                  </div>
+                  <div className="dark:text-slate-300">
+                    {clinicDetails?.address || ""}
+                  </div>
                 </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Place :</div>
-                  <div>{clinicDetails?.place || ""}</div>
+                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                    Place <span>:</span>
+                  </div>
+                  <div className="dark:text-slate-300">
+                    {clinicDetails?.place || ""}
+                  </div>
                 </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Email :</div>
-                  <div>{clinicDetails?.User?.email || ""}</div>
+                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                    Email <span>:</span>
+                  </div>
+                  <div className="dark:text-slate-300">
+                    {clinicDetails?.User?.email || ""}
+                  </div>
                 </div>
-                <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark">Username :</div>
-                  <div>{clinicDetails?.User?.user_name || ""}</div>
+                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                    Username <span>:</span>
+                  </div>
+                  <div className="dark:text-slate-300">
+                    {clinicDetails?.User?.user_name || ""}
+                  </div>
                 </div>
-                <div className="flex items-center sm:gap-2 flex-wrap">
-                  <div className="text-white-dark">Phone :</div>
-                  <div>{clinicDetails?.phone || ""}</div>
+                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                    Phone <span>:</span>
+                  </div>
+                  <div className="dark:text-slate-300">
+                    {clinicDetails?.phone || ""}
+                  </div>
                 </div>
                 <button
                   type="button"
                   onClick={() =>
                     handleGetLocation(clinicDetails?.googleLocation)
                   }
-                  className="btn btn-success mt-2"
+                  className="btn btn-success mt-5"
                 >
                   <IconMenuContacts className="mr-1 w-5" />
                   View Location
                 </button>
-                <div className="w-full flex items-start gap-3 flex-wrap mt-5">
+                {/* <div className="w-full flex items-start gap-3 flex-wrap mt-5">
                   <div className="flex flex-col items-center bg-[#f1f2f3] dark:bg-[#060818] rounded p-2">
                     <QRCode id="qrcode-canvas" value={qrUrl} size={220} />
                     <button
                       type="button"
-                      className="mt-2 btn btn-primary w-fit"
+                      className="mt-2 btn btn-green w-fit"
                       onClick={downloadQRCode}
                     >
                       <IconDownload className="mr-2" />
@@ -570,7 +477,7 @@ const ClinicSingleView = () => {
                       <input
                         type="text"
                         defaultValue={qrUrl}
-                        className="form-input"
+                        className="form-input form-input-green"
                         readOnly
                       />
                       <div className="mt-1">
@@ -584,7 +491,7 @@ const ClinicSingleView = () => {
                         >
                           <button
                             type="button"
-                            className="btn btn-primary px-2 ml-auto"
+                            className="btn btn-green px-2 ml-auto"
                           >
                             <IconCopy className="ltr:mr-2 rtl:ml-2" />
                             Copy
@@ -593,7 +500,8 @@ const ClinicSingleView = () => {
                       </div>
                     </form>
                   </div>
-                </div>
+                </div> */}
+                <QRCodeComponent qrUrl={qrUrl} />
               </div>
             </div>
           </>
@@ -696,16 +604,17 @@ const ClinicSingleView = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy content="Block/Unblock">
+                    <Tippy content={rowData.status ? "Block" : "Unblock"}>
                       <label
                         className="w-[46px] h-[22px] relative"
+                        disabled={blockUnblockDoctorLoading}
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (rowData?.status) {
-                            showDoctorBlockAlert(rowData?.user_id);
-                          } else {
-                            showDoctorUnblockAlert(rowData?.user_id);
-                          }
+                          showDoctorAlert(
+                            rowData?.user_id,
+                            rowData?.status ? "block" : "activate",
+                            "doctor"
+                          );
                         }}
                       >
                         <input

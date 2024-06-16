@@ -17,6 +17,7 @@ import IconEye from "../../../components/Icon/IconEye";
 import ShowSalesPerson from "./ShowSalesPerson";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
+import useBlockUnblock from "../../../utils/useBlockUnblock";
 
 const Sales = () => {
   const dispatch = useDispatch();
@@ -215,61 +216,9 @@ const Sales = () => {
     setViewModal(false);
   };
 
-  //  block or unblock handler
-  const handleActiveUser = async (userId) => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/activate/${userId}`
-      );
-      fetchData();
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  };
-
-  const showBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Sales Person!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Sales Person has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Sales Person!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Unblocked!",
-          text: "The Sales Person has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
+  // block and unblock handler
+  const { showAlert: showSalesAlert, loading: blockUnblockSalesLoading } =
+    useBlockUnblock(fetchData);
 
   return (
     <div>
@@ -331,16 +280,16 @@ const Sales = () => {
                   textAlignment: "center",
                   render: (user) => (
                     <div className="flex gap-4 items-center w-max mx-auto">
-                      <Tippy content="Block / Unblock">
+                      <Tippy content={user?.User?.status ? "Block" : "Unblock"}>
                         <label
                           className="w-[46px] h-[22px] relative"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (user?.User?.status) {
-                              showBlockAlert(user?.user_id);
-                            } else {
-                              showUnblockAlert(user?.user_id);
-                            }
+                            showSalesAlert(
+                              user?.user_id,
+                              user?.User?.status ? "block" : "activate",
+                              "sales person"
+                            );
                           }}
                         >
                           <input

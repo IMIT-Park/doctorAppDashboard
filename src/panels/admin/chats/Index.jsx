@@ -248,12 +248,14 @@ const contactList = [
     active: true,
   },
 ];
-const loginUser = {
+const clinicUser = {
   id: 0,
-  name: "Alon Smith",
+  name: "Clinic Name",
   path: "profile-34.jpeg",
-  designation: "Software Developer",
+  active: true, // Assuming clinic is always active
+  time: 'now', // Default active message
 };
+
 const Chat = () => {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -323,14 +325,13 @@ const Chat = () => {
           isShowChatMenu ? "min-h-[999px]" : ""
         }`}
       >
-        {/* <div
+        <div
           className={`panel p-4 flex-none max-w-xs w-full absolute xl:relative z-10 space-y-4 xl:h-full hidden xl:block overflow-hidden ${
             isShowChatMenu ? "!block" : ""
           }`}
         >
           <div className="flex justify-between items-center">
-
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
                             <div className="flex-none">
                                 <img src="/assets/images/profile-34.jpeg" className="rounded-full h-12 w-12 object-cover" alt="" />
                             </div>
@@ -338,16 +339,13 @@ const Chat = () => {
                                 <p className="mb-1 font-semibold">Alon Smith</p>
                                 <p className="text-xs text-white-dark">Software Developer</p>
                             </div>
-                        </div>
-
+                        </div> */}
             <div className="dropdown">
               <Dropdown
                 offset={[0, 5]}
                 placement={`${isRtl ? "bottom-start" : "bottom-end"}`}
-
-                btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full !flex justify-center items-center hover:text-primary"
-                button={<IconHorizontalDots className="opacity-70" />}
-
+                // btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full !flex justify-center items-center hover:text-primary"
+                // button={<IconHorizontalDots className="opacity-70" />}
               >
                 <ul className="whitespace-nowrap">
                   <li>
@@ -356,20 +354,18 @@ const Chat = () => {
                       Settings
                     </button>
                   </li>
-
-                  <li>
+                  {/* <li>
                                         <button type="button">
                                             <IconHelpCircle className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
                                             Help & feedback
                                         </button>
-                                    </li>
-                  <li>
+                                    </li> */}
+                  {/* <li>
                                         <button type="button">
                                             <IconLogin className="ltr:mr-1 rtl:ml-1 shrink-0" />
                                             Sign Out
                                         </button>
-                                    </li>
-
+                                    </li> */}
                 </ul>
               </Dropdown>
             </div>
@@ -386,8 +382,7 @@ const Chat = () => {
               <IconSearch />
             </div>
           </div>
-
-          <div className="flex justify-between items-center text-xs">
+          {/* <div className="flex justify-between items-center text-xs">
                         <button type="button" className="hover:text-primary">
                             <IconMessagesDot className="mx-auto mb-1" />
                             Chats
@@ -407,8 +402,7 @@ const Chat = () => {
                             <IconBell className="w-5 h-5 mx-auto mb-1" />
                             Notification
                         </button>
-                    </div>
-
+                    </div> */}
           <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b]"></div>
           <div className="!mt-0">
             <PerfectScrollbar className="chat-users relative h-[400px] min-h-[400px] sm:h-[calc(100vh_-_357px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
@@ -457,7 +451,7 @@ const Chat = () => {
               })}
             </PerfectScrollbar>
           </div>
-        </div> */}
+        </div>
         <div
           className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${
             isShowChatMenu ? "!block xl:!hidden" : ""
@@ -638,7 +632,7 @@ const Chat = () => {
                 {/* <p className="flex justify-center bg-white-dark/20 p-2 font-semibold rounded-md max-w-[190px] mx-auto">
                                     <IconMessage className="ltr:mr-2 rtl:ml-2" />
                                     Click User To Chat
-                                </p> */}
+                </p> */}
               </div>
             </div>
           )}

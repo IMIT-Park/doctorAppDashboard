@@ -2,18 +2,111 @@ import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
+import NetworkHandler from "../../../utils/NetworkHandler";
+import { showMessage } from "../../../utils/showMessage";
 
-const AddLeave = ({ open, closeModal, buttonLoading, formSubmit }) => {
-  const [selectedDuration, setSelectedDuration] = useState("Full Day");
+const AddLeave = ({
+  open,
+  closeModal,
+  buttonLoading,
+  clinicId,
+  doctorId,
+  fetchLeaveData
+}) => {
+  const [leaveType, setLeaveType] = useState("Full Day");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [timeSlots, setTimeSlots] = useState([]);
 
-  const handleDurationChange = (e) => {
-    setSelectedDuration(e.target.value);
+ 
+  // Function to reset the form
+  const resetForm = () => {
+    setSelectedDate("");
+    setStartDate("");
+    setEndDate("");
+    setErrorMessage("");
+    setTimeSlots([]);
   };
 
+  
+  // Handle date change to fetch time slots
+  const handleDateChange = async (e) => {
+    const date = e.target.value;
+    setSelectedDate(date);
+    setErrorMessage("");
+    setTimeSlots([]);
+    console.log("Selected Date:", date);
+
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/getTimeSlot/${doctorId}`, 
+        { date }
+      );
+      console.log("API Response:", response.data);
+
+      if (response.data.doctorTimeSlots.count === 0) {
+        setErrorMessage("No Timeslots found for this day");
+      } else {
+        setTimeSlots(response.data.doctorTimeSlots?.rows);
+      }
+    } catch (error) {
+      console.error("Error fetching time slots:", error);
+      if (error.response && error.response.status === 404) {
+        setErrorMessage("No Timeslots found for this day");
+      } else {
+        setErrorMessage("An error occurred while fetching timeslots");
+      }
+    }
+  };
+
+  // Handle leave submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    formSubmit();
+    try {
+      if (leaveType === "Full Day") {
+        const leaveData = {
+          leaveslots: timeSlots.map((slot) => ({
+            clinic_id: clinicId,
+            DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
+            leave_date: selectedDate,
+          })),
+        };
+        console.log(leaveData);
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/doctor/createLeaveSlots/${doctorId}`, 
+          leaveData
+        );
+        showMessage("Leave added successfully.");
+      }else if (leaveType === "Multiple") {
+        const leaveData = {
+          startDate: startDate,
+          endDate: endDate,
+          clinic_id: clinicId,
+        };
+        console.log(leaveData);
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/doctor/createBlukLeave/${doctorId}`,
+          leaveData
+        );
+        console.log(response);
+        showMessage("Bulk leave added successfully.");
+      }
+      closeModal();
+      fetchLeaveData();
+      resetForm();
+    } catch (error) {
+      console.error("Error creating leave slots:", error);
+      if (error.response && error.response.status === 404) {
+        showMessage("Leave already taken on the date","error");
+      } else {
+        showMessage("An error occurred while creating leave slots","error");
+      }
+    }
   };
+
+
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -57,7 +150,7 @@ const AddLeave = ({ open, closeModal, buttonLoading, formSubmit }) => {
                   New Leave
                 </div>
                 <div className="p-5">
-                  <form>
+                  <form onSubmit={handleSubmit}>
                     <label htmlFor="duration" className="text-white-dark mb-3">
                       Select Duration
                     </label>
@@ -71,8 +164,8 @@ const AddLeave = ({ open, closeModal, buttonLoading, formSubmit }) => {
                           name="duration"
                           value="Full Day"
                           className="form-radio peer text-[#006241]"
-                          checked={selectedDuration === "Full Day"}
-                          onChange={handleDurationChange}
+                          checked={leaveType === "Full Day"}
+                          onChange={() => setLeaveType("Full Day")}
                         />
                         <span className="peer-checked:text-[#006241]">
                           Full Day
@@ -84,8 +177,8 @@ const AddLeave = ({ open, closeModal, buttonLoading, formSubmit }) => {
                           name="duration"
                           value="Multiple"
                           className="form-radio peer text-[#006241]"
-                          checked={selectedDuration === "Multiple"}
-                          onChange={handleDurationChange}
+                          checked={leaveType === "Multiple"}
+                          onChange={() => setLeaveType("Multiple")}
                         />
                         <span className="peer-checked:text-[#006241]">
                           Multiple
@@ -97,83 +190,66 @@ const AddLeave = ({ open, closeModal, buttonLoading, formSubmit }) => {
                           name="duration"
                           value="By Shift"
                           className="form-radio peer text-[#006241]"
-                          checked={selectedDuration === "By Shift"}
-                          onChange={handleDurationChange}
+                          checked={leaveType === "By Shift"}
+                          onChange={() => setLeaveType("By Shift")}
                         />
                         <span className="peer-checked:text-[#006241]">
                           By Shift
                         </span>
                       </label>
                     </div>
-                    <label htmlFor="date" className="text-white-dark mb-3">
-                      Select Date
-                    </label>
-                    {selectedDuration !== "Multiple" && (
-                      <div>
-                        <label htmlFor="date" className="text-white-dark">
-                          Date
-                        </label>
-                        <input
-                          id="date"
-                          type="date"
-                          className="form-input form-input-green w-1/2"
-                        />
-                      </div>
-                    )}
-                    {selectedDuration === "Multiple" && (
-                      <div className="grid sm:grid-cols-2 gap-1 sm:gap-4">
-                        <div>
-                          <label
-                            htmlFor="fromDate"
-                            className="text-white-dark text-sm mb-0"
-                          >
-                            From
-                          </label>
+                    {leaveType === "Full Day" && (
+                      <div className="mb-8 flex items-center flex-col md:flex-row justify-between gap-8">
+                        <div className="w-full">
+                          <label htmlFor="Date">Date</label>
                           <input
-                            id="fromDate"
+                            id="Date"
                             type="date"
-                            className="form-input form-input-green"
+                            className="form-input"
+                            value={selectedDate || ""}
+                            onChange={handleDateChange}
                           />
                         </div>
-                        <div>
-                          <label
-                            htmlFor="toDate"
-                            className="text-white-dark text-sm mb-0"
-                          >
-                            To
-                          </label>
-                          <input
-                            id="toDate"
-                            type="date"
-                            className="form-input form-input-green"
-                          />
+                        <div className="w-full">
+                          {errorMessage && (
+                            <div className="text-red-500 mt-2">
+                              {errorMessage}
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
-                    {selectedDuration === "By Shift" && (
-                      <div className="flex items-center gap-3 flex-wrap mt-4">
-                        <label className="inline-flex items-center">
-                          <input
-                            type="radio"
-                            name="shift"
-                            className="form-radio text-primary"
-                          />
-                          <span className="text-[#006241] text-sm font-bold border border-[#006241] px-3 py-1 rounded">
-                            10.00 AM - 12.00 AM
-                          </span>
+
+                    {leaveType === "Multiple" && (
+                      <div className="mb-5">
+                        <label htmlFor="date">
+                          You can select multiple dates.
                         </label>
-                        <label className="inline-flex items-center">
-                          <input
-                            type="radio"
-                            name="shift"
-                            className="form-radio text-primary"
-                          />
-                          <span className="text-[#006241] text-sm font-bold border border-[#006241] px-3 py-1 rounded">
-                            1.00 PM - 2.00 PM
-                          </span>
-                        </label>
+                        <div className="mb-8 mt-2 flex items-center flex-col md:flex-row justify-between gap-8">
+                          <div className="w-full">
+                            <p className="mt-2">From</p>
+                            <input
+                              id="StartDate"
+                              type="date"
+                              className="form-input"
+                              value={startDate || ""}
+                              onChange={(e) => setStartDate(e.target.value)}
+                            />
+                          </div>
+                          <div className="w-full">
+                            <p className="mt-2">To</p>
+                            <input
+                              id="EndDate"
+                              type="date"
+                              className="form-input"
+                              value={endDate || ""}
+                              onChange={(e) => setEndDate(e.target.value)}
+                            />
+                          </div>
+                        </div>
                       </div>
                     )}
+
                     <div className="flex justify-end items-center mt-8">
                       <button
                         type="button"
@@ -183,9 +259,8 @@ const AddLeave = ({ open, closeModal, buttonLoading, formSubmit }) => {
                         Cancel
                       </button>
                       <button
-                        type="button"
+                        type="submit" // Change to type="submit" to trigger handleSubmit
                         className="btn btn-green ltr:ml-4 rtl:mr-4"
-                        onClick={handleSubmit}
                         disabled={buttonLoading}
                       >
                         {buttonLoading ? (
@@ -196,6 +271,8 @@ const AddLeave = ({ open, closeModal, buttonLoading, formSubmit }) => {
                       </button>
                     </div>
                   </form>
+               
+
                 </div>
               </Dialog.Panel>
             </Transition.Child>

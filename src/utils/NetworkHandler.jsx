@@ -31,6 +31,9 @@ class NetworkHandler {
         if (tokenDetails?.accessToken) {
           config.headers.Authorization = `Bearer ${tokenDetails.accessToken}`;
         }
+
+        config.headers["ngrok-skip-browser-warning"] = "true";
+
         return config;
       },
       function (error) {

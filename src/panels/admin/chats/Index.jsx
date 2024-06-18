@@ -248,12 +248,11 @@ const contactList = [
     active: true,
   },
 ];
-const clinicUser = {
+const loginUser = {
   id: 0,
-  name: "Clinic Name",
+  name: "Alon Smith",
   path: "profile-34.jpeg",
-  active: true, // Assuming clinic is always active
-  time: 'now', // Default active message
+  designation: "Software Developer",
 };
 
 const Chat = () => {

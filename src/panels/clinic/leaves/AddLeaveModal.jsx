@@ -112,7 +112,7 @@ const AddLeave = ({
     }
 
     if (leaveType === "Full Day" && timeSlots.length === 0) {
-      showBlockAlert("No time slots selected");
+      showBlockAlert("No time slots available");
       return;
     }
 
@@ -153,6 +153,19 @@ const AddLeave = ({
         );
         console.log(response);
         showMessage("Bulk leave added successfully.");
+      } else if (leaveType === "By Shift") {
+        const leaveData = {
+          leaveslots: selectedTimeSlots.map((slotId) => ({
+            clinic_id: userData?.UserClinic[0]?.clinic_id,
+            DoctorTimeSlot_id: slotId,
+            leave_date: selectedDate,
+          })),
+        };
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
+          leaveData
+        );
+        showMessage("Leave by shift added successfully.");
       }
       closeAddLeaveModal();
       fetchLeaveData();
@@ -387,7 +400,7 @@ const AddLeave = ({
                       </div>
                     )}
 
-                    {leaveType === "By Shift" && (
+                     {leaveType === "By Shift" && (
                       <div className="mb-8 flex flex-col gap-5 justify-between">
                         <div>
                           <label htmlFor="Date">Date</label>
@@ -420,6 +433,7 @@ const AddLeave = ({
                                       id={`slot-${slot.DoctorTimeSlot_id}`}
                                       value={slot.DoctorTimeSlot_id}
                                       className="form-checkbox mr-2 ml-2"
+                                      onChange={handleTimeSlotChange}
                                     />
                                     <label
                                       htmlFor={`slot-${slot.DoctorTimeSlot_id}`}
@@ -437,7 +451,7 @@ const AddLeave = ({
                         </div>
                       </div>
                     )}
-
+                    
                     <div className="flex justify-center items-center mt-8">
                       <button
                         type="button"

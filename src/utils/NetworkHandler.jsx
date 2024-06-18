@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const baseUrl = "https://doctorbackend.gitdr.com/api";
+export const baseUrl = "https://aeda-2405-201-f018-10d6-605d-8aa4-161b-1443.ngrok-free.app/api";
 export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
 
 // website url

@@ -84,7 +84,7 @@ const Sales = () => {
   const fetchData = async () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/salesperson/getallsalespersons?page=${page}&pageSize=${pageSize}`
+        `/v1/salesperson/getallsalespersons?page=${page}&paggetallsalespersonseSize=${pageSize}`
       );
       setTotalSalesPerson(response.data?.Salesperson?.count);
       setAllSalesPerson(response.data?.Salesperson?.rows);

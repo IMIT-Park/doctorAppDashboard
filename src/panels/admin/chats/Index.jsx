@@ -48,7 +48,7 @@ const contactList = [
       {
         fromUserId: 1,
         toUserId: 0,
-        text: "Welcom Back",
+        text: "Welcome Back",
       },
       {
         fromUserId: 1,

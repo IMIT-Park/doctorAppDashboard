@@ -31,7 +31,7 @@ const SinglePage = () => {
 
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
-  const isOwner = userData?.user_id === 1;
+  const isSuperAdmin = userData?.user_id === 1;
 
   useEffect(() => {
     if (location?.state?.previousUrl) {
@@ -102,12 +102,12 @@ const SinglePage = () => {
   const doctorDetails = doctorData?.Doctor;
 
   // fetch leaves data function
-  // const {
-  //   data: doctorLeavesData,
-  //   loading: leavesLoading,
-  //   refetch: fetchLeaveData,
-  // } = useFetchData(`/v1/doctor/getdrleave/${doctorId}`, {}, [doctorId]);
-  // const doctorLeaves = doctorLeavesData?.leaveDetails;
+  const {
+    data: doctorLeavesData,
+    loading: leavesLoading,
+    refetch: fetchLeaveData,
+  } = useFetchData(`/v1/doctor/getdrleave/${doctorId}`, {}, [doctorId]);
+  const doctorLeaves = doctorLeavesData?.leaveDetails;
 
   // edit details modal handler
   const openEditDetailsModal = () => {
@@ -411,91 +411,6 @@ const SinglePage = () => {
     setAddLeaveModal(false);
   };
 
-  const doctorLeaves = [
-    {
-      leave_date: "2024-06-12T00:00:00.000Z",
-      timeslot_count: 1,
-      leaves: [
-        {
-          leave_id: 4,
-          DoctorTimeSlot_id: 20,
-          doctor_id: 4,
-          clinic_id: 1,
-          leave_date: "2024-06-12T00:00:00.000Z",
-          created_at: "2024-06-14T09:20:55.000Z",
-          updated_at: "2024-06-14T09:20:55.000Z",
-          deleted_at: null,
-          DoctorTimeSlot: {
-            DoctorTimeSlot_id: 20,
-            doctor_id: 4,
-            day_id: 3,
-            time_slot: 5,
-            startTime: "01:00:00",
-            endTime: "02:00:00",
-            clinic_id: 1,
-            noOfConsultationsPerDay: 10,
-            created_at: "2024-06-11T06:49:36.000Z",
-            updated_at: "2024-06-11T06:49:36.000Z",
-            deleted_at: null,
-          },
-        },
-      ],
-      fullday: true,
-    },
-    {
-      leave_date: "2024-06-18T00:00:00.000Z",
-      timeslot_count: 2,
-      leaves: [
-        {
-          leave_id: 6,
-          DoctorTimeSlot_id: 19,
-          doctor_id: 4,
-          clinic_id: 1,
-          leave_date: "2024-06-18T00:00:00.000Z",
-          created_at: "2024-06-14T09:21:17.000Z",
-          updated_at: "2024-06-14T09:21:17.000Z",
-          deleted_at: null,
-          DoctorTimeSlot: {
-            DoctorTimeSlot_id: 19,
-            doctor_id: 4,
-            day_id: 2,
-            time_slot: 5,
-            startTime: "01:00:00",
-            endTime: "02:00:00",
-            clinic_id: 1,
-            noOfConsultationsPerDay: 10,
-            created_at: "2024-06-11T06:49:36.000Z",
-            updated_at: "2024-06-11T06:49:36.000Z",
-            deleted_at: null,
-          },
-        },
-        {
-          leave_id: 6,
-          DoctorTimeSlot_id: 20,
-          doctor_id: 4,
-          clinic_id: 1,
-          leave_date: "2024-06-18T00:00:00.000Z",
-          created_at: "2024-06-14T09:21:17.000Z",
-          updated_at: "2024-06-14T09:21:17.000Z",
-          deleted_at: null,
-          DoctorTimeSlot: {
-            DoctorTimeSlot_id: 20,
-            doctor_id: 4,
-            day_id: 2,
-            time_slot: 5,
-            startTime: "10:00:00",
-            endTime: "12:00:00",
-            clinic_id: 1,
-            noOfConsultationsPerDay: 10,
-            created_at: "2024-06-11T06:49:36.000Z",
-            updated_at: "2024-06-11T06:49:36.000Z",
-            deleted_at: null,
-          },
-        },
-      ],
-      fullday: false,
-    },
-  ];
 
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
@@ -529,7 +444,7 @@ const SinglePage = () => {
                     No photo
                   </div>
                 )}
-                {!isOwner && (
+                {!isSuperAdmin && (
                   <button
                     type="button"
                     className="absolute top-0 right-0 btn btn-dark w-8 h-8 p-0 rounded-full"
@@ -645,7 +560,7 @@ const SinglePage = () => {
                     <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
                   </label>
                 </Tippy>
-                {!isOwner && (
+                {!isSuperAdmin && (
                   <button
                     className="flex hover:text-info"
                     onClick={openEditDetailsModal}
@@ -660,7 +575,7 @@ const SinglePage = () => {
                 <h5 className="text-base font-semibold dark:text-white-light">
                   Available Days & Time Slots:
                 </h5>
-                {!isOwner && (
+                {!isSuperAdmin && (
                   <button
                     type="button"
                     className="btn btn-green"
@@ -723,7 +638,7 @@ const SinglePage = () => {
                                           {timeslot?.time_slot} Min
                                         </div>
                                       </div>
-                                      {!isOwner && (
+                                      {!isSuperAdmin && (
                                         <div className="flex items-center gap-1 mt-1">
                                           <button
                                             type="button"
@@ -766,7 +681,7 @@ const SinglePage = () => {
                 <h5 className="text-base font-semibold mb-1 dark:text-white-light">
                   Leaves:
                 </h5>
-                {!isOwner && (
+                {!isSuperAdmin && (
                   <button
                     type="button"
                     className="btn btn-green"
@@ -869,9 +784,16 @@ const SinglePage = () => {
         open={addLeaveModal}
         closeModal={closeAddLeaveModal}
         buttonLoading={buttonLoading}
+        clinicId={clinicId}
+        doctorId={doctorId}
+        fetchLeaveData={fetchLeaveData}
       />
     </div>
   );
 };
 
 export default SinglePage;
+
+
+
+

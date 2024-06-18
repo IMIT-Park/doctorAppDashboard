@@ -17,6 +17,8 @@ import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { showMessage } from "../../../utils/showMessage";
 import { handleGetLocation } from "../../../utils/getLocation";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
+import ModalSubscription from "../subscription-plans/ModalSubscription";
+
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -30,11 +32,13 @@ const Clinics = () => {
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
   });
+
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [allClinics, setAllClinics] = useState([]);
   const [totalClinics, setTotalClinics] = useState(0);
+  const [subscriptionAddModal,setsubscriptionAddModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [currentClinicId, setCurrentClinicId] = useState("");
@@ -106,6 +110,15 @@ const Clinics = () => {
   const openAddModal = () => {
     setAddModal(true);
   };
+
+  const addSubscriptionModal = () => {
+    setsubscriptionAddModal(true);
+  };
+
+  const closeSubscriptionModal  = () => {
+    setsubscriptionAddModal(false);
+  };
+
 
   const closeAddModal = () => {
     setAddModal(false);
@@ -264,6 +277,11 @@ const Clinics = () => {
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchData);
 
+
+    const handleSubButtonClick = () => {
+      setsubscriptionAddModal(true);
+    };
+
   return (
     <div>
       <ScrollToTop />
@@ -333,6 +351,24 @@ const Clinics = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
+                        handleSubButtonClick();
+
+                      }}
+                      className="btn btn-success btn-sm py-1"
+                    >
+                      sub
+                    </button>
+                  ),
+                },
+                {
+                  accessor: "googleLocation",
+                  title: "Location",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
                         handleGetLocation(rowData.googleLocation);
                       }}
                       className="btn btn-success btn-sm py-1"
@@ -342,6 +378,7 @@ const Clinics = () => {
                     </button>
                   ),
                 },
+                
                 {
                   accessor: "Actions",
                   textAlignment: "center",
@@ -423,6 +460,12 @@ const Clinics = () => {
         buttonLoading={buttonLoading}
         isEdit={true}
       />
+
+      <ModalSubscription
+      open={subscriptionAddModal}
+      closeModal={closeSubscriptionModal}
+       />
+
 
       {/* delete sales person modal */}
       {/* <DeleteClinic open={deleteModal} closeModal={closeDeleteConfirmModal} /> */}

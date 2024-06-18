@@ -8,8 +8,13 @@ import IconLockDots from "../../../components/Icon/IconLockDots";
 import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
 
-const ModalPage = () => {
-  const { planId } = useParams(); // Extract planId from URL params
+const ModalPage = ({
+  open,
+  closeModal,
+  buttonLoading,
+
+}) => {
+ 
   const [selectedClinics, setSelectedClinics] = useState([]);
 
   // Simulated clinics data for demonstration
@@ -76,7 +81,6 @@ const ModalPage = () => {
                   Add Clinic
                 </div>
                 <div className="p-5">
-                  <form onSubmit={handleSubmitAdd}>
                     <div className="flex justify-end items-center mt-8">
                       <button
                         type="button"
@@ -96,7 +100,6 @@ const ModalPage = () => {
                         )}
                       </button>
                     </div>
-                  </form>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

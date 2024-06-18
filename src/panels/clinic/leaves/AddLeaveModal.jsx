@@ -38,6 +38,7 @@ const AddLeave = ({
   const [timeSlots, setTimeSlots] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
 
   const resetForm = () => {
     setLeaveType("Full Day");
@@ -89,6 +90,15 @@ const AddLeave = ({
     return day ? day.name : "";
   };
 
+  const handleTimeSlotChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setSelectedTimeSlots([...selectedTimeSlots, value]);
+    } else {
+      setSelectedTimeSlots(selectedTimeSlots.filter((id) => id !== value));
+    }
+  };
+
   
   const handleSaveLeave = async () => {
     if (!selectedDoctorId) {
@@ -108,6 +118,11 @@ const AddLeave = ({
 
     if (leaveType === "Multiple" && (!startDate || !endDate)) {
       showBlockAlert("Please select a date range");
+      return;
+    }
+
+    if (leaveType === "By Shift" && (!selectedDate || selectedTimeSlots.length === 0)) {
+      showBlockAlert("Please select a date and at least one time slot");
       return;
     }
 

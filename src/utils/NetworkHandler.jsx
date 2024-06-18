@@ -1,11 +1,15 @@
 import axios from "axios";
 
-export const baseUrl = "https://aeda-2405-201-f018-10d6-605d-8aa4-161b-1443.ngrok-free.app/api";
-export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
+export const baseUrl =
+  "https://aeda-2405-201-f018-10d6-605d-8aa4-161b-1443.ngrok-free.app/api";
+  
+export const imageBaseUrl =
+  "https://aeda-2405-201-f018-10d6-605d-8aa4-161b-1443.ngrok-free.app/";
+
+// export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
 
 // dashboard url
 export const dashboardUrl = "https://mydoctorsdashboard.gitdr.com/";
-
 
 // website url
 export const websiteUrl = "http://localhost:3000/clinic/";
@@ -31,6 +35,9 @@ class NetworkHandler {
         if (tokenDetails?.accessToken) {
           config.headers.Authorization = `Bearer ${tokenDetails.accessToken}`;
         }
+
+        config.headers["ngrok-skip-browser-warning"] = "true";
+
         return config;
       },
       function (error) {

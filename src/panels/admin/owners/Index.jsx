@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import Swal from "sweetalert2";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -10,7 +9,7 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { useNavigate } from "react-router-dom";
-import NetworkHandler from "../../../utils/NetworkHandler";
+import NetworkHandler, { baseUrl } from "../../../utils/NetworkHandler";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 
 const Owners = () => {
@@ -39,28 +38,14 @@ const Owners = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
-    });
-  };
-
   // fetch function
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/owner/getallowner?page=${page}&pageSize=${pageSize}`
+        `/v1/owner/getallowner?page=${1}&pageSize=${2}`
       );
+      console.log(response);
       setTotalOwners(response?.data?.Owner?.count);
       setAllOwners(response?.data?.Owner?.rows);
       setLoading(false);

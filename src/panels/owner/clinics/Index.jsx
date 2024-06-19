@@ -282,6 +282,9 @@ const Clinics = () => {
       setsubscriptionAddModal(true);
     };
 
+
+
+
   return (
     <div>
       <ScrollToTop />
@@ -343,8 +346,8 @@ const Clinics = () => {
                 { accessor: "place", title: "Place" },
                 { accessor: "User.email", title: "Email" },
                 {
-                  accessor: "googleLocation",
-                  title: "Location",
+                  accessor: "clinic_id",
+                  title: "Plan Details",
                   textAlignment: "center",
                   render: (rowData) => (
                     <button
@@ -352,6 +355,7 @@ const Clinics = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSubButtonClick();
+ 
 
                       }}
                       className="btn btn-success btn-sm py-1"
@@ -464,8 +468,10 @@ const Clinics = () => {
       <ModalSubscription
       open={subscriptionAddModal}
       closeModal={closeSubscriptionModal}
+      clinicId = {currentClinicId}
+      
        />
-
+      
 
       {/* delete sales person modal */}
       {/* <DeleteClinic open={deleteModal} closeModal={closeDeleteConfirmModal} /> */}

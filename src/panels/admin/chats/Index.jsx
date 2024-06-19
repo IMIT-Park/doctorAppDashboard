@@ -1,32 +1,20 @@
-// import Dropdown from '../../components/Dropdown';
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { setPageTitle } from "../../../store/themeConfigSlice";
-// import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
 import IconSettings from "../../../components/Icon/IconSettings";
-// import IconHelpCircle from '../../components/Icon/IconHelpCircle';
-// import IconLogin from '../../components/Icon/IconLogin';
 import IconSearch from "../../../components/Icon/IconSearch";
-// import IconMessagesDot from '../../components/Icon/IconMessagesDot';
-// import IconPhone from '../../components/Icon/IconPhone';
-// import IconUserPlus from '../../components/Icon/IconUserPlus';
-// import IconBell from '../../components/Icon/IconBell';
 import IconMenu from "../../../components/Icon/IconMenu";
-// import IconMessage from '../../components/Icon/IconMessage';
-// import IconPhoneCall from '../../components/Icon/IconPhoneCall';
-// import IconVideo from '../../components/Icon/IconVideo';
 import IconCopy from "../../../components/Icon/IconCopy";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
-// import IconShare from '../../components/Icon/IconShare';
-import IconMoodSmile from '../../../components/Icon/IconMoodSmile';
-import IconSend from '../../../components/Icon/IconSend';
-// import IconMicrophoneOff from '../../components/Icon/IconMicrophoneOff';
+import IconMoodSmile from "../../../components/Icon/IconMoodSmile";
+import IconSend from "../../../components/Icon/IconSend";
 import IconDownload from "../../../components/Icon/IconDownload";
-// import IconUser from "../../../components/Icon/IconUser";
-// import IconCamera from '../../components/Icon/IconCamera';
 import Dropdown from "../../../components/Dropdown";
 import IconHorizontalDots from "../../../components/Icon/IconHorizontalDots";
+import NetworkHandler from "../../../utils/NetworkHandler";
+import IconMessage from "../../../components/Icon/IconMessage";
+
 const contactList = [
   {
     userId: 1,
@@ -247,6 +235,36 @@ const contactList = [
     messages: [],
     active: true,
   },
+  {
+    userId: 90,
+    name: "Alma Clarke0000",
+    path: "profile-2.jpeg",
+    time: "1:44 PM",
+    preview: "I’ve forgotten how it felt before",
+    messages: [
+      {
+        fromUserId: 0,
+        toUserId: 3,
+        text: "Hey Buddy.",
+      },
+      {
+        fromUserId: 0,
+        toUserId: 3,
+        text: "What's up",
+      },
+      {
+        fromUserId: 3,
+        toUserId: 0,
+        text: "I am sick",
+      },
+      {
+        fromUserId: 0,
+        toUserId: 3,
+        text: "Not comming to office today.",
+      },
+    ],
+    active: true,
+  },
 ];
 const loginUser = {
   id: 0,
@@ -273,6 +291,10 @@ const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [textMessage, setTextMessage] = useState("");
   const [filteredItems, setFilteredItems] = useState(contactList);
+  const [loading, setLoading] = useState(false);
+  const [chatersList, setChatersList] = useState([]);
+  const [messageLoading, setMessageLoading] = useState(false);
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     setFilteredItems(() => {
@@ -297,6 +319,7 @@ const Chat = () => {
     scrollToBottom();
     setIsShowChatMenu(false);
   };
+
   const sendMessage = () => {
     if (textMessage.trim()) {
       let list = contactList;
@@ -317,6 +340,57 @@ const Chat = () => {
       sendMessage();
     }
   };
+
+  // fetch chaters list function
+  const fetchChatersList = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        "/v1/message/getAllmessage"
+      );
+
+      setChatersList(response?.data?.uniqueOwners);
+
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // fetching chaters
+  useEffect(() => {
+    fetchChatersList();
+  }, []);
+
+  // fetch messages function
+  const fetchMessages = async () => {
+    console.log("iammmmm");
+    setMessageLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/message/getmessage/${selectedUser?.owner_id}`
+      );
+      setMessages(response?.data?.Messages);
+      setMessageLoading(false);
+    } catch (error) {
+      console.log(error);
+      setMessageLoading(false);
+    } finally {
+      setMessageLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedUser) {
+      fetchMessages();
+    }
+  }, [selectedUser]);
+
+  console.log("messages", messages);
+
   return (
     <div>
       <div
@@ -329,46 +403,6 @@ const Chat = () => {
             isShowChatMenu ? "!block" : ""
           }`}
         >
-          <div className="flex justify-between items-center">
-            {/* <div className="flex items-center">
-                            <div className="flex-none">
-                                <img src="/assets/images/profile-34.jpeg" className="rounded-full h-12 w-12 object-cover" alt="" />
-                            </div>
-                            <div className="mx-3">
-                                <p className="mb-1 font-semibold">Alon Smith</p>
-                                <p className="text-xs text-white-dark">Software Developer</p>
-                            </div>
-                        </div> */}
-            <div className="dropdown">
-              <Dropdown
-                offset={[0, 5]}
-                placement={`${isRtl ? "bottom-start" : "bottom-end"}`}
-                // btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full !flex justify-center items-center hover:text-primary"
-                // button={<IconHorizontalDots className="opacity-70" />}
-              >
-                <ul className="whitespace-nowrap">
-                  <li>
-                    <button type="button">
-                      <IconSettings className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
-                      Settings
-                    </button>
-                  </li>
-                  {/* <li>
-                                        <button type="button">
-                                            <IconHelpCircle className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
-                                            Help & feedback
-                                        </button>
-                                    </li> */}
-                  {/* <li>
-                                        <button type="button">
-                                            <IconLogin className="ltr:mr-1 rtl:ml-1 shrink-0" />
-                                            Sign Out
-                                        </button>
-                                    </li> */}
-                </ul>
-              </Dropdown>
-            </div>
-          </div>
           <div className="relative">
             <input
               type="text"
@@ -381,37 +415,17 @@ const Chat = () => {
               <IconSearch />
             </div>
           </div>
-          {/* <div className="flex justify-between items-center text-xs">
-                        <button type="button" className="hover:text-primary">
-                            <IconMessagesDot className="mx-auto mb-1" />
-                            Chats
-                        </button>
-
-                        <button type="button" className="hover:text-primary">
-                            <IconPhone className="mx-auto mb-1" />
-                            Calls
-                        </button>
-
-                        <button type="button" className="hover:text-primary">
-                            <IconUserPlus className="mx-auto mb-1" />
-                            Contacts
-                        </button>
-
-                        <button type="button" className="hover:text-primary group">
-                            <IconBell className="w-5 h-5 mx-auto mb-1" />
-                            Notification
-                        </button>
-                    </div> */}
           <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b]"></div>
           <div className="!mt-0">
-            <PerfectScrollbar className="chat-users relative h-[400px] min-h-[400px] sm:h-[calc(100vh_-_357px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
-              {filteredItems.map((person) => {
+            <PerfectScrollbar className="chat-users relative h-[400px] min-h-[400px] sm:h-[calc(100vh_-_250px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
+              {chatersList?.map((person) => {
                 return (
-                  <div key={person.userId}>
+                  <div key={person?.owner_id}>
                     <button
                       type="button"
                       className={`w-full flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-[#050b14] rounded-md dark:hover:text-primary hover:text-primary ${
-                        selectedUser && selectedUser.userId === person.userId
+                        selectedUser &&
+                        selectedUser?.owner_id === person?.owner_id
                           ? "bg-gray-100 dark:bg-[#050b14] dark:text-primary text-primary"
                           : ""
                       }`}
@@ -421,28 +435,20 @@ const Chat = () => {
                         <div className="flex items-center">
                           <div className="flex-shrink-0 relative">
                             <img
-                              src={`/assets/images/${person.path}`}
+                              src={`/assets/images/empty-user.png`}
                               className="rounded-full h-12 w-12 object-cover"
                               alt=""
                             />
-                            {person.active && (
-                              <div>
-                                <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
-                                  <div className="w-4 h-4 bg-success rounded-full"></div>
-                                </div>
-                              </div>
-                            )}
                           </div>
                           <div className="mx-3 ltr:text-left rtl:text-right">
-                            <p className="mb-1 font-semibold">{person.name}</p>
+                            <p className="mb-1 font-semibold capitalize">
+                              {person?.name || ""}
+                            </p>
                             <p className="text-xs text-white-dark truncate max-w-[185px]">
-                              {person.preview}
+                              {person?.email || ""}
                             </p>
                           </div>
                         </div>
-                      </div>
-                      <div className="font-semibold whitespace-nowrap text-xs">
-                        <p>{person.time}</p>
                       </div>
                     </button>
                   </div>
@@ -628,10 +634,10 @@ const Chat = () => {
                     />
                   </svg>
                 </div>
-                {/* <p className="flex justify-center bg-white-dark/20 p-2 font-semibold rounded-md max-w-[190px] mx-auto">
-                                    <IconMessage className="ltr:mr-2 rtl:ml-2" />
-                                    Click User To Chat
-                </p> */}
+                <p className="flex justify-center bg-white-dark/20 p-2 font-semibold rounded-md max-w-[190px] mx-auto">
+                  <IconMessage className="ltr:mr-2 rtl:ml-2" />
+                  Click User To Chat
+                </p>
               </div>
             </div>
           )}
@@ -648,72 +654,18 @@ const Chat = () => {
                   </button>
                   <div className="relative flex-none">
                     <img
-                      src={`/assets/images/${selectedUser.path}`}
+                      src={`/assets/images/empty-user.png`}
                       className="rounded-full w-10 h-10 sm:h-12 sm:w-12 object-cover"
                       alt=""
                     />
-                    <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
-                      <div className="w-4 h-4 bg-success rounded-full"></div>
-                    </div>
                   </div>
                   <div className="mx-3">
-                    <p className="font-semibold">{selectedUser.name}</p>
-                    <p className="text-white-dark text-xs">
-                      {selectedUser.active
-                        ? "Active now"
-                        : "Last seen at " + selectedUser.time}
+                    <p className="font-semibold capitalize">
+                      {selectedUser.name || ""}
                     </p>
-                  </div>
-                </div>
-                <div className="flex sm:gap-5 gap-3">
-                  {/* <button type="button">
-                                        <IconPhoneCall className="hover:text-primary" />
-                                    </button> */}
-
-                  {/* <button type="button">
-                                        <IconVideo className="w-5 h-5 hover:text-primary" />
-                                    </button> */}
-                  <div className="dropdown">
-                    <Dropdown
-                      placement={`${isRtl ? "bottom-start" : "bottom-end"}`}
-                      btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full !flex justify-center items-center"
-                      button={
-                        <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
-                      }
-                    >
-                      <ul className="text-black dark:text-white-dark">
-                        <li>
-                          <button type="button">
-                            <IconSearch className="ltr:mr-2 rtl:ml-2 shrink-0" />
-                            Search
-                          </button>
-                        </li>
-                        <li>
-                          <button type="button">
-                            <IconCopy className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                            Copy
-                          </button>
-                        </li>
-                        <li>
-                          <button type="button">
-                            <IconTrashLines className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                            Delete
-                          </button>
-                        </li>
-                        {/* <li>
-                                                    <button type="button">
-                                                        <IconShare className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                                                        Share
-                                                    </button>
-                                                </li> */}
-                        <li>
-                          <button type="button">
-                            <IconSettings className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                            Settings
-                          </button>
-                        </li>
-                      </ul>
-                    </Dropdown>
+                    <p className="text-white-dark text-xs">
+                      {selectedUser?.email || ""}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -721,16 +673,9 @@ const Chat = () => {
 
               <PerfectScrollbar className="relative h-full sm:h-[calc(100vh_-_300px)] chat-conversation-box">
                 <div className="space-y-5 p-4 sm:pb-0 pb-[68px] sm:min-h-[300px] min-h-[400px]">
-                  <div className="block m-6 mt-0">
-                    <h4 className="text-xs text-center border-b border-[#f4f4f4] dark:border-gray-800 relative">
-                      <span className="relative top-2 px-3 bg-white dark:bg-black">
-                        {"Today, " + selectedUser.time}
-                      </span>
-                    </h4>
-                  </div>
                   {selectedUser.messages && selectedUser.messages.length ? (
                     <>
-                      {selectedUser.messages.map((message, index) => {
+                      {selectedUser?.messages.map((message, index) => {
                         return (
                           <div key={index}>
                             <div
@@ -817,9 +762,13 @@ const Chat = () => {
                     >
                       <IconMoodSmile />
                     </button>
-                    <button type="button" className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 hover:text-primary" onClick={() => sendMessage()}>
-                                            <IconSend />
-                                        </button>
+                    <button
+                      type="button"
+                      className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 hover:text-primary"
+                      onClick={() => sendMessage()}
+                    >
+                      <IconSend />
+                    </button>
                   </div>
                   <div className="items-center space-x-3 rtl:space-x-reverse sm:py-0 py-3 hidden sm:block">
                     {/* <button type="button" className="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light rounded-md p-2 hover:text-primary">

@@ -32,7 +32,7 @@ const ClinicSingleView = () => {
   const location = useLocation();
   const { clinicId } = useParams();
   const previousUrl = sessionStorage.getItem("clinicPreviousPage");
-  const qrUrl = `${websiteUrl}${clinicId}`;
+  const qrUrl = `${websiteUrl}clinic/${clinicId}`;
 
   useEffect(() => {
     if (location?.state?.previousUrl) {

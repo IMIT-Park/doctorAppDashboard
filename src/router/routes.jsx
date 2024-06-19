@@ -13,7 +13,9 @@ const Profile = lazy(() => import("../pages/Profile/Profile"));
 // <--------------> admin panel imports starts here<-------------->
 const AdminIndex = lazy(() => import("../panels/admin/Index"));
 const AdminOwners = lazy(() => import("../panels/admin/owners/Index"));
-const AdminOwnerSingleView = lazy(() => import("../panels/admin/owners/OwnerSingleView"));
+const AdminOwnerSingleView = lazy(() =>
+  import("../panels/admin/owners/OwnerSingleView")
+);
 const AdminClinics = lazy(() => import("../panels/admin/clinics/Index"));
 const AdminDoctors = lazy(() => import("../panels/admin/doctors/Index"));
 const AdminReports = lazy(() => import("../panels/admin/reports/Index"));
@@ -23,10 +25,13 @@ const AdminSalesOwners = lazy(() =>
 );
 const AdminMessages = lazy(() => import("../panels/admin/messages/Index"));
 const AdminChats = lazy(() => import("../panels/admin/chats/Index"));
-
 const AdminSubscriptionPlans = lazy(() =>
   import("../panels/admin/subscription-plans/Index")
 );
+const AdminSupportUser = lazy(() =>
+  import("../panels/admin/supportUser/Index")
+);
+
 // <--------------> admin panel imports ends here <-------------->
 
 // <--------------> owner panel imports starts here<-------------->
@@ -51,9 +56,7 @@ const ClinicPatients = lazy(() =>
   import("../panels/clinic/bookings/PatientsDetails")
 );
 
-const ClinicChats = lazy(() =>
-  import("../panels/clinic/chats/Index")
-);
+const ClinicChats = lazy(() => import("../panels/clinic/chats/Index"));
 
 const ClinicProfile = lazy(() =>
   import("../panels/clinic/profile/ClinicProfile")
@@ -68,6 +71,10 @@ const DoctorIndex = lazy(() => import("../panels/doctor/Index"));
 const SalesIndex = lazy(() => import("../panels/sales/Index"));
 const SalesOwners = lazy(() => import("../panels/sales/owners/Owners"));
 // <--------------> sales panel imports ends here <-------------->
+
+// <--------------> supportUser panel imports starts here<-------------->
+const SupportUserIndex = lazy(() => import("../panels/supportUser/Index"));
+// <--------------> supportUser panel imports ends here <-------------->
 
 // <--------------> clinic single-view imports starts here <-------------->
 const ClinicSingleView = lazy(() => import("../pages/ClinicSingleView/Index"));
@@ -185,6 +192,13 @@ const routes = [
     layout: "default",
   },
 
+  // support user
+  {
+    path: "/admin/supportuser",
+    element: <AdminSupportUser />,
+    layout: "default",
+  },
+
   // <--------------> admin panel ends here <-------------->
 
   // <--------------> owner panel starts here <-------------->
@@ -294,6 +308,16 @@ const routes = [
     layout: "default",
   },
 
+  // <--------------> sales panel ends here <-------------->
+
+  // <--------------> sales panel starts here <-------------->
+
+  // dashboard
+  {
+    path: "/support/dashboard",
+    element: <SupportUserIndex />,
+    layout: "default",
+  },
   // <--------------> sales panel ends here <-------------->
 
   // <--------------> doctor single-view starts here <-------------->

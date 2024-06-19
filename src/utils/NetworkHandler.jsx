@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const baseUrl =
-  "https://aeda-2405-201-f018-10d6-605d-8aa4-161b-1443.ngrok-free.app/api";
+  "https://0c17-2405-201-f018-10d6-fdb6-68ab-422e-981e.ngrok-free.app/api";
   
 export const imageBaseUrl =
   "https://aeda-2405-201-f018-10d6-605d-8aa4-161b-1443.ngrok-free.app/";
@@ -12,7 +12,7 @@ export const imageBaseUrl =
 export const dashboardUrl = "https://mydoctorsdashboard.gitdr.com/";
 
 // website url
-export const websiteUrl = "http://localhost:3000/clinic/";
+export const websiteUrl = "http://localhost:3000/";
 
 // Helper function to get stored token details
 function getStoredTokenDetails() {

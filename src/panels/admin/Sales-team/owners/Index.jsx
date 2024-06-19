@@ -57,7 +57,6 @@ const Owners = () => {
     }
   };
 
-  // fetching Mds
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);

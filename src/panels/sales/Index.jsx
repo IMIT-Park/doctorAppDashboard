@@ -16,7 +16,10 @@ import IconMenuDatatables from "../../components/Icon/Menu/IconMenuDatatables";
 import Dropdown from "../../components/Dropdown";
 import IconHorizontalDots from "../../components/Icon/IconHorizontalDots";
 import ReactApexChart from "react-apexcharts";
-import NetworkHandler, { dashboardUrl, websiteUrl } from "../../utils/NetworkHandler";
+import NetworkHandler, {
+  dashboardUrl,
+  websiteUrl,
+} from "../../utils/NetworkHandler";
 import { showMessage } from "../../utils/showMessage";
 
 const Users = () => {
@@ -62,7 +65,7 @@ const Users = () => {
   };
 
   const shareByEmail = () => {
-    const body = "Check out this awesome content at https://example.com";
+    const body = `Check out this awesome content at ${message1}`;
     const mailtoUrl = `mailto:?subject=&body=${encodeURIComponent(body)}`;
     window.open(mailtoUrl, "_blank");
   };
@@ -329,7 +332,9 @@ const Users = () => {
         `/v1/salesperson/getsalesperson/${salespersonId}`
       );
       setDetails(response?.data?.salespersons);
-      setMessage1(websiteUrl + response?.data?.salespersons?.salespersoncode);
+      setMessage1(
+        `${websiteUrl}signup/${response?.data?.salespersons?.salespersoncode}`
+      );
       setLoading(false);
     } catch (error) {
       console.log(error);

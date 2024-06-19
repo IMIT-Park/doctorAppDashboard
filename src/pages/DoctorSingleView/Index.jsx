@@ -21,6 +21,8 @@ import useBlockUnblock from "../../utils/useBlockUnblock";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import useFetchData from "../../customHooks/useFetchData";
+import IconTrashLines from "../../components/Icon/IconTrashLines";
+import DeleteLeave from "./components/DeleteLeave";
 
 const SinglePage = () => {
   const { clinicId, doctorId } = useParams();
@@ -78,6 +80,9 @@ const SinglePage = () => {
   const [timeSlotId, setTimeSlotId] = useState("");
   const [selectedDay, setSelectedDay] = useState("");
   const [addLeaveModal, setAddLeaveModal] = useState(false);
+  const [deleteLeaveModal, setDeleteLeaveModal] = useState(false);
+  const [selectedLeave, setSelectedLeave] = useState(null);
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
 
   const togglePara = (value) => {
     setActive((oldValue) => (oldValue === value ? null : value));
@@ -411,6 +416,17 @@ const SinglePage = () => {
     setAddLeaveModal(false);
   };
 
+  const openDeleteLeaveModal = (leave) => {
+    setSelectedLeave(leave);
+    setDeleteLeaveModal(true);
+    console.log(leave);
+  };
+
+  const closeDeleteLeaveModal = () => {
+    setDeleteLeaveModal(false);
+    setSelectedTimeSlots([]);
+    setSelectedLeave(null);
+  };
 
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
@@ -702,20 +718,28 @@ const SinglePage = () => {
                       <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
                         {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
                       </span>
-                      <div className="flex items-center flex-wrap gap-1 font-bold text-base text-slate-500">
+                      <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-1 font-bold text-base text-slate-500 ml-auto">
                         <span>{formatDate(leave?.leave_date)}</span>
                         {!leave?.fullday && (
-                          <div className="flex items-center flex-wrap ">
+                          <div className="flex items-center flex-wrap">
                             {leave?.leaves?.map((slot, slotIndex) => (
                               <span key={slot?.DoctorTimeSlot_id}>
                                 (Slot:{" "}
                                 {formatTime(slot?.DoctorTimeSlot?.startTime)} -{" "}
                                 {formatTime(slot?.DoctorTimeSlot?.endTime)})
-                                {slotIndex < leave.leaves.length - 1 && " , "}
+                                {slotIndex < leave.leaves.length - 1 && ", "}
                               </span>
                             ))}
                           </div>
                         )}
+                        <button
+                          type="button"
+                          className="text-red-500 hover:text-red-700 ml-2"
+                          onClick={() => openDeleteLeaveModal(leave)}
+                          title="Delete leave"
+                        >
+                          <IconTrashLines />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -788,12 +812,18 @@ const SinglePage = () => {
         doctorId={doctorId}
         fetchLeaveData={fetchLeaveData}
       />
+
+      <DeleteLeave
+        open={deleteLeaveModal}
+        closeModal={closeDeleteLeaveModal}
+        buttonLoading={buttonLoading}
+        leave={selectedLeave}
+        fetchLeaveData={fetchLeaveData}
+        selectedTimeSlots={selectedTimeSlots}
+        setSelectedTimeSlots={setSelectedTimeSlots}
+      />
     </div>
   );
 };
 
 export default SinglePage;
-
-
-
-

@@ -4,6 +4,7 @@ import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
+import { formatTime } from "../../../utils/formatTime";
 
 const AddLeave = ({
   open,
@@ -11,7 +12,7 @@ const AddLeave = ({
   buttonLoading,
   clinicId,
   doctorId,
-  fetchLeaveData
+  fetchLeaveData,
 }) => {
   const [leaveType, setLeaveType] = useState("Full Day");
   const [selectedDate, setSelectedDate] = useState("");
@@ -19,8 +20,18 @@ const AddLeave = ({
   const [endDate, setEndDate] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [timeSlots, setTimeSlots] = useState([]);
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
 
- 
+  const days = [
+    { name: "Sunday", id: "0" },
+    { name: "Monday", id: "1" },
+    { name: "Tuesday", id: "2" },
+    { name: "Wednesday", id: "3" },
+    { name: "Thursday", id: "4" },
+    { name: "Friday", id: "5" },
+    { name: "Saturday", id: "6" },
+  ];
+
   // Function to reset the form
   const resetForm = () => {
     setSelectedDate("");
@@ -30,7 +41,6 @@ const AddLeave = ({
     setTimeSlots([]);
   };
 
-  
   // Handle date change to fetch time slots
   const handleDateChange = async (e) => {
     const date = e.target.value;
@@ -41,7 +51,7 @@ const AddLeave = ({
 
     try {
       const response = await NetworkHandler.makePostRequest(
-        `/v1/doctor/getTimeSlot/${doctorId}`, 
+        `/v1/doctor/getTimeSlot/${doctorId}`,
         { date }
       );
       console.log("API Response:", response.data);
@@ -61,52 +71,76 @@ const AddLeave = ({
     }
   };
 
+  const getDayName = (dayId) => {
+    const day = days.find((d) => d.id === String(dayId));
+    return day ? day.name : "";
+  };
+
+  const handleTimeSlotChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setSelectedTimeSlots([...selectedTimeSlots, value]);
+    } else {
+      setSelectedTimeSlots(selectedTimeSlots.filter((id) => id !== value));
+    }
+  };
+
   // Handle leave submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let leaveData;
+
       if (leaveType === "Full Day") {
-        const leaveData = {
+        leaveData = {
           leaveslots: timeSlots.map((slot) => ({
             clinic_id: clinicId,
             DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
             leave_date: selectedDate,
           })),
         };
-        console.log(leaveData);
-        const response = await NetworkHandler.makePostRequest(
-          `/v1/doctor/createLeaveSlots/${doctorId}`, 
-          leaveData
-        );
-        showMessage("Leave added successfully.");
-      }else if (leaveType === "Multiple") {
-        const leaveData = {
+      } else if (leaveType === "Multiple") {
+        leaveData = {
           startDate: startDate,
           endDate: endDate,
           clinic_id: clinicId,
         };
-        console.log(leaveData);
-        const response = await NetworkHandler.makePostRequest(
-          `/v1/doctor/createBlukLeave/${doctorId}`,
-          leaveData
-        );
-        console.log(response);
-        showMessage("Bulk leave added successfully.");
+      } else if (leaveType === "By Shift") {
+        leaveData = {
+          leaveslots: selectedTimeSlots.map((slotId) => ({
+            clinic_id: clinicId,
+            DoctorTimeSlot_id: slotId,
+            leave_date: selectedDate,
+          })),
+        };
       }
+
+      // console.log("leaveData", leaveData);
+
+      const url =
+        leaveType === "Multiple"
+          ? `/v1/doctor/createBlukLeave/${doctorId}`
+          : `/v1/doctor/createLeaveSlots/${doctorId}`;
+      const response = await NetworkHandler.makePostRequest(url, leaveData);
+
+      showMessage(
+        leaveType === "Multiple"
+          ? "Bulk leave added successfully."
+          : "Leave added successfully."
+      );
+
       closeModal();
       fetchLeaveData();
       resetForm();
     } catch (error) {
       console.error("Error creating leave slots:", error);
       if (error.response && error.response.status === 404) {
-        showMessage("Leave already taken on the date","error");
+        showMessage("Leave already taken on the date", "error");
       } else {
-        showMessage("An error occurred while creating leave slots","error");
+        showMessage("An error occurred while creating leave slots", "error");
       }
     }
   };
-
-
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -250,6 +284,59 @@ const AddLeave = ({
                       </div>
                     )}
 
+                    {leaveType === "By Shift" && (
+                      <div className="mb-8 flex flex-col gap-5 justify-between">
+                        <div className="w-1/2">
+                          <label htmlFor="Date">Date</label>
+                          <input
+                            id="Date"
+                            type="date"
+                            className="form-input"
+                            value={selectedDate || ""}
+                            onChange={handleDateChange}
+                          />
+                          {errorMessage && (
+                            <div className="text-red-500 mt-2">
+                              {errorMessage}
+                            </div>
+                          )}
+                        </div>
+                        <div className="w-full">
+                          {timeSlots.length > 0 && (
+                            <div className="mt-5 w-full">
+                              <label className="block mb-2">
+                                Doctor Time Slots:
+                              </label>
+                              <div className="flex flex-wrap mt-2">
+                                {timeSlots.map((slot) => (
+                                  <div
+                                    key={slot.DoctorTimeSlot_id}
+                                    className="flex items-center mb-2"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      id={`slot-${slot.DoctorTimeSlot_id}`}
+                                      value={slot.DoctorTimeSlot_id}
+                                      className="form-checkbox mr-2 ml-2"
+                                      onChange={handleTimeSlotChange}
+                                    />
+                                    <label
+                                      htmlFor={`slot-${slot.DoctorTimeSlot_id}`}
+                                      className="badge badge-outline-dark text-gray-500 p-2 text-lg"
+                                    >
+                                      {getDayName(slot.day_id)}:{" "}
+                                      {formatTime(slot.startTime)} -{" "}
+                                      {formatTime(slot.endTime)}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex justify-end items-center mt-8">
                       <button
                         type="button"
@@ -271,8 +358,6 @@ const AddLeave = ({
                       </button>
                     </div>
                   </form>
-               
-
                 </div>
               </Dialog.Panel>
             </Transition.Child>

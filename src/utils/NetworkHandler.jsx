@@ -12,7 +12,7 @@ export const imageBaseUrl =
 export const dashboardUrl = "https://mydoctorsdashboard.gitdr.com/";
 
 // website url
-export const websiteUrl = "http://localhost:3000/clinic/";
+export const websiteUrl = "http://localhost:3000/";
 
 // Helper function to get stored token details
 function getStoredTokenDetails() {

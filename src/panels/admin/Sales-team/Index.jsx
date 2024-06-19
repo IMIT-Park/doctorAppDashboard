@@ -152,7 +152,6 @@ const Sales = () => {
     if (
       !input.name ||
       !input.email ||
-      !input.user_name ||
       !input.phone ||
       !input.address
     ) {

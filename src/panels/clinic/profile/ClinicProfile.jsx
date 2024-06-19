@@ -26,7 +26,7 @@ const ClinicProfile = () => {
   const userData = JSON.parse(userDetails);
   const clinicId = userData?.UserClinic?.[0]?.clinic_id || 0;
 
-  const qrUrl = `${websiteUrl}${clinicId}`;
+  const qrUrl = `${websiteUrl}clinic/${clinicId}`;
 
   useEffect(() => {
     dispatch(setPageTitle("Profile"));

@@ -15,6 +15,7 @@ const ShowSalesPerson = ({ open, closeModal, details }) => {
   useEffect(() => {
     if (details) {
       setMessage1(websiteUrl + details.salespersoncode);
+      setMessage1(`${websiteUrl}signup/${details?.salespersoncode}`);
     }
   }, [details]);
 

@@ -1,49 +1,32 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
-import IconEye from "../../../components/Icon/IconEye"; // Ensure this path is correct
+import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
-const AddSalesPerson = ({
+
+const AddSupportUser = ({
   open,
   closeModal,
   input,
   setInput,
   formSubmit,
   isEditMode,
-  emailError,
-  setEmailError,
   buttonLoading,
-  setButtonLoading,
-  showPassword,
-  setShowPassword,
-  showComfirmPassword,
-  setShowComfirmPassword,
 }) => {
-  const handleEmailChange = (e) => {
-    const email = e.target.value;
-    setInput({ ...input, email, user_name: email });
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailRegex.test(email)) {
-      setEmailError("");
-    } else {
-      setEmailError("Please enter a valid email address");
-    }
-  };
+  const [showPassword, setShowPassword] = useState(false);
+  const [showComfirmPassword, setShowComfirmPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setButtonLoading(true);
-    await formSubmit();
-    setButtonLoading(false);
+    formSubmit();
   };
 
   useEffect(() => {
-    // Check if input.email exists and set the username accordingly
     if (input.email) {
       setInput((prevInput) => ({
         ...prevInput,
-        user_name: input.email, // Extract username from email
+        user_name: input.email,
       }));
     }
   }, [input.email]);
@@ -87,7 +70,7 @@ const AddSalesPerson = ({
                   <IconX />
                 </button>
                 <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  {isEditMode ? "Edit Sales Person" : "Add Sales Person"}
+                  {isEditMode ? "Edit Support User" : "Add Support User"}
                 </div>
                 <div className="p-5">
                   <form>
@@ -112,29 +95,26 @@ const AddSalesPerson = ({
                         placeholder="Enter Email"
                         className="form-input form-input-green"
                         value={input?.email}
-                        onChange={handleEmailChange}
+                        onChange={(e) =>
+                          setInput({ ...input, email: e.target.value })
+                        }
+                        required
                       />
-                      {emailError && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {emailError}
-                        </p>
-                      )}
                     </div>
-                    {!isEditMode && (
-                      <div className="mb-5">
-                        <label htmlFor="user-name">User Name</label>
-                        <input
-                          id="user-name"
-                          type="text"
-                          placeholder="Enter User Name"
-                          className="form-input form-input-green"
-                          value={input?.user_name}
-                          onChange={(e) =>
-                            setInput({ ...input, user_name: e.target.value })
-                          }
-                        />
-                      </div>
-                    )}
+                    {!isEditMode &&
+                    <div className="mb-5">
+                      <label htmlFor="user-name">User Name</label>
+                      <input
+                        id="user-name"
+                        type="text"
+                        placeholder="Enter User Name"
+                        className="form-input form-input-green"
+                        value={input?.user_name}
+                        onChange={(e) =>
+                          setInput({ ...input, user_name: e.target.value })
+                        }
+                      />
+                    </div>}
                     <div className="mb-5">
                       <label htmlFor="phone">Phone Number</label>
                       <input
@@ -263,4 +243,4 @@ const AddSalesPerson = ({
   );
 };
 
-export default AddSalesPerson;
+export default AddSupportUser;

@@ -117,6 +117,7 @@ const Owners = () => {
                   title: "Active",
                   textAlignment: "center",
                   render: (user) => (
+                    <div className="grid place-items-center">
                     <label className="w-[46px] h-[22px] relative">
                       <input
                         type="checkbox"
@@ -127,7 +128,7 @@ const Owners = () => {
                         disabled
                       />
                       <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                    </label>
+                    </label></div>
                   ),
                 },
               ]}

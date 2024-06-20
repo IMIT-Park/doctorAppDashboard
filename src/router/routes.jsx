@@ -40,7 +40,7 @@ const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
 const OwnerSubscriptionPlans = lazy(() =>
   import("../panels/owner/subscription-plans/Index")
 );
-
+const OwnerChat = lazy(() => import("../panels/owner/chats/Index"));
 // <--------------> owner panel imports ends here <-------------->
 
 // <--------------> clinic panel imports starts here<-------------->
@@ -74,6 +74,9 @@ const SalesOwners = lazy(() => import("../panels/sales/owners/Owners"));
 
 // <--------------> supportUser panel imports starts here<-------------->
 const SupportUserIndex = lazy(() => import("../panels/supportUser/Index"));
+const SupportUserChats = lazy(() =>
+  import("../panels/supportUser/chats/Index")
+);
 // <--------------> supportUser panel imports ends here <-------------->
 
 // <--------------> clinic single-view imports starts here <-------------->
@@ -224,6 +227,13 @@ const routes = [
     layout: "default",
   },
 
+  //owner subscription plans
+  {
+    path: "/owner/chat",
+    element: <OwnerChat />,
+    layout: "default",
+  },
+
   // <--------------> owner panel ends here <-------------->
 
   // <--------------> clinic panel starts here <-------------->
@@ -310,15 +320,22 @@ const routes = [
 
   // <--------------> sales panel ends here <-------------->
 
-  // <--------------> sales panel starts here <-------------->
+  // <--------------> support-user panel starts here <-------------->
 
   // dashboard
   {
-    path: "/support/dashboard",
+    path: "/supportuser/dashboard",
     element: <SupportUserIndex />,
     layout: "default",
   },
-  // <--------------> sales panel ends here <-------------->
+
+  // chats
+  {
+    path: "/supportuser/chats",
+    element: <SupportUserChats />,
+    layout: "default",
+  },
+  // <--------------> support-user sales panel ends here <-------------->
 
   // <--------------> doctor single-view starts here <-------------->
   {

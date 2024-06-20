@@ -116,6 +116,8 @@ const LoginBoxed = () => {
           navigate("/doctor/dashboard");
         } else if (user?.role_id === 5) {
           navigate("/sales/dashboard");
+        } else if (user?.role_id === 6) {
+          navigate("/supportuser/dashboard");
         } else {
           navigate("/admin/dashboard");
         }

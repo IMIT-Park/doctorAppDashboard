@@ -4,8 +4,12 @@ import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
 
-const DeleteSupportPerson = ({ open, closeModal,handleSubmit }) => {
-
+const DeleteSupportPerson = ({
+  open,
+  closeModal,
+  handleSubmit,
+  buttonLoading,
+}) => {
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -45,14 +49,14 @@ const DeleteSupportPerson = ({ open, closeModal,handleSubmit }) => {
                   <IconX />
                 </button>
                 <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  Delete Message
+                  Delete Support User
                 </div>
                 <div className="p-5 text-center">
                   <div className="text-white bg-danger ring-4 ring-danger/30 p-4 rounded-full w-fit mx-auto">
                     <IconTrashLines className="w-7 h-7 mx-auto" />
                   </div>
                   <div className="sm:w-full mx-auto mt-5">
-                    Are you sure you want to delete this Message?
+                    Are you sure you want to delete this Support User?
                   </div>
 
                   <div className="flex justify-center items-center mt-8">
@@ -68,7 +72,11 @@ const DeleteSupportPerson = ({ open, closeModal,handleSubmit }) => {
                       className="btn btn-green ltr:ml-4 rtl:mr-4"
                       onClick={handleSubmit}
                     >
-                      Delete
+                      {buttonLoading ? (
+                        <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle" />
+                      ) : (
+                        "Delete"
+                      )}
                     </button>
                   </div>
                 </div>

@@ -8,22 +8,17 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import NetworkHandler from "../../../utils/NetworkHandler";
-import IconCaretDown from "../../../components/Icon/IconCaretDown";
-import { showMessage } from "../../../utils/showMessage";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import IconUserPlus from "../../../components/Icon/IconUserPlus";
 import AddSupportUser from "./AddSupportUser";
 import IconEdit from "../../../components/Icon/IconEdit";
-import IconEye from "../../../components/Icon/IconEye";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import DeleteSupportPerson from "./DeleteSupportPerson";
+import { showMessage } from "../../../utils/showMessage";
 
 const SupportUser = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { salesId } = useParams();
 
   useEffect(() => {
     dispatch(setPageTitle("Support User"));
@@ -175,7 +170,7 @@ const SupportUser = () => {
     setEditModal(false);
   };
 
-  //Edit Sales Person function
+  //Edit support user function
   const editSupportUser = async () => {
     if (
       !input.name ||
@@ -236,19 +231,18 @@ const SupportUser = () => {
         `/v1/supportuser/deleteSupportuser/${supportPersonId}`,
         input
       );
-      console.log(response);
-      // if (response.status === 200) {
-      //   showMessage("Support User Deleted successfully.");
-      //   setButtonLoading(false);
-      //   closeDeleteModal();
-      //   fetchData();
-      // } else {
-      //   showMessage(
-      //     "Failed to delete support user. Please try again.",
-      //     "error"
-      //   );
-      //   setButtonLoading(false);
-      // }
+      if (response.status === 201) {
+        showMessage("Support User Deleted successfully.");
+        setButtonLoading(false);
+        closeDeleteModal();
+        fetchData();
+      } else {
+        showMessage(
+          "Failed to delete support user. Please try again.",
+          "error"
+        );
+        setButtonLoading(false);
+      }
     } catch (error) {
       setButtonLoading(false);
 
@@ -323,7 +317,7 @@ const SupportUser = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <div className="flex gap-4 items-center w-max mx-auto">
+                    <div className="flex gap-5 items-center w-max mx-auto">
                       <Tippy
                         content={rowData?.User?.status ? "Block" : "Unblock"}
                       >
@@ -347,18 +341,6 @@ const SupportUser = () => {
                           />
                           <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
                         </label>
-                      </Tippy>
-
-                      <Tippy content="View">
-                        <button
-                          className="flex hover:text-primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openViewMessage();
-                          }}
-                        >
-                          <IconEye className="" />
-                        </button>
                       </Tippy>
                       <Tippy content="Edit">
                         <button

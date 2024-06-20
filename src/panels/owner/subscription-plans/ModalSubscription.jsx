@@ -7,37 +7,70 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import IconLockDots from "../../../components/Icon/IconLockDots";
 import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
+import NetworkHandler from "../../../utils/NetworkHandler";
+import {formatDate} from "../../../utils/formatDate"
 
 const ModalPage = ({
   open,
   closeModal,
   buttonLoading,
-
+  ownerId,
+  clinicId
 }) => {
- 
+
+  const [loading, setLoading] = useState(false);
+
   const [selectedClinics, setSelectedClinics] = useState([]);
+  const [subscriptionData, setSubscriptionData] = useState(null);
+  const [allPlans, setAllPlans] = useState([]);
 
-  // Simulated clinics data for demonstration
-  const clinics = [
-    { id: 1, name: "Clinic A" },
-    { id: 2, name: "Clinic B" },
-    { id: 3, name: "Clinic C" },
-  ];
-
-  const handleCheckboxChange = (clinicId) => {
-    if (selectedClinics.includes(clinicId)) {
-      setSelectedClinics((prev) => prev.filter((id) => id !== clinicId));
-    } else {
-      setSelectedClinics((prev) => [...prev, clinicId]);
+  const fetchSubscriptionData = async () => {
+    try {
+      setLoading(true);
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/subscription/getsubscription/${clinicId}`
+      );
+      if (response?.status === 201) {
+        setSubscriptionData(response?.data?.Subscriptions);
+      } else {
+        setSubscriptionData(null);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setSubscriptionData(null);
+      } else {
+        console.error("Error fetching subscription data:", error);
+      }
+    } finally {
+      setLoading(false);
     }
   };
+  useEffect(() => {
+    fetchSubscriptionData();
+  }, []);
+console.log(subscriptionData);
 
-  const handleConfirmPurchase = () => {
-    // Implement purchase logic with selectedClinics and planId
-    console.log("Confirming purchase for planId:", planId);
-    console.log("Selected clinics:", selectedClinics);
-    // Add your logic to finalize purchase
-  };
+
+const fetchPlanDetails = async () => {
+  setLoading(true);
+  try {
+    const response = await NetworkHandler.makeGetRequest(
+      `/v1/plans/getallplans`
+    );
+    console.log(response.data);
+    setAllPlans(response?.data?.Plans?.rows || []);
+  } catch {
+    setLoading(false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchPlanDetails();
+}, []);
+
+
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -78,8 +111,60 @@ const ModalPage = ({
                   <IconX />
                 </button>
                 <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  Add Clinic
+                  Subscription Plans
                 </div>
+
+
+
+                {subscriptionData ? (
+                       <>
+                <div className="flex justify-between mb-4 p-4">
+                        <div>
+                          <h2 className="text-lg font-semibold">
+                            Plan Name: {subscriptionData?.Plan?.plan_name}
+                          </h2>
+                          <p className="text-sm text-gray-500">
+                            Subscription ID: {subscriptionData?.subscription_id}
+                          </p>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="bg-green-100 text-green-600 dark:bg-green-600 dark:text-white px-2 py-1 rounded-md text-xs font-semibold uppercase">
+                            {subscriptionData?.status}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="border-t border-gray-200 dark:border-gray-700 pt-4 p-4">
+                        <p className="text-sm text-gray-500">
+                          Start Date: {formatDate(subscriptionData?.start_date)}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          End Date: {formatDate(subscriptionData?.end_date)}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Next Billing Date: {formatDate(subscriptionData?.next_billing_date)}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Price per Doctor: ${subscriptionData?.Plan?.price_per_doctor}
+                        </p>
+                      </div>
+                         </>
+     ) : (
+      <div>
+      <p className="text-sm text-gray-500 ps-4">No subscription data found. Available Plans:</p>
+      <div className="mt-4 space-y-4">
+        {allPlans.map((plan) => (
+          <div key={plan.plan_id} className="border p-4 rounded-lg">
+            <h3 className="text-lg font-semibold">{plan.plan_name}</h3>
+            <p className="text-sm text-gray-500">Price per Doctor: ${plan.price_per_doctor}</p>
+            <p className="text-sm text-gray-500">Frequency: {plan.frequency_in_days} days</p>
+          </div>
+        ))}
+      </div>
+    </div>
+    )}
+
+
+
                 <div className="p-5">
                     <div className="flex justify-end items-center mt-8">
                       <button

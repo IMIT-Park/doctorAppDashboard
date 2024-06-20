@@ -174,6 +174,22 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+                <li className="nav-item">
+                  <NavLink to="/owner/chat" className="group">
+                    <div className="flex items-center">
+                      <IconMenuChat
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "owner-subscription-plans"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Chat"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
               </ul>
             ) : role === 3 ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
@@ -321,6 +337,41 @@ const Sidebar = () => {
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Owners"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+              </ul>
+            ) : role === 6 ? (
+              <ul className="relative font-semibold space-y-0.5 p-4 py-0">
+                <li className="nav-item">
+                  <NavLink to="/supportuser/dashboard" className="group">
+                    <div className="flex items-center">
+                      <IconMenuDashboard
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "sales-dashboard"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Dashboard"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/supportuser/chats" className="group">
+                    <div className="flex items-center">
+                      <IconMenuChat
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "sales-dashboard"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Chats"}
                       </span>
                     </div>
                   </NavLink>

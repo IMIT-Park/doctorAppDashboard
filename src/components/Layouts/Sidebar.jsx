@@ -457,15 +457,15 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/admin/reports" className="group">
+                  <NavLink to="/admin/complaints" className="group">
                     <div className="flex items-center">
                       <IconMenuDocumentation
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "admin-reports" ? "!text-primary" : ""
+                          currentMenu === "admin-complaints" ? "!text-primary" : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Reports"}
+                        {"Complaints"}
                       </span>
                     </div>
                   </NavLink>

@@ -18,7 +18,7 @@ const AdminOwnerSingleView = lazy(() =>
 );
 const AdminClinics = lazy(() => import("../panels/admin/clinics/Index"));
 const AdminDoctors = lazy(() => import("../panels/admin/doctors/Index"));
-const AdminReports = lazy(() => import("../panels/admin/reports/Index"));
+const AdminComplaints = lazy(() => import("../panels/admin/complaints/Index"));
 const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
 const AdminSalesOwners = lazy(() =>
   import("../panels/admin/Sales-team/owners/Index")
@@ -153,8 +153,8 @@ const routes = [
   },
   // reports
   {
-    path: "/admin/reports",
-    element: <AdminReports />,
+    path: "/admin/complaints",
+    element: <AdminComplaints />,
     layout: "default",
   },
 

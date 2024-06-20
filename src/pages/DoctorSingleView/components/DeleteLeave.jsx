@@ -9,9 +9,7 @@ const DeleteLeave = ({
   open,
   closeModal,
   buttonLoading,
-  clinicId,
-  doctorId,
-  //   fetchLeaveData,
+  fetchLeaveData,
   leave,
   selectedTimeSlots,
   setSelectedTimeSlots,
@@ -35,27 +33,27 @@ const DeleteLeave = ({
         leave_id: leaveItem.leave_id,
       }));
       setTimeSlots(extractedTimeSlots);
+      setSelectedTimeSlots([]); 
     } else {
       setTimeSlots([]);
     }
   }, [open, leave]);
 
+
   const handleTimeSlotChange = (e) => {
     const { value, checked } = e.target;
-    const selectedSlot = timeSlots.find(
-      (slot) => slot.DoctorTimeSlot_id === parseInt(value)
-    );
+    const leaveId = parseInt(value);
 
-    if (checked && selectedSlot) {
-      setSelectedTimeSlots([...selectedTimeSlots, selectedSlot]);
+    if (checked) {
+      setSelectedTimeSlots((prevSelected) => [...prevSelected, leaveId]);
     } else {
-      setSelectedTimeSlots(
-        selectedTimeSlots.filter(
-          (slot) => slot.DoctorTimeSlot_id !== parseInt(value)
-        )
+      setSelectedTimeSlots((prevSelected) =>
+        prevSelected.filter((id) => id !== leaveId)
       );
     }
   };
+
+
 
   const getDayName = (dayId) => {
     const day = days.find((d) => d.id === String(dayId));
@@ -65,13 +63,13 @@ const DeleteLeave = ({
   const handleDelete = async (e) => {
     e.preventDefault();
 
-    const timeSlotIdsToDelete = selectedTimeSlots.map((slot) => slot.leave_id);
+    console.log("Time slots to delete:", selectedTimeSlots);
 
     try {
       const response = await NetworkHandler.makeDeleteRequest(
         "/v1/doctor/deleteLeaveSlot",
         {
-          leave_ids: timeSlotIdsToDelete,
+          leave_ids: selectedTimeSlots,
         }
       );
       console.log("Delete successful:", response.data);
@@ -81,8 +79,8 @@ const DeleteLeave = ({
       console.error("Delete error:", error);
     }
   };
-
   console.log("selectedTimeSlots", selectedTimeSlots);
+
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -134,18 +132,18 @@ const DeleteLeave = ({
                       <div className="flex flex-wrap mt-2">
                         {timeSlots.map((slot) => (
                           <div
-                            key={slot.DoctorTimeSlot_id}
+                            key={slot.leave_id}
                             className="flex items-center mb-2"
                           >
                             <input
                               type="checkbox"
-                              id={`slot-${slot.DoctorTimeSlot_id}`}
-                              value={slot.DoctorTimeSlot_id}
+                              id={`slot-${slot.leave_id}`}
+                              value={slot.leave_id}
                               className="form-checkbox mr-2 ml-2"
                               onChange={handleTimeSlotChange}
                             />
                             <label
-                              htmlFor={`slot-${slot.DoctorTimeSlot_id}`}
+                              htmlFor={`slot-${slot.leave_id}`}
                               className="badge badge-outline-dark text-gray-500 p-2 text-lg"
                             >
                               {getDayName(slot.day_id)}:{" "}

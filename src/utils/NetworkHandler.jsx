@@ -1,10 +1,9 @@
 import axios from "axios";
 
 export const baseUrl =
-  "https://doctorbackend.gitdr.com/api";
-  
-export const imageBaseUrl =
-  "https://aeda-2405-201-f018-10d6-605d-8aa4-161b-1443.ngrok-free.app/";
+  "https://4429-2405-201-f018-10d6-fdb6-68ab-422e-981e.ngrok-free.app/api";
+
+export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
 
 // export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
 
@@ -54,7 +53,7 @@ class NetworkHandler {
           const { refreshToken } = getStoredTokenDetails();
           try {
             const response = await this.#axios.post("/v1/auth/refreshToken", {
-              refreshToken,
+              RefreshToken: refreshToken,
             });
             const { accessToken } = response.data;
             sessionStorage.setItem("accessToken", accessToken);
@@ -101,7 +100,3 @@ class NetworkHandler {
 }
 
 export default new NetworkHandler();
-
-
-
-

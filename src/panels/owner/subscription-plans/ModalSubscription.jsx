@@ -8,21 +8,18 @@ import IconLockDots from "../../../components/Icon/IconLockDots";
 import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
 import NetworkHandler from "../../../utils/NetworkHandler";
-import {formatDate} from "../../../utils/formatDate"
+import { formatDate } from "../../../utils/formatDate";
 
-const ModalPage = ({
-  open,
-  closeModal,
-  buttonLoading,
-  ownerId,
-  clinicId
-}) => {
-
+const ModalPage = ({ open, closeModal, buttonLoading,setButtonLoading, ownerId, clinicId }) => {
   const [loading, setLoading] = useState(false);
 
   const [selectedClinics, setSelectedClinics] = useState([]);
   const [subscriptionData, setSubscriptionData] = useState(null);
   const [allPlans, setAllPlans] = useState([]);
+  const [selectedPlans, setSelectedPlans] = useState({});
+  
+
+  console.log(clinicId);
 
   const fetchSubscriptionData = async () => {
     try {
@@ -30,6 +27,7 @@ const ModalPage = ({
       const response = await NetworkHandler.makeGetRequest(
         `/v1/subscription/getsubscription/${clinicId}`
       );
+      console.log("response", response);
       if (response?.status === 201) {
         setSubscriptionData(response?.data?.Subscriptions);
       } else {
@@ -45,33 +43,71 @@ const ModalPage = ({
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchSubscriptionData();
+  }, [clinicId]);
+
+  console.log(subscriptionData);
+
+  const fetchPlanDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/plans/getallplans`
+      );
+      console.log(response.data);
+      setAllPlans(response?.data?.Plans?.rows || []);
+    } catch {
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlanDetails();
   }, []);
-console.log(subscriptionData);
 
 
-const fetchPlanDetails = async () => {
-  setLoading(true);
-  try {
-    const response = await NetworkHandler.makeGetRequest(
-      `/v1/plans/getallplans`
-    );
-    console.log(response.data);
-    setAllPlans(response?.data?.Plans?.rows || []);
-  } catch {
-    setLoading(false);
-  } finally {
-    setLoading(false);
-  }
-};
+  const handlePlanSelection = (planId) => {
+    setSelectedPlans((prevSelectedPlans) => ({
+      ...prevSelectedPlans,
+      [planId]: !prevSelectedPlans[planId],
+    }));
+  };
 
-useEffect(() => {
-  fetchPlanDetails();
-}, []);
+  const createSubscription = async () => {
+    try {
+      setButtonLoading(true);
+      const selectedPlanId = Object.keys(selectedPlans).find(
+        (planId) => selectedPlans[planId]
+      );
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/subscription/createsubscription`,
+        {
+          plan_id: selectedPlanId,
+          owner_id: ownerId,
+          clinic_id: clinicId,
+        }
+      );console.log(response);
+      if (response?.status === 201) {
+        console.log("Subscription Created Successfully", response?.data);console.log(response);
+        showMessage("Plans updated successfully.", "success");
+        closeModal(); // Close modal after successful creation
+      }
+    } catch (error) {
+      console.error("Error creating subscription:", error);
+      showMessage("An error occurred. Please try again.", "error");
+
+    } finally {
+      setButtonLoading(false);
+    }
+  };
 
 
 
+  
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -110,81 +146,113 @@ useEffect(() => {
                 >
                   <IconX />
                 </button>
-                <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
+                <div className="text-lg  font-semibold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px] pb-1">
                   Subscription Plans
                 </div>
 
-
-
                 {subscriptionData ? (
-                       <>
-                <div className="flex justify-between mb-4 p-4">
-                        <div>
-                          <h2 className="text-lg font-semibold">
-                            Plan Name: {subscriptionData?.Plan?.plan_name}
-                          </h2>
-                          <p className="text-sm text-gray-500">
-                            Subscription ID: {subscriptionData?.subscription_id}
-                          </p>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="bg-green-100 text-green-600 dark:bg-green-600 dark:text-white px-2 py-1 rounded-md text-xs font-semibold uppercase">
-                            {subscriptionData?.status}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="border-t border-gray-200 dark:border-gray-700 pt-4 p-4">
+                  <>
+                    <div className="flex justify-between mb-4 p-4">
+                      <div>
+                        <h2 className="text-lg font-semibold">
+                          Plan Name: {subscriptionData?.Plan?.plan_name}
+                        </h2>
                         <p className="text-sm text-gray-500">
-                          Start Date: {formatDate(subscriptionData?.start_date)}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          End Date: {formatDate(subscriptionData?.end_date)}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Next Billing Date: {formatDate(subscriptionData?.next_billing_date)}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Price per Doctor: ${subscriptionData?.Plan?.price_per_doctor}
+                          Subscription ID: {subscriptionData?.subscription_id}
                         </p>
                       </div>
-                         </>
-     ) : (
-      <div>
-      <p className="text-sm text-gray-500 ps-4">No subscription data found. Available Plans:</p>
-      <div className="mt-4 space-y-4">
-        {allPlans.map((plan) => (
-          <div key={plan.plan_id} className="border p-4 rounded-lg">
-            <h3 className="text-lg font-semibold">{plan.plan_name}</h3>
-            <p className="text-sm text-gray-500">Price per Doctor: ${plan.price_per_doctor}</p>
-            <p className="text-sm text-gray-500">Frequency: {plan.frequency_in_days} days</p>
-          </div>
-        ))}
-      </div>
-    </div>
-    )}
-
-
+                      <div className="flex items-center">
+                        <span className="bg-green-100 text-green-600 dark:bg-green-600 dark:text-white px-2 py-1 rounded-md text-xs font-semibold uppercase">
+                          {subscriptionData?.status}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4 p-4">
+                      <p className="text-sm text-gray-500">
+                        Start Date: {formatDate(subscriptionData?.start_date)}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        End Date: {formatDate(subscriptionData?.end_date)}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Next Billing Date:{" "}
+                        {formatDate(subscriptionData?.next_billing_date)}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Price per Doctor: $
+                        {subscriptionData?.Plan?.price_per_doctor}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                  <p className="text-sm text-gray-500 ps-4 text-[16px]">
+                    No subscription data found. Available Plans:
+                  </p>
+                  <div className="mt-6 flex gap-3 items-start mx-2 flex-wrap sm:flex-nowrap">
+                    {allPlans.length > 0 ? (
+                      <>
+                        {allPlans.map((plan, index) => (
+                          <div
+                            key={plan.plan_id}
+                            className="w-full"
+                            onClick={() => handlePlanSelection(plan.plan_id)}
+                          >
+                            <div className="border p-4 rounded-lg flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                className="mr-4"
+                                checked={!!selectedPlans[plan.plan_id]}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  handlePlanSelection(plan.plan_id);
+                                }}
+                              />
+                              <div>
+                                <h3 className="text-lg font-semibold">{plan.plan_name}</h3>
+                                <p className="text-sm text-gray-500">
+                                  Price per Doctor: ${plan.price_per_doctor}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  Frequency: {plan.frequency_in_days} days
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    ) : (
+                      <p>No plans available</p>
+                    )}
+                  </div>
+                </div>
+                
+                
+                
+                
+                )}
 
                 <div className="p-5">
-                    <div className="flex justify-end items-center mt-8">
-                      <button
-                        type="button"
-                        className="btn btn-outline-danger"
-                        onClick={closeModal}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                      >
-                        {buttonLoading ? (
-                          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-0 rtl:mr-0 shrink-0" />
-                        ) : (
-                          "Add"
-                        )}
-                      </button>
-                    </div>
+                  <div className="flex justify-end items-center mt-8">
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger"
+                      onClick={closeModal}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                      onClick={createSubscription}
+                    >
+                      {buttonLoading ? (
+                        <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-0 rtl:mr-0 shrink-0" />
+                      ) : (
+                        "Confirm"
+                      )}
+                    </button>
+                  </div>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

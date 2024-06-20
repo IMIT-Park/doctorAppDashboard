@@ -278,11 +278,10 @@ const Clinics = () => {
     useBlockUnblock(fetchData);
 
 
-    const handleSubButtonClick = () => {
+    const handleSubButtonClick = (clinic) => {
+      setCurrentClinicId(clinic.clinic_id);
       setsubscriptionAddModal(true);
     };
-
-
 
 
   return (
@@ -354,13 +353,13 @@ const Clinics = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleSubButtonClick();
+                        handleSubButtonClick(rowData);
  
 
                       }}
-                      className="btn btn-success btn-sm py-1"
+                      className="btn btn-green btn-sm py-1"
                     >
-                      sub
+                      View Plan
                     </button>
                   ),
                 },
@@ -469,6 +468,9 @@ const Clinics = () => {
       open={subscriptionAddModal}
       closeModal={closeSubscriptionModal}
       clinicId = {currentClinicId}
+      ownerId= {ownerId}
+      buttonLoading={buttonLoading}
+      setButtonLoading = {setButtonLoading}
       
        />
       

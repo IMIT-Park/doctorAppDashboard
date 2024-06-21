@@ -74,7 +74,7 @@ const AddDoctor = ({
                     <li>
                       <div
                         className={`${
-                          activeTab === 1 ? "!bg-primary text-white" : ""
+                          activeTab === 1 ? "!bg-green-800 text-white" : ""
                         }
                                             block rounded-full bg-[#f3f2ee] p-2.5 dark:bg-[#1b2e4b]`}
                         onClick={() => setActiveTab(1)}
@@ -86,7 +86,7 @@ const AddDoctor = ({
                     <li>
                       <div
                         className={`${
-                          activeTab === 2 ? "!bg-primary text-white" : ""
+                          activeTab === 2 ? "!bg-green-800 text-white" : ""
                         } block rounded-full bg-[#f3f2ee] p-2.5 dark:bg-[#1b2e4b]`}
                         onClick={() => setActiveTab(2)}
                       >
@@ -97,7 +97,7 @@ const AddDoctor = ({
                     <li>
                       <div
                         className={`${
-                          activeTab === 3 ? "!bg-primary text-white" : ""
+                          activeTab === 3 ? "!bg-green-800 text-white" : ""
                         } block rounded-full bg-[#f3f2ee] p-2.5 dark:bg-[#1b2e4b]`}
                         onClick={() => setActiveTab(3)}
                       >
@@ -136,7 +136,7 @@ const AddDoctor = ({
                   <div className="flex justify-between">
                     <button
                       type="button"
-                      className={`btn btn-primary ${
+                      className={`btn btn-green ${
                         activeTab === 1 ? "hidden" : ""
                       }`}
                       onClick={() => setActiveTab(activeTab === 3 ? 2 : 1)}
@@ -145,7 +145,7 @@ const AddDoctor = ({
                     </button>
                     <button
                       type="button"
-                      className="btn btn-primary ltr:ml-auto rtl:mr-auto"
+                      className="btn btn-green ltr:ml-auto rtl:mr-auto"
                       onClick={(e) =>
                         activeTab === 3
                           ? handleSubmit(e)

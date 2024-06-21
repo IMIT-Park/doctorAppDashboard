@@ -102,7 +102,7 @@ const Patients = () => {
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
+      {/* <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
         <ul className="flex space-x-2 rtl:space-x-reverse mb-2">
           <li>
             <Link to="/clinic/bookings" className="text-primary hover:underline">
@@ -118,7 +118,7 @@ const Patients = () => {
             <span>Booking</span>
           </li>
         </ul>
-      </div>
+      </div> */}
 
       <div className="panel mb-1">
         {/* <div className="flex justify-between flex-wrap gap-4 sm:px-4">
@@ -148,7 +148,6 @@ const Patients = () => {
         </div> */}
         <div className="text-left sm:px-4 mt-5">
           {" "}
-          {/*mt-5 */}
           <div className="mt-5">
           <div className="text-2xl font-semibold capitalize mb-2">Patient</div> 
             <div className="flex items-center sm:gap-2 flex-wrap mb-2 sm:mb-1">
@@ -185,11 +184,11 @@ const Patients = () => {
 
         <div className="flex flex-col md:flex-row gap-4 justify-center">
           <div className="border-gray-300 p-2 mb-4 w-full sm:w-max mt-5 md:order-1">
-            <div className="border border-gray-300 p-2 mb-4 text-center w-full md:w-36  font-semibold">
+            <div className="border border-blue-300 rounded p-2 mb-4 text-center text-green-800 w-full md:w-36 font-semibold text-lg">
               Select Date
             </div>
             <div className="flex items-start my-6 justify-center md:justify-start">
-              <div className="form-input-wrapper  md:max-w-xs mx-auto md:mx-0">
+              <div className="form-input-wrapper mt-5 md:max-w-xs mx-auto md:mx-0">
                 <Flatpickr
                   // value={date1}
                   placeholder="Select date"
@@ -205,16 +204,16 @@ const Patients = () => {
             </div>
           </div>
           <div className=" border-gray-300 p-2 mb-4 w-full md:w-8/12 mt-5 mr-5 order-2 md:order-2 mx-auto md:mx-0">
-            <div className="border border-gray-300 p-2 text-center mb-4 w-full lg:w-36 md:w-36 sm:w-80 font-semibold">
+            <div className="border border-blue-300 rounded p-2 text-center text-green-800 mb-4 w-full lg:w-36 md:w-36 sm:w-80 font-semibold text-lg">
               Select Time
             </div>
             <div className="flex flex-col items-start my-6">
               <div className=" w-full p-2 pb-4">
-                <div className="w-full sm:w-20 p-1 font-semibold text-lg">
+                <div className="w-full sm:w-20 p-1 font-semibold text-green-800 text-2xl">
                   Morning
                 </div>
 
-                <div className="flex flex-wrap gap-3 md:gap-3">
+                <div className="flex flex-wrap text-base gap-3 md:gap-3">
                   {[
                     "10:00 AM",
                     "10:30 AM",
@@ -225,9 +224,9 @@ const Patients = () => {
                   ].map((time) => (
                     <div
                       key={time}
-                      className={`p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-500 ${
+                      className={`p-3 w-24 h-10 mt-3 cursor-pointer pb-8 rounded text-center hover:bg-green-500 ${
                         selectedTime === time && !isTimeDisabled
-                          ? "bg-blue-500 text-white"
+                          ? "bg-green-800 text-white"
                           : ""
                       }`}
                       onClick={() => handleTimeSelection(time)}
@@ -241,28 +240,28 @@ const Patients = () => {
 
             <div className="flex flex-col items-start my-6">
               <div className=" w-full p-2 pb-4">
-                <div className="w-full sm:w-20 p-1 font-semibold text-lg">
+                <div className="w-full sm:w-20 p-1 font-semibold text-green-800 text-2xl">
                   Afternoon
                 </div>
-                <div className="flex flex-wrap gap-3 md:gap-3">
+                <div className="flex flex-wrap text-base gap-3 md:gap-3">
                   {[
-                    "1:00 PM",
-                    "1:30 PM",
-                    "2:00 PM",
-                    "2:30 PM",
-                    "3:00 PM",
-                    "3:30 PM",
-                    "4:00 PM",
-                    "4:30 PM",
-                    "5:00 PM",
-                    "5:30 PM",
-                    "6:00 PM",
+                    "01:00 PM",
+                    "01:30 PM",
+                    "02:00 PM",
+                    "02:30 PM",
+                    "03:00 PM",
+                    "03:30 PM",
+                    "04:00 PM",
+                    "04:30 PM",
+                    "05:00 PM",
+                    "05:30 PM",
+                    "06:00 PM",
                   ].map((time) => (
                     <div
                       key={time}
-                      className={`p-3 w-24 h-10 mt-3 cursor-pointer text-center hover:bg-blue-500 ${
+                      className={`p-3 w-24 h-10 mt-3 cursor-pointer pb-8 rounded text-center hover:bg-green-500 ${
                         selectedTime === time && !isTimeDisabled
-                          ? "bg-blue-500 text-white"
+                          ? "bg-green-800 text-white"
                           : ""
                       }`}
                       onClick={() => handleTimeSelection(time)}
@@ -275,7 +274,7 @@ const Patients = () => {
             </div>
             <div className="flex items-start flex-wrap gap-2 ml-6">
               <div className="flex items-center gap-1 ">
-                <div className="border p-2 bg-blue-500"></div>
+                <div className="border p-2 bg-green-800"></div>
                 <div className="mr-3">Selected</div>
               </div>
               <div className="flex items-center gap-1 ">

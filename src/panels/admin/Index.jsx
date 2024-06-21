@@ -282,16 +282,16 @@ const Index = () => {
     <div>
       <ul className="flex justify-between space-x-2 rtl:space-x-reverse">
         <li className="ltr:before:mr-2 rtl:before:ml-2">
-          <span>Dashboard</span>
+          {/* <span>Dashboard</span> */}
         </li>
         <div className="flex items-center gap-2">
-          <button type="button" className="btn btn-primary">
-             Year
+          <button type="button" className="btn btn-green">
+            Year
           </button>
-          <button type="button" className="btn btn-outline-primary">
-          Month
+          <button type="button" className="btn btn-outline-green">
+            Month
           </button>{" "}
-          <button type="button" className="btn btn-outline-primary">
+          <button type="button" className="btn btn-outline-green">
             Week
           </button>
         </div>
@@ -410,18 +410,18 @@ const Index = () => {
                     offset={[0, 1]}
                     placement="bottom-end"
                     button={
-                      <IconHorizontalDots className="text-black/70 dark:text-white/70 hover:!text-primary" />
+                      <IconHorizontalDots className="text-black/70 dark:text-white/70 hover:!text-green-800" />
                     }
                   >
                     <ul>
                       <li>
-                        <button type="button">Weekly</button>
+                        <button type="button" className="hover:!text-green-800">Weekly</button>
                       </li>
                       <li>
-                        <button type="button">Monthly</button>
+                        <button type="button" className="hover:!text-green-800">Monthly</button>
                       </li>
                       <li>
-                        <button type="button">Yearly</button>
+                        <button type="button" className="hover:!text-green-800">Yearly</button>
                       </li>
                     </ul>
                   </Dropdown>

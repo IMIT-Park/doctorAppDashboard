@@ -38,7 +38,7 @@ const SubscriptionPlans = () => {
   return (
     <div className="panel">
       <div className="">
-        <div className="max-w-[320px] md:max-w-[990px] mx-auto">
+        <div className="max-w-[320px] md:max-w-[990px] mx-auto mt-16 mb-16">
           {loading ? (
             <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
           ) : (
@@ -46,10 +46,10 @@ const SubscriptionPlans = () => {
               {allPlans.map((plan, index) => (
                 <div
                   key={index}
-                  className="p-3 lg:p-5 border border-black dark:border-[#1b2e4b] text-center rounded group hover:border-primary"
+                  className="p-3 lg:p-5 border border-black dark:border-[#1b2e4b] text-center rounded group hover:border-green-900"
                 >
                   <h3 className="text-xl lg:text-2xl">{plan.plan_name}</h3>
-                  <div className="border-t border-black dark:border-white-dark w-1/5 mx-auto my-6 group-hover:border-primary"></div>
+                  <div className="border-t border-black dark:border-white-dark w-1/5 mx-auto my-6 group-hover:border-green-900"></div>
                   <p className="text-[15px]">
                     {plan.description ||
                       "For people who are starting out in the water saving business"}

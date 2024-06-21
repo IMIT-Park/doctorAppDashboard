@@ -154,7 +154,7 @@ const SelectDays = ({
                       <button
                         type="button"
                         className={`p-3 w-full flex items-center justify-between text-white-dark dark:bg-[#1b2e4b] ${
-                          active === day.id ? "!text-primary" : ""
+                          active === day.id ? "!text-green-800" : ""
                         }`}
                         onClick={() => togglePara(day.id)}
                       >
@@ -176,7 +176,7 @@ const SelectDays = ({
                               (slot, index) => (
                                 <div
                                   key={index}
-                                  className="pb-1 flex flex-col justify-start border-b border-blue-950 mb-4 relative"
+                                  className="pb-1 flex flex-col  justify-start border-b border-blue-950 mb-4 relative"
                                 >
                                   <button
                                     type="button"
@@ -272,7 +272,7 @@ const SelectDays = ({
 
                             <button
                               type="button"
-                              className="btn btn-info ml-auto"
+                              className="btn btn-green ml-auto"
                               onClick={() => handleAddTimeSlot(day.id)}
                             >
                               Add Another

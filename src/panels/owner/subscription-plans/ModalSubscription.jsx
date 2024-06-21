@@ -9,21 +9,28 @@ import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { formatDate } from "../../../utils/formatDate";
+import { showMessage } from "../../../utils/showMessage";
 
-const ModalPage = ({ open, closeModal, buttonLoading,setButtonLoading, ownerId, clinicId }) => {
+const ModalPage = ({
+  open,
+  closeModal,
+  buttonLoading,
+  setButtonLoading,
+  ownerId,
+  clinicId,
+  fetchClinicData,
+}) => {
   const [loading, setLoading] = useState(false);
+  const [planLoading, setPlanLoading] = useState(false);
 
   const [selectedClinics, setSelectedClinics] = useState([]);
   const [subscriptionData, setSubscriptionData] = useState(null);
   const [allPlans, setAllPlans] = useState([]);
   const [selectedPlans, setSelectedPlans] = useState({});
-  
-
-  console.log(clinicId);
 
   const fetchSubscriptionData = async () => {
     try {
-      setLoading(true);
+      setPlanLoading(true);
       const response = await NetworkHandler.makeGetRequest(
         `/v1/subscription/getsubscription/${clinicId}`
       );
@@ -40,17 +47,20 @@ const ModalPage = ({ open, closeModal, buttonLoading,setButtonLoading, ownerId, 
         console.error("Error fetching subscription data:", error);
       }
     } finally {
-      setLoading(false);
+      setPlanLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSubscriptionData();
+    if (clinicId) {
+      fetchSubscriptionData();
+    }
   }, [clinicId]);
 
   console.log(subscriptionData);
 
   const fetchPlanDetails = async () => {
+    console.log("gdsdgjhagh");
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
@@ -66,9 +76,10 @@ const ModalPage = ({ open, closeModal, buttonLoading,setButtonLoading, ownerId, 
   };
 
   useEffect(() => {
-    fetchPlanDetails();
+    if (clinicId && !subscriptionData) {
+      fetchPlanDetails();
+    }
   }, []);
-
 
   const handlePlanSelection = (planId) => {
     setSelectedPlans((prevSelectedPlans) => ({
@@ -90,24 +101,23 @@ const ModalPage = ({ open, closeModal, buttonLoading,setButtonLoading, ownerId, 
           owner_id: ownerId,
           clinic_id: clinicId,
         }
-      );console.log(response);
+      );
+      console.log(response);
       if (response?.status === 201) {
-        console.log("Subscription Created Successfully", response?.data);console.log(response);
+        console.log("Subscription Created Successfully", response?.data);
+        console.log(response);
         showMessage("Plans updated successfully.", "success");
-        closeModal(); // Close modal after successful creation
+        closeModal();
+        fetchClinicData();
       }
     } catch (error) {
       console.error("Error creating subscription:", error);
       showMessage("An error occurred. Please try again.", "error");
-
     } finally {
       setButtonLoading(false);
     }
   };
 
-
-
-  
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -149,111 +159,120 @@ const ModalPage = ({ open, closeModal, buttonLoading,setButtonLoading, ownerId, 
                 <div className="text-lg  font-semibold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px] pb-1">
                   Subscription Plans
                 </div>
-
-                {subscriptionData ? (
-                  <>
-                    <div className="flex justify-between mb-4 p-4">
-                      <div>
-                        <h2 className="text-lg font-semibold">
-                          Plan Name: {subscriptionData?.Plan?.plan_name}
-                        </h2>
-                        <p className="text-sm text-gray-500">
-                          Subscription ID: {subscriptionData?.subscription_id}
-                        </p>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="bg-green-100 text-green-600 dark:bg-green-600 dark:text-white px-2 py-1 rounded-md text-xs font-semibold uppercase">
-                          {subscriptionData?.status}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4 p-4">
-                      <p className="text-sm text-gray-500">
-                        Start Date: {formatDate(subscriptionData?.start_date)}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        End Date: {formatDate(subscriptionData?.end_date)}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Next Billing Date:{" "}
-                        {formatDate(subscriptionData?.next_billing_date)}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Price per Doctor: $
-                        {subscriptionData?.Plan?.price_per_doctor}
-                      </p>
-                    </div>
-                  </>
+                {planLoading ? (
+                  <IconLoader className="animate-[spin_2s_linear_infinite]  w-7 h-28 my-5 align-middle shrink-0 mx-auto" />
                 ) : (
-                  <div>
-                  <p className="text-sm text-gray-500 ps-4 text-[16px]">
-                    No subscription data found. Available Plans:
-                  </p>
-                  <div className="mt-6 flex gap-3 items-start mx-2 flex-wrap sm:flex-nowrap">
-                    {allPlans.length > 0 ? (
+                  <>
+                    {subscriptionData ? (
                       <>
-                        {allPlans.map((plan, index) => (
-                          <div
-                            key={plan.plan_id}
-                            className="w-full"
-                            onClick={() => handlePlanSelection(plan.plan_id)}
-                          >
-                            <div className="border p-4 rounded-lg flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                className="mr-4"
-                                checked={!!selectedPlans[plan.plan_id]}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  handlePlanSelection(plan.plan_id);
-                                }}
-                              />
-                              <div>
-                                <h3 className="text-lg font-semibold">{plan.plan_name}</h3>
-                                <p className="text-sm text-gray-500">
-                                  Price per Doctor: ${plan.price_per_doctor}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  Frequency: {plan.frequency_in_days} days
-                                </p>
-                              </div>
-                            </div>
+                        <div className="flex justify-between mb-4 p-4">
+                          <div>
+                            <h2 className="text-lg font-semibold">
+                              Plan Name: {subscriptionData?.Plan?.plan_name}
+                            </h2>
+                            <p className="text-sm text-gray-500">
+                              Subscription ID:{" "}
+                              {subscriptionData?.subscription_id}
+                            </p>
                           </div>
-                        ))}
+                          <div className="flex items-center">
+                            <span className="bg-green-100 text-green-600 dark:bg-green-600 dark:text-white px-2 py-1 rounded-md text-xs font-semibold uppercase">
+                              {subscriptionData?.status}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 p-4">
+                          <p className="text-sm text-gray-500">
+                            Start Date:{" "}
+                            {formatDate(subscriptionData?.start_date)}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            End Date: {formatDate(subscriptionData?.end_date)}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Next Billing Date:{" "}
+                            {formatDate(subscriptionData?.next_billing_date)}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Price per Doctor: $
+                            {subscriptionData?.Plan?.price_per_doctor}
+                          </p>
+                        </div>
                       </>
                     ) : (
-                      <p>No plans available</p>
+                      <div>
+                        <p className="text-sm text-gray-500 ps-4 text-[16px]">
+                          No subscription data found. Available Plans:
+                        </p>
+                        <div className="mt-6 flex gap-3 items-start mx-2 flex-wrap sm:flex-nowrap">
+                          {allPlans.length > 0 ? (
+                            <>
+                              {allPlans.map((plan, index) => (
+                                <div
+                                  key={plan.plan_id}
+                                  className="w-full"
+                                  onClick={() =>
+                                    handlePlanSelection(plan.plan_id)
+                                  }
+                                >
+                                  <div className="border p-4 rounded-lg flex items-center cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      className="mr-4"
+                                      checked={!!selectedPlans[plan.plan_id]}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        handlePlanSelection(plan.plan_id);
+                                      }}
+                                    />
+                                    <div>
+                                      <h3 className="text-lg font-semibold">
+                                        {plan.plan_name}
+                                      </h3>
+                                      <p className="text-sm text-gray-500">
+                                        Price per Doctor: $
+                                        {plan.price_per_doctor}
+                                      </p>
+                                      <p className="text-sm text-gray-500">
+                                        Frequency: {plan.frequency_in_days} days
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </>
+                          ) : (
+                            <p>No plans available</p>
+                          )}
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </div>
-                
-                
-                
-                
+                  </>
                 )}
-
-                <div className="p-5">
-                  <div className="flex justify-end items-center mt-8">
-                    <button
-                      type="button"
-                      className="btn btn-outline-danger"
-                      onClick={closeModal}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                      onClick={createSubscription}
-                    >
-                      {buttonLoading ? (
-                        <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-0 rtl:mr-0 shrink-0" />
-                      ) : (
-                        "Confirm"
-                      )}
-                    </button>
+                {!subscriptionData && (
+                  <div className="p-5">
+                    <div className="flex justify-end items-center mt-8">
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger"
+                        onClick={closeModal}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                        onClick={createSubscription}
+                      >
+                        {buttonLoading ? (
+                          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-0 rtl:mr-0 shrink-0" />
+                        ) : (
+                          "Confirm"
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>

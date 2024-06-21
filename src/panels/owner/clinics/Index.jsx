@@ -471,6 +471,7 @@ const Clinics = () => {
       ownerId= {ownerId}
       buttonLoading={buttonLoading}
       setButtonLoading = {setButtonLoading}
+      fetchClinicData = {fetchData}
       
        />
       

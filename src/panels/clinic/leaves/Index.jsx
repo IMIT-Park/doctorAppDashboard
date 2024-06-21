@@ -14,8 +14,11 @@ import IconSearch from "../../../components/Icon/IconSearch";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
 import AddLeave from "./AddLeaveModal";
-import {formatDate} from "../../../utils/formatDate";
-import {formatTime} from "../../../utils/formatTime";
+import AnimateHeight from "react-animate-height";
+import IconCaretDown from "../../../components/Icon/IconCaretDown";
+
+import { formatDate } from "../../../utils/formatDate";
+import { formatTime } from "../../../utils/formatTime";
 
 const ClinicDoctorLeave = () => {
   const dispatch = useDispatch();
@@ -37,8 +40,11 @@ const ClinicDoctorLeave = () => {
   const [allDoctorNames, setAllDoctorNames] = useState([]);
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
+  const [active, setActive] = useState("");
 
-  
+  const togglePara = (value) => {
+    setActive((oldValue) => (oldValue === value ? "" : value));
+  };
 
   useEffect(() => {
     setPage(1);
@@ -57,73 +63,17 @@ const ClinicDoctorLeave = () => {
     setAddLeaveModal(false);
   };
 
-  //  block or unblock handler
-  const handleActiveUser = async (userId) => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/activate/${userId}`
-      );
-      fetchData();
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  };
-
-  const showDoctorBlockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to block this Doctor!",
-      showCancelButton: true,
-      confirmButtonText: "Block",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Blocked!",
-          text: "The Doctor has been blocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
-  const showDoctorUnblockAlert = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Are you sure?",
-      text: "You want to unblock this Doctor!",
-      showCancelButton: true,
-      confirmButtonText: "Unblock",
-      padding: "2em",
-      customClass: "sweet-alerts",
-    }).then((result) => {
-      if (result.value) {
-        handleActiveUser(id);
-        Swal.fire({
-          title: "Unblocked!",
-          text: "The Doctor has been unblocked.",
-          icon: "success",
-          customClass: "sweet-alerts",
-        });
-      }
-    });
-  };
-
   // Get Leave by Clinic
   const fetchLeaveData = async () => {
     const clinicId = userData?.UserClinic[0]?.clinic_id;
     console.log(clinicId);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getleave/${clinicId}?page=${page}&pageSize=${pageSize}`
+        `/v1/doctor/getleave/${clinicId}`
       );
-
-      setTotalLeaves(response.data?.count);
-      setAllLeaves(response.data?.doctorLeaveDetails);
+      console.log(response);
+      // setTotalLeaves(response.data?.count);
+      setAllLeaves(response.data?.leaveDetails?.doctors);
 
       setLoading(false);
     } catch (error) {
@@ -173,45 +123,9 @@ const ClinicDoctorLeave = () => {
     fetchDoctorData();
   }, []);
 
-
-
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start justify-end gap-2 flex-wrap mb-1">
-        <div className="flex items-center flex-wrap gap-4">
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Active
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-          <div className="flex items-start gap-1">
-            <h5 className="text-base font-semibold dark:text-white-light">
-              Blocked
-            </h5>
-            <label className="w-11 h-5 relative">
-              <input
-                type="checkbox"
-                className="custom_switch absolute w-full h-full opacity-0 z-10 peer"
-                id="custom_switch_checkbox_active"
-                checked={false}
-                readOnly
-              />
-              <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-3 before:h-3 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-            </label>
-          </div>
-        </div>
-      </div>
 
       <div className="panel">
         <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
@@ -221,7 +135,7 @@ const ClinicDoctorLeave = () => {
             </h5>
             <Tippy content="Total Doctors">
               <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalLeaves} duration={3}></CountUp>
+                {/* <CountUp start={0} end={totalLeaves} duration={3}></CountUp> */}
               </span>
             </Tippy>
           </div>
@@ -253,7 +167,7 @@ const ClinicDoctorLeave = () => {
             <Tippy content="Click to Add Doctor">
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-green"
                 onClick={openAddLeaveModal}
               >
                 <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
@@ -262,95 +176,111 @@ const ClinicDoctorLeave = () => {
             </Tippy>
           </div>
         </div>
-        {loading ? (
-          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
-        ) : (
-          <div className="datatables">
-            <DataTable
-              noRecordsText="No Leaves to show"
-              noRecordsIcon={
-                <span className="mb-2">
-                  <img src={emptyBox} alt="" className="w-10" />
-                </span>
-              }
-              mih={180}
-              highlightOnHover
-              className="whitespace-nowrap table-hover"
-              records={allLeaves}
-              idAccessor="leave_id"
-              // onRowClick={() => navigate("/admin/owners/clinics/doctors/doctor")}
-              columns={[
-                {
-                  accessor: "No",
-                  title: "No",
-                  render: (row, rowIndex) => rowIndex + 1,
-                },
-                {
-                  accessor: "doctorDetails.photo",
-                  title: "Photo",
-                  render: (row) =>
-                    row?.doctorDetails?.photo ? (
-                      <img
-                        src={imageBaseUrl + row?.doctorDetails?.photo}
-                        alt="Doctor's photo"
-                        className="w-10 h-10 rounded-[50%]"
-                      />
-                    ) : (
-                      "---"
-                    ),
-                },
 
-                { accessor: "doctorDetails.name", title: "Name" },
-                { accessor: "doctorDetails.phone", title: "phone" },
+        {/* basic */}
+        <div className="panel" id="basic">
+          <div className="mb-5">
+            <div className="space-y-2 font-semibold">
+              <div className="border border-[#d3d3d3] rounded dark:border-[#1b2e4b]">
+                <button
+                  type="button"
+                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
+                    active === "1" ? "!text-primary" : ""
+                  }`}
+                  onClick={() => togglePara("1")}
+                >
+                  22-11-2023
+                  <div
+                    className={`ltr:ml-auto rtl:mr-auto ${
+                      active === "1" ? "rotate-180" : ""
+                    }`}
+                  >
+                    <IconCaretDown />
+                  </div>
+                </button>
 
-                // {
-                //   accessor: "leave_date",
-                //   title: "Leave Date",
-                //   render: (row) => formatDate(row.leaveSlots[0]?.leave_date),
-                // },
-
-                {
-                  accessor: "DoctorTimeSlot",
-                  title: "Leave Date and Slot",
-
-                  render: (row) => {
-                    if (row.leaveSlots && row.leaveSlots.length > 0) {
-                      return (
-                        <div>
-                          {row.leaveSlots.map((leaveSlot, index) => (
-                              <div key={index} className="mb-5"
-                             
-                              >
-                              <span className="text-slate-900 dark:text-slate-50 font-normal   px-2 py-0.5 rounded-md">
-                                <time>{formatDate(leaveSlot.leave_date)} : </time>
-                              </span>
-                              <span className="text-slate-900 dark:text-slate-50 font-normal border border-primary px-2 py-0.5 rounded-md ml-2">
-                                <time>{formatTime(leaveSlot.DoctorTimeSlot.startTime)} - {formatTime(leaveSlot.DoctorTimeSlot.endTime)}</time>
-                              </span>
-                            </div>
-                          ))}
+                <div>
+                  <AnimateHeight
+                    duration={300}
+                    height={active === "1" ? "auto" : 0}
+                  >
+                    <div className="p-4 text-white-dark text-[13px] border-t border-[#D3D3D3] dark:border-[#1B2E4B] flex items-center justify-start flex-wrap gap-3 sm:gap-4">
+                      <div className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded">
+                        Doctor Name : Dr.Allen
+                        <div className="text-slate-700 dark:text-slate-300">
+                          <p>Full Day</p>{" "}
                         </div>
-                      );
-                    } else {
-                      return "";
-                    }
-                  },
-                },
-              
-              ]}
-              totalRecords={totalLeaves}
-              recordsPerPage={pageSize}
-              page={page}
-              onPageChange={(p) => setPage(p)}
-              recordsPerPageOptions={PAGE_SIZES}
-              onRecordsPerPageChange={setPageSize}
-              minHeight={200}
-              paginationText={({ from, to, totalRecords }) =>
-                `Showing ${from} to ${to} of ${totalRecords} entries`
-              }
-            />
+                        <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
+                          Monday : 11:00:00 - 12:00:00{" "}
+                        </span>
+                      </div>
+                    </div>
+                  </AnimateHeight>
+                </div>
+              </div>
+              <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
+                <button
+                  type="button"
+                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
+                    active === "2" ? "!text-primary" : ""
+                  }`}
+                  onClick={() => togglePara("2")}
+                >
+                  Group Item #2
+                  <div
+                    className={`ltr:ml-auto rtl:mr-auto ${
+                      active === "2" ? "rotate-180" : ""
+                    }`}
+                  >
+                    <IconCaretDown />
+                  </div>
+                </button>
+                <div>
+                  <AnimateHeight
+                    duration={300}
+                    height={active === "2" ? "auto" : 0}
+                  >
+                    <div className="p-4 text-[13px] border-t border-[#d3d3d3] dark:border-[#1b2e4b]">
+                      <ul className="space-y-1">
+                        <li>
+                          <button type="button">Apple</button>
+                        </li>
+                      </ul>
+                    </div>
+                  </AnimateHeight>
+                </div>
+              </div>
+              <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
+                <button
+                  type="button"
+                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
+                    active === "3" ? "!text-primary" : ""
+                  }`}
+                  onClick={() => togglePara("3")}
+                >
+                  Group Item #3
+                  <div
+                    className={`ltr:ml-auto rtl:mr-auto ${
+                      active === "3" ? "rotate-180" : ""
+                    }`}
+                  >
+                    <IconCaretDown />
+                  </div>
+                </button>
+                <div>
+                  <AnimateHeight
+                    duration={300}
+                    height={active === "3" ? "auto" : 0}
+                  >
+                    <div className="p-4 text-[13px] border-t border-[#d3d3d3] dark:border-[#1b2e4b]">
+                      <p>A</p>
+                    </div>
+                  </AnimateHeight>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
       </div>
       <AddLeave
         addLeaveModal={addLeaveModal}

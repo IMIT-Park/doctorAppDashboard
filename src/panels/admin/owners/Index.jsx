@@ -24,9 +24,6 @@ const Owners = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [totalOwners, setTotalOwners] = useState(0);
   const [allOwners, setAllOwners] = useState([]);
-  const [addUserModal, setAddUserModal] = useState(false);
-  const [viewModal, setViewModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -43,9 +40,8 @@ const Owners = () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/owner/getallowner?page=${1}&pageSize=${2}`
+        `/v1/owner/getallowner?page=${page}&pageSize=${pageSize}`
       );
-      console.log(response);
       setTotalOwners(response?.data?.Owner?.count);
       setAllOwners(response?.data?.Owner?.rows);
       setLoading(false);

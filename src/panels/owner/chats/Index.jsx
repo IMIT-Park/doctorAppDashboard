@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import IconSend from "../../../components/Icon/IconSend";
@@ -12,14 +12,13 @@ const Chat = () => {
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const ownerId = userData?.UserOwner?.[0]?.owner_id || 0;
+  const ownerRoleId = userData?.role_id || 0;
 
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(setPageTitle("Chat"));
-  });
+  }, []);
 
-  const [isShowUserChat, setIsShowUserChat] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [textMessage, setTextMessage] = useState({
     owner_id: ownerId,
     content: "",
@@ -28,6 +27,7 @@ const Chat = () => {
   const [messageLoading, setMessageLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [replyMessage, setReplyMessage] = useState(null);
+  const inputRef = useRef(null);
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -60,7 +60,12 @@ const Chat = () => {
   }, []);
 
   const handleReplyClick = (message) => {
+    setTextMessage({
+      ...textMessage,
+      parent_message_id: message?.message_id,
+    });
     setReplyMessage(message);
+    inputRef.current.focus();
   };
 
   const handleRemoveReply = () => {
@@ -75,13 +80,6 @@ const Chat = () => {
   const sendMessage = async () => {
     if (!textMessage?.content) {
       return true;
-    }
-
-    if (replyMessage) {
-      setTextMessage({
-        ...textMessage,
-        parent_message_id: replyMessage?.message_id,
-      });
     }
 
     try {
@@ -108,7 +106,11 @@ const Chat = () => {
     }
   };
 
-  console.log(messages);
+  // Function to find the message content by parent_message_id
+  const getParentMessageContent = (parentId) => {
+    const parentMessage = messages.find((msg) => msg.message_id === parentId);
+    return parentMessage ? parentMessage.content : "Message not found";
+  };
 
   return (
     <div>
@@ -146,14 +148,14 @@ const Chat = () => {
                           <div key={message?.message_id}>
                             <div
                               className={`flex items-start gap-3 ${
-                                ownerId == message?.sender_role_id
+                                ownerRoleId == message?.sender_role_id
                                   ? "justify-end"
                                   : ""
                               }`}
                             >
                               <div
                                 className={`flex-none ${
-                                  ownerId == message?.sender_role_id
+                                  ownerRoleId == message?.sender_role_id
                                     ? "order-2"
                                     : ""
                                 }`}
@@ -162,24 +164,27 @@ const Chat = () => {
                                 <div className="flex items-center gap-3 relative">
                                   <div
                                     className={`dark:bg-gray-800 px-3 py-2 rounded-md max-w-[550px] bg-black/10 ${
-                                      ownerId == message?.sender_role_id
+                                      ownerRoleId == message?.sender_role_id
                                         ? "ltr:rounded-br-none rtl:rounded-bl-none !bg-primary text-white"
                                         : "ltr:rounded-bl-none rtl:rounded-br-none"
                                     }`}
                                   >
-                                    {/* <div
+                                    {message?.parent_message_id && (
+                                      <div
                                         className={`${
-                                          supportUserRoleId ==
-                                          message?.sender_role_id
+                                          ownerRoleId == message?.sender_role_id
                                             ? "bg-[#4a4d8582] dark:bg-[#292d7582] text-slate-400"
                                             : "bg-[#9898a082] dark:bg-[#17172a82] text-slate-600"
                                         } rounded p-1 w-full`}
                                       >
-                                        there you are
-                                      </div> */}
+                                        {getParentMessageContent(
+                                          message?.parent_message_id
+                                        )}
+                                      </div>
+                                    )}
                                     {message?.content || ""}
                                   </div>
-                                  {ownerId != message?.sender_role_id && (
+                                  {ownerRoleId != message?.sender_role_id && (
                                     <div
                                       onClick={() => handleReplyClick(message)}
                                       className="absolute -bottom-4.5 right-0 text-xs text-[#006241] font-semibold text-right cursor-pointer w-fit"
@@ -216,6 +221,7 @@ const Chat = () => {
               <div className="sm:flex w-full space-x-3 rtl:space-x-reverse items-center">
                 <div className="relative flex-1">
                   <input
+                    ref={inputRef}
                     className="form-input rounded-full border-0 bg-[#f4f4f4] pr-12 pl-6 focus:outline-none py-2"
                     placeholder="Type a message"
                     value={textMessage?.content}

@@ -16,6 +16,7 @@ import IconCaretsDown from "../Icon/IconCaretsDown";
 import IconMenuInvoice from "../Icon/Menu/IconMenuInvoice";
 import IconMenuTodo from "../Icon/Menu/IconMenuTodo";
 import IconUserPlus from "../Icon/IconUserPlus";
+import IconUser from "../Icon/IconUser";
 
 const Sidebar = () => {
   const [currentMenu, setCurrentMenu] = useState("dashboard");
@@ -209,7 +210,6 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
-
                 <li className="nav-item">
                   <NavLink to="/clinic/profile" className="group">
                     <div className="flex items-center">
@@ -466,23 +466,10 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/admin/chats" className="group">
-                    <div className="flex items-center">
-                      <IconMenuDashboard
-                        className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "clinic-chats" ? "!text-primary" : ""
-                        }`}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"chats"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
                   <NavLink to="/admin/supportuser" className="group">
                     <div className="flex items-center">
-                      <IconMenuDashboard
+                      <IconUser
+                        fill
                         className={`group-hover:!text-primary shrink-0 ${
                           currentMenu === "clinic-chats" ? "!text-primary" : ""
                         }`}
@@ -512,7 +499,9 @@ const Sidebar = () => {
                     <div className="flex items-center">
                       <IconMenuDocumentation
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "admin-complaints" ? "!text-primary" : ""
+                          currentMenu === "admin-complaints"
+                            ? "!text-primary"
+                            : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">

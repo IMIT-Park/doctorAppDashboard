@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const baseUrl =
-  "https://4429-2405-201-f018-10d6-fdb6-68ab-422e-981e.ngrok-free.app/api";
+  "https://doctorbackend.gitdr.com/api";
 
 export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
 

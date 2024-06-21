@@ -24,7 +24,6 @@ const AdminSalesOwners = lazy(() =>
   import("../panels/admin/Sales-team/owners/Index")
 );
 const AdminMessages = lazy(() => import("../panels/admin/messages/Index"));
-const AdminChats = lazy(() => import("../panels/admin/chats/Index"));
 const AdminSubscriptionPlans = lazy(() =>
   import("../panels/admin/subscription-plans/Index")
 );
@@ -186,12 +185,6 @@ const routes = [
   {
     path: "/admin/subscription-plans",
     element: <AdminSubscriptionPlans />,
-    layout: "default",
-  },
-
-  {
-    path: "/admin/chats",
-    element: <AdminChats />,
     layout: "default",
   },
 

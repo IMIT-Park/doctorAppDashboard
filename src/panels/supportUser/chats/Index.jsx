@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import IconMenu from "../../../components/Icon/IconMenu";
@@ -38,6 +38,7 @@ const Chat = () => {
   const [messageLoading, setMessageLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [replyMessage, setReplyMessage] = useState(null);
+  const inputRef = useRef(null);
 
   const scrollToBottom = () => {
     if (isShowUserChat) {
@@ -64,7 +65,6 @@ const Chat = () => {
       const response = await NetworkHandler.makeGetRequest(
         "/v1/message/getAllmessage"
       );
-
       setChatersList(response?.data?.uniqueOwners);
 
       setLoading(false);
@@ -106,7 +106,12 @@ const Chat = () => {
   }, [selectedUser]);
 
   const handleReplyClick = (message) => {
+    setTextMessage({
+      ...textMessage,
+      parent_message_id: message?.message_id,
+    });
     setReplyMessage(message);
+    inputRef.current.focus();
   };
 
   const handleRemoveReply = () => {
@@ -123,12 +128,7 @@ const Chat = () => {
       return true;
     }
 
-    if (replyMessage) {
-      setTextMessage({
-        ...textMessage,
-        parent_message_id: replyMessage?.message_id,
-      });
-    }
+    console.log(textMessage);
 
     try {
       const response = await NetworkHandler.makePostRequest(
@@ -154,8 +154,11 @@ const Chat = () => {
     }
   };
 
-  // console.log("selected user", selectedUser);
-  // console.log("messages", messages);
+  // Function to find the message content by parent_message_id
+  const getParentMessageContent = (parentId) => {
+    const parentMessage = messages.find((msg) => msg.message_id === parentId);
+    return parentMessage ? parentMessage.content : "Message not found";
+  };
 
   return (
     <div>
@@ -174,46 +177,54 @@ const Chat = () => {
           {loading ? (
             <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
           ) : (
-            <div className="!mt-0">
-              <PerfectScrollbar className="chat-users relative h-[400px] min-h-[400px] sm:h-[calc(100vh_-_250px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
-                {chatersList?.map((person) => {
-                  return (
-                    <div key={person?.owner_id}>
-                      <button
-                        type="button"
-                        className={`w-full flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-[#050b14] rounded-md dark:hover:text-primary hover:text-primary ${
-                          selectedUser &&
-                          selectedUser?.owner_id === person?.owner_id
-                            ? "bg-gray-100 dark:bg-[#050b14] dark:text-primary text-primary"
-                            : ""
-                        }`}
-                        onClick={() => selectUser(person)}
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 relative">
-                              <img
-                                src={`/assets/images/empty-user.png`}
-                                className="rounded-full h-12 w-12 object-cover"
-                                alt=""
-                              />
+            <>
+              {chatersList && chatersList?.length ? (
+                <div className="!mt-0">
+                  <PerfectScrollbar className="chat-users relative h-[400px] min-h-[400px] sm:h-[calc(100vh_-_250px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
+                    {chatersList?.map((person) => {
+                      return (
+                        <div key={person?.owner_id}>
+                          <button
+                            type="button"
+                            className={`w-full flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-[#050b14] rounded-md dark:hover:text-primary hover:text-primary ${
+                              selectedUser &&
+                              selectedUser?.owner_id === person?.owner_id
+                                ? "bg-gray-100 dark:bg-[#050b14] dark:text-primary text-primary"
+                                : ""
+                            }`}
+                            onClick={() => selectUser(person)}
+                          >
+                            <div className="flex-1">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 relative">
+                                  <img
+                                    src={`/assets/images/empty-user.png`}
+                                    className="rounded-full h-12 w-12 object-cover"
+                                    alt=""
+                                  />
+                                </div>
+                                <div className="mx-3 ltr:text-left rtl:text-right">
+                                  <p className="mb-1 font-semibold capitalize">
+                                    {person?.name || ""}
+                                  </p>
+                                  <p className="text-xs text-white-dark truncate max-w-[185px]">
+                                    {person?.email || ""}
+                                  </p>
+                                </div>
+                              </div>
                             </div>
-                            <div className="mx-3 ltr:text-left rtl:text-right">
-                              <p className="mb-1 font-semibold capitalize">
-                                {person?.name || ""}
-                              </p>
-                              <p className="text-xs text-white-dark truncate max-w-[185px]">
-                                {person?.email || ""}
-                              </p>
-                            </div>
-                          </div>
+                          </button>
                         </div>
-                      </button>
-                    </div>
-                  );
-                })}
-              </PerfectScrollbar>
-            </div>
+                      );
+                    })}
+                  </PerfectScrollbar>
+                </div>
+              ) : (
+                <div className="text-xs h-10 grid place-items-center">
+                  No Owners Found
+                </div>
+              )}
+            </>
           )}
         </div>
         <div
@@ -438,7 +449,7 @@ const Chat = () => {
                   <div className="space-y-5 p-4 sm:pb-0 pb-[68px] sm:min-h-[300px] min-h-[400px]">
                     {messages && messages?.length ? (
                       <>
-                        {messages?.map((message, index) => {
+                        {messages?.map((message) => {
                           return (
                             <div key={message?.message_id}>
                               <div
@@ -465,16 +476,20 @@ const Chat = () => {
                                           : "ltr:rounded-bl-none rtl:rounded-br-none"
                                       }`}
                                     >
-                                      {/* <div
-                                        className={`${
-                                          supportUserRoleId ==
-                                          message?.sender_role_id
-                                            ? "bg-[#4a4d8582] dark:bg-[#292d7582] text-slate-400"
-                                            : "bg-[#9898a082] dark:bg-[#17172a82] text-slate-600"
-                                        } rounded p-1 w-full`}
-                                      >
-                                        there you are
-                                      </div> */}
+                                      {message?.parent_message_id && (
+                                        <div
+                                          className={`${
+                                            supportUserRoleId ==
+                                            message?.sender_role_id
+                                              ? "bg-[#4a4d8582] dark:bg-[#292d7582] text-slate-400"
+                                              : "bg-[#9898a082] dark:bg-[#17172a82] text-slate-600"
+                                          } rounded p-1 w-full`}
+                                        >
+                                          {getParentMessageContent(
+                                            message.parent_message_id
+                                          )}
+                                        </div>
+                                      )}
                                       {message?.content || ""}
                                     </div>
                                     {supportUserRoleId !=
@@ -515,6 +530,7 @@ const Chat = () => {
                 <div className="sm:flex w-full space-x-3 rtl:space-x-reverse items-center">
                   <div className="relative flex-1">
                     <input
+                      ref={inputRef}
                       className="form-input rounded-full border-0 bg-[#f4f4f4] pr-12 pl-6 focus:outline-none py-2"
                       placeholder="Type a message"
                       value={textMessage?.content}

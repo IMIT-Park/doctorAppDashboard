@@ -1,5 +1,5 @@
 import { setPageTitle } from "../../store/themeConfigSlice";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Dropdown from "../../components/Dropdown";
 import IconHorizontalDots from "../../components/Icon/IconHorizontalDots";
@@ -415,13 +415,19 @@ const Index = () => {
                   >
                     <ul>
                       <li>
-                        <button type="button" className="hover:!text-green-800">Weekly</button>
+                        <button type="button" className="hover:!text-green-800">
+                          Weekly
+                        </button>
                       </li>
                       <li>
-                        <button type="button" className="hover:!text-green-800">Monthly</button>
+                        <button type="button" className="hover:!text-green-800">
+                          Monthly
+                        </button>
                       </li>
                       <li>
-                        <button type="button" className="hover:!text-green-800">Yearly</button>
+                        <button type="button" className="hover:!text-green-800">
+                          Yearly
+                        </button>
                       </li>
                     </ul>
                   </Dropdown>

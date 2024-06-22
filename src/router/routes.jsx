@@ -36,9 +36,6 @@ const AdminSupportUser = lazy(() =>
 // <--------------> owner panel imports starts here<-------------->
 const OwnerIndex = lazy(() => import("../panels/owner/Index"));
 const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
-const OwnerSubscriptionPlans = lazy(() =>
-  import("../panels/owner/subscription-plans/Index")
-);
 const OwnerChat = lazy(() => import("../panels/owner/chats/Index"));
 // <--------------> owner panel imports ends here <-------------->
 
@@ -54,8 +51,6 @@ const ClinicPatientSingleView = lazy(() =>
 const ClinicPatients = lazy(() =>
   import("../panels/clinic/bookings/PatientsDetails")
 );
-
-const ClinicChats = lazy(() => import("../panels/clinic/chats/Index"));
 
 const ClinicProfile = lazy(() =>
   import("../panels/clinic/profile/ClinicProfile")
@@ -215,13 +210,6 @@ const routes = [
 
   //owner subscription plans
   {
-    path: "/owner/subscription-plans",
-    element: <OwnerSubscriptionPlans />,
-    layout: "default",
-  },
-
-  //owner subscription plans
-  {
     path: "/owner/chat",
     element: <OwnerChat />,
     layout: "default",
@@ -269,12 +257,6 @@ const routes = [
   {
     path: "/clinic/bookings/:doctorId/patients",
     element: <ClinicPatients />,
-    layout: "default",
-  },
-
-  {
-    path: "/clinic/chats",
-    element: <ClinicChats />,
     layout: "default",
   },
 

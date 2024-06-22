@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../store/themeConfigSlice";
 import IconLoader from "../../components/Icon/IconLoader";
@@ -18,31 +18,21 @@ import DoctorProfileEdit from "./components/DoctorProfileEdit";
 import DoctorTimeSlotEdit from "./components/DoctorTimeSlotEdit";
 import AddLeave from "./components/AddLeave";
 import useBlockUnblock from "../../utils/useBlockUnblock";
-import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import useFetchData from "../../customHooks/useFetchData";
 import IconTrashLines from "../../components/Icon/IconTrashLines";
 import DeleteLeave from "./components/DeleteLeave";
+import CustomSwitch from "../../components/CustomSwitch";
+import { UserContext } from "../../contexts/UseContext";
 
 const SinglePage = () => {
   const { clinicId, doctorId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-  const previousUrl = sessionStorage.getItem("doctorPreviousPage");
 
-  const userDetails = sessionStorage.getItem("userData");
-  const userData = JSON.parse(userDetails);
-  const isSuperAdmin = userData?.user_id === 1;
+  const { userDetails } = useContext(UserContext);
 
-  useEffect(() => {
-    if (location?.state?.previousUrl) {
-      sessionStorage.setItem(
-        "doctorPreviousPage",
-        location?.state?.previousUrl
-      );
-    }
-  }, [location?.state?.previousUrl]);
+  const isSuperAdmin = userDetails?.role_id === 1;
 
   useEffect(() => {
     dispatch(setPageTitle("Doctor"));
@@ -436,7 +426,7 @@ const SinglePage = () => {
     <div>
       <ScrollToTop />
       <button
-        onClick={() => navigate(previousUrl)}
+        onClick={() => navigate(-1)}
         type="button"
         className="btn btn-green btn-sm -mt-4 mb-4"
       >
@@ -554,28 +544,19 @@ const SinglePage = () => {
                 </div>
               </div>
               <div className="absolute top-5 right-5 flex flex-col items-center gap-4">
-                <Tippy content={doctorDetails?.status ? "Block" : "Unblock"}>
-                  <label
-                    className="w-12 h-6 relative"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showDoctorAlert(
-                        doctorDetails?.user_id,
-                        doctorDetails?.status ? "block" : "activate",
-                        "doctor"
-                      );
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                      id={`custom_switch_checkbox${doctorDetails?.clinic_id}`}
-                      checked={doctorDetails?.status}
-                      readOnly
-                    />
-                    <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                  </label>
-                </Tippy>
+                <CustomSwitch
+                  checked={doctorDetails?.status}
+                  onChange={() =>
+                    showDoctorAlert(
+                      doctorDetails?.user_id,
+                      doctorDetails?.status ? "block" : "activate",
+                      "doctor"
+                    )
+                  }
+                  tooltipText={doctorDetails?.status ? "Block" : "Unblock"}
+                  uniqueId={`doctor${doctorDetails?.clinic_id}`}
+                  size="large"
+                />
                 {!isSuperAdmin && (
                   <button
                     className="flex hover:text-info"

@@ -17,6 +17,7 @@ import QRCodeComponent from "../../../components/QRCodeComponent";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import { showMessage } from "../../../utils/showMessage";
 import { handleGetLocation } from "../../../utils/getLocation";
+import CustomSwitch from "../../../components/CustomSwitch";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -33,7 +34,7 @@ const ClinicProfile = () => {
   }, [dispatch]);
 
   const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState({});
+  const [profileData, setProfileData] = useState(null);
   const [editModal, setEditModal] = useState(false);
   const [currentClinicId, setCurrentClinicId] = useState("");
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -180,106 +181,107 @@ const ClinicProfile = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="flex justify-between flex-wrap gap-4">
-              <div>
-                <div className="w-full max-w-96 rounded-md overflow-hidden">
-                  <img
-                    src={imageBaseUrl + profileData?.banner_img_url}
-                    className="w-full h-full object-cover"
-                    alt="Banner"
-                  />
-                </div>
-                <div className="text-2xl font-semibold capitalize mt-2">
-                  {profileData?.name || ""}
-                </div>
-              </div>
+            {profileData ? (
+              <>
+                <div className="flex justify-between flex-wrap gap-4">
+                  <div>
+                    <div className="w-full max-w-96 rounded-md overflow-hidden">
+                      <img
+                        src={imageBaseUrl + profileData?.banner_img_url}
+                        className="w-full h-full object-cover"
+                        alt="Banner"
+                      />
+                    </div>
+                    <div className="text-2xl font-semibold capitalize mt-2">
+                      {profileData?.name || ""}
+                    </div>
+                  </div>
 
-              <div className="flex flex-col items-center gap-4">
-                <Tippy
-                  content={profileData?.User?.status ? "Block" : "Unblock"}
-                >
-                  <label
-                    className="w-12 h-6 relative"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showClinicAlert(
-                        profileData?.User?.user_id,
-                        profileData?.User?.status ? "block" : "activate",
-                        "clinic"
-                      );
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                      id={`custom_switch_checkbox${profileData?.clinic_id}`}
+                  <div className="flex flex-col items-center gap-4">
+                    <CustomSwitch
                       checked={profileData?.User?.status}
-                      readOnly
+                      onChange={() =>
+                        showClinicAlert(
+                          profileData?.User?.user_id,
+                          profileData?.User?.status ? "block" : "activate",
+                          "clinic"
+                        )
+                      }
+                      tooltipText={
+                        profileData?.User?.status ? "Block" : "Unblock"
+                      }
+                      uniqueId={`clinic${profileData?.clinic_id}`}
+                      size="large"
                     />
-                    <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                  </label>
-                </Tippy>
-                <button
-                  className="flex hover:text-info"
-                  onClick={() => openEditModal(profileData)}
-                >
-                  <IconEdit className="w-6 h-6" />
-                </button>
+                    <button
+                      className="flex hover:text-info"
+                      onClick={() => openEditModal(profileData)}
+                    >
+                      <IconEdit className="w-6 h-6" />
+                    </button>
+                  </div>
+                </div>
+                <div className="text-left">
+                  <div className="mt-5">
+                    <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                      <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                        Address <span>:</span>
+                      </div>
+                      <div className="dark:text-slate-300">
+                        {profileData?.address || ""}
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                      <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                        Place <span>:</span>
+                      </div>
+                      <div className="dark:text-slate-300">
+                        {profileData?.place || ""}
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                      <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                        Email <span>:</span>
+                      </div>
+                      <div className="dark:text-slate-300">
+                        {profileData?.User?.email || ""}
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                      <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                        Username <span>:</span>
+                      </div>
+                      <div className="dark:text-slate-300">
+                        {profileData?.User?.user_name || ""}
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                      <div className="text-white-dark min-w-[75px] flex items-start justify-between">
+                        Phone <span>:</span>
+                      </div>
+                      <div className="dark:text-slate-300">
+                        {profileData?.phone || ""}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleGetLocation(profileData?.googleLocation)
+                      }
+                      className="btn btn-success mt-5"
+                    >
+                      <IconMenuContacts className="mr-1 w-5" />
+                      View Location
+                    </button>
+                    <QRCodeComponent qrUrl={qrUrl} />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="h-52 grid place-items-center text-gray-500">
+                No Data Found
               </div>
-            </div>
-            <div className="text-left">
-              <div className="mt-5">
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Address <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {profileData?.address || ""}
-                  </div>
-                </div>
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Place <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {profileData?.place || ""}
-                  </div>
-                </div>
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Email <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {profileData?.User?.email || ""}
-                  </div>
-                </div>
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Username <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {profileData?.User?.user_name || ""}
-                  </div>
-                </div>
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Phone <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {profileData?.phone || ""}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleGetLocation(profileData?.googleLocation)}
-                  className="btn btn-success mt-5"
-                >
-                  <IconMenuContacts className="mr-1 w-5" />
-                  View Location
-                </button>
-                <QRCodeComponent qrUrl={qrUrl} />
-              </div>
-            </div>
+            )}
           </>
         )}
       </div>

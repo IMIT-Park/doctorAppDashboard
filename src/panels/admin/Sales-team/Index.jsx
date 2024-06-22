@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
 import IconEdit from "../../../components/Icon/IconEdit";
-import Swal from "sweetalert2";
 import IconUserPlus from "../../../components/Icon/IconUserPlus";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
@@ -18,6 +17,7 @@ import ShowSalesPerson from "./ShowSalesPerson";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
+import CustomSwitch from "../../../components/CustomSwitch";
 
 const Sales = () => {
   const dispatch = useDispatch();
@@ -149,12 +149,7 @@ const Sales = () => {
       return;
     }
 
-    if (
-      !input.name ||
-      !input.email ||
-      !input.phone ||
-      !input.address
-    ) {
+    if (!input.name || !input.email || !input.phone || !input.address) {
       showMessage("Please fill in all required fields", "error");
       return;
     }
@@ -279,28 +274,19 @@ const Sales = () => {
                   textAlignment: "center",
                   render: (user) => (
                     <div className="flex gap-4 items-center w-max mx-auto">
-                      <Tippy content={user?.User?.status ? "Block" : "Unblock"}>
-                        <label
-                          className="w-[46px] h-[22px] relative"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            showSalesAlert(
-                              user?.user_id,
-                              user?.User?.status ? "block" : "activate",
-                              "sales person"
-                            );
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id={`custom_switch_checkbox${user.owner_id}`}
-                            checked={user?.User?.status}
-                            readOnly
-                          />
-                          <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                        </label>
-                      </Tippy>
+                      <CustomSwitch
+                        checked={user?.User?.status}
+                        onChange={() =>
+                          showSalesAlert(
+                            user?.user_id,
+                            user?.User?.status ? "block" : "activate",
+                            "sales person"
+                          )
+                        }
+                        tooltipText={user?.User?.status ? "Block" : "Unblock"}
+                        uniqueId={`sales${user?.owner_id}`}
+                        size="normal"
+                      />
                       <Tippy content="Edit">
                         <button
                           className="flex hover:text-info"

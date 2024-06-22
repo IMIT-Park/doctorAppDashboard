@@ -2,19 +2,19 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import Swal from "sweetalert2";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import NetworkHandler from "../../../utils/NetworkHandler";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import IconCaretDown from "../../../components/Icon/IconCaretDown";
 import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { handleGetLocation } from "../../../utils/getLocation";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
+import CustomSwitch from "../../../components/CustomSwitch";
 
 const OwnerSingleView = () => {
   const dispatch = useDispatch();
@@ -79,12 +79,9 @@ const OwnerSingleView = () => {
     }
   };
 
-  useEffect(
-    () => {
-      fetchOwnerInfo();
-    }, //[ownerId, page, pageSize]
-    []
-  );
+  useEffect(() => {
+    fetchOwnerInfo();
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -100,7 +97,7 @@ const OwnerSingleView = () => {
     <div>
       <ScrollToTop />
       <button
-        onClick={() => navigate("/admin/owners")}
+        onClick={() => navigate(-1)}
         type="button"
         className="btn btn-green btn-sm -mt-4 mb-4"
       >
@@ -111,34 +108,25 @@ const OwnerSingleView = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="flex justify-between flex-wrap gap-4 sm:px-4">
+            <div className="flex justify-between flex-wrap gap-4">
               <div className="text-2xl font-semibold capitalize dark:text-slate-300">
                 {ownerInfo?.name || ""}
               </div>
-              <Tippy content={ownerInfo?.User?.status ? "Block" : "Unblock"}>
-                <label
-                  className="w-12 h-6 relative"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    showOwnerAlert(
-                      ownerInfo?.user_id,
-                      ownerInfo?.User?.status ? "block" : "activate",
-                      "owner"
-                    );
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                    id={`custom_switch_checkbox_owner${ownerInfo?.owner_id}`} // Unique ID
-                    checked={ownerInfo?.User?.status}
-                    readOnly
-                  />
-                  <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                </label>
-              </Tippy>
+              <CustomSwitch
+                checked={ownerInfo?.User?.status}
+                onChange={() =>
+                  showOwnerAlert(
+                    ownerInfo?.user_id,
+                    ownerInfo?.User?.status ? "block" : "activate",
+                    "owner"
+                  )
+                }
+                tooltipText={ownerInfo?.User?.status ? "Block" : "Unblock"}
+                uniqueId={`owner${ownerInfo?.owner_id}`}
+                size="large"
+              />
             </div>
-            <div className="text-left sm:px-4">
+            <div className="text-left">
               <div className="mt-5">
                 <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 sm:mb-1">
                   <div className="text-white-dark min-w-16 flex items-end justify-between">
@@ -234,30 +222,19 @@ const OwnerSingleView = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy
-                      content={rowData?.User?.status ? "Block" : "Unblock"}
-                    >
-                      <label
-                        className="w-[46px] h-[22px] relative"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          showClinicAlert(
-                            rowData?.user_id,
-                            rowData?.User?.status ? "block" : "activate",
-                            "clinic"
-                          );
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox_${rowData.clinic_id}`} // Unique ID
-                          checked={rowData?.User?.status}
-                          readOnly
-                        />
-                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                      </label>
-                    </Tippy>
+                    <CustomSwitch
+                      checked={rowData?.User?.status}
+                      onChange={() =>
+                        showClinicAlert(
+                          rowData?.user_id,
+                          rowData?.User?.status ? "block" : "activate",
+                          "clinic"
+                        )
+                      }
+                      tooltipText={rowData?.User?.status ? "Block" : "Unblock"}
+                      uniqueId={`clinic${rowData?.clinic_id}`}
+                      size="normal"
+                    />
                   ),
                 },
               ]}

@@ -9,8 +9,9 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { useNavigate } from "react-router-dom";
-import NetworkHandler, { baseUrl } from "../../../utils/NetworkHandler";
+import NetworkHandler from "../../../utils/NetworkHandler";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
+import CustomSwitch from "../../../components/CustomSwitch";
 
 const Owners = () => {
   const dispatch = useDispatch();
@@ -111,30 +112,21 @@ const Owners = () => {
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="grid place-items-center">
-                      <Tippy
-                        content={rowData?.User?.status ? "Block" : "Unblock"}
-                      >
-                        <label
-                          className="w-[46px] h-[22px] relative"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            showOwnerAlert(
-                              rowData?.user_id,
-                              rowData?.User?.status ? "block" : "activate",
-                              "owner"
-                            );
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id={`custom_switch_checkbox${rowData.owner_id}`}
-                            checked={rowData?.User?.status}
-                            readOnly
-                          />
-                          <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                        </label>
-                      </Tippy>
+                      <CustomSwitch
+                        checked={rowData?.User?.status}
+                        onChange={() =>
+                          showOwnerAlert(
+                            rowData?.user_id,
+                            rowData?.User?.status ? "block" : "activate",
+                            "owner"
+                          )
+                        }
+                        tooltipText={
+                          rowData?.User?.status ? "Block" : "Unblock"
+                        }
+                        uniqueId={`owner${rowData?.owner_id}`}
+                        size="normal"
+                      />
                     </div>
                   ),
                 },

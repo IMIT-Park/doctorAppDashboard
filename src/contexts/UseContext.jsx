@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from "react";
 
 const UserContext = createContext(null);
 
@@ -6,7 +6,7 @@ const UserProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState(null);
 
   useEffect(() => {
-    const userData = sessionStorage.getItem('userData');
+    const userData = sessionStorage.getItem("userData");
     if (userData) {
       setUserDetails(JSON.parse(userData));
     }

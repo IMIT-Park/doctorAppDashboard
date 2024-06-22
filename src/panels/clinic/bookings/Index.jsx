@@ -22,8 +22,6 @@ const ClinicBookingDoctor = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const initialRecords = rowData.slice(0, pageSize);
-
   const [search, setSearch] = useState("");
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
@@ -34,6 +32,7 @@ const ClinicBookingDoctor = () => {
 
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
+  const clinicId = userData?.UserClinic[0]?.clinic_id;
 
  
   useEffect(() => {
@@ -66,8 +65,6 @@ const ClinicBookingDoctor = () => {
   // fetch Doctors function
   const fetchData = async () => {
 
-    const clinicId = userData?.UserClinic[0]?.clinic_id;
-    console.log("clinicId:", clinicId);
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`

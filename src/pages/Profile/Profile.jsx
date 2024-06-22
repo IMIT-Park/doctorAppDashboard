@@ -1,17 +1,13 @@
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../store/themeConfigSlice";
-import { useEffect, useState } from "react";
-import IconCoffee from "../../components/Icon/IconCoffee";
-import IconMapPin from "../../components/Icon/IconMapPin";
-import IconMail from "../../components/Icon/IconMail";
-import IconPhone from "../../components/Icon/IconPhone";
+import { useContext, useEffect, useState } from "react";
 import IconEye from "../../components/Icon/IconEye";
 import IconCloseEye from "../../components/Icon/IconCloseEye";
 import IconLockDots from "../../components/Icon/IconLockDots";
 import NetworkHandler from "../../utils/NetworkHandler";
-import IconX from "../../components/Icon/IconX";
 import IconLoader from "../../components/Icon/IconLoader";
-import Swal from "sweetalert2";
+import { UserContext } from "../../contexts/UseContext";
+import { showMessage } from "../../utils/showMessage";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -19,32 +15,45 @@ const Profile = () => {
     dispatch(setPageTitle("Profile"));
   });
 
-  const userDetails = sessionStorage.getItem("userData");
-  const userData = JSON.parse(userDetails);
-  // console.log("userData:", userData);
+
+  const { userDetails } = useContext(UserContext);
+
+  const createUserData = (userDetails) => {
+    const userData = {
+      user_id: userDetails?.user_id,
+      role_id: userDetails?.role_id,
+      user_name: userDetails?.user_name,
+      password: userDetails?.password,
+      email: userDetails?.email,
+      status: userDetails?.status,
+      additionalDetails: {},
+    };
+
+    if (userDetails?.UserClinic?.length > 0) {
+      userData.additionalDetails = userDetails?.UserClinic[0];
+    }
+    if (userDetails?.UserOwner?.length > 0) {
+      userData.additionalDetails = userDetails?.UserOwner[0];
+    }
+    if (userDetails?.UserDoctor?.length > 0) {
+      userData.additionalDetails = userDetails?.UserDoctor[0];
+    }
+    if (userDetails?.UserSalesperson?.length > 0) {
+      userData.additionalDetails = userDetails?.UserSalesperson[0];
+    }
+    if (userDetails?.UserSupportuser?.length > 0) {
+      userData.additionalDetails = userDetails?.UserSupportuser[0];
+    }
+
+    return userData;
+  };
+
+  const userData = createUserData(userDetails);
 
   const [showPassword, setShowPassword] = useState(false);
   const [data, setData] = useState({ oldpassword: "", newpassword: "" });
   const [loading, setLoading] = useState(false);
-  const [showAlert, setShowAlert] = useState({
-    show: false,
-    message: "",
-    type: "info",
-  });
   const [isIncorrect, setIsIncorrect] = useState(false);
-
-  // warning alert closer
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowAlert({ show: false, message: "", type: "info" });
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [showAlert.show]);
-
-  const handleCloseAlert = () => {
-    setShowAlert({ show: false, message: "", type: "info" });
-  };
 
   // change password function
   const handleChangePassword = async (e) => {
@@ -53,25 +62,15 @@ const Profile = () => {
     setLoading(true);
 
     if (!data.oldpassword || !data.newpassword) {
-      // ensure keys match
-      setShowAlert({
-        show: true,
-        message: "Please fill in all input fields.",
-        type: "warning",
-      });
+      showMessage("Please fill in all input fields.", "warning");
       setLoading(false);
       return;
     }
 
     const userId = userData?.user_id;
-    console.log("userId:", userId);
 
     if (!userId) {
-      setShowAlert({
-        show: true,
-        message: "User ID not found.",
-        type: "danger",
-      });
+      showMessage("User ID not found.", "error");
       setLoading(false);
       return;
     }
@@ -84,29 +83,21 @@ const Profile = () => {
 
       if (response.status === 201) {
         setIsIncorrect(false);
-        showMessage("Password changed successfully.");
+        showMessage("Password changed successfully.", "success");
         setData({ oldpassword: "", newpassword: "" });
       } else {
-        setShowAlert({
-          show: true,
-          message: response.data.message || "An error occurred.",
-          type: "danger",
-        });
+        showMessage(response.data.message || "An error occurred.", "error");
         setIsIncorrect(true);
       }
     } catch (error) {
       console.error("Error response:", error);
       if (error.response?.status === 403) {
-        setShowAlert({
-          show: true,
-          message: "Current password is incorrect.",
-          type: "danger",
-        });
+        showMessage("Current password is incorrect.", "error");
       } else {
         const message =
           error.response?.data?.message ||
           "An error occurred. Please try again.";
-        setShowAlert({ show: true, message, type: "danger" });
+        showMessage(message, "error");
       }
       setIsIncorrect(true);
     } finally {
@@ -128,73 +119,82 @@ const Profile = () => {
     }
   };
 
-  // show success message
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
-    });
-  };
-
-
   return (
     <div>
       <ul className="flex space-x-2 rtl:space-x-reverse">
         <li className="">
-          <span>Profile</span>
+          <span>Profile Details</span>
         </li>
       </ul>
-      <div className="pt-5">
-        <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-5">
+      <div className="pt-2">
+        <div className="flex flex-col gap-3">
           <div className="panel">
             <div className="mb-2">
-              <div className="flex flex-col justify-center items-center">
-                {userData?.profile && (
-                  <img
-                    src="/assets/images/profile-4.jpeg"
-                    alt="img"
-                    className="w-36 h-36 rounded-full object-cover  mb-5"
-                  />
+              <div className="flex flex-col items-start gap-2">
+                {userData?.additionalDetails?.name && (
+                  <div className="flex items-start gap-2 flex-wrap">
+                    <div className="flex items-center justify-between min-w-[72px] text-sm text-gray-500">
+                      Name <span>:</span>
+                    </div>
+                    <p className="font-semibold text-[#006241] text-base capitalize">
+                      {userData?.additionalDetails?.name}
+                    </p>
+                  </div>
                 )}
-                <p className="font-semibold text-primary text-base capitalize">
-                  {userData?.user_name ? userData?.user_name : ""}
-                </p>
+                {userData?.email && (
+                  <div className="flex items-start gap-2 flex-wrap">
+                    <div className="flex items-center justify-between min-w-[72px] text-sm text-gray-500">
+                      Email <span>:</span>
+                    </div>
+                    <p className="text-sm text-black dark:text-slate-300">
+                      {userData?.email}
+                    </p>
+                  </div>
+                )}
+                {userData?.user_name && (
+                  <div className="flex items-start gap-2 flex-wrap">
+                    <div className="flex items-center justify-between min-w-[72px] text-sm text-gray-500">
+                      Username <span>:</span>
+                    </div>
+                    <p className="text-sm text-black dark:text-slate-300">
+                      {userData?.user_name}
+                    </p>
+                  </div>
+                )}
+                {userData?.additionalDetails?.phone && (
+                  <div className="flex items-start gap-2 flex-wrap">
+                    <div className="flex items-center justify-between min-w-[72px] text-sm text-gray-500">
+                      Phone <span>:</span>
+                    </div>
+                    <p className="text-sm text-black dark:text-slate-300">
+                      {userData?.additionalDetails?.phone}
+                    </p>
+                  </div>
+                )}
+                {userData?.additionalDetails?.address && (
+                  <div className="flex items-start gap-2 flex-wrap">
+                    <div className="flex items-center justify-between min-w-[72px] text-sm text-gray-500">
+                      Address <span>:</span>
+                    </div>
+                    <p className="text-sm text-black dark:text-slate-300">
+                      {userData?.additionalDetails?.address}
+                    </p>
+                  </div>
+                )}
+                {userData?.additionalDetails?.place && (
+                  <div className="flex items-start gap-2 flex-wrap">
+                    <div className="flex items-center justify-between min-w-[72px] text-sm text-gray-500">
+                      Place <span>:</span>
+                    </div>
+                    <p className="text-sm text-black dark:text-slate-300">
+                      {userData?.additionalDetails?.place}
+                    </p>
+                  </div>
+                )}
               </div>
-              <ul className="mt-5 flex flex-col max-w-[160px] m-auto space-y-4 font-semibold text-white-dark">
-                {userData?.address && (
-                  <li className="flex items-center gap-2 capitalize">
-                    <IconMapPin className="shrink-0" />
-                    {userData?.address ? userData?.address : ""}
-                  </li>
-                )}
-                <li>
-                  <button className="flex items-center gap-2">
-                    <IconMail className="w-5 h-5 shrink-0" />
-                    <span className="text-primary truncate">
-                      {userData?.email ? userData?.email : ""}
-                    </span>
-                  </button>
-                </li>
-                {userData?.phone && (
-                  <li className="flex items-center gap-2">
-                    <IconPhone />
-                    <span className="whitespace-nowrap" dir="ltr">
-                      {userData?.phone ? `+91 ${userData?.phone}` : ""}
-                    </span>
-                  </li>
-                )}
-              </ul>
             </div>
           </div>
-          <div className="lg:col-span-2 xl:col-span-3">
+          <div className="lg:col-span-2 xl:col-span-3 max-w-[70rem]">
             <form
               className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black"
               onSubmit={handleChangePassword}
@@ -213,7 +213,7 @@ const Profile = () => {
                         id="oldpassword"
                         type={showPassword ? "text" : "password"}
                         placeholder="Current Password"
-                        className="form-input ps-10 pr-9 placeholder:text-white-dark"
+                        className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
                         value={data.oldpassword}
                         onChange={(e) =>
                           setData({ ...data, oldpassword: e.target.value })
@@ -244,7 +244,7 @@ const Profile = () => {
                         id="newpassword"
                         type={showPassword ? "text" : "password"}
                         placeholder="New Password"
-                        className="form-input ps-10 pr-9 placeholder:text-white-dark"
+                        className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
                         value={data.newpassword}
                         onChange={(e) =>
                           setData({ ...data, newpassword: e.target.value })
@@ -264,7 +264,7 @@ const Profile = () => {
                     </div>
                   </div>
                   <div className="sm:col-span-2 mt-3 ml-auto">
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit" className="btn btn-green">
                       {loading ? (
                         <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle shrink-0" />
                       ) : (
@@ -278,28 +278,6 @@ const Profile = () => {
           </div>
         </div>
       </div>
-      {showAlert.show && (
-        <div
-          className={`fixed top-[70px] right-6 flex items-center p-3.5 rounded text-white ${
-            showAlert.type === "warning"
-              ? "bg-warning"
-              : showAlert.type === "danger"
-              ? "bg-danger"
-              : "bg-info"
-          }`}
-        >
-          <span className="ltr:pr-2 rtl:pl-2">
-            <strong>{showAlert?.message}</strong>
-          </span>
-          <button
-            type="button"
-            className="ltr:ml-auto rtl:mr-auto hover:opacity-80"
-            onClick={handleCloseAlert}
-          >
-            <IconX className="w-5 h-5" />
-          </button>
-        </div>
-      )}
     </div>
   );
 };

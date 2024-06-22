@@ -16,6 +16,7 @@ import IconEdit from "../../../components/Icon/IconEdit";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import DeleteSupportPerson from "./DeleteSupportPerson";
 import { showMessage } from "../../../utils/showMessage";
+import CustomSwitch from "../../../components/CustomSwitch";
 
 const SupportUser = () => {
   const dispatch = useDispatch();
@@ -318,30 +319,21 @@ const SupportUser = () => {
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex gap-5 items-center w-max mx-auto">
-                      <Tippy
-                        content={rowData?.User?.status ? "Block" : "Unblock"}
-                      >
-                        <label
-                          className="w-[46px] h-[22px] relative"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            showSupportAlert(
-                              rowData?.user_id,
-                              rowData?.User?.status ? "block" : "activate",
-                              "support user"
-                            );
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id={`custom_switch_checkbox${rowData.owner_id}`}
-                            checked={rowData?.User?.status}
-                            readOnly
-                          />
-                          <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                        </label>
-                      </Tippy>
+                      <CustomSwitch
+                        checked={rowData?.User?.status}
+                        onChange={() =>
+                          showSupportAlert(
+                            rowData?.user_id,
+                            rowData?.User?.status ? "block" : "activate",
+                            "support user"
+                          )
+                        }
+                        tooltipText={
+                          rowData?.User?.status ? "Block" : "Unblock"
+                        }
+                        uniqueId={`support${rowData?.supportuser_id}`}
+                        size="normal"
+                      />
                       <Tippy content="Edit">
                         <button
                           className="flex hover:text-primary"

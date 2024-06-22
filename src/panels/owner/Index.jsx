@@ -1,5 +1,5 @@
 import { setPageTitle } from "../../store/themeConfigSlice";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Dropdown from "../../components/Dropdown";
 import IconHorizontalDots from "../../components/Icon/IconHorizontalDots";
@@ -20,6 +20,7 @@ const Index = () => {
   useEffect(() => {
     dispatch(setPageTitle("Dashboard"));
   });
+
 
   const revenueChart = {
     series: [

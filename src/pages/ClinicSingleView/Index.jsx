@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -25,23 +25,20 @@ import { handleGetLocation } from "../../utils/getLocation";
 import useBlockUnblock from "../../utils/useBlockUnblock";
 import QRCodeComponent from "../../components/QRCodeComponent";
 import useFetchData from "../../customHooks/useFetchData";
+import CustomSwitch from "../../components/CustomSwitch";
+import { UserContext } from "../../contexts/UseContext";
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { clinicId } = useParams();
-  const previousUrl = sessionStorage.getItem("clinicPreviousPage");
-  const qrUrl = `${websiteUrl}clinic/${clinicId}`;
 
-  useEffect(() => {
-    if (location?.state?.previousUrl) {
-      sessionStorage.setItem(
-        "clinicPreviousPage",
-        location?.state?.previousUrl
-      );
-    }
-  }, [location?.state?.previousUrl]);
+  const { userDetails } = useContext(UserContext);
+
+  const isSuperAdmin = userDetails?.role_id === 1;
+
+  const qrUrl = `${websiteUrl}clinic/${clinicId}`;
 
   useEffect(() => {
     dispatch(setPageTitle("Doctors"));
@@ -321,7 +318,7 @@ const ClinicSingleView = () => {
     <div>
       <ScrollToTop />
       <button
-        onClick={() => navigate(previousUrl)}
+        onClick={() => navigate(-1)}
         type="button"
         className="btn btn-green btn-sm -mt-4 mb-4"
       >
@@ -347,36 +344,29 @@ const ClinicSingleView = () => {
               </div>
 
               <div className="flex flex-col items-center gap-4">
-                <Tippy
-                  content={clinicDetails?.User?.status ? "Block" : "Unblock"}
-                >
-                  <label
-                    className="w-12 h-6 relative"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showClinicAlert(
-                        clinicDetails?.User?.user_id,
-                        clinicDetails?.User?.status ? "block" : "activate",
-                        "clinic"
-                      );
-                    }}
+                <CustomSwitch
+                  checked={clinicDetails?.User?.status}
+                  onChange={() =>
+                    showClinicAlert(
+                      clinicDetails?.User?.user_id,
+                      clinicDetails?.User?.status ? "block" : "activate",
+                      "clinic"
+                    )
+                  }
+                  tooltipText={
+                    clinicDetails?.User?.status ? "Block" : "Unblock"
+                  }
+                  uniqueId={`clinic${clinicDetails?.clinic_id}`}
+                  size="large"
+                />
+                {!isSuperAdmin && (
+                  <button
+                    className="flex hover:text-info"
+                    onClick={openEditModal}
                   >
-                    <input
-                      type="checkbox"
-                      className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                      id={`custom_switch_checkbox${clinicDetails?.clinic_id}`}
-                      checked={clinicDetails?.User?.status}
-                      readOnly
-                    />
-                    <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                  </label>
-                </Tippy>
-                <button
-                  className="flex hover:text-info"
-                  onClick={openEditModal}
-                >
-                  <IconEdit className="w-6 h-6" />
-                </button>
+                    <IconEdit className="w-6 h-6" />
+                  </button>
+                )}
               </div>
             </div>
             <div className="text-left">
@@ -534,29 +524,19 @@ const ClinicSingleView = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy content={rowData.status ? "Block" : "Unblock"}>
-                      <label
-                        className="w-[46px] h-[22px] relative"
-                        disabled={blockUnblockDoctorLoading}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          showDoctorAlert(
-                            rowData?.user_id,
-                            rowData?.status ? "block" : "activate",
-                            "doctor"
-                          );
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox${rowData.doctor_id}`}
-                          checked={rowData?.status}
-                          readOnly
-                        />
-                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                      </label>
-                    </Tippy>
+                    <CustomSwitch
+                      checked={rowData?.status}
+                      onChange={() =>
+                        showDoctorAlert(
+                          rowData?.user_id,
+                          rowData.status ? "block" : "activate",
+                          "doctor"
+                        )
+                      }
+                      tooltipText={rowData?.status ? "Block" : "Unblock"}
+                      uniqueId={`doctor${rowData?.doctor_id}`}
+                      size="normal"
+                    />
                   ),
                 },
               ]}

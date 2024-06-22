@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { setPageTitle } from "../../store/themeConfigSlice";
 import IconMail from "../../components/Icon/IconMail";
 import IconLockDots from "../../components/Icon/IconLockDots";
@@ -13,6 +13,7 @@ import { toggleTheme } from "../../store/themeConfigSlice";
 import IconX from "../../components/Icon/IconX";
 import IconLoader from "../../components/Icon/IconLoader";
 import { baseUrl } from "../../utils/NetworkHandler";
+import { UserContext } from "../../contexts/UseContext";
 
 const LoginBoxed = () => {
   const dispatch = useDispatch();
@@ -37,6 +38,8 @@ const LoginBoxed = () => {
   });
   const [loading, setLoading] = useState(false);
   const [isIncorrect, setIsIncorrect] = useState(false);
+
+  const { setUserDetails } = useContext(UserContext); // Using UserContext
 
   // warning alert closer
   useEffect(() => {
@@ -87,6 +90,7 @@ const LoginBoxed = () => {
     }
 
     const auth = btoa(`${data.email}:${data.password}`);
+
     const headers = new Headers({
       "Content-Type": "application/json",
       Authorization: `${auth}`,
@@ -106,6 +110,10 @@ const LoginBoxed = () => {
         sessionStorage.setItem("accessToken", accessToken);
         sessionStorage.setItem("refreshToken", refreshToken);
         sessionStorage.setItem("userData", JSON.stringify(user));
+
+        // Update the user details in context
+        setUserDetails(user);
+
         setLoading(false);
         setIsIncorrect(false);
         if (user?.role_id === 2) {

@@ -160,22 +160,6 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/owner/subscription-plans" className="group">
-                    <div className="flex items-center">
-                      <IconMenuTodo
-                        className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "owner-subscription-plans"
-                            ? "!text-primary"
-                            : ""
-                        }`}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Subscription Plans"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
                   <NavLink to="/owner/chat" className="group">
                     <div className="flex items-center">
                       <IconMenuChat
@@ -271,20 +255,6 @@ const Sidebar = () => {
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Leaves"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/clinic/chats" className="group">
-                    <div className="flex items-center">
-                      <IconMenuDashboard
-                        className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "clinic-chats" ? "!text-primary" : ""
-                        }`}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"chats"}
                       </span>
                     </div>
                   </NavLink>
@@ -481,20 +451,6 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/admin/messages" className="group">
-                    <div className="flex items-center">
-                      <IconMenuChat
-                        className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "admin-doctors" ? "!text-primary" : ""
-                        }`}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Messages"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
                   <NavLink to="/admin/complaints" className="group">
                     <div className="flex items-center">
                       <IconMenuDocumentation
@@ -506,6 +462,20 @@ const Sidebar = () => {
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Complaints"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/messages" className="group">
+                    <div className="flex items-center">
+                      <IconMenuChat
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "admin-doctors" ? "!text-primary" : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Messages"}
                       </span>
                     </div>
                   </NavLink>

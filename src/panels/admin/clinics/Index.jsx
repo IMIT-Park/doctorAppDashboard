@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -8,21 +8,18 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import {  useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import IconSearch from "../../../components/Icon/IconSearch";
-import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import { showMessage } from "../../../utils/showMessage";
+import NetworkHandler from "../../../utils/NetworkHandler";
 import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { handleGetLocation } from "../../../utils/getLocation";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
+import CustomSwitch from "../../../components/CustomSwitch";
 
 const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const userDetails = sessionStorage.getItem("userData");
-  const userData = JSON.parse(userDetails);
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
@@ -162,30 +159,19 @@ const Clinics = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy
-                      content={rowData?.User?.status ? "Block" : "Unblock"}
-                    >
-                      <label
-                        className="w-[46px] h-[22px] relative"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          showClinicAlert(
-                            rowData?.user_id,
-                            rowData?.User?.status ? "block" : "activate",
-                            "clinic"
-                          );
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox${rowData.User.user_id}`}
-                          checked={rowData.User.status}
-                          readOnly
-                        />
-                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                      </label>
-                    </Tippy>
+                    <CustomSwitch
+                      checked={rowData?.User?.status}
+                      onChange={() =>
+                        showClinicAlert(
+                          rowData?.user_id,
+                          rowData?.User?.status ? "block" : "activate",
+                          "clinic"
+                        )
+                      }
+                      tooltipText={rowData?.User?.status ? "Block" : "Unblock"}
+                      uniqueId={`clinic${rowData?.clinic_id}`}
+                      size="normal"
+                    />
                   ),
                 },
               ]}

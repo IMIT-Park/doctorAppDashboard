@@ -14,8 +14,7 @@ import IconSearch from "../../../components/Icon/IconSearch";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { formatDate } from "../../../utils/formatDate";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
-
-const rowData = [];
+import CustomSwitch from "../../../components/CustomSwitch";
 
 const Doctors = () => {
   const dispatch = useDispatch();
@@ -171,28 +170,19 @@ const Doctors = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <Tippy content={rowData?.status ? "Block" : "Unblock"}>
-                      <label
-                        className="w-[46px] h-[22px] relative"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          showDoctorAlert(
-                            rowData?.user_id,
-                            rowData?.status ? "block" : "activate",
-                            "doctor"
-                          );
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                          id={`custom_switch_checkbox${rowData?.doctor_id}`}
-                          checked={rowData?.status}
-                          readOnly
-                        />
-                        <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-[14px] before:h-[14px] before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                      </label>
-                    </Tippy>
+                    <CustomSwitch
+                      checked={rowData?.status}
+                      onChange={() =>
+                        showDoctorAlert(
+                          rowData?.user_id,
+                          rowData?.status ? "block" : "activate",
+                          "doctor"
+                        )
+                      }
+                      tooltipText={rowData?.status ? "Block" : "Unblock"}
+                      uniqueId={`clinic${rowData?.clinic_id}`}
+                      size="normal"
+                    />
                   ),
                 },
               ]}

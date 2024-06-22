@@ -27,6 +27,7 @@ import QRCodeComponent from "../../components/QRCodeComponent";
 import useFetchData from "../../customHooks/useFetchData";
 import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
+import CustomButton from "../../components/CustomButton"
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -440,16 +441,10 @@ const ClinicSingleView = () => {
           </div>
 
           <div className="flex items-right text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Doctor">
-              <button
-                type="button"
-                className="btn btn-green"
-                onClick={openAddDoctorModal}
-              >
-                <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
-                Add Doctor
-              </button>
-            </Tippy>
+            <CustomButton onClick={openAddDoctorModal}>
+              <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
+              Add Doctor
+            </CustomButton>
           </div>
         </div>
         {doctorLoading ? (

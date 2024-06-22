@@ -20,6 +20,7 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import ModalSubscription from "./ModalSubscription";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomSwitch from "../../../components/CustomSwitch";
+import CustomButton from "../../../components/CustomButton"
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -299,14 +300,10 @@ const Clinics = () => {
             </Tippy>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <button
-              type="button"
-              className="btn btn-green"
-              onClick={() => openAddModal()}
-            >
+            <CustomButton onClick={() => openAddModal()}>
               <IconPlus className="ltr:mr-2 rtl:ml-2" />
               Add Clinic
-            </button>
+            </CustomButton>
           </div>
         </div>
         {loading ? (

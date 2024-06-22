@@ -24,6 +24,7 @@ import IconTrashLines from "../../components/Icon/IconTrashLines";
 import DeleteLeave from "./components/DeleteLeave";
 import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
+import CustomButton from "../../components/CustomButton";
 
 const SinglePage = () => {
   const { clinicId, doctorId } = useParams();
@@ -573,14 +574,10 @@ const SinglePage = () => {
                   Available Days & Time Slots:
                 </h5>
                 {!isSuperAdmin && (
-                  <button
-                    type="button"
-                    className="btn btn-green"
-                    onClick={openAddTimeSlotModal}
-                  >
+                  <CustomButton onClick={openAddTimeSlotModal}>
                     <IconPlus className="ltr:mr-2 rtl:ml-2" />
                     Add Time Slot
-                  </button>
+                  </CustomButton>
                 )}
               </div>
               {doctorDetails?.timeslots && (
@@ -679,14 +676,10 @@ const SinglePage = () => {
                   Leaves:
                 </h5>
                 {!isSuperAdmin && (
-                  <button
-                    type="button"
-                    className="btn btn-green"
-                    onClick={openAddLeaveModal}
-                  >
+                  <CustomButton onClick={openAddLeaveModal}>
                     <IconPlus className="ltr:mr-2 rtl:ml-2" />
                     Add Leave
-                  </button>
+                  </CustomButton>
                 )}
               </div>
               {doctorLeaves && doctorLeaves?.length > 0 ? (

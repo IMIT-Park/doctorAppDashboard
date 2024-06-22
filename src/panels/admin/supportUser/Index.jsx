@@ -17,6 +17,7 @@ import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import DeleteSupportPerson from "./DeleteSupportPerson";
 import { showMessage } from "../../../utils/showMessage";
 import CustomSwitch from "../../../components/CustomSwitch";
+import CustomButton from "../../../components/CustomButton";
 
 const SupportUser = () => {
   const dispatch = useDispatch();
@@ -276,14 +277,10 @@ const SupportUser = () => {
               </span>
             </Tippy>
           </div>
-          <button
-            type="button"
-            className="btn btn-green"
-            onClick={openAddModal}
-          >
+          <CustomButton onClick={openAddModal}>
             <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
             Add Support User
-          </button>
+          </CustomButton>
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />

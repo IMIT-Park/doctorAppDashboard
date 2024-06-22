@@ -14,17 +14,15 @@ import router from "./router/index";
 // Redux
 import { Provider } from "react-redux";
 import store from "./store/index";
-
-// Mantine
-// import { MantineProvider } from '@mantine/core';
+import { UserProvider } from "./contexts/UseContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Suspense>
       <Provider store={store}>
-        {/* <MantineProvider> */}
-        <RouterProvider router={router} />
-        {/* </MantineProvider> */}
+        <UserProvider>
+          <RouterProvider router={router} />
+        </UserProvider>
       </Provider>
     </Suspense>
   </React.StrictMode>

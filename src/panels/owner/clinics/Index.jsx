@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -18,16 +18,15 @@ import { showMessage } from "../../../utils/showMessage";
 import { handleGetLocation } from "../../../utils/getLocation";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import ModalSubscription from "../subscription-plans/ModalSubscription";
-
+import { UserContext } from "../../../contexts/UseContext";
 
 const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const userDetails = sessionStorage.getItem("userData");
-  const userData = JSON.parse(userDetails);
-  const ownerId = userData?.UserOwner?.[0]?.owner_id || 0;
+  const { userDetails } = useContext(UserContext);
+  const ownerId = userDetails?.UserOwner?.[0]?.owner_id || 0;
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
@@ -38,7 +37,7 @@ const Clinics = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [allClinics, setAllClinics] = useState([]);
   const [totalClinics, setTotalClinics] = useState(0);
-  const [subscriptionAddModal,setsubscriptionAddModal] = useState(false);
+  const [subscriptionAddModal, setsubscriptionAddModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [currentClinicId, setCurrentClinicId] = useState("");
@@ -115,10 +114,9 @@ const Clinics = () => {
     setsubscriptionAddModal(true);
   };
 
-  const closeSubscriptionModal  = () => {
+  const closeSubscriptionModal = () => {
     setsubscriptionAddModal(false);
   };
-
 
   const closeAddModal = () => {
     setAddModal(false);
@@ -277,12 +275,10 @@ const Clinics = () => {
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchData);
 
-
-    const handleSubButtonClick = (clinic) => {
-      setCurrentClinicId(clinic.clinic_id);
-      setsubscriptionAddModal(true);
-    };
-
+  const handleSubButtonClick = (clinic) => {
+    setCurrentClinicId(clinic.clinic_id);
+    setsubscriptionAddModal(true);
+  };
 
   return (
     <div>
@@ -354,8 +350,6 @@ const Clinics = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSubButtonClick(rowData);
- 
-
                       }}
                       className="btn btn-green btn-sm py-1"
                     >
@@ -381,7 +375,7 @@ const Clinics = () => {
                     </button>
                   ),
                 },
-                
+
                 {
                   accessor: "Actions",
                   textAlignment: "center",
@@ -465,16 +459,14 @@ const Clinics = () => {
       />
 
       <ModalSubscription
-      open={subscriptionAddModal}
-      closeModal={closeSubscriptionModal}
-      clinicId = {currentClinicId}
-      ownerId= {ownerId}
-      buttonLoading={buttonLoading}
-      setButtonLoading = {setButtonLoading}
-      fetchClinicData = {fetchData}
-      
-       />
-      
+        open={subscriptionAddModal}
+        closeModal={closeSubscriptionModal}
+        clinicId={currentClinicId}
+        ownerId={ownerId}
+        buttonLoading={buttonLoading}
+        setButtonLoading={setButtonLoading}
+        fetchClinicData={fetchData}
+      />
 
       {/* delete sales person modal */}
       {/* <DeleteClinic open={deleteModal} closeModal={closeDeleteConfirmModal} /> */}

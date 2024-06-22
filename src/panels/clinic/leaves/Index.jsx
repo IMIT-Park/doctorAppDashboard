@@ -16,6 +16,7 @@ import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard
 import AddLeave from "./AddLeaveModal";
 import AnimateHeight from "react-animate-height";
 import IconCaretDown from "../../../components/Icon/IconCaretDown";
+import IconTrashLines from "../../../components/Icon/IconTrashLines";
 
 import { formatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
@@ -73,7 +74,7 @@ const ClinicDoctorLeave = () => {
       );
       console.log(response);
       // setTotalLeaves(response.data?.count);
-      setAllLeaves(response.data?.leaveDetails?.doctors);
+      setAllLeaves(response.data?.leaveDetails);
 
       setLoading(false);
     } catch (error) {
@@ -178,109 +179,83 @@ const ClinicDoctorLeave = () => {
         </div>
 
         {/* basic */}
-        <div className="panel" id="basic">
-          <div className="mb-5">
-            <div className="space-y-2 font-semibold">
-              <div className="border border-[#d3d3d3] rounded dark:border-[#1b2e4b]">
-                <button
-                  type="button"
-                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
-                    active === "1" ? "!text-primary" : ""
-                  }`}
-                  onClick={() => togglePara("1")}
-                >
-                  22-11-2023
+        {loading ? (
+          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+        ) : (
+          <div className="panel" id="basic">
+            <div className="mb-5">
+              <div className="space-y-2 font-semibold">
+                {allLeaves.map((leaveDetail, index) => (
                   <div
-                    className={`ltr:ml-auto rtl:mr-auto ${
-                      active === "1" ? "rotate-180" : ""
-                    }`}
+                    key={index}
+                    className="border border-[#d3d3d3] rounded dark:border-[#1b2e4b]"
                   >
-                    <IconCaretDown />
-                  </div>
-                </button>
+                    <button
+                      type="button"
+                      className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
+                        active === index ? "!text-[#006241] dark:!text-[#4ec37bfb]" : ""
+                      }`}
+                      onClick={() => togglePara(index)}
+                    >
+                      {formatDate(new Date(leaveDetail.date))}
 
-                <div>
-                  <AnimateHeight
-                    duration={300}
-                    height={active === "1" ? "auto" : 0}
-                  >
-                    <div className="p-4 text-white-dark text-[13px] border-t border-[#D3D3D3] dark:border-[#1B2E4B] flex items-center justify-start flex-wrap gap-3 sm:gap-4">
-                      <div className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded">
-                        Doctor Name : Dr.Allen
-                        <div className="text-slate-700 dark:text-slate-300">
-                          <p>Full Day</p>{" "}
-                        </div>
-                        <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
-                          Monday : 11:00:00 - 12:00:00{" "}
-                        </span>
+                      <div
+                        className={`ltr:ml-auto rtl:mr-auto ${
+                          active === index ? "rotate-180" : ""
+                        }`}
+                      >
+                        <IconCaretDown />
                       </div>
+                    </button>
+                    <div>
+                      <AnimateHeight
+                        duration={300}
+                        height={active === index ? "auto" : 0}
+                      >
+                        <div className="p-4 text-white-dark text-[15px] border-t border-[#D3D3D3] dark:border-[#1B2E4B] flex items-center justify-start flex-wrap gap-3 sm:gap-4">
+                          {leaveDetail.doctors.map((doctor, docIndex) => (
+                            <div
+                              key={docIndex}
+                              className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
+                            >
+                              <div className="ml-auto">
+                                <IconTrashLines />
+                              </div>{" "}
+                              <div className="flex items-center gap-1 mt-3">
+                                <p>Dr.Name : </p>{" "}
+                                <div className="text-slate-700 dark:text-slate-300">
+                                  {doctor.doctor_name}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                Duration :
+                                <div className="text-slate-700 dark:text-slate-300">
+                                  {doctor.fullday ? "Full Day" : "By Shift"}
+                                </div>{" "}
+                              </div>
+                              {doctor.leaves.map((leave, leaveIndex) => (
+                                <span
+                                  key={leaveIndex}
+                                  className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded mb-2"
+                                >
+                                  {/* {formatDate(leave.leave_date)} :{" "} */}
+                                  {formatTime(
+                                    leave.DoctorTimeSlot.startTime
+                                  )} -{" "}
+                                  {formatTime(leave.DoctorTimeSlot.endTime)}
+                                </span>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      </AnimateHeight>
                     </div>
-                  </AnimateHeight>
-                </div>
-              </div>
-              <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
-                <button
-                  type="button"
-                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
-                    active === "2" ? "!text-primary" : ""
-                  }`}
-                  onClick={() => togglePara("2")}
-                >
-                  Group Item #2
-                  <div
-                    className={`ltr:ml-auto rtl:mr-auto ${
-                      active === "2" ? "rotate-180" : ""
-                    }`}
-                  >
-                    <IconCaretDown />
                   </div>
-                </button>
-                <div>
-                  <AnimateHeight
-                    duration={300}
-                    height={active === "2" ? "auto" : 0}
-                  >
-                    <div className="p-4 text-[13px] border-t border-[#d3d3d3] dark:border-[#1b2e4b]">
-                      <ul className="space-y-1">
-                        <li>
-                          <button type="button">Apple</button>
-                        </li>
-                      </ul>
-                    </div>
-                  </AnimateHeight>
-                </div>
-              </div>
-              <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
-                <button
-                  type="button"
-                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
-                    active === "3" ? "!text-primary" : ""
-                  }`}
-                  onClick={() => togglePara("3")}
-                >
-                  Group Item #3
-                  <div
-                    className={`ltr:ml-auto rtl:mr-auto ${
-                      active === "3" ? "rotate-180" : ""
-                    }`}
-                  >
-                    <IconCaretDown />
-                  </div>
-                </button>
-                <div>
-                  <AnimateHeight
-                    duration={300}
-                    height={active === "3" ? "auto" : 0}
-                  >
-                    <div className="p-4 text-[13px] border-t border-[#d3d3d3] dark:border-[#1b2e4b]">
-                      <p>A</p>
-                    </div>
-                  </AnimateHeight>
-                </div>
+                ))}
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <AddLeave
         addLeaveModal={addLeaveModal}

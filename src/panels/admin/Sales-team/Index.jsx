@@ -18,6 +18,7 @@ import NetworkHandler from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
+import CustomButton from "../../../components/CustomButton";
 
 const Sales = () => {
   const dispatch = useDispatch();
@@ -230,14 +231,10 @@ const Sales = () => {
             </Tippy>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <button
-              type="button"
-              className="btn btn-green"
-              onClick={openAddSalesPersonModal}
-            >
+            <CustomButton onClick={openAddSalesPersonModal}>
               <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
               Add Sales Person
-            </button>
+            </CustomButton>
           </div>
         </div>
         <div className="datatables">

@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
 import CountUp from "react-countup";
-import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import IconLoader from "../../components/Icon/IconLoader";
 import ScrollToTop from "../../components/ScrollToTop";
@@ -27,7 +26,7 @@ import QRCodeComponent from "../../components/QRCodeComponent";
 import useFetchData from "../../customHooks/useFetchData";
 import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
-import CustomButton from "../../components/CustomButton"
+import CustomButton from "../../components/CustomButton";
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -109,8 +108,8 @@ const ClinicSingleView = () => {
     {},
     [clinicId, page, pageSize]
   );
-  const totalDoctors = doctorData?.Doctors?.count || 0;
-  const allDoctors = doctorData?.Doctors?.rows || [];
+  const totalDoctors = doctorData?.count || 0;
+  const allDoctors = doctorData?.alldoctors || [];
 
   // doctor image picker
   const handleFileChange = (e) => {
@@ -493,8 +492,16 @@ const ClinicSingleView = () => {
                   accessor: "name",
                   title: "Name",
                 },
+                {
+                  accessor: "email",
+                  title: "Email",
+                },
+
                 { accessor: "phone" },
-                { accessor: "gender" },
+                {
+                  accessor: "gender",
+                  cellsStyle: { textTransform: "capitalize" },
+                },
                 {
                   accessor: "dateOfBirth",
                   title: "Date of Birth",

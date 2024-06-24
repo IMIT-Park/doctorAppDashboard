@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import Swal from "sweetalert2";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -150,8 +149,13 @@ const Doctors = () => {
                 },
 
                 { accessor: "name", title: "Name" },
+                { accessor: "email", title: "Email" },
                 { accessor: "phone", title: "Phone" },
-                { accessor: "gender", title: "Gender" },
+                {
+                  accessor: "gender",
+                  title: "Gender",
+                  cellsStyle: { textTransform: "capitalize" },
+                },
                 {
                   accessor: "dateOfBirth",
                   title: "Date of Birth",

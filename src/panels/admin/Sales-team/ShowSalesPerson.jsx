@@ -21,7 +21,6 @@ const ShowSalesPerson = ({ open, closeModal, details }) => {
 
   if (!details) return null;
 
-  console.log(details);
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -62,7 +61,7 @@ const ShowSalesPerson = ({ open, closeModal, details }) => {
                   <IconX />
                 </button>
                 <div className="flex items-center flex-wrap gap-2 text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  <div className="ltr:mr-3 rtl:ml-3">{details.name}</div>
+                  <div className="ltr:mr-3 rtl:ml-3 capitalize">{details.name}</div>
                 </div>
                 <div className="p-5">
                   <ul className="flex flex-col space-y-4 font-semibold text-white-dark">

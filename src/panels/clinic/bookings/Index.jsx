@@ -70,8 +70,8 @@ const ClinicBookingDoctor = () => {
         `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
       );
       // console.log(response?.data?.Clinic);
-      setTotalDoctors(response.data?.Doctors?.count);
-      setAllDoctors(response.data?.Doctors?.rows);
+      setTotalDoctors(response.data?.count);
+      setAllDoctors(response.data?.alldoctors);
       setLoading(false);
     } catch (error) {
       console.log(error);

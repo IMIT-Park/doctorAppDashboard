@@ -70,7 +70,7 @@ const ClinicDoctorLeave = () => {
     console.log(clinicId);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/doctor/getleave/${clinicId}`
+        `/v1/leave/getleave/${clinicId}`
       );
       console.log(response);
       // setTotalLeaves(response.data?.count);
@@ -134,11 +134,6 @@ const ClinicDoctorLeave = () => {
             <h5 className="font-semibold text-lg dark:text-white-light">
               Leaves
             </h5>
-            <Tippy content="Total Doctors">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                {/* <CountUp start={0} end={totalLeaves} duration={3}></CountUp> */}
-              </span>
-            </Tippy>
           </div>
 
           <div>
@@ -181,6 +176,13 @@ const ClinicDoctorLeave = () => {
         {/* basic */}
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+        ) : allLeaves.length === 0 ? (
+          <div className="flex flex-col items-center justify-center">
+            <img src={emptyBox} alt="" className="w-10" />
+            <p className="text-gray-500 dark:text-white-dark mt-4">
+              No leaves to show.
+            </p>
+          </div>
         ) : (
           <div className="panel" id="basic">
             <div className="mb-5">

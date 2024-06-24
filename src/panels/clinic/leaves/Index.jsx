@@ -102,7 +102,7 @@ const ClinicDoctorLeave = () => {
           `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
         );
 
-        const doctorData = response.data?.Doctors?.rows || [];
+        const doctorData = response.data?.alldoctors;
         allDoctors = allDoctors.concat(doctorData);
 
         hasMorePages = doctorData.length === pageSize;

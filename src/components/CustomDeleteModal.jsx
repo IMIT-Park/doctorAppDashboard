@@ -1,14 +1,17 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../components/Icon/IconX";
-import IconLoader from "../../../components/Icon/IconLoader";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
+import IconX from "./Icon/IconX";
+import IconTrashLines from "./Icon/IconTrashLines";
+import IconLoader from "./Icon/IconLoader";
+
 
 const DeleteSupportPerson = ({
   open,
   closeModal,
   handleSubmit,
   buttonLoading,
+  title,
+  warningText
 }) => {
   return (
     <Transition appear show={open} as={Fragment}>
@@ -49,14 +52,14 @@ const DeleteSupportPerson = ({
                   <IconX />
                 </button>
                 <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  Delete Support User
+                  {title || ""}
                 </div>
                 <div className="p-5 text-center">
                   <div className="text-white bg-danger ring-4 ring-danger/30 p-4 rounded-full w-fit mx-auto">
                     <IconTrashLines className="w-7 h-7 mx-auto" />
                   </div>
                   <div className="sm:w-full mx-auto mt-5">
-                    Are you sure you want to delete this Support User?
+                    {warningText || ""}
                   </div>
 
                   <div className="flex justify-center items-center mt-8">

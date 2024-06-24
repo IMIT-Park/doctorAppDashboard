@@ -62,6 +62,7 @@ const SupportUser = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/supportuser/getallSupportuser?pageSize=${pageSize}&page=${page}`
       );
+
       setTotalSupportUsers(response?.data?.Supportuser?.count);
       setAllSupportUsers(response?.data?.Supportuser?.rows);
       setLoading(false);
@@ -117,9 +118,10 @@ const SupportUser = () => {
       return true;
     }
     setButtonLoading(true);
+
     try {
       const response = await NetworkHandler.makePostRequest(
-        "/v1/supportuser/createSupportuser",
+        "/v1/supportuser/createSupportuser", 
         input
       );
 
@@ -135,7 +137,7 @@ const SupportUser = () => {
     } catch (error) {
       setButtonLoading(false);
       if (error.response && error.response.status === 403) {
-        showMessage("Email already exists.", "error");
+        showMessage(error?.response?.data?.error == "User Already Exists" ? "Username Already Exists" : "Email already exists.", "error");
       } else {
         showMessage("An error occurred. Please try again.", "error");
       }
@@ -148,11 +150,9 @@ const SupportUser = () => {
   const openEditModal = (rowData) => {
     setSupportPersonId(rowData?.supportuser_id || "");
     setInput({
-      ...input,
       name: rowData?.name || "",
       phone: rowData?.phone || "",
       address: rowData?.address || "",
-      email: rowData?.email || "",
     });
     setEditModal(true);
   };
@@ -176,8 +176,6 @@ const SupportUser = () => {
   const editSupportUser = async () => {
     if (
       !input.name ||
-      !input.email ||
-      !input.user_name ||
       !input.phone ||
       !input.address
     ) {

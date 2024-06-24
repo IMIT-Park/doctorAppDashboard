@@ -104,6 +104,7 @@ const AddSalesPerson = ({
                         }
                       />
                     </div>
+                    {!isEditMode &&
                     <div className="mb-5">
                       <label htmlFor="email">Email</label>
                       <input
@@ -119,7 +120,7 @@ const AddSalesPerson = ({
                           {emailError}
                         </p>
                       )}
-                    </div>
+                    </div>}
                     {!isEditMode && (
                       <div className="mb-5">
                         <label htmlFor="user-name">User Name</label>

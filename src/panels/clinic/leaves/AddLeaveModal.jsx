@@ -65,7 +65,7 @@ const AddLeave = ({
 
     try {
       const response = await NetworkHandler.makePostRequest(
-        `/v1/doctor/getTimeSlot/${selectedDoctorId}`,
+        `/v1/leave/getTimeSlot/${selectedDoctorId}`,
         { date }
       );
       console.log("API Response:", response.data);

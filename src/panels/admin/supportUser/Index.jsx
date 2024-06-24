@@ -14,10 +14,10 @@ import IconUserPlus from "../../../components/Icon/IconUserPlus";
 import AddSupportUser from "./AddSupportUser";
 import IconEdit from "../../../components/Icon/IconEdit";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import DeleteSupportPerson from "./DeleteSupportPerson";
 import { showMessage } from "../../../utils/showMessage";
 import CustomSwitch from "../../../components/CustomSwitch";
 import CustomButton from "../../../components/CustomButton";
+import DeleteSupportPerson from "../../../components/CustomDeleteModal";
 
 const SupportUser = () => {
   const dispatch = useDispatch();
@@ -395,6 +395,8 @@ const SupportUser = () => {
 
       {/* delete support user modal */}
       <DeleteSupportPerson
+        title={" Delete Support User"}
+        warningText={" Are you sure you want to delete this Support User?"}
         open={deleteModal}
         closeModal={closeDeleteModal}
         buttonLoading={buttonLoading}

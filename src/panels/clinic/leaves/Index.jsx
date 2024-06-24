@@ -20,6 +20,8 @@ import IconTrashLines from "../../../components/Icon/IconTrashLines";
 
 import { formatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
+import DeleteLeaveModal from "./DeleteLeaveModal";
+
 
 const ClinicDoctorLeave = () => {
   const dispatch = useDispatch();
@@ -36,12 +38,15 @@ const ClinicDoctorLeave = () => {
   const [allLeaves, setAllLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [buttonLoading, setButtonLoading] = useState(false);
-
   const [addLeaveModal, setAddLeaveModal] = useState(false);
   const [allDoctorNames, setAllDoctorNames] = useState([]);
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const [active, setActive] = useState("");
+
+  const [deleteLeaveModal, setDeleteLeaveModal] = useState(false);
+  const [selectedLeave, setSelectedLeave] = useState(null);
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
 
   const togglePara = (value) => {
     setActive((oldValue) => (oldValue === value ? "" : value));
@@ -124,6 +129,18 @@ const ClinicDoctorLeave = () => {
     fetchDoctorData();
   }, []);
 
+  const openDeleteLeaveModal = (leave) => {
+    setSelectedLeave(leave);
+    setDeleteLeaveModal(true);
+    console.log(leave);
+  };
+
+  const closeDeleteLeaveModal = () => {
+    setDeleteLeaveModal(false);
+    setSelectedTimeSlots([]);
+    setSelectedLeave(null);
+  };
+
   return (
     <div>
       <ScrollToTop />
@@ -195,7 +212,9 @@ const ClinicDoctorLeave = () => {
                     <button
                       type="button"
                       className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
-                        active === index ? "!text-[#006241] dark:!text-[#4ec37bfb]" : ""
+                        active === index
+                          ? "!text-[#006241] dark:!text-[#4ec37bfb]"
+                          : ""
                       }`}
                       onClick={() => togglePara(index)}
                     >
@@ -220,9 +239,16 @@ const ClinicDoctorLeave = () => {
                               key={docIndex}
                               className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
                             >
-                              <div className="ml-auto">
-                                <IconTrashLines />
-                              </div>{" "}
+                              <Tippy content="Delete Leave">
+                                <button
+                                  type="button"
+                                  className="btn btn-dark w-9 h-9 p-0 rounded-full ml-auto"
+                                  onClick={() => openDeleteLeaveModal(leaveDetail)}
+                                >
+                                  <IconTrashLines />
+                                </button>
+                              </Tippy>
+
                               <div className="flex items-center gap-1 mt-3">
                                 <p>Dr.Name : </p>{" "}
                                 <div className="text-slate-700 dark:text-slate-300">
@@ -266,6 +292,16 @@ const ClinicDoctorLeave = () => {
         buttonLoading={buttonLoading}
         allDoctorNames={allDoctorNames}
         fetchLeaveData={fetchLeaveData}
+      />
+
+      <DeleteLeaveModal
+        open={deleteLeaveModal}
+        closeModal={closeDeleteLeaveModal}
+        buttonLoading={buttonLoading}
+        leave={selectedLeave}
+        fetchLeaveData={fetchLeaveData}
+        selectedTimeSlots={selectedTimeSlots}
+        setSelectedTimeSlots={setSelectedTimeSlots}
       />
     </div>
   );

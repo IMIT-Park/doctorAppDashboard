@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
 import IconPlus from "../../../components/Icon/IconPlus";
 import IconX from "../../../components/Icon/IconX";
-import axios from "axios";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import Swal from "sweetalert2";
-import {formatTime} from "../../../utils/formatTime";
-import {formatDate} from "../../../utils/formatDate";
-
+import { formatTime } from "../../../utils/formatTime";
+import { formatDate } from "../../../utils/formatDate";
+import { showMessage } from "../../../utils/showMessage";
 
 const AddLeave = ({
   addLeaveModal,
@@ -61,7 +59,7 @@ const AddLeave = ({
     setSelectedDate(date);
     setErrorMessage("");
     setTimeSlots([]);
-    setSelectedTimeSlots([]); 
+    setSelectedTimeSlots([]);
     console.log("Selected Date:", date);
 
     try {
@@ -100,30 +98,32 @@ const AddLeave = ({
     }
   };
 
-  
   const handleSaveLeave = async () => {
     if (!selectedDoctorId) {
-      showBlockAlert("No doctor selected");
+      showMessage("No doctor selected", "error");
       return;
     }
 
     if (leaveType === "Full Day" && !selectedDate) {
-      showBlockAlert("No date selected");
+      showMessage("No date selected", "error");
       return;
     }
 
     if (leaveType === "Full Day" && timeSlots.length === 0) {
-      showBlockAlert("No time slots available");
+      showMessage("No time slots available", "error");
       return;
     }
 
     if (leaveType === "Multiple" && (!startDate || !endDate)) {
-      showBlockAlert("Please select a date range");
+      showMessage("Please select a date range", "error");
       return;
     }
 
-    if (leaveType === "By Shift" && (!selectedDate || selectedTimeSlots.length === 0)) {
-      showBlockAlert("Please select a date and at least one time slot");
+    if (
+      leaveType === "By Shift" &&
+      (!selectedDate || selectedTimeSlots.length === 0)
+    ) {
+      showMessage("Please select a date and at least one time slot", "error");
       return;
     }
 
@@ -176,47 +176,12 @@ const AddLeave = ({
     } catch (error) {
       console.error("Error creating leave slots:", error);
       if (error.response && error.response.status === 404) {
-        showBlockAlert("Leave already taken on the date");
+        showMessage("Leave already taken on the date", "error");
       } else {
-        showBlockAlert("An error occurred while creating leave slots");
+        showMessage("An error occurred while creating leave slots", "error");
       }
     }
   };
-
-
-  const showMessage = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top-right",
-      showConfirmButton: false,
-      showCloseButton: true,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: type,
-      title: msg,
-      padding: "10px 20px",
-    });
-  };
-
-  const showBlockAlert = (msg = "", type = "success") => {
-    const toast = Swal.mixin({
-      toast: true,
-      position: "top-right",
-      showConfirmButton: false,
-      showCloseButton: true,
-      timer: 3000,
-      customClass: { container: "toast" },
-    });
-    toast.fire({
-      icon: "warning",
-      title: msg,
-      padding: "10px 20px",
-    });
-  };
-
- 
 
   return (
     <Transition appear show={addLeaveModal} as={Fragment}>
@@ -403,7 +368,7 @@ const AddLeave = ({
                       </div>
                     )}
 
-                     {leaveType === "By Shift" && (
+                    {leaveType === "By Shift" && (
                       <div className="mb-8 flex flex-col gap-5 justify-between">
                         <div>
                           <label htmlFor="Date">Date</label>
@@ -454,7 +419,7 @@ const AddLeave = ({
                         </div>
                       </div>
                     )}
-                    
+
                     <div className="flex justify-center items-center mt-8">
                       <button
                         type="button"

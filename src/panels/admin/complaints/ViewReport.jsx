@@ -2,8 +2,11 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
+import IconMail from "../../../components/Icon/IconMail";
+import IconPhone from "../../../components/Icon/IconPhone";
+import IconOpenBook from "../../../components/Icon/IconOpenBook";
 
-const ViewReport = ({ open, closeModal }) => {
+const ViewReport = ({ open, closeModal,details }) => {
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -43,30 +46,32 @@ const ViewReport = ({ open, closeModal }) => {
                 >
                   <IconX />
                 </button>
-                <div className="flex items-center flex-wrap gap-2 text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  <div className="ltr:mr-3 rtl:ml-3">Reporter</div>
-                </div>
                 <div className="p-5">
-                  <p className="text-[#006241] text-xs mb-1.5 font-bold">
-                    25 Sep 2020
-                  </p>
-                  <h5 className="text-[#3b3f5c] text-[15px] font-bold mb-2 dark:text-white-light">
-                    How to Start a Blog in 5 Easy Steps.
-                  </h5>
-                  <p className="text-white-dark ">
-                    Vestibulum vestibulum tortor ut eros tincidunt, ut rutrum
-                    elit volutpat.
-                  </p>
-
-                  <div className="ltr:text-right rtl:text-left mt-8">
-                    <button
-                      type="button"
-                      className="btn btn-outline-danger"
-                      onClick={closeModal}
-                    >
-                      Close
-                    </button>
-                  </div>
+                  <ul className="flex flex-col space-y-4 font-semibold text-white-dark">
+                    <li>
+                      <button className="flex items-start gap-2">
+                        {/* <IconMail className="w-5 h-5 shrink-0" /> */}
+                        <div className="text-gray-500 flex justify-between min-w-16">Email <span>:</span></div>
+                        <span className="text-gray-500 dark:text-slate-300">
+                          {details.email}
+                        </span>
+                      </button>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      {/* <IconPhone className="w-5 h-5 shrink-0" /> */}
+                      <div className="text-gray-500 flex justify-between min-w-16">Phone <span>:</span></div>
+                      <span className="whitespace-nowrap text-gray-500 dark:text-slate-300" dir="ltr">
+                        {details.phone}
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      {/* <IconOpenBook className="w-5 h-5 shrink-0" /> */}
+                      <div className="text-gray-500 flex justify-between min-w-16">Content <span>:</span></div>
+                      <span className="text-gray-500 dark:text-slate-300" dir="ltr">
+                        {details.content}
+                      </span>
+                    </li>
+                  </ul>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

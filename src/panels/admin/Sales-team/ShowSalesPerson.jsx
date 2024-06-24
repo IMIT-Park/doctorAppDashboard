@@ -21,7 +21,6 @@ const ShowSalesPerson = ({ open, closeModal, details }) => {
 
   if (!details) return null;
 
-  console.log(details);
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog

@@ -86,7 +86,8 @@ const Sales = () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/salesperson/getallsalespersons?page=${page}&paggetallsalespersonseSize=${pageSize}`
-      );
+      ); 
+  console.log(response.data);
       setTotalSalesPerson(response.data?.Salesperson?.count);
       setAllSalesPerson(response.data?.Salesperson?.rows);
       setLoading(false);
@@ -136,13 +137,14 @@ const Sales = () => {
         showMessage("Failed to add sales person. Please try again.", "error");
       }
     } catch (error) {
-      if (error.response && error.response.status === 403) {
-        showMessage("Email already exists.", "error");
+      console.log(error);
+      if (error?.response && error?.response?.status === 403) {
+        showMessage(error?.response?.data?.error == "User Already Exists" ? "Username Already Exists" :  "Email already exists.", "error");
       } else {
         showMessage("Failed to add sales person. Please try again.", "error");
       }
     }
-  };
+  }; 
 
   const updateSalesPerson = async () => {
     if (!selectedSalesPerson) {
@@ -150,7 +152,7 @@ const Sales = () => {
       return;
     }
 
-    if (!input.name || !input.email || !input.phone || !input.address) {
+    if (!input.name || !input.phone || !input.address) {
       showMessage("Please fill in all required fields", "error");
       return;
     }
@@ -178,12 +180,8 @@ const Sales = () => {
     setEditSalesPersonModal(true);
     setInput({
       name: salesPerson.name,
-      email: salesPerson.email,
-      user_name: salesPerson.user_name,
       phone: salesPerson.phone,
       address: salesPerson.address,
-      password: "",
-      confirmPassword: "",
     });
   };
 
@@ -193,7 +191,7 @@ const Sales = () => {
     setInput({
       ...input,
       name: "",
-      email: "",
+      email:"",
       user_name: "",
       phone: "",
       address: "",

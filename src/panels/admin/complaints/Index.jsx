@@ -15,6 +15,7 @@ import DeleteReport from "./DeleteReport";
 import { formatDate } from "../../../utils/formatDate";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
+import IconEye from "../../../components/Icon/IconEye";
 
 const Complaints = () => {
   const dispatch = useDispatch();
@@ -29,6 +30,8 @@ const Complaints = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [totalComplaints, setTotalComplaints] = useState(0);
   const [allComplaints, setAllComplaints] = useState([]);
+  const [singleDetails, setSingleDetails] = useState({});
+  const [viewModal, setViewModal] = useState(false); 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -72,6 +75,15 @@ const Complaints = () => {
     setDeleteModal(false);
   };
 
+  const openViewModal = (user) => {
+    setSingleDetails(user);
+    setViewModal(true);
+  };
+
+  const closeViewModal = () => {
+    setViewModal(false);
+  };
+
 
   return (
     <div>
@@ -108,14 +120,25 @@ const Complaints = () => {
                 { accessor: "No", title: "NO",
                 render: (row, rowIndex) => rowIndex + 1,},
                 { accessor: "email", title: "email" },
-                { accessor: "content", title: "content" },
+                { accessor: "content", title: "content", ellipsis:true, width:350},
                 { accessor: "phone", title: "phone" },
 
                 {
                   accessor: "Actions",
                   textAlignment: "center",
-                  render: (rowData) => (
+                  render: (user) => (
                     <div className="flex gap-4 items-center w-max mx-auto">
+                      <Tippy content="View">
+                        <button
+                          className="flex hover:text-primary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openViewModal(user);
+                          }}
+                        >
+                          <IconEye />
+                        </button>
+                      </Tippy>
                       <Tippy content="Delete">
                         <button
                           type="button"
@@ -148,7 +171,7 @@ const Complaints = () => {
       </div>
 
       {/* view user modal */}
-      {/* <ViewReport open={viewModal} closeModal={closeViewModal} /> */}
+      <ViewReport open={viewModal} closeModal={closeViewModal}  details={singleDetails}/>
 
       {/* delete user modal */}
       <DeleteReport open={deleteModal} closeModal={closeDeleteModal} />

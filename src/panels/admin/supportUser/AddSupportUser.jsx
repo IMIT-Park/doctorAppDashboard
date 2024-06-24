@@ -87,6 +87,7 @@ const AddSupportUser = ({
                         }
                       />
                     </div>
+                    {!isEditMode &&
                     <div className="mb-5">
                       <label htmlFor="email">Email</label>
                       <input
@@ -100,7 +101,7 @@ const AddSupportUser = ({
                         }
                         required
                       />
-                    </div>
+                    </div>}
                     {!isEditMode &&
                     <div className="mb-5">
                       <label htmlFor="user-name">User Name</label>

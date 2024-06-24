@@ -102,7 +102,7 @@ const SinglePage = () => {
     data: doctorLeavesData,
     loading: leavesLoading,
     refetch: fetchLeaveData,
-  } = useFetchData(`/v1/doctor/getdrleave/${doctorId}`, {}, [doctorId]);
+  } = useFetchData(`/v1/leave/getdrleave/${doctorId}`, {}, [doctorId]);
   const doctorLeaves = doctorLeavesData?.leaveDetails;
 
   // edit details modal handler

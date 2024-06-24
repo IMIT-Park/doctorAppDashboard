@@ -149,36 +149,37 @@ const AddClinic = ({
                         }
                       />
                     </div>
-
-                    <div className="mb-5">
-                      <label htmlFor="email">Email</label>
-                      <input
-                        id="email"
-                        type="email"
-                        placeholder="Enter Email"
-                        className="form-input"
-                        value={data.email}
-                        onChange={(e) =>
-                          setData({ ...data, email: e.target.value })
-                        }
-                        autoComplete="off"
-                      />
-                    </div>
-
-                    <div className="mb-5">
-                      <label htmlFor="username">Username</label>
-                      <input
-                        id="username"
-                        type="text"
-                        placeholder="Username"
-                        className="form-input"
-                        value={data.user_name}
-                        onChange={(e) =>
-                          setData({ ...data, user_name: e.target.value })
-                        }
-                      />
-                    </div>
-
+                    {!isEdit && (
+                      <div className="mb-5">
+                        <label htmlFor="email">Email</label>
+                        <input
+                          id="email"
+                          type="email"
+                          placeholder="Enter Email"
+                          className="form-input"
+                          value={data.email}
+                          onChange={(e) =>
+                            setData({ ...data, email: e.target.value })
+                          }
+                          autoComplete="off"
+                        />
+                      </div>
+                    )}
+                    {!isEdit && (
+                      <div className="mb-5">
+                        <label htmlFor="username">Username</label>
+                        <input
+                          id="username"
+                          type="text"
+                          placeholder="Username"
+                          className="form-input"
+                          value={data.user_name}
+                          onChange={(e) =>
+                            setData({ ...data, user_name: e.target.value })
+                          }
+                        />
+                      </div>
+                    )}
                     <div className="mb-5">
                       <label htmlFor="number">Phone Number</label>
                       <input

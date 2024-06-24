@@ -61,6 +61,7 @@ const AddLeave = ({
     setSelectedDate(date);
     setErrorMessage("");
     setTimeSlots([]);
+    setSelectedTimeSlots([]); 
     console.log("Selected Date:", date);
 
     try {
@@ -135,8 +136,9 @@ const AddLeave = ({
             leave_date: selectedDate,
           })),
         };
+        console.log("Sending Full Day Leave Data:", leaveData);
         const response = await NetworkHandler.makePostRequest(
-          `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
+          `/v1/leave/createLeaveSlots/${selectedDoctorId}`,
           leaveData
         );
         showMessage("Leave added successfully.");
@@ -148,7 +150,7 @@ const AddLeave = ({
         };
         console.log(leaveData);
         const response = await NetworkHandler.makePostRequest(
-          `/v1/doctor/createBlukLeave/${selectedDoctorId}`,
+          `/v1/leave/createBlukLeave/${selectedDoctorId}`,
           leaveData
         );
         console.log(response);
@@ -161,8 +163,9 @@ const AddLeave = ({
             leave_date: selectedDate,
           })),
         };
+        console.log("Sending Shift Day Leave Data:", leaveData);
         const response = await NetworkHandler.makePostRequest(
-          `/v1/doctor/createLeaveSlots/${selectedDoctorId}`,
+          `/v1/leave/createLeaveSlots/${selectedDoctorId}`,
           leaveData
         );
         showMessage("Leave by shift added successfully.");

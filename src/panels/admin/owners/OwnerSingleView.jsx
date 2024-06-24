@@ -51,7 +51,6 @@ const OwnerSingleView = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getallclinics/${ownerId}?page=${page}&pageSize=${pageSize}`
       );
-
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
       setLoading(false);

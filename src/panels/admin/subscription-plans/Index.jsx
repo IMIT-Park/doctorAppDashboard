@@ -22,6 +22,7 @@ const SubscriptionPlans = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/plans/getallplans`
       );
+      console.log(response);
       setAllPlans(response?.data?.Plans?.rows || []);
     } catch {
       setLoading(false);
@@ -49,7 +50,9 @@ const SubscriptionPlans = () => {
                       key={index}
                       className="p-3 lg:p-5 border border-black dark:border-[#1b2e4b] text-center rounded group hover:border-green-900"
                     >
-                      <h3 className="text-xl lg:text-2xl">{plan.plan_name}</h3>
+                      <h3 className="text-xl lg:text-2xl">
+                        {plan?.plan_name || ""}
+                      </h3>
                       <div className="border-t border-black dark:border-white-dark w-1/5 mx-auto my-6 group-hover:border-green-900"></div>
                       <p className="text-[15px]">
                         {plan.description ||
@@ -57,21 +60,11 @@ const SubscriptionPlans = () => {
                       </p>
                       <div className="my-7 p-2.5 text-center text-lg group-hover:text-[#006241]">
                         <strong className="text-[#3b3f5c] dark:text-white-dark text-3xl lg:text-5xl group-hover:text-[#006241]">
-                          ${plan.price_per_doctor}
+                          ₹{plan.price_per_doctor}
                         </strong>{" "}
                         / {plan.frequency_in_days === 30 ? "monthly" : "yearly"}
                       </div>
                       <ul className="space-y-2.5 mb-5 font-semibold group-hover:text-[#006241]">
-                        {/* {plan.features?.map((feature, featureIndex) => (
-                    <li
-                      key={featureIndex}
-                      className="flex justify-center items-center"
-                    >
-                      <IconArrowLeft className="w-3.5 h-3.5 ltr:mr-1 rtl:ml-1 rtl:rotate-180 shrink-0" />
-                      {feature}
-                    </li>
-                  )) || ( 
-                     <> */}
                         <li className="flex justify-center items-center">
                           <IconArrowLeft className="w-3.5 h-3.5 ltr:mr-1 rtl:ml-1 rtl:rotate-180 shrink-0" />
                           Free water saving e-book

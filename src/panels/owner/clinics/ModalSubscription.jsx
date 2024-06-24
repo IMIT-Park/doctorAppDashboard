@@ -42,7 +42,7 @@ const ModalPage = ({
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setSubscriptionData(null);
+        setSubscriptionData(null);fetchPlanDetails()
       } else {
         console.error("Error fetching subscription data:", error);
       }
@@ -57,7 +57,6 @@ const ModalPage = ({
     }
   }, [clinicId]);
 
-  console.log(subscriptionData);
 
   const fetchPlanDetails = async () => {
     console.log("gdsdgjhagh");
@@ -79,7 +78,7 @@ const ModalPage = ({
     if (clinicId && !subscriptionData) {
       fetchPlanDetails();
     }
-  }, []);
+  }, [!subscriptionData]);
 
   const handlePlanSelection = (planId) => {
     setSelectedPlans((prevSelectedPlans) => ({
@@ -165,9 +164,9 @@ const ModalPage = ({
                   <>
                     {subscriptionData ? (
                       <>
-                        <div className="flex justify-between mb-4 p-4">
+                        <div className="flex justify-between mb-4 ps-3">
                           <div>
-                            <h2 className="text-lg font-semibold">
+                            <h2 className="text-lg font-semibold mt-4">
                               Plan Name: {subscriptionData?.Plan?.plan_name}
                             </h2>
                             <p className="text-sm text-gray-500">
@@ -176,27 +175,48 @@ const ModalPage = ({
                             </p>
                           </div>
                           <div className="flex items-center">
-                            <span className="bg-green-100 text-green-600 dark:bg-green-600 dark:text-white px-2 py-1 rounded-md text-xs font-semibold uppercase">
+                            <span className="bg-green-100 text-green-600 dark:bg-green-600 dark:text-white px-2 py-1 mx-3 rounded-md text-xs font-semibold uppercase">
                               {subscriptionData?.status}
                             </span>
                           </div>
                         </div>
-                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 p-4">
-                          <p className="text-sm text-gray-500">
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 p-4 text-[14px]">
+                        <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
+                        <div className="text-white-dark min-w-[50px] flex justify-between">
                             Start Date:{" "}
+                        </div>
+                        <div className="dark:text-slate-300 md:max-w-80">
                             {formatDate(subscriptionData?.start_date)}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            End Date: {formatDate(subscriptionData?.end_date)}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Next Billing Date:{" "}
-                            {formatDate(subscriptionData?.next_billing_date)}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Price per Doctor: $
-                            {subscriptionData?.Plan?.price_per_doctor}
-                          </p>
+                        </div>
+                          </div>
+
+                          <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
+                        <div className="text-white-dark min-w-[50px] flex justify-between">
+                             End Date:{" "}
+                        </div>
+                        <div className="dark:text-slate-300 md:max-w-80">
+                            {formatDate(subscriptionData?.end_date)}
+                        </div>
+                          </div>
+
+                          <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
+                        <div className="text-white-dark min-w-[50px] flex justify-between">
+                        Next Billing Date:{" "}
+                        </div>
+                        <div className="dark:text-slate-300 md:max-w-80">
+                        {formatDate(subscriptionData?.next_billing_date)}
+                        </div>
+                          </div>
+
+                          <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
+                        <div className="text-white-dark min-w-[50px] flex justify-between">
+                        Price per Doctor: 
+                        </div>
+                        <div className="dark:text-slate-300 md:max-w-80">
+                        $
+                        {subscriptionData?.Plan?.price_per_doctor}
+                        </div>
+                          </div>
                         </div>
                       </>
                     ) : (

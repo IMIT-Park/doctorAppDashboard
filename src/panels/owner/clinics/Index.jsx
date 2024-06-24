@@ -20,7 +20,7 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import ModalSubscription from "./ModalSubscription";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomSwitch from "../../../components/CustomSwitch";
-import CustomButton from "../../../components/CustomButton"
+import CustomButton from "../../../components/CustomButton";
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ const Clinics = () => {
   const { userDetails } = useContext(UserContext);
   const ownerId = userDetails?.UserOwner?.[0]?.owner_id || 0;
 
-  console.log(userDetails);
+  // console.log(userDetails);
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
@@ -134,7 +134,8 @@ const Clinics = () => {
       phone: "",
       address: "",
       place: "",
-      banner_img_url: "",
+      picture: null,
+      defaultPicture:null,
       googleLocation: "",
     });
   };
@@ -164,7 +165,7 @@ const Clinics = () => {
       phone: "",
       address: "",
       place: "",
-      picture: "",
+      picture: null,
       googleLocation: {},
     });
     setCurrentClinicId(null);
@@ -203,6 +204,7 @@ const Clinics = () => {
       formData.append("image_url[]", input.picture);
     }
     formData.append("password", input.password);
+    console.log(input);
     try {
       const response = await NetworkHandler.makePostRequest(
         "/v1/clinic/createClinic",
@@ -216,8 +218,14 @@ const Clinics = () => {
         closeAddModal();
       }
     } catch (error) {
+      console.log(error);
       if (error?.response?.status === 403) {
-        showMessage("User Already Exist.", "error");
+        showMessage(
+          error?.response?.data?.error == "User Already Exists"
+            ? "Username Already Exist."
+            : "Email Already Exist.",
+          "error"
+        );
       } else {
         showMessage("An error occurred. Please try again.", "error");
       }
@@ -230,8 +238,6 @@ const Clinics = () => {
   const updateClinic = async () => {
     if (
       !input.name ||
-      !input.email ||
-      !input.user_name ||
       !input.phone ||
       !input.address ||
       !input.place ||
@@ -245,8 +251,6 @@ const Clinics = () => {
 
     const formData = new FormData();
     formData.append("name", input.name);
-    formData.append("email", input.email);
-    formData.append("user_name", input.user_name);
     formData.append("phone", input.phone);
     formData.append("address", input.address);
     formData.append("place", input.place);

@@ -67,7 +67,7 @@ const DeleteLeave = ({
 
     try {
       const response = await NetworkHandler.makeDeleteRequest(
-        "/v1/doctor/deleteLeaveSlot",
+        "/v1/leave/deleteLeaveSlot",
         {
           leave_ids: selectedTimeSlots,
         }

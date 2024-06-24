@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import AnimateHeight from "react-animate-height";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,8 +17,22 @@ import IconMenuInvoice from "../Icon/Menu/IconMenuInvoice";
 import IconMenuTodo from "../Icon/Menu/IconMenuTodo";
 import IconUserPlus from "../Icon/IconUserPlus";
 import IconUser from "../Icon/IconUser";
+import { UserContext } from "../../contexts/UseContext";
 
 const Sidebar = () => {
+  // role handler
+  const { userDetails } = useContext(UserContext);
+  const roleMap = {
+    1: "superAdmin",
+    2: "owner",
+    3: "clinic",
+    4: "doctor",
+    5: "salesPerson",
+    6: "supportUser",
+  };
+  const role = roleMap[userDetails?.role_id] || "superAdmin";
+
+
   const [currentMenu, setCurrentMenu] = useState("dashboard");
   const [errorSubMenu, setErrorSubMenu] = useState(false);
   const themeConfig = useSelector((state) => state.themeConfig);
@@ -90,11 +104,6 @@ const Sidebar = () => {
     }
   }, [location]);
 
-  // role handler
-  const strigifyUserData = sessionStorage.getItem("userData");
-  const userData = JSON.parse(strigifyUserData);
-  const role = userData?.role_id;
-
   return (
     <div className={semidark ? "dark" : ""}>
       <nav
@@ -127,7 +136,7 @@ const Sidebar = () => {
             </button>
           </div>
           <PerfectScrollbar className="mt-10 h-[calc(100vh-80px)] relative">
-            {role === 2 ? (
+            {role === "owner" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
                 <li className="nav-item">
                   <NavLink to="/owner/dashboard" className="group">
@@ -176,7 +185,7 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
               </ul>
-            ) : role === 3 ? (
+            ) : role === "clinic" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
                 <li className="nav-item">
                   <NavLink to="/clinic/dashboard" className="group">
@@ -260,7 +269,7 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
               </ul>
-            ) : role === 4 ? (
+            ) : role === "doctor" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
                 <li className="nav-item">
                   <NavLink to="/doctor/dashboard" className="group">
@@ -279,7 +288,7 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
               </ul>
-            ) : role === 5 ? (
+            ) : role === "salesPerson" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
                 <li className="nav-item">
                   <NavLink to="/sales/dashboard" className="group">
@@ -312,7 +321,7 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
               </ul>
-            ) : role === 6 ? (
+            ) : role === "supportUser" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
                 <li className="nav-item">
                   <NavLink to="/supportuser/dashboard" className="group">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toggleTheme, toggleSidebar } from "../../store/themeConfigSlice";
@@ -14,14 +14,45 @@ import IconUser from "../Icon/IconUser";
 import IconLogout from "../Icon/IconLogout";
 import IconMailDot from "../Icon/IconMailDot";
 import IconArrowLeft from "../Icon/IconArrowLeft";
+import { UserContext } from "../../contexts/UseContext";
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Admin Details
-  const userDetails = sessionStorage.getItem("userData");
-  const userData = JSON.parse(userDetails);
+  const { userDetails } = useContext(UserContext);
+
+  const createUserData = (userDetails) => {
+    const userData = {
+      user_id: userDetails?.user_id,
+      role_id: userDetails?.role_id,
+      user_name: userDetails?.user_name,
+      password: userDetails?.password,
+      email: userDetails?.email,
+      status: userDetails?.status,
+      additionalDetails: {},
+    };
+
+    if (userDetails?.UserClinic?.length > 0) {
+      userData.additionalDetails = userDetails?.UserClinic[0];
+    }
+    if (userDetails?.UserOwner?.length > 0) {
+      userData.additionalDetails = userDetails?.UserOwner[0];
+    }
+    if (userDetails?.UserDoctor?.length > 0) {
+      userData.additionalDetails = userDetails?.UserDoctor[0];
+    }
+    if (userDetails?.UserSalesperson?.length > 0) {
+      userData.additionalDetails = userDetails?.UserSalesperson[0];
+    }
+    if (userDetails?.UserSupportuser?.length > 0) {
+      userData.additionalDetails = userDetails?.UserSupportuser[0];
+    }
+
+    return userData;
+  };
+
+  const userData = createUserData(userDetails);
 
   useEffect(() => {
     const selector = document.querySelector(
@@ -81,7 +112,6 @@ const Header = () => {
   const removeNotification = (value) => {
     setNotifications(notifications.filter((user) => user.id !== value));
   };
-
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -366,7 +396,10 @@ const Header = () => {
                       })}
                       <li>
                         <div className="p-4">
-                          <button className="btn btn-primary block w-full btn-small" onClick={()=>navigate(`/admin/chats`)}>
+                          <button
+                            className="btn btn-primary block w-full btn-small"
+                            onClick={() => navigate(`/admin/chats`)}
+                          >
                             Read All Notifications
                           </button>
                         </div>
@@ -403,21 +436,23 @@ const Header = () => {
               >
                 <ul className="text-dark dark:text-white-dark !py-0 w-[230px] font-semibold dark:text-white-light/90">
                   <li>
-                    <div className="flex items-center px-4 py-4">
+                    <div className="flex items-center px-2 py-4">
                       <img
                         className="rounded-md w-10 h-10 object-cover"
                         src="/assets/images/empty-user.png"
                         alt="userProfile"
                       />
-                      <div className="ltr:pl-4 rtl:pr-4 truncate">
+                      <div className="pl-2 truncate">
                         <h4 className="text-xs">
-                          {userData?.user_name ? userData?.user_name : ""}
+                          {userData?.email ? userData?.email : ""}
                         </h4>
                         <button
                           type="button"
-                          className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white"
+                          className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white capitalize"
                         >
-                          {userData?.email ? userData?.email : ""}
+                          {userData?.additionalDetails?.name
+                            ? userData?.additionalDetails?.name
+                            : "Admin"}
                         </button>
                       </div>
                     </div>

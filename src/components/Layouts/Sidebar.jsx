@@ -89,8 +89,12 @@ const Sidebar = () => {
       setCurrentMenu("clinic-leaves");
     } else if (location.pathname === "/clinic/profile") {
       setCurrentMenu("clinic-profile");
+    } else if (location.pathname === "/clinic/requestToDoctor") {
+      setCurrentMenu("clinic-requestToDoctor");
     } else if (location.pathname === "/doctor/dashboard") {
       setCurrentMenu("doctor-dashboard");
+    } else if (location.pathname === "/doctor/requests") {
+      setCurrentMenu("doctor-requests");
     } else if (location.pathname === "/sales/dashboard") {
       setCurrentMenu("sales-dashboard");
     } else {
@@ -268,6 +272,21 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+
+                <li className="nav-item">
+                  <NavLink to="/clinic/requestToDoctor" className="group">
+                    <div className="flex items-center">
+                      <IconMenuDashboard
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "clinic-requestToDoctor" ? "!text-primary" : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Request To Doctor"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
               </ul>
             ) : role === "doctor" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">
@@ -287,6 +306,24 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+
+                <li className="nav-item">
+                  <NavLink to="/doctor/requests" className="group">
+                    <div className="flex items-center">
+                      <IconMenuDashboard
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "doctor-requests"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Requests"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+
               </ul>
             ) : role === "salesPerson" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">

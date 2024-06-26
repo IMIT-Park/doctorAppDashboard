@@ -44,14 +44,23 @@ const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
 const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/index"));
 const ClinicLeaves = lazy(() => import("../panels/clinic/leaves/Index"));
 const ClinicBookings = lazy(() => import("../panels/clinic/bookings/Index"));
-const ClinicPatientSingleView = lazy(() =>import("../panels/clinic/bookings/Patients"));
-const ClinicPatients = lazy(() =>import("../panels/clinic/bookings/PatientsDetails"));
-const ClinicProfile = lazy(() =>import("../panels/clinic/profile/ClinicProfile"));
-const RequestToDoctor = lazy(() =>import("../panels/clinic/requestToDoctor/RequestToDoctor"));
+const ClinicPatientSingleView = lazy(() =>
+  import("../panels/clinic/bookings/Patients")
+);
+const ClinicPatients = lazy(() =>
+  import("../panels/clinic/bookings/PatientsDetails")
+);
+const ClinicProfile = lazy(() =>
+  import("../panels/clinic/profile/ClinicProfile")
+);
+const RequestToDoctor = lazy(() =>
+  import("../panels/clinic/requestToDoctor/RequestToDoctor")
+);
 // <--------------> clinic panel imports ends here <-------------->
 
 // <--------------> doctor panel imports starts here<-------------->
 const DoctorIndex = lazy(() => import("../panels/doctor/Index"));
+const DoctorProfile = lazy(() => import("../panels/doctor/profile/Index"));
 const DoctorRequests = lazy(() => import("../panels/doctor/requests/Requests"));
 // <--------------> doctor panel imports ends here <-------------->
 
@@ -275,6 +284,13 @@ const routes = [
   {
     path: "/doctor/dashboard",
     element: <DoctorIndex />,
+    layout: "default",
+  },
+
+  // doctor Profile
+  {
+    path: "/doctor/profile",
+    element: <DoctorProfile />,
     layout: "default",
   },
 

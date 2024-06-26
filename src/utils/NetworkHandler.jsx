@@ -1,7 +1,6 @@
 import axios from "axios";
 
-export const baseUrl =
-  "https://doctorbackend.gitdr.com/api";
+export const baseUrl = "https://doctorbackend.gitdr.com/api";
 
 export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
 
@@ -49,7 +48,12 @@ class NetworkHandler {
         return response;
       },
       async (error) => {
-        if (error.response?.status === 401 && getStoredTokenDetails()) {
+        console.log(error);
+        if (
+          error.response?.status === 401 &&
+          error.response?.data?.message == "Invalid access token." &&
+          getStoredTokenDetails()
+        ) {
           const { refreshToken } = getStoredTokenDetails();
           try {
             const response = await this.#axios.post("/v1/auth/refreshToken", {

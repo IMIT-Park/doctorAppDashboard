@@ -79,7 +79,6 @@ const DeleteLeave = ({
       console.error("Delete error:", error);
     }
   };
-  console.log("selectedTimeSlots", selectedTimeSlots);
 
 
   return (

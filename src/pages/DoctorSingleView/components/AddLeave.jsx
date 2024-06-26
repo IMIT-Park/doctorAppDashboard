@@ -51,7 +51,7 @@ const AddLeave = ({
 
     try {
       const response = await NetworkHandler.makePostRequest(
-        `/v1/doctor/getTimeSlot/${doctorId}`,
+        `/v1/leave/getTimeSlot/${doctorId}`,
         { date }
       );
       console.log("API Response:", response.data);
@@ -119,8 +119,8 @@ const AddLeave = ({
 
       const url =
         leaveType === "Multiple"
-          ? `/v1/doctor/createBlukLeave/${doctorId}`
-          : `/v1/doctor/createLeaveSlots/${doctorId}`;
+          ? `/v1/leave/createBlukLeave/${doctorId}`
+          : `/v1/leave/createLeaveSlots/${doctorId}`;
       const response = await NetworkHandler.makePostRequest(url, leaveData);
 
       showMessage(

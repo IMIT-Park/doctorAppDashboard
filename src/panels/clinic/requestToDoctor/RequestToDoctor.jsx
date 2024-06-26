@@ -1,124 +1,173 @@
 import { useContext, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { setPageTitle } from "../../../store/themeConfigSlice";
+import { DataTable } from "mantine-datatable";
+import CountUp from "react-countup";
+import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
-import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import { showMessage } from "../../../utils/showMessage";
+import emptyBox from "/assets/images/empty-box.svg";
+import { useNavigate } from "react-router-dom";
+import NetworkHandler from "../../../utils/NetworkHandler";
+import useBlockUnblock from "../../../utils/useBlockUnblock";
+import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
+import ModalRequests from "./ModalRequests";
 
-const RequestToDoctor = () => {
+const Requests = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(setPageTitle("RequestsToDoctor"));
+  });
+
   const { userDetails } = useContext(UserContext);
-  const clinicId = userDetails?.UserClinic?.[0]?.clinic_id || "";
-  console.log(clinicId);
+  const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id || "";
 
-  const [message, setMessage] = useState("");
-  const [email, setEmail] = useState("");
-  const [isValidEmail, setIsValidEmail] = useState(true);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZES = [10, 20, 30, 50, 100];
+  const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+  const [totalRequests, setTotalRequests] = useState(0);
+  const [allRequests, setAllRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
 
-  const validateEmail = (email) => {
-    // Regex for basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
-  const handleRequest = async (e) => {
-    e.preventDefault(); // Prevent form submission for validation check
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
-    if (!validateEmail(email)) {
-      showMessage("Please enter a valid email address.", "error");
-      setIsValidEmail(false);
-      return;
-    }
+  useEffect(() => {
+    setPage(1);
+  }, [pageSize]);
 
-    setButtonLoading(true);
+  useEffect(() => {
+    fetchData();
+  }, [page, pageSize]);
+
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/clinic/createRequest`,
-        {
-          clinic_id: clinicId,
-          email: email,
-        }
-      );
-
-      console.log(response);
-      if (response?.status === 201) {
-        showMessage("Request sent successfully!", "success");
-        setMessage("Request sent successfully!");
-        setEmail("");
-      } else {
-        showMessage("Failed to send request.", "error");
-        setMessage("Failed to send request.");
-      }
+      // const response = await NetworkHandler.makeGetRequest(
+      //   `/v1/doctor/getRequest/${doctorId}?page=${page}&pageSize=${pageSize}`
+      // );
+      // setTotalRequests(response?.data?.allRequest?.count);
+      // setAllRequests(response?.data?.allRequest?.rows);
+      setLoading(false);
     } catch (error) {
-      console.error("Error creating request:", error);
-      showMessage("An error occurred. Please try again.", "error");
-      setMessage("Error: " + error.message);
+      console.log(error);
+      setLoading(false);
     } finally {
-      setButtonLoading(false); // Reset loading state after request completes
+      setLoading(false);
     }
   };
+
+  const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } = useBlockUnblock(fetchData);
 
   return (
     <div>
       <ScrollToTop />
-      <div className="panel max-w-[500px] mx-auto mt-10">
-        <div className=" items-center flex-wrap gap-3 justify-between mb-5">
-          <div className="flex items-center justify-center gap-1 mb-4">
-            <h5 className="font-semibold text-lg dark:text-white-light mx-auto">
-              Send Request to Doctor
-            </h5>
-          </div>
+      <div className="panel">
+        <div className="flex items-center gap-1 mb-3">
+          <h5 className="font-semibold text-lg dark:text-white-light">Requests</h5>
+          <Tippy content="Total Owners">
+            <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
+              <CountUp start={0} end={totalRequests} duration={3}></CountUp>
+            </span>
+          </Tippy>
 
-          <form action="" onSubmit={handleRequest}>
-            <div className="mb-5 flex items-center justify-center">
-              <label htmlFor="mds-name" className="mr-3">
-                Email :
-              </label>
-              <input
-                type="text"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setIsValidEmail(true); // Reset validation state on input change
-                }}
-                placeholder="Enter Email"
-                className={`form-input ${isValidEmail ? "" : "border-red-500"}`}
-                style={{ width: "300px" }}
-                required
-              />
-            </div>
-
-            <div className="container flex items-center justify-center">
+          <div className="ml-auto flex text-gray-500 font-semibold dark:text-white-dark gap-y-4 mb-3">
               <button
-                type="submit"
-                className={`btn btn-green ${
-                  buttonLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                disabled={buttonLoading}
+                type="button"
+                className="btn btn-green"
+                onClick={openModal}
               >
-                {buttonLoading ? "Sending..." : "Request"}
+                Send Request
               </button>
-            </div>
-          </form>
-
-          {message && (
-            <div className="mt-4 text-center">
-              <p
-                className={
-                  message.startsWith("Error")
-                    ? "text-red-600"
-                    : "text-green-600"
-                }
-              >
-                {message}
-              </p>
-            </div>
-          )}
+          </div>
         </div>
-        <div></div>
+
+        {loading ? (
+          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+        ) : (
+          <div className="datatables">
+            <DataTable
+              noRecordsText="No Owners to show"
+              noRecordsIcon={
+                <span className="mb-2">
+                  <img src={emptyBox} alt="" className="w-10" />
+                </span>
+              }
+              mih={180}
+              highlightOnHover
+              className="whitespace-nowrap table-hover"
+              records={allRequests}
+              onRowClick={(row) => navigate(`/admin/owners/${row?.owner_id}`)}
+              idAccessor="clinic_id"
+              columns={[
+                {
+                  accessor: "owner_id",
+                  title: "No.",
+                  render: (row, rowIndex) => rowIndex + 1,
+                },
+                {
+                  accessor: "name",
+                  title: "Name",
+                },
+                { accessor: "email" },
+                { accessor: "phone" },
+                { accessor: "address", title: "Address" },
+                {
+                  accessor: "Actions",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="grid place-items-center">
+                      <CustomSwitch
+                        checked={rowData?.User?.status}
+                        onChange={() =>
+                          showOwnerAlert(
+                            rowData?.user_id,
+                            rowData?.User?.status ? "block" : "activate",
+                            "owner"
+                          )
+                        }
+                        tooltipText={
+                          rowData?.User?.status ? "Block" : "Unblock"
+                        }
+                        uniqueId={`owner${rowData?.owner_id}`}
+                        size="normal"
+                      />
+                    </div>
+                  ),
+                },
+              ]}
+              totalRecords={totalRequests}
+              recordsPerPage={pageSize}
+              page={page}
+              onPageChange={(p) => setPage(p)}
+              recordsPerPageOptions={PAGE_SIZES}
+              onRecordsPerPageChange={setPageSize}
+              minHeight={200}
+              paginationText={({ from, to, totalRecords }) =>
+                `Showing  ${from} to ${to} of ${totalRecords} entries`
+              }
+            />
+          </div>
+        )}
       </div>
+
+      <ModalRequests
+        open={isModalOpen}
+        closeModal={closeModal}
+        fetchClinicData={fetchData}
+        setButtonLoading={setButtonLoading}
+
+      />
     </div>
   );
 };
 
-export default RequestToDoctor;
+export default Requests;

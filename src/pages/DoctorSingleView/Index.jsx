@@ -40,6 +40,7 @@ const SinglePage = () => {
   });
 
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [timeslotsLoading, setTimeslotsLoading] = useState(false);
   const [active, setActive] = useState(null);
   const [editDetailsModal, setEditDetailsModal] = useState(false);
   const [editPhotoModal, setEditPhotoModal] = useState(false);
@@ -69,6 +70,7 @@ const SinglePage = () => {
     day_id: "",
   });
   const [timeSlotId, setTimeSlotId] = useState("");
+  const [doctorTimeSlots, setDoctorTimeSlots] = useState([]);
   const [selectedDay, setSelectedDay] = useState("");
   const [addLeaveModal, setAddLeaveModal] = useState(false);
   const [deleteLeaveModal, setDeleteLeaveModal] = useState(false);
@@ -104,6 +106,34 @@ const SinglePage = () => {
     refetch: fetchLeaveData,
   } = useFetchData(`/v1/leave/getdrleave/${doctorId}`, {}, [doctorId]);
   const doctorLeaves = doctorLeavesData?.leaveDetails;
+
+  // fetch timeslots data function
+  const getDoctorTimeslots = async () => {
+    setTimeslotsLoading(true);
+
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        "/v1/doctor/gettimeslots",
+        { doctor_id: doctorId, clinic_id: clinicId }
+      );
+
+      if (response.status === 201) {
+        setTimeslotsLoading(false);
+        setDoctorTimeSlots(response?.data?.timeslots?.rows);
+      }
+    } catch (error) {
+      setTimeslotsLoading(false);
+      console.log(error);
+    } finally {
+      setTimeslotsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (clinicId) {
+      getDoctorTimeslots();
+    }
+  }, [clinicId]);
 
   // edit details modal handler
   const openEditDetailsModal = () => {
@@ -392,7 +422,7 @@ const SinglePage = () => {
 
   // Group time slots by day
   const timeSlotsByDay = {};
-  doctorDetails?.timeslots?.forEach((timeslot) => {
+  doctorTimeSlots?.forEach((timeslot) => {
     if (!timeSlotsByDay[timeslot.day_id]) {
       timeSlotsByDay[timeslot.day_id] = [];
     }
@@ -580,93 +610,107 @@ const SinglePage = () => {
                   </CustomButton>
                 )}
               </div>
-              {doctorDetails?.timeslots && (
-                <div className="space-y-2 font-semibold">
-                  {days.map((day) => (
-                    <div key={day.id}>
-                      {timeSlotsByDay[day.id] && (
-                        <div>
-                          <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
-                            <button
-                              type="button"
-                              className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
-                                active === day.id
-                                  ? "!text-[#006241] dark:!text-[#4ec37bfb]"
-                                  : ""
-                              }`}
-                              onClick={() => togglePara(day.id)}
-                            >
-                              {day.name}
-                              <div
-                                className={`ltr:ml-auto rtl:mr-auto ${
-                                  active === day.id ? "rotate-180" : ""
-                                }`}
-                              >
-                                <IconCaretDown />
-                              </div>
-                            </button>
+              {doctorTimeSlots && doctorTimeSlots?.length ? (
+                <>
+                  {timeslotsLoading ? (
+                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+                  ) : (
+                    <div className="space-y-2 font-semibold">
+                      {days.map((day) => (
+                        <div key={day.id}>
+                          {timeSlotsByDay[day.id] && (
                             <div>
-                              <AnimateHeight
-                                duration={300}
-                                height={active === day.id ? "auto" : 0}
-                              >
-                                <div className="p-4 text-white-dark text-[13px] border-t border-[#d3d3d3] dark:border-[#1b2e4b] flex items-center justify-start flex-wrap gap-3 sm:gap-4">
-                                  {timeSlotsByDay[day.id].map((timeslot) => (
-                                    <div
-                                      key={timeslot.DoctorTimeSlot_id}
-                                      className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
-                                    >
-                                      <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
-                                        {formatTime(timeslot?.startTime)} -{" "}
-                                        {formatTime(timeslot?.endTime)}
-                                      </span>
-                                      <div className="flex items-center gap-1">
-                                        <p>No. of Consultations:</p>{" "}
-                                        <div className="text-slate-700 dark:text-slate-300">
-                                          {timeslot?.noOfConsultationsPerDay}
-                                        </div>
-                                      </div>
-                                      <div className="flex items-center gap-1">
-                                        <p>Consultation Time: </p>
-                                        <div className="text-slate-700 dark:text-slate-300">
-                                          {timeslot?.time_slot} Min
-                                        </div>
-                                      </div>
-                                      {!isSuperAdmin && (
-                                        <div className="flex items-center gap-1 mt-1">
-                                          <button
-                                            type="button"
-                                            className="btn btn-primary btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
-                                            onClick={() =>
-                                              openEditTimeSlotModal(timeslot)
-                                            }
+                              <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
+                                <button
+                                  type="button"
+                                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
+                                    active === day.id
+                                      ? "!text-[#006241] dark:!text-[#4ec37bfb]"
+                                      : ""
+                                  }`}
+                                  onClick={() => togglePara(day.id)}
+                                >
+                                  {day.name}
+                                  <div
+                                    className={`ltr:ml-auto rtl:mr-auto ${
+                                      active === day.id ? "rotate-180" : ""
+                                    }`}
+                                  >
+                                    <IconCaretDown />
+                                  </div>
+                                </button>
+                                <div>
+                                  <AnimateHeight
+                                    duration={300}
+                                    height={active === day.id ? "auto" : 0}
+                                  >
+                                    <div className="p-4 text-white-dark text-[13px] border-t border-[#d3d3d3] dark:border-[#1b2e4b] flex items-center justify-start flex-wrap gap-3 sm:gap-4">
+                                      {timeSlotsByDay[day.id].map(
+                                        (timeslot) => (
+                                          <div
+                                            key={timeslot.DoctorTimeSlot_id}
+                                            className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
                                           >
-                                            Edit
-                                          </button>
-                                          <button
-                                            type="button"
-                                            className="btn btn-danger btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
-                                            onClick={() =>
-                                              openDeletTimeSlotModal(
-                                                timeslot?.DoctorTimeSlot_id
-                                              )
-                                            }
-                                          >
-                                            Delete
-                                          </button>
-                                        </div>
+                                            <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
+                                              {formatTime(timeslot?.startTime)}{" "}
+                                              - {formatTime(timeslot?.endTime)}
+                                            </span>
+                                            <div className="flex items-center gap-1">
+                                              <p>No. of Consultations:</p>{" "}
+                                              <div className="text-slate-700 dark:text-slate-300">
+                                                {
+                                                  timeslot?.noOfConsultationsPerDay
+                                                }
+                                              </div>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                              <p>Consultation Time: </p>
+                                              <div className="text-slate-700 dark:text-slate-300">
+                                                {timeslot?.time_slot} Min
+                                              </div>
+                                            </div>
+                                            {!isSuperAdmin && (
+                                              <div className="flex items-center gap-1 mt-1">
+                                                <button
+                                                  type="button"
+                                                  className="btn btn-primary btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
+                                                  onClick={() =>
+                                                    openEditTimeSlotModal(
+                                                      timeslot
+                                                    )
+                                                  }
+                                                >
+                                                  Edit
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  className="btn btn-danger btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
+                                                  onClick={() =>
+                                                    openDeletTimeSlotModal(
+                                                      timeslot?.DoctorTimeSlot_id
+                                                    )
+                                                  }
+                                                >
+                                                  Delete
+                                                </button>
+                                              </div>
+                                            )}
+                                          </div>
+                                        )
                                       )}
                                     </div>
-                                  ))}
+                                  </AnimateHeight>
                                 </div>
-                              </AnimateHeight>
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
-                      )}
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-xs text-gray-600">No Timeslots Found</div>
               )}
             </div>
 

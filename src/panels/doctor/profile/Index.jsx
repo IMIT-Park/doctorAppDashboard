@@ -117,7 +117,7 @@ const Profile = () => {
     }
   }, [doctorClinics]);
 
-  // fetch leaves data function
+  // fetch timeslots data function
   const getDoctorTimeslots = async () => {
     setTimeslotsLoading(true);
 
@@ -627,44 +627,48 @@ const Profile = () => {
             <h5 className="mt-5 mb-2 text-base font-semibold dark:text-white-light">
               Clinics:
             </h5>
-            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
-              {doctorClinics?.map((clinic) => (
-                <div
-                  key={clinic?.clinic_id}
-                  className={`Sm:min-w-[413px] border bg-[#F6F6F6] dark:bg-slate-900 ${
-                    selectedClinic?.clinic_id === clinic?.clinic_id
-                      ? "border-[#006241]"
-                      : "border-slate-200 dark:border-slate-800"
-                  } rounded flex gap-3 items-center p-1 cursor-pointer`}
-                  onClick={() => handleClinicSelect(clinic)}
-                >
-                  <img
-                    src={imageBaseUrl + clinic?.banner_img_url}
-                    alt="Clinic"
-                    className="w-[76px] h-[62px] rounded-md object-cover"
-                  />
-                  <div>
-                    <h4 className="text-base font-semibold text-slate-800 dark:text-slate-300 capitalize">
-                      {clinic?.name || ""}
-                    </h4>
-                    <p className="text-xs font-normal text-slate-500 capitalize">
-                      {clinic?.place || ""}
-                    </p>
-                  </div>
+            {doctorClinics && doctorClinics?.length ? (
+              <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+                {doctorClinics?.map((clinic) => (
                   <div
-                    className={`ml-auto mr-2 w-4 h-4 rounded-full border ${
+                    key={clinic?.clinic_id}
+                    className={`Sm:min-w-[413px] border bg-[#F6F6F6] dark:bg-slate-900 ${
                       selectedClinic?.clinic_id === clinic?.clinic_id
-                        ? "border-[#006241] bg-slate-400"
+                        ? "border-[#006241]"
                         : "border-slate-200 dark:border-slate-800"
-                    } p-[1px] bg-slate-200 dark:bg-slate-800`}
+                    } rounded flex gap-3 items-center p-1 cursor-pointer`}
+                    onClick={() => handleClinicSelect(clinic)}
                   >
-                    {selectedClinic?.clinic_id === clinic?.clinic_id && (
-                      <div className="bg-[#006241] w-full h-full rounded-full" />
-                    )}
+                    <img
+                      src={imageBaseUrl + clinic?.banner_img_url}
+                      alt="Clinic"
+                      className="w-[76px] h-[62px] rounded-md object-cover"
+                    />
+                    <div>
+                      <h4 className="text-base font-semibold text-slate-800 dark:text-slate-300 capitalize">
+                        {clinic?.name || ""}
+                      </h4>
+                      <p className="text-xs font-normal text-slate-500 capitalize">
+                        {clinic?.place || ""}
+                      </p>
+                    </div>
+                    <div
+                      className={`ml-auto mr-2 w-4 h-4 rounded-full border ${
+                        selectedClinic?.clinic_id === clinic?.clinic_id
+                          ? "border-[#006241] bg-slate-400"
+                          : "border-slate-200 dark:border-slate-800"
+                      } p-[1px] bg-slate-200 dark:bg-slate-800`}
+                    >
+                      {selectedClinic?.clinic_id === clinic?.clinic_id && (
+                        <div className="bg-[#006241] w-full h-full rounded-full" />
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-xs text-gray-600">No clinics Found</div>
+            )}
             {/* clinics list ends here */}
 
             <div className="my-10">
@@ -679,7 +683,7 @@ const Profile = () => {
                   </CustomButton>
                 )}
               </div>
-              {doctorTimeSlots && doctorTimeSlots?.length && (
+              {doctorTimeSlots && doctorTimeSlots?.length ? (
                 <>
                   {timeslotsLoading ? (
                     <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -778,6 +782,8 @@ const Profile = () => {
                     </div>
                   )}
                 </>
+              ) : (
+                <div className="text-xs text-gray-600">No Timeslots Found</div>
               )}
             </div>
 
@@ -798,7 +804,10 @@ const Profile = () => {
                   {doctorLeaves?.map((leave, index) => (
                     <div
                       key={leave?.leave_date + index}
-                      className="w-full flex items-center justify-between flex-wrap gap-2 py-6 border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
+                      className={`w-full flex items-center justify-between flex-wrap gap-2 py-6 ${
+                        index < leave.leaves.length - 1 &&
+                        "border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
+                      }`}
                     >
                       <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
                         {leave?.fullday ? "Full Day Leave" : "Shift Leave"}

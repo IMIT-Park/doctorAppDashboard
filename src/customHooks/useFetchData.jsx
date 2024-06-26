@@ -14,7 +14,7 @@ const useFetchData = (endpoint, initialData = [], dependencies = []) => {
       setData(response.data);
     } catch (err) {
       setError(err);
-      showMessage("An error occurred. Please try again.", "error");
+      console.log(err);
     } finally {
       setLoading(false);
     }

@@ -58,7 +58,7 @@ const Clinics = () => {
     confirmPassword: "",
     picture: null,
     defaultPicture: null,
-    googleLocation: {},
+    googleLocation: null,
   });
 
   useEffect(() => {
@@ -288,6 +288,8 @@ const Clinics = () => {
     setsubscriptionAddModal(true);
   };
 
+
+  console.log(input);
   return (
     <div>
       <ScrollToTop />

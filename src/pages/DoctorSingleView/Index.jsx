@@ -600,7 +600,7 @@ const SinglePage = () => {
             </div>
             <div className="my-10">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5 className="text-base font-semibold dark:text-white-light">
+                <h5 className="text-base font-semibold text-white-dark">
                   Available Days & Time Slots:
                 </h5>
                 {!isSuperAdmin && (
@@ -716,7 +716,7 @@ const SinglePage = () => {
 
             <div className="mt-4">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5 className="text-base font-semibold mb-1 dark:text-white-light">
+                <h5 className="text-base font-semibold mb-1 text-white-dark">
                   Leaves:
                 </h5>
                 {!isSuperAdmin && (

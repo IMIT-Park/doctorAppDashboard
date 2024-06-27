@@ -1,5 +1,8 @@
 import axios from "axios";
 
+// google map api key
+export const googleMapsApiKey = "AIzaSyBLY08Xu8vf1iZPDBk86jNKbl8THKwXG1A";
+
 export const baseUrl = "https://doctorbackend.gitdr.com/api";
 
 export const imageBaseUrl = "https://doctorbackend.gitdr.com/";

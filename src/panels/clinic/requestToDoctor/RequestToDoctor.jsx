@@ -35,17 +35,42 @@ const Requests = () => {
   const [buttonLoading, setButtonLoading] = useState(false);
 
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
 
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
 
+  useEffect(() => {
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize;
+  }, [page, pageSize]);
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, [page, pageSize]);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  // Get request
+ const fetchData = async () => {
+    setLoading(true);
+  try {
+    const response = await NetworkHandler.makeGetRequest(
+      `/v1/clinic/getrequest/${clinicId}?page=${page}&pageSize=${pageSize}`
+    );
+    setTotalRequests(response.data?.Clinic?.count);
+    setAllRequests(response.data?.Clinic?.rows);
+    console.log(allRequests);
+    setLoading(false);
+  } catch (error) {
+    console.log(error);
+    setLoading(false);
+  } finally {
+    setLoading(false);
+  }
+  }
+
+
+  useEffect(() => {
+    fetchData();
+  }, [page , pageSize]);
 
   return (
     <div>

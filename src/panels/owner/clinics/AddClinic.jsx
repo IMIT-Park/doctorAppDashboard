@@ -268,10 +268,10 @@ const AddClinic = ({
                       )}
                     </div>
                     <label htmlFor="address">Select Location</label>
-                    <div className="w-full border border-[#006241] rounded">
+                    <div className="w-full border border-[#006241] rounded mb-12">
                       <GoogleLocationPicker data={data} setData={setData} />
                     </div>
-                    <div className="grid grid-cols-1 sm:flex justify-between gap-4 my-8">
+                    <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-12">
                       {!isEdit && (
                         <>
                           <div className="w-full">

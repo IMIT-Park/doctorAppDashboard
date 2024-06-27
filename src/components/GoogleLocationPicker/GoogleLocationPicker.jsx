@@ -5,25 +5,22 @@ import {
   Autocomplete,
   Marker,
   InfoWindow,
+  useJsApiLoader,
 } from "@react-google-maps/api";
 import { googleMapsApiKey } from "../../utils/NetworkHandler";
 import IconSearch from "../../components/Icon/IconSearch";
 
 const libraries = ["places"];
 
-const defaultCenter = {
-  lat: -33.8688,
-  lng: 151.2195,
-};
-
 const GoogleLocationPicker = ({ data, setData }) => {
-  const { isLoaded, loadError } = useLoadScript({
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: "google-map-script",
     googleMapsApiKey: googleMapsApiKey,
     libraries,
   });
 
   const [map, setMap] = useState(null);
-  const [center, setCenter] = useState(defaultCenter);
+  const [center, setCenter] = useState(null);
   const [marker, setMarker] = useState(null);
   const [infoWindow, setInfoWindow] = useState(null);
   const [autocomplete, setAutocomplete] = useState(null);
@@ -35,15 +32,23 @@ const GoogleLocationPicker = ({ data, setData }) => {
       navigator?.geolocation?.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position?.coords;
-          setCenter({ lat: latitude, lng: longitude });
+          const userLocation = { lat: latitude, lng: longitude };
+          setCenter(userLocation);
         },
         () => {
           console.error("Error fetching geolocation.");
+          setCenter({ lat: -33.8688, lng: 151.2195 });
         }
       );
+    } else {
+      setCenter({ lat: -33.8688, lng: 151.2195 });
     }
 
-    if (data.googleLocation && data.googleLocation.lat && data.googleLocation.long) {
+    if (
+      data.googleLocation &&
+      data.googleLocation.lat &&
+      data.googleLocation.long
+    ) {
       const { lat, long } = data.googleLocation;
       const initialLocation = { lat, lng: long };
       setCenter(initialLocation);
@@ -79,7 +84,8 @@ const GoogleLocationPicker = ({ data, setData }) => {
 
   const onPlaceChanged = () => {
     const place = autocomplete?.getPlace();
-    if (!place?.geometry || !place?.geometry?.location) {
+
+    if (!place || !place?.geometry || !place?.geometry?.location) {
       console.log("No details available for input: '" + place?.name + "'");
       return;
     }
@@ -172,16 +178,17 @@ const GoogleLocationPicker = ({ data, setData }) => {
         center={center}
         onLoad={onMapLoad}
       >
-        {marker && <Marker position={marker.position} />}
-        {infoWindow && (
+        {marker && <Marker position={marker?.position} />}
+
+        {/* {infoWindow && infoWindow?.content && infoWindow?.content?.formatted_address && (
           <InfoWindow position={infoWindow.position}>
             <div>
-              <h2>{infoWindow.content.name}</h2>
-              <p>Place ID: {infoWindow.content.placeId}</p>
-              <p>{infoWindow.content.formatted_address}</p>
+              <h2>{infoWindow?.content.name}</h2>
+              <p>Place ID: {infoWindow?.content.placeId}</p>
+              <p>{infoWindow?.content?.formatted_address}</p>
             </div>
           </InfoWindow>
-        )}
+        )} */}
       </GoogleMap>
     </div>
   );

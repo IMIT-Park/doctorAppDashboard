@@ -53,41 +53,6 @@ const AddClinic = ({
     }
   }, [data.email]);
 
-  useEffect(() => {
-    // Parse googleLocation if it is a string
-    if (typeof data?.googleLocation === "string") {
-      try {
-        const parsedLocation = JSON.parse(data?.googleLocation);
-        setData((prevData) => ({
-          ...prevData,
-          googleLocation: parsedLocation,
-        }));
-      } catch (error) {
-        console.error("Error parsing googleLocation", error);
-      }
-    }
-  }, [data?.googleLocation]);
-
-  const getLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const long = position.coords.longitude;
-          setData((prevData) => ({
-            ...prevData,
-            googleLocation: { lat, long },
-          }));
-        },
-        (error) => {
-          console.error("Error getting location", error);
-          alert("Error getting location. Please try again.");
-        }
-      );
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  };
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -271,7 +236,7 @@ const AddClinic = ({
                     <div className="w-full border border-[#006241] rounded mb-12">
                       <GoogleLocationPicker data={data} setData={setData} />
                     </div>
-                    <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-12">
+                    <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
                       {!isEdit && (
                         <>
                           <div className="w-full">

@@ -15,7 +15,10 @@ import AddClinic from "./AddClinic";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { showMessage } from "../../../utils/showMessage";
-import { convertLocationDetail, handleGetLocation } from "../../../utils/getLocation";
+import {
+  convertLocationDetail,
+  handleGetLocation,
+} from "../../../utils/getLocation";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import ModalSubscription from "./ModalSubscription";
 import { UserContext } from "../../../contexts/UseContext";
@@ -182,10 +185,18 @@ const Clinics = () => {
       !input.place ||
       !input.password ||
       !input.picture ||
-      !input.googleLocation ||
       !input.confirmPassword
     ) {
       showMessage("Please fill in all required fields", "warning");
+      return true;
+    }
+
+    if (input.password !== input.confirmPassword) {
+      return true;
+    }
+
+    if (!input.googleLocation) {
+      showMessage("Please select clinic location", "warning");
       return true;
     }
 
@@ -204,7 +215,6 @@ const Clinics = () => {
       formData.append("image_url[]", input.picture);
     }
     formData.append("password", input.password);
-    console.log(input);
     try {
       const response = await NetworkHandler.makePostRequest(
         "/v1/clinic/createClinic",
@@ -288,7 +298,6 @@ const Clinics = () => {
     setsubscriptionAddModal(true);
   };
 
-  console.log(input);
   return (
     <div>
       <ScrollToTop />

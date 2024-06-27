@@ -1,21 +1,18 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
-import MaskedInput from "react-text-mask";
 import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import IconLockDots from "../../../components/Icon/IconLockDots";
 import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
+import GoogleLocationPicker from "../../../components/GoogleLocationPicker/GoogleLocationPicker";
 
 const AddClinic = ({
   open,
   closeModal,
-  handleFileChange,
-  saveUser,
   data,
   setData,
-  onSubmit,
   handleSubmit,
   handleRemoveImage,
   buttonLoading,
@@ -26,7 +23,6 @@ const AddClinic = ({
 
   const handlePasswordChange = (e) => {
     setData({ ...data, password: e.target.value });
-    // Clear the error when password is changed
     setPasswordError("");
   };
 
@@ -59,9 +55,9 @@ const AddClinic = ({
 
   useEffect(() => {
     // Parse googleLocation if it is a string
-    if (typeof data.googleLocation === "string") {
+    if (typeof data?.googleLocation === "string") {
       try {
-        const parsedLocation = JSON.parse(data.googleLocation);
+        const parsedLocation = JSON.parse(data?.googleLocation);
         setData((prevData) => ({
           ...prevData,
           googleLocation: parsedLocation,
@@ -70,7 +66,7 @@ const AddClinic = ({
         console.error("Error parsing googleLocation", error);
       }
     }
-  }, [data.googleLocation]);
+  }, [data?.googleLocation]);
 
   const getLocation = () => {
     if (navigator.geolocation) {
@@ -123,7 +119,7 @@ const AddClinic = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
+              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-2xl text-black dark:text-white-dark">
                 <button
                   type="button"
                   onClick={closeModal}
@@ -136,90 +132,94 @@ const AddClinic = ({
                 </div>
                 <div className="p-5">
                   <form onSubmit={handleSubmitAdd}>
-                    <div className="mb-5">
-                      <label htmlFor="first-name">Name</label>
-                      <input
-                        id="first-name"
-                        type="text"
-                        placeholder="Enter Name"
-                        className="form-input"
-                        value={data.name}
-                        onChange={(e) =>
-                          setData({ ...data, name: e.target.value })
-                        }
-                      />
-                    </div>
-                    {!isEdit && (
-                      <div className="mb-5">
-                        <label htmlFor="email">Email</label>
+                    <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
+                      <div className="w-full">
+                        <label htmlFor="first-name">Name</label>
                         <input
-                          id="email"
-                          type="email"
-                          placeholder="Enter Email"
-                          className="form-input"
-                          value={data.email}
-                          onChange={(e) =>
-                            setData({ ...data, email: e.target.value })
-                          }
-                          autoComplete="off"
-                        />
-                      </div>
-                    )}
-                    {!isEdit && (
-                      <div className="mb-5">
-                        <label htmlFor="username">Username</label>
-                        <input
-                          id="username"
+                          id="first-name"
                           type="text"
-                          placeholder="Username"
-                          className="form-input"
-                          value={data.user_name}
+                          placeholder="Enter Name"
+                          className="form-input form-input-green"
+                          value={data.name}
                           onChange={(e) =>
-                            setData({ ...data, user_name: e.target.value })
+                            setData({ ...data, name: e.target.value })
                           }
                         />
                       </div>
-                    )}
-                    <div className="mb-5">
-                      <label htmlFor="number">Phone Number</label>
-                      <input
-                        id="phone"
-                        type="number"
-                        placeholder="Phone Number"
-                        className="form-input"
-                        value={data.phone}
-                        onChange={(e) =>
-                          setData({ ...data, phone: e.target.value })
-                        }
-                      />
+                      {!isEdit && (
+                        <div className="w-full">
+                          <label htmlFor="email">Email</label>
+                          <input
+                            id="email"
+                            type="email"
+                            placeholder="Enter Email"
+                            className="form-input form-input-green"
+                            value={data.email}
+                            onChange={(e) =>
+                              setData({ ...data, email: e.target.value })
+                            }
+                            autoComplete="off"
+                          />
+                        </div>
+                      )}
                     </div>
-
+                    <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
+                      {!isEdit && (
+                        <div className="w-full">
+                          <label htmlFor="username">Username</label>
+                          <input
+                            id="username"
+                            type="text"
+                            placeholder="Username"
+                            className="form-input form-input-green"
+                            value={data.user_name}
+                            onChange={(e) =>
+                              setData({ ...data, user_name: e.target.value })
+                            }
+                          />
+                        </div>
+                      )}
+                      <div className="w-full">
+                        <label htmlFor="number">Phone Number</label>
+                        <input
+                          id="phone"
+                          type="number"
+                          placeholder="Phone Number"
+                          className="form-input form-input-green"
+                          value={data.phone}
+                          onChange={(e) =>
+                            setData({ ...data, phone: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                      <div className="">
+                        <label htmlFor="place">Place</label>
+                        <input
+                          id="place"
+                          type="text"
+                          placeholder="Place"
+                          className="form-input form-input-green"
+                          value={data.place}
+                          onChange={(e) =>
+                            setData({ ...data, place: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
                     <div className="mb-5">
                       <label htmlFor="address">Address</label>
                       <textarea
                         id="address"
                         rows={3}
                         placeholder="Enter Address"
-                        className="form-textarea resize-none min-h-[130px]"
+                        className="form-textarea form-textarea-green resize-none min-h-[130px]"
                         value={data.address}
                         onChange={(e) =>
                           setData({ ...data, address: e.target.value })
                         }
                       ></textarea>
-                    </div>
-
-                    <div className="mb-5">
-                      <label htmlFor="place">Place</label>
-                      <input
-                        id="place"
-                        type="text"
-                        placeholder="Place"
-                        className="form-input"
-                        value={data.place}
-                        onChange={(e) =>
-                          setData({ ...data, place: e.target.value })
-                        }
-                      />
                     </div>
 
                     <div className="mb-5">
@@ -267,84 +267,78 @@ const AddClinic = ({
                         )
                       )}
                     </div>
-                    <div className="mb-5">
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={getLocation}
-                      >
-                        Get Current Location
-                      </button>
-                      {data.googleLocation.lat && data.googleLocation.long && (
-                        <p className="mt-2">
-                          Latitude: {data.googleLocation.lat}, Longitude:{" "}
-                          {data.googleLocation.long}
-                        </p>
+                    <label htmlFor="address">Select Location</label>
+                    <div className="w-full border border-[#006241] rounded">
+                      <GoogleLocationPicker data={data} setData={setData} />
+                    </div>
+                    <div className="grid grid-cols-1 sm:flex justify-between gap-4 my-8">
+                      {!isEdit && (
+                        <>
+                          <div className="w-full">
+                            <label htmlFor="password">Password</label>
+                            <div className="relative text-white-dark">
+                              <input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter Password"
+                                className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
+                                value={data.password}
+                                onChange={handlePasswordChange}
+                              />
+                              <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                                <IconLockDots fill={true} />
+                              </span>
+                              <span
+                                title={
+                                  showPassword
+                                    ? "hide password"
+                                    : "show password"
+                                }
+                                className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                {showPassword ? <IconEye /> : <IconCloseEye />}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="w-full">
+                            <label htmlFor="confirm-password">
+                              Confirm Password
+                            </label>
+                            <div className="relative text-white-dark">
+                              <input
+                                id="Confirm Password"
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter Confirm Password"
+                                className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
+                                value={data.confirmPassword}
+                                onChange={handleConfirmPasswordChange}
+                              />
+                              <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                                <IconLockDots fill={true} />
+                              </span>
+                              <span
+                                title={
+                                  showPassword
+                                    ? "hide password"
+                                    : "show password"
+                                }
+                                className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                {showPassword ? <IconEye /> : <IconCloseEye />}
+                              </span>
+                            </div>
+                            {passwordError && (
+                              <p className="text-red-500 text-sm mt-2">
+                                {passwordError}
+                              </p>
+                            )}
+                          </div>
+                        </>
                       )}
                     </div>
-                    {!isEdit && (
-                      <>
-                        <div className="mb-5">
-                          <label htmlFor="password">Password</label>
-                          <div className="relative text-white-dark">
-                            <input
-                              id="password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Enter Password"
-                              className="form-input ps-10 pr-9 placeholder:text-white-dark"
-                              value={data.password}
-                              onChange={handlePasswordChange}
-                            />
-                            <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                              <IconLockDots fill={true} />
-                            </span>
-                            <span
-                              title={
-                                showPassword ? "hide password" : "show password"
-                              }
-                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <IconEye /> : <IconCloseEye />}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="mb-5">
-                          <label htmlFor="confirm-password">
-                            Confirm Password
-                          </label>
-                          <div className="relative text-white-dark">
-                            <input
-                              id="Confirm Password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Enter Confirm Password"
-                              className="form-input ps-10 pr-9 placeholder:text-white-dark"
-                              value={data.confirmPassword}
-                              onChange={handleConfirmPasswordChange}
-                            />
-                            <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                              <IconLockDots fill={true} />
-                            </span>
-                            <span
-                              title={
-                                showPassword ? "hide password" : "show password"
-                              }
-                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <IconEye /> : <IconCloseEye />}
-                            </span>
-                          </div>
-                          {passwordError && (
-                            <p className="text-red-500 text-sm mt-2">
-                              {passwordError}
-                            </p>
-                          )}
-                        </div>
-                      </>
-                    )}
-
                     <div className="flex justify-end items-center mt-8">
                       <button
                         type="button"

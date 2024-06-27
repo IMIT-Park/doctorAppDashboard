@@ -10,8 +10,6 @@ import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { useNavigate } from "react-router-dom";
 import NetworkHandler from "../../../utils/NetworkHandler";
-import useBlockUnblock from "../../../utils/useBlockUnblock";
-import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
 import ModalRequests from "./ModalRequests";
 
@@ -24,7 +22,7 @@ const Requests = () => {
   });
 
   const { userDetails } = useContext(UserContext);
-  const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id || "";
+  const clinicId = userDetails?.UserClinic?.[0]?.clinic_id || "";
 
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -44,28 +42,10 @@ const Requests = () => {
     setPage(1);
   }, [pageSize]);
 
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      // const response = await NetworkHandler.makeGetRequest(
-      //   `/v1/doctor/getRequest/${doctorId}?page=${page}&pageSize=${pageSize}`
-      // );
-      // setTotalRequests(response?.data?.allRequest?.count);
-      // setAllRequests(response?.data?.allRequest?.rows);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } = useBlockUnblock(fetchData);
+  // useEffect(() => {
+  //   fetchData();
+  // }, [page, pageSize]);
 
   return (
     <div>
@@ -120,29 +100,6 @@ const Requests = () => {
                 { accessor: "email" },
                 { accessor: "phone" },
                 { accessor: "address", title: "Address" },
-                {
-                  accessor: "Actions",
-                  textAlignment: "center",
-                  render: (rowData) => (
-                    <div className="grid place-items-center">
-                      <CustomSwitch
-                        checked={rowData?.User?.status}
-                        onChange={() =>
-                          showOwnerAlert(
-                            rowData?.user_id,
-                            rowData?.User?.status ? "block" : "activate",
-                            "owner"
-                          )
-                        }
-                        tooltipText={
-                          rowData?.User?.status ? "Block" : "Unblock"
-                        }
-                        uniqueId={`owner${rowData?.owner_id}`}
-                        size="normal"
-                      />
-                    </div>
-                  ),
-                },
               ]}
               totalRecords={totalRequests}
               recordsPerPage={pageSize}
@@ -159,13 +116,13 @@ const Requests = () => {
         )}
       </div>
 
-      <ModalRequests
+      {/* <ModalRequests
         open={isModalOpen}
         closeModal={closeModal}
         fetchClinicData={fetchData}
         setButtonLoading={setButtonLoading}
 
-      />
+      /> */}
     </div>
   );
 };

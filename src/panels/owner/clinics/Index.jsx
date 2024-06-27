@@ -15,7 +15,7 @@ import AddClinic from "./AddClinic";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { showMessage } from "../../../utils/showMessage";
-import { handleGetLocation } from "../../../utils/getLocation";
+import { convertLocationDetail, handleGetLocation } from "../../../utils/getLocation";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import ModalSubscription from "./ModalSubscription";
 import { UserContext } from "../../../contexts/UseContext";
@@ -135,8 +135,8 @@ const Clinics = () => {
       address: "",
       place: "",
       picture: null,
-      defaultPicture:null,
-      googleLocation: "",
+      defaultPicture: null,
+      googleLocation: null,
     });
   };
 
@@ -149,7 +149,7 @@ const Clinics = () => {
       address: clinic.address,
       place: clinic.place,
       picture: null,
-      googleLocation: JSON.parse(clinic.googleLocation),
+      googleLocation: convertLocationDetail(clinic?.googleLocation),
       defaultPicture: imageBaseUrl + clinic?.banner_img_url || null,
     });
     setCurrentClinicId(clinic.clinic_id);
@@ -288,7 +288,6 @@ const Clinics = () => {
     setsubscriptionAddModal(true);
   };
 
-
   console.log(input);
   return (
     <div>
@@ -351,16 +350,18 @@ const Clinics = () => {
                   title: "Plan Details",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSubButtonClick(rowData);
-                      }}
-                      className="btn btn-green btn-sm py-1"
-                    >
-                      View Plan
-                    </button>
+                    <div className="grid place-items-center">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSubButtonClick(rowData);
+                        }}
+                        className="btn btn-green btn-sm py-1"
+                      >
+                        View Plan
+                      </button>
+                    </div>
                   ),
                 },
                 {
@@ -368,17 +369,19 @@ const Clinics = () => {
                   title: "Location",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleGetLocation(rowData.googleLocation);
-                      }}
-                      className="btn btn-success btn-sm py-1"
-                    >
-                      <IconMenuContacts className="mr-1 w-4" />
-                      View Location
-                    </button>
+                    <div className="grid place-items-center">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleGetLocation(rowData.googleLocation);
+                        }}
+                        className="btn btn-success btn-sm py-1"
+                      >
+                        <IconMenuContacts className="mr-1 w-4" />
+                        View Location
+                      </button>
+                    </div>
                   ),
                 },
 

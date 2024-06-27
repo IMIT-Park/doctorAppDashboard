@@ -35,3 +35,33 @@ export const handleGetLocation = (googleLocation) => {
     showMessage("Invalid location data", "error");
   }
 };
+
+export const convertLocationDetail = (locationString) => {
+  try {
+    const decodedLocation = locationString.replace(/\\/g, "");
+
+    const cleanedLocationString =
+      decodedLocation.startsWith('"') && decodedLocation.endsWith('"')
+        ? decodedLocation.slice(1, -1)
+        : decodedLocation;
+
+    const locationData = JSON.parse(cleanedLocationString);
+
+    const cleanedLocationData = {};
+    Object.keys(locationData).forEach((key) => {
+      const trimmedKey = key.trim();
+      cleanedLocationData[trimmedKey] = parseFloat(locationData[key]);
+    });
+
+    const { lat, long } = cleanedLocationData;
+
+    if (!isNaN(lat) && !isNaN(long)) {
+      return { lat, long: long };
+    } else {
+      throw new Error("Invalid location data");
+    }
+  } catch (error) {
+    console.error("Failed to parse location data", error);
+    throw new Error("Invalid location data");
+  }
+};

@@ -42,6 +42,14 @@ const GoogleLocationPicker = ({ data, setData }) => {
         }
       );
     }
+
+    if (data.googleLocation && data.googleLocation.lat && data.googleLocation.long) {
+      const { lat, long } = data.googleLocation;
+      const initialLocation = { lat, lng: long };
+      setCenter(initialLocation);
+      setMarker({ position: initialLocation });
+      setLocation(initialLocation);
+    }
   }, []);
 
   const onMapLoad = useCallback((map) => {
@@ -95,13 +103,24 @@ const GoogleLocationPicker = ({ data, setData }) => {
       },
     });
     setLocation(location);
-    setData({
-      ...data,
-      googleLocation: { lat: location?.lat, long: location?.lng },
-    });
     map.panTo(place?.geometry?.location);
     map.setZoom(13);
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+    }
+  };
+
+  useEffect(() => {
+    if (location?.lat && location?.lng) {
+      setData((prevData) => ({
+        ...prevData,
+        googleLocation: { lat: location.lat, long: location.lng },
+      }));
+    }
+  }, [location]);
 
   if (loadError) return "Error loading maps";
   if (!isLoaded) return "Loading Maps";
@@ -125,13 +144,30 @@ const GoogleLocationPicker = ({ data, setData }) => {
             type="text"
             placeholder="Enter your Location"
             className="form-input border-0 border-l rounded-none bg-white  focus:shadow-[0_0_5px_2px_rgb(194_213_255_/_62%)] dark:shadow-[#1b2e4b] placeholder:tracking-wider focus:outline-none py-3"
+            onKeyDown={handleKeyDown}
           />
         </div>
       </Autocomplete>
 
+      {location?.lat && location?.lng && (
+        <div className="flex items-center gap-2 sm:gap-4 flex-wrap w-full justify-center p-2">
+          <div className="flex items-center gap-1">
+            <p className="text-gray-500">Latitude:</p>
+            <div className="text-slate-800 dark:text-slate-300">
+              {location?.lat}
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            <p className="text-gray-500">Longitude:</p>
+            <div className="text-slate-800 dark:text-slate-300">
+              {location?.lng}
+            </div>
+          </div>
+        </div>
+      )}
       <GoogleMap
         id="map"
-        mapContainerClassName="w-full aspect-square"
+        mapContainerClassName="w-full aspect-video"
         zoom={13}
         center={center}
         onLoad={onMapLoad}
@@ -147,14 +183,6 @@ const GoogleLocationPicker = ({ data, setData }) => {
           </InfoWindow>
         )}
       </GoogleMap>
-
-      {location?.lat && location?.lng && (
-        <div>
-          <h3>Selected Location</h3>
-          <p>Latitude: {location?.lat}</p>
-          <p>Longitude: {location?.lng}</p>
-        </div>
-      )}
     </div>
   );
 };

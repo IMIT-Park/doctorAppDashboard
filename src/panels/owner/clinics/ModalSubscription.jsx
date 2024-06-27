@@ -52,7 +52,7 @@ const ModalPage = ({
   };
 
   useEffect(() => {
-    if (clinicId) {
+    if (clinicId && open) {
       fetchSubscriptionData();
     }
   }, [clinicId]);

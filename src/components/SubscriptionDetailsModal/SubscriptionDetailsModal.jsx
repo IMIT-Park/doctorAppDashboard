@@ -312,4 +312,4 @@ const ModalPage = ({
     </Transition>
   );
 };
-export default ModalPage;
+export default SubscriptionDetailsModal;

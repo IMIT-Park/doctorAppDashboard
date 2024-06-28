@@ -97,7 +97,7 @@ const AddClinic = ({
                 </div>
                 <div className="p-5">
                   <form onSubmit={handleSubmitAdd}>
-                    <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
+                    <div className={`grid grid-cols-1 ${isEdit ? "sm:grid-cols-2" : "sm:flex justify-between"} gap-4 mb-5`}>
                       <div className="w-full">
                         <label htmlFor="first-name">Name</label>
                         <input
@@ -128,7 +128,7 @@ const AddClinic = ({
                         </div>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
+                    <div  className={`grid grid-cols-1 ${isEdit ? "sm:grid-cols-2" : "sm:flex justify-between"} gap-4 mb-5`}>
                       {!isEdit && (
                         <div className="w-full">
                           <label htmlFor="username">Username</label>

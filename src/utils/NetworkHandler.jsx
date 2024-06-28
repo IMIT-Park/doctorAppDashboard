@@ -51,7 +51,6 @@ class NetworkHandler {
         return response;
       },
       async (error) => {
-        console.log(error);
         if (
           error.response?.status === 401 &&
           error.response?.data?.message == "Invalid access token." &&

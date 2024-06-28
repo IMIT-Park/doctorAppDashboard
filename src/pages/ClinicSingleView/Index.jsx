@@ -20,13 +20,17 @@ import AddClinic from "../../panels/owner/clinics/AddClinic";
 import { formatDate } from "../../utils/formatDate";
 import { showMessage } from "../../utils/showMessage";
 import IconCaretDown from "../../components/Icon/IconCaretDown";
-import { handleGetLocation } from "../../utils/getLocation";
+import {
+  convertLocationDetail,
+  handleGetLocation,
+} from "../../utils/getLocation";
 import useBlockUnblock from "../../utils/useBlockUnblock";
 import QRCodeComponent from "../../components/QRCodeComponent";
 import useFetchData from "../../customHooks/useFetchData";
 import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
 import CustomButton from "../../components/CustomButton";
+import ModalSubscription from "../../panels/owner/clinics/ModalSubscription";
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -35,6 +39,7 @@ const ClinicSingleView = () => {
   const { clinicId } = useParams();
 
   const { userDetails } = useContext(UserContext);
+  const ownerId = userDetails?.UserOwner?.[0]?.owner_id;
 
   const isSuperAdmin = userDetails?.role_id === 1;
 
@@ -80,6 +85,8 @@ const ClinicSingleView = () => {
     confirmPassword: "",
   });
   const [timeSlotInput, setTimeSlotInput] = useState({});
+  const [subscriptionModal, setsubscriptionModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
   useEffect(() => {
     setPage(1);
@@ -132,7 +139,7 @@ const ClinicSingleView = () => {
       address: clinicDetails.address,
       place: clinicDetails.place,
       picture: null,
-      googleLocation: clinicDetails.googleLocation,
+      googleLocation: convertLocationDetail(clinicDetails?.googleLocation),
       defaultPicture: imageBaseUrl + clinicDetails?.banner_img_url || null,
     });
     setEditModal(true);
@@ -192,6 +199,16 @@ const ClinicSingleView = () => {
     } finally {
       setButtonLoading(false);
     }
+  };
+
+  // subscription modal handler
+  const openSubscriptionModal = () => {
+    setsubscriptionModal(true);
+  };
+
+  const closeSubscriptionModal = () => {
+    setsubscriptionModal(false);
+    setSelectedPlan(null);
   };
 
   const openAddDoctorModal = () => {
@@ -338,9 +355,10 @@ const ClinicSingleView = () => {
                     alt="Banner"
                   />
                 </div>
-                <div className="text-2xl font-semibold capitalize mt-2">
+                <div className="text-2xl font-semibold capitalize mt-2 mb-4">
                   {clinicDetails?.name || ""}
                 </div>
+                <QRCodeComponent qrUrl={qrUrl} />
               </div>
 
               <div className="flex flex-col items-center gap-4">
@@ -421,7 +439,13 @@ const ClinicSingleView = () => {
                   <IconMenuContacts className="mr-1 w-5" />
                   View Location
                 </button>
-                <QRCodeComponent qrUrl={qrUrl} />
+                <button
+                  type="button"
+                  className="btn btn-secondary mt-5"
+                  onClick={openSubscriptionModal}
+                >
+                  View Plan Details
+                </button>
               </div>
             </div>
           </>
@@ -569,6 +593,20 @@ const ClinicSingleView = () => {
         buttonLoading={buttonLoading}
         isEdit={true}
       />
+
+      {/* subscription modal */}
+      <ModalSubscription
+        open={subscriptionModal}
+        closeModal={closeSubscriptionModal}
+        clinicId={clinicId}
+        ownerId={ownerId}
+        buttonLoading={buttonLoading}
+        setButtonLoading={setButtonLoading}
+        fetchClinicData={fetchClinicData}
+        selectedPlan={selectedPlan}
+        setSelectedPlan={setSelectedPlan}
+      />
+
       {/* add doctor modal */}
       <AddDoctor
         open={addDoctorModal}

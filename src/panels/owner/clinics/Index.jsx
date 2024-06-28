@@ -63,6 +63,7 @@ const Clinics = () => {
     defaultPicture: null,
     googleLocation: null,
   });
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
   useEffect(() => {
     setPage(1);
@@ -123,6 +124,7 @@ const Clinics = () => {
 
   const closeSubscriptionModal = () => {
     setsubscriptionAddModal(false);
+    setSelectedPlan(null);
   };
 
   const closeAddModal = () => {
@@ -475,6 +477,8 @@ const Clinics = () => {
         buttonLoading={buttonLoading}
         setButtonLoading={setButtonLoading}
         fetchClinicData={fetchData}
+        selectedPlan={selectedPlan}
+        setSelectedPlan={setSelectedPlan}
       />
     </div>
   );

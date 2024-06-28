@@ -20,27 +20,31 @@ const QRCodeComponent = ({ qrUrl }) => {
   };
 
   return (
-    <div className="w-full flex items-start gap-3 flex-wrap mt-5">
-      <div className="flex flex-col items-center bg-[#f1f2f3] dark:bg-[#060818] rounded p-2">
-        <QRCode id="qrcode-canvas" value={qrUrl} size={220} />
+    <div className="w-fit flex items-start gap-3 flex-wrap ">
+      <div className="flex items-center flex-wrap gap-4 bg-[#f1f2f3] dark:bg-[#060818] rounded p-2">
+        <QRCode
+          id="qrcode-canvas"
+          value={qrUrl}
+          size={220}
+          style={{ display: "none" }}
+        />
         <button
           type="button"
-          className="mt-2 btn btn-green w-fit"
+          className="btn btn-green w-fit"
           onClick={downloadQRCode}
         >
           <IconDownload className="mr-2" />
-          Download
+          Download QR code
         </button>
-      </div>
-      <div className="bg-[#f1f2f3] p-2 rounded dark:bg-[#060818] w-full max-w-80">
-        <form>
+        {/* <div className="bg-[#f1f2f3] p-2 rounded dark:bg-[#060818] w-full max-w-80"> */}
+        <form className="flex items-center">
           <input
             type="text"
             defaultValue={qrUrl}
-            className="form-input form-input-green"
+            className="form-input form-input-green rounded-none"
             readOnly
           />
-          <div className="mt-1">
+          <div>
             <CopyToClipboard
               text={qrUrl}
               onCopy={(text, result) => {
@@ -49,7 +53,7 @@ const QRCodeComponent = ({ qrUrl }) => {
                 }
               }}
             >
-              <button type="button" className="btn btn-green px-2 ml-auto">
+              <button type="button" className="btn btn-green px-2 rounded-none">
                 <IconCopy className="ltr:mr-2 rtl:ml-2" />
                 Copy
               </button>
@@ -57,6 +61,8 @@ const QRCodeComponent = ({ qrUrl }) => {
           </div>
         </form>
       </div>
+
+      {/* </div> */}
     </div>
   );
 };

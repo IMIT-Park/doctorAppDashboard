@@ -15,11 +15,16 @@ import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { handleGetLocation } from "../../../utils/getLocation";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
+import SubscriptionDetailsModal from "../../../components/SubscriptionDetailsModal/SubscriptionDetailsModal";
+import { UserContext } from "../../../contexts/UseContext";
 
 const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { userDetails } = useContext(UserContext);
+  const ownerId = userDetails?.UserOwner?.[0]?.owner_id || 0;
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
@@ -31,6 +36,12 @@ const Clinics = () => {
   const [totalClinics, setTotalClinics] = useState(0);
   const [allClinics, setAllClinics] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentClinicId, setCurrentClinicId] = useState("");
+  const [subscriptionAddModal, setsubscriptionAddModal] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
+
 
   useEffect(() => {
     setPage(1);
@@ -66,6 +77,17 @@ const Clinics = () => {
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchData);
+
+    const handleSubButtonClick = (clinic) => {
+      setCurrentClinicId(clinic.clinic_id);
+      setsubscriptionAddModal(true);
+    };
+
+    const closeSubscriptionModal = () => {
+      setsubscriptionAddModal(false);
+      setSelectedPlan(null);
+    };
+  
 
   return (
     <div>
@@ -137,6 +159,25 @@ const Clinics = () => {
                 { accessor: "phone" },
                 { accessor: "place", title: "Place" },
                 { accessor: "address", title: "Address" },
+                 {
+                  accessor: "clinic_id",
+                  title: "Plan Details",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="grid place-items-center">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSubButtonClick(rowData);
+                        }}
+                        className="btn btn-green btn-sm py-1"
+                      >
+                        View Plan
+                      </button>
+                    </div>
+                  ),
+                },
                 {
                   accessor: "googleLocation",
                   title: "Location",
@@ -189,6 +230,17 @@ const Clinics = () => {
           </div>
         )}
       </div>
+      <SubscriptionDetailsModal
+        open={subscriptionAddModal}
+        closeModal={closeSubscriptionModal}
+        clinicId={currentClinicId}
+        ownerId={ownerId}
+        buttonLoading={buttonLoading}
+        setButtonLoading={setButtonLoading}
+        fetchClinicData={fetchData}
+        selectedPlan={selectedPlan}
+        setSelectedPlan={setSelectedPlan}
+      />
     </div>
   );
 };

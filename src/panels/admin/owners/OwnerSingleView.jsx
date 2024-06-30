@@ -15,6 +15,7 @@ import IconMenuContacts from "../../../components/Icon/Menu/IconMenuContacts";
 import { handleGetLocation } from "../../../utils/getLocation";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
+import SubscriptionDetailsModal from "../../../components/SubscriptionDetailsModal/SubscriptionDetailsModal";
 
 const OwnerSingleView = () => {
   const dispatch = useDispatch();
@@ -34,6 +35,11 @@ const OwnerSingleView = () => {
   const [loading, setLoading] = useState(false);
   const [ownerInfo, setOwnerInfo] = useState({});
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [subscriptionAddModal, setsubscriptionAddModal] = useState(false);
+  const [currentClinicId, setCurrentClinicId] = useState("");
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
 
   useEffect(() => {
     setPage(1);
@@ -91,6 +97,16 @@ const OwnerSingleView = () => {
     useBlockUnblock(fetchOwnerInfo);
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchData);
+
+    const handleSubButtonClick = (clinic) => {
+      setCurrentClinicId(clinic.clinic_id);
+      setsubscriptionAddModal(true);
+    };
+
+    const closeSubscriptionModal = () => {
+      setsubscriptionAddModal(false);
+      setSelectedPlan(null);
+    };
 
   return (
     <div>
@@ -200,6 +216,25 @@ const OwnerSingleView = () => {
 
                 { accessor: "place", title: "Place" },
                 {
+                  accessor: "clinic_id",
+                  title: "Plan Details",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="grid place-items-center">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSubButtonClick(rowData);
+                        }}
+                        className="btn btn-green btn-sm py-1"
+                      >
+                        View Plan
+                      </button>
+                    </div>
+                  ),
+                },
+                {
                   accessor: "googleLocation",
                   title: "Location",
                   textAlignment: "center",
@@ -251,6 +286,17 @@ const OwnerSingleView = () => {
           </div>
         )}
       </div>
+      <SubscriptionDetailsModal
+        open={subscriptionAddModal}
+        closeModal={closeSubscriptionModal}
+        clinicId={currentClinicId}
+        ownerId={ownerId}
+        buttonLoading={buttonLoading}
+        setButtonLoading={setButtonLoading}
+        fetchClinicData={fetchData}
+        selectedPlan={selectedPlan}
+        setSelectedPlan={setSelectedPlan}
+      />
     </div>
   );
 };

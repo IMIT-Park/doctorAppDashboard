@@ -1,12 +1,13 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import IconX from "../../../components/Icon/IconX";
-import IconLoader from "../../../components/Icon/IconLoader";
-import NetworkHandler from "../../../utils/NetworkHandler";
-import { formatDate } from "../../../utils/formatDate";
-import { showMessage } from "../../../utils/showMessage";
 
-const ModalPage = ({
+import IconX from "../Icon/IconX";
+import NetworkHandler from "../../utils/NetworkHandler";
+import { formatDate } from "../../utils/formatDate";
+import { showMessage } from "../../utils/showMessage";
+import IconLoader from "../Icon/IconLoader";
+
+const SubscriptionDetailsModal = ({
   open,
   closeModal,
   buttonLoading,
@@ -142,7 +143,7 @@ const ModalPage = ({
                   onClick={closeModal}
                   className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
                 >
-                  <IconX />
+                  <IconX/>
                 </button>
                 <div className="text-lg  font-semibold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px] pb-1">
                   Subscription Plans

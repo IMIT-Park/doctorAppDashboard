@@ -937,7 +937,7 @@ const Profile = () => {
       <AddLeave
         open={addLeaveModal}
         closeModal={closeAddLeaveModal}
-        buttonLoading={buttonLoading}
+        // buttonLoading={buttonLoading}
         clinicId={clinicId}
         doctorId={doctorId}
         fetchLeaveData={getDoctorLeaves}

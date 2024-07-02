@@ -6,14 +6,7 @@ import NetworkHandler from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
 import { formatTime } from "../../../utils/formatTime";
 
-const AddLeave = ({
-  open,
-  closeModal,
-  buttonLoading,
-  clinicId,
-  doctorId,
-  fetchLeaveData,
-}) => {
+const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
   const [leaveType, setLeaveType] = useState("Full Day");
   const [selectedDate, setSelectedDate] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -21,6 +14,8 @@ const AddLeave = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [timeSlots, setTimeSlots] = useState([]);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const days = [
     { name: "Sunday", id: "0" },
@@ -39,6 +34,7 @@ const AddLeave = ({
     setEndDate("");
     setErrorMessage("");
     setTimeSlots([]);
+    // setSelectedTimeSlots([]);
   };
 
   // Handle date change to fetch time slots
@@ -47,6 +43,7 @@ const AddLeave = ({
     setSelectedDate(date);
     setErrorMessage("");
     setTimeSlots([]);
+    setLoading(true);
     console.log("Selected Date:", date);
 
     try {
@@ -59,7 +56,16 @@ const AddLeave = ({
       if (response.data.doctorTimeSlots.count === 0) {
         setErrorMessage("No Timeslots found for this day");
       } else {
-        setTimeSlots(response.data.doctorTimeSlots?.rows);
+        // Filter time slots based on clinicId
+        const filteredTimeSlots = response.data.doctorTimeSlots.rows.filter(
+          (slot) => slot.clinic_id === clinicId
+        );
+
+        if (filteredTimeSlots.length === 0) {
+          setErrorMessage("No Timeslots found for this clinic on this day");
+        } else {
+          setTimeSlots(filteredTimeSlots);
+        }
       }
     } catch (error) {
       console.error("Error fetching time slots:", error);
@@ -68,6 +74,8 @@ const AddLeave = ({
       } else {
         setErrorMessage("An error occurred while fetching timeslots");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,23 +86,41 @@ const AddLeave = ({
 
   const handleTimeSlotChange = (e) => {
     const { value, checked } = e.target;
+    const slotId = parseInt(value, 10);
     if (checked) {
-      setSelectedTimeSlots([...selectedTimeSlots, value]);
+      setSelectedTimeSlots((prev) => [...prev, slotId]);
     } else {
-      setSelectedTimeSlots(selectedTimeSlots.filter((id) => id !== value));
+      setSelectedTimeSlots((prev) => prev.filter((id) => id !== slotId));
     }
   };
 
   // Handle leave submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setButtonLoading(true);
     try {
       let leaveData;
+
+      if (leaveType === "By Shift" && selectedTimeSlots.length === 0) {
+        showMessage("No time slots selected for leave", "error");
+        setButtonLoading(false);
+        return;
+      }
+      if (leaveType === "Full Day" && !selectedDate) {
+        showMessage("Select a date for leave", "error");
+        setButtonLoading(false);
+        return;
+      }
+
+      if (leaveType === "Multiple" && (!startDate || !endDate)) {
+        showMessage("Please select a date range", "error");
+        setButtonLoading(false);
+        return;
+      }
 
       if (leaveType === "Full Day") {
         leaveData = {
           leaveslots: timeSlots.map((slot) => ({
-            clinic_id: clinicId,
             DoctorTimeSlot_id: slot.DoctorTimeSlot_id,
             leave_date: selectedDate,
           })),
@@ -103,12 +129,10 @@ const AddLeave = ({
         leaveData = {
           startDate: startDate,
           endDate: endDate,
-          clinic_id: clinicId,
         };
       } else if (leaveType === "By Shift") {
         leaveData = {
-          leaveslots: selectedTimeSlots.map((slotId) => ({
-            clinic_id: clinicId,
+          leaveslots: [...new Set(selectedTimeSlots)].map((slotId) => ({
             DoctorTimeSlot_id: slotId,
             leave_date: selectedDate,
           })),
@@ -126,7 +150,6 @@ const AddLeave = ({
           ? "Bulk leave added successfully."
           : "Leave added successfully."
       );
-
       closeModal();
       fetchLeaveData();
       resetForm();
@@ -137,9 +160,10 @@ const AddLeave = ({
       } else {
         showMessage("An error occurred while creating leave slots", "error");
       }
+    } finally {
+      setButtonLoading(false);
     }
   };
-
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -241,13 +265,20 @@ const AddLeave = ({
                             className="form-input"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
+                            disabled={loading}
                           />
                         </div>
-                        <div className="w-full">
-                          {errorMessage && (
-                            <div className="text-red-500 mt-2">
-                              {errorMessage}
+                        <div className="w-full mt-5">
+                          {loading ? (
+                            <div className="flex  items-center">
+                              <IconLoader className="animate-spin" />
                             </div>
+                          ) : (
+                            errorMessage && (
+                              <div className="text-red-500 mt-2">
+                                {errorMessage}
+                              </div>
+                            )
                           )}
                         </div>
                       </div>
@@ -293,11 +324,18 @@ const AddLeave = ({
                             className="form-input"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
+                            disabled={loading}
                           />
-                          {errorMessage && (
-                            <div className="text-red-500 mt-2">
-                              {errorMessage}
+                          {loading ? (
+                            <div className="flex  items-center mt-2">
+                              <IconLoader className="animate-spin" />
                             </div>
+                          ) : (
+                            errorMessage && (
+                              <div className="text-red-500 mt-2">
+                                {errorMessage}
+                              </div>
+                            )
                           )}
                         </div>
                         <div className="w-full">

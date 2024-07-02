@@ -346,19 +346,67 @@ const ClinicSingleView = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="flex justify-between flex-wrap gap-4">
-              <div>
-                <div className="w-full max-w-96 rounded-md overflow-hidden">
+            <div className="flex justify-between flex-wrap">
+              <div className="w-full max-w-96">
+                <div className="rounded-md overflow-hidden">
                   <img
                     src={imageBaseUrl + clinicDetails?.banner_img_url}
-                    className="w-full h-full object-cover"
+                    className="w-full h-80 object-cover"
                     alt="Banner"
                   />
                 </div>
-                <div className="text-2xl font-semibold capitalize mt-2 mb-4">
+                {/* <div className="text-2xl font-semibold capitalize mt-2 mb-4">
                   {clinicDetails?.name || ""}
+                </div> */}
+                {/* <QRCodeComponent qrUrl={qrUrl} /> */}
+              </div>
+
+              <div className="text-left mr-96">
+                <div className="mt-5">
+                  <div className="text-4xl text-green-800 font-semibold capitalize mt-2 mb-4">
+                    {clinicDetails?.name || ""}
+                  </div>
+                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
+                      Address <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300 text-base">
+                      {clinicDetails?.address || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
+                      Place <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300 text-base">
+                      {clinicDetails?.place || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
+                      Email <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300 text-base">
+                      {clinicDetails?.User?.email || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
+                      Username <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300 text-base">
+                      {clinicDetails?.User?.user_name || ""}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
+                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
+                      Phone <span>:</span>
+                    </div>
+                    <div className="dark:text-slate-300 text-base">
+                      {clinicDetails?.phone || ""}
+                    </div>
+                  </div>
                 </div>
-                <QRCodeComponent qrUrl={qrUrl} />
               </div>
 
               <div className="flex flex-col items-center gap-4">
@@ -386,8 +434,31 @@ const ClinicSingleView = () => {
                   </button>
                 )}
               </div>
+
+              <div className="mt-5">
+                <div className="flex flex-row gap-3">
+                  <QRCodeComponent qrUrl={qrUrl} />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleGetLocation(clinicDetails?.googleLocation)
+                    }
+                    className="btn btn-success mb-1"
+                  >
+                    <IconMenuContacts className="mr-1 w-5" />
+                    View Location
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary mb-1"
+                    onClick={openSubscriptionModal}
+                  >
+                    View Plan Details
+                  </button>
+                </div>
+              </div>
             </div>
-            <div className="text-left">
+            {/* <div className="text-left">
               <div className="mt-5">
                 <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
                   <div className="text-white-dark min-w-[75px] flex items-start justify-between">
@@ -447,7 +518,7 @@ const ClinicSingleView = () => {
                   View Plan Details
                 </button>
               </div>
-            </div>
+            </div> */}
           </>
         )}
       </div>

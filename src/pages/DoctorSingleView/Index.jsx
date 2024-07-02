@@ -27,7 +27,7 @@ import { UserContext } from "../../contexts/UseContext";
 import CustomButton from "../../components/CustomButton";
 
 const SinglePage = () => {
-  const { clinicId, doctorId } = useParams();
+  const { doctorId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -40,6 +40,8 @@ const SinglePage = () => {
   });
 
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [selectedClinic, setSelectedClinic] = useState(null);
+  const [clinicId, setClinicId] = useState(null);
   const [timeslotsLoading, setTimeslotsLoading] = useState(false);
   const [leavesLoading, setLeavesLoading] = useState(false);
   const [active, setActive] = useState(null);
@@ -101,6 +103,22 @@ const SinglePage = () => {
   } = useFetchData(`/v1/doctor/getbyId/${doctorId}`, {}, [doctorId]);
   const doctorDetails = doctorData?.Doctor;
 
+  // fetch doctor's clinics function
+  const {
+    data: clinicsData,
+    loading: clinicsLoading,
+    refetch: fetchDoctorClinics,
+  } = useFetchData(`/v1/doctor/getClincbydr/${doctorId}`, {}, [doctorId]);
+  const doctorClinics = clinicsData?.allclinics;
+
+  // set the first clinic from the clinics list into the selectedClinic state
+  useEffect(() => {
+    if (doctorClinics && doctorClinics.length > 0) {
+      setSelectedClinic(doctorClinics[0]);
+      setClinicId(doctorClinics[0]?.clinic_id);
+    }
+  }, [doctorClinics]);
+
   // fetch timeslots data function
   const getDoctorTimeslots = async () => {
     setTimeslotsLoading(true);
@@ -150,6 +168,12 @@ const SinglePage = () => {
       getDoctorLeaves();
     }
   }, [clinicId]);
+
+  // clinic select funtion
+  const handleClinicSelect = (clinic) => {
+    setSelectedClinic(clinic);
+    setClinicId(clinic?.clinic_id);
+  };
 
   // edit details modal handler
   const openEditDetailsModal = () => {
@@ -582,7 +606,7 @@ const SinglePage = () => {
                   </div>
                   <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                     <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Profie Visibility <span>:</span>
+                      Profile Visibility <span>:</span>
                     </div>
                     <div className="dark:text-slate-300">
                       {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
@@ -614,14 +638,89 @@ const SinglePage = () => {
                 )}
               </div>
             </div>
+
+            {/* <div className="flex items-center">
+              <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
+                Clinics:
+              </h5>
+              <div className="border flex-grow ml-4"></div>
+            </div> */}
+            <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
+              Clinics:
+            </h5>
+            {doctorClinics && doctorClinics?.length ? (
+              <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+                {doctorClinics?.map((clinic) => (
+                  <div
+                    key={clinic?.clinic_id}
+                    className={`Sm:min-w-[413px] border bg-[#F6F6F6] dark:bg-slate-900 ${
+                      selectedClinic?.clinic_id === clinic?.clinic_id
+                        ? "border-[#006241]"
+                        : "border-slate-200 dark:border-slate-800"
+                    } rounded flex gap-3 items-center p-1 cursor-pointer`}
+                    onClick={() => handleClinicSelect(clinic)}
+                  >
+                    <img
+                      src={imageBaseUrl + clinic?.banner_img_url}
+                      alt="Clinic"
+                      className="w-[76px] h-[62px] rounded-md object-cover"
+                    />
+                    <div>
+                      <h4 className="text-xl font-semibold text-slate-800 dark:text-slate-300 capitalize">
+                        {clinic?.name || ""}
+                      </h4>
+                      <p className="text-base font-semibold text-slate-500 capitalize">
+                        {clinic?.place || ""}
+                      </p>
+                    </div>
+                    <div className="ml-auto mr-2">
+                      {selectedClinic?.clinic_id === clinic?.clinic_id ? (
+                        <svg
+                          className="w-6 h-6 text-green-700"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          ></path>
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-6 h-6 text-slate-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 15l7-7 7 7"
+                          ></path>
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-xs text-gray-600">No clinics Found</div>
+            )}
+
             <div className="my-10">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5 className="text-base font-semibold text-white-dark">
+                <h5 className="text-xl font-semibold text-dark dark:text-slate-300">
                   Available Days & Time Slots:
                 </h5>
                 {!isSuperAdmin && (
                   <CustomButton onClick={openAddTimeSlotModal}>
-                    <IconPlus className="ltr:mr-2 rtl:ml-2" />
+                    <IconPlus className="ltr:mr-2 rtl:ml-2 text-dark" />
                     Add Time Slot
                   </CustomButton>
                 )}
@@ -639,7 +738,7 @@ const SinglePage = () => {
                               <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
                                 <button
                                   type="button"
-                                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
+                                  className={`p-4 w-full text-base flex items-center text-dark dark:bg-[#1b2e4b] ${
                                     active === day.id
                                       ? "!text-[#006241] dark:!text-[#4ec37bfb]"
                                       : ""
@@ -667,11 +766,11 @@ const SinglePage = () => {
                                             key={timeslot.DoctorTimeSlot_id}
                                             className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
                                           >
-                                            <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
+                                            <span className="text-[#ec3e73] text-base font-bold border border-[#006241] px-4 py-1 rounded">
                                               {formatTime(timeslot?.startTime)}{" "}
                                               - {formatTime(timeslot?.endTime)}
                                             </span>
-                                            <div className="flex items-center gap-1">
+                                            <div className="flex text-base items-center gap-1">
                                               <p>No. of Consultations:</p>{" "}
                                               <div className="text-slate-700 dark:text-slate-300">
                                                 {
@@ -679,7 +778,7 @@ const SinglePage = () => {
                                                 }
                                               </div>
                                             </div>
-                                            <div className="flex items-center gap-1">
+                                            <div className="text-base flex items-center gap-1">
                                               <p>Consultation Time: </p>
                                               <div className="text-slate-700 dark:text-slate-300">
                                                 {timeslot?.time_slot} Min
@@ -726,18 +825,20 @@ const SinglePage = () => {
                   )}
                 </>
               ) : (
-                <div className="text-xs text-gray-600">No Timeslots Found</div>
+                <div className="text-base text-dark dark:text-slate-300">
+                  No Timeslots Found
+                </div>
               )}
             </div>
 
             <div className="mt-4">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5 className="text-base font-semibold mb-1 text-white-dark">
+                <h5 className="text-xl font-semibold mb-1 text-dark dark:text-slate-300">
                   Leaves:
                 </h5>
                 {!isSuperAdmin && (
                   <CustomButton onClick={openAddLeaveModal}>
-                    <IconPlus className="ltr:mr-2 rtl:ml-2" />
+                    <IconPlus className="ltr:mr-2 rtl:ml-2 " />
                     Add Leave
                   </CustomButton>
                 )}
@@ -751,7 +852,11 @@ const SinglePage = () => {
                       {doctorLeaves?.map((leave, index) => (
                         <div
                           key={leave?.leave_date + index}
-                          className="w-full flex items-center justify-between flex-wrap gap-2 py-6 border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
+                          className={`w-full flex items-center justify-between flex-wrap gap-2 py-6 ${
+                            index !== doctorLeaves.length - 1
+                              ? "border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
+                              : ""
+                          }`}
                         >
                           <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
                             {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
@@ -789,7 +894,7 @@ const SinglePage = () => {
                   )}
                 </>
               ) : (
-                <div className="text-xs text-gray-600">No Leaves Found</div>
+                <div className="text-base text-dark dark:text-slate-300">No Leaves Found</div>
               )}
             </div>
           </>

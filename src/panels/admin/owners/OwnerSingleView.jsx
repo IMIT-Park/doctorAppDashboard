@@ -40,7 +40,6 @@ const OwnerSingleView = () => {
   const [buttonLoading, setButtonLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
@@ -98,15 +97,15 @@ const OwnerSingleView = () => {
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchData);
 
-    const handleSubButtonClick = (clinic) => {
-      setCurrentClinicId(clinic.clinic_id);
-      setsubscriptionAddModal(true);
-    };
+  const handleSubButtonClick = (clinic) => {
+    setCurrentClinicId(clinic.clinic_id);
+    setsubscriptionAddModal(true);
+  };
 
-    const closeSubscriptionModal = () => {
-      setsubscriptionAddModal(false);
-      setSelectedPlan(null);
-    };
+  const closeSubscriptionModal = () => {
+    setsubscriptionAddModal(false);
+    setSelectedPlan(null);
+  };
 
   return (
     <div>
@@ -197,7 +196,7 @@ const OwnerSingleView = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allClinics}
-              idAccessor="clinic_id"
+              idAccessor="User.user_id"
               onRowClick={(row) =>
                 navigate(`/clinics/${row?.clinic_id}`, {
                   state: { previousUrl: location?.pathname },
@@ -205,7 +204,7 @@ const OwnerSingleView = () => {
               }
               columns={[
                 {
-                  accessor: "clinic_id",
+                  accessor: "User.user_id",
                   title: "No.",
                   render: (row, rowIndex) => rowIndex + 1,
                 },

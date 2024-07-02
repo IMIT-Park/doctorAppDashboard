@@ -115,8 +115,6 @@ const AddLeave = ({
         };
       }
 
-      // console.log("leaveData", leaveData);
-
       const url =
         leaveType === "Multiple"
           ? `/v1/leave/createBlukLeave/${doctorId}`
@@ -141,6 +139,7 @@ const AddLeave = ({
       }
     }
   };
+
 
   return (
     <Transition appear show={open} as={Fragment}>

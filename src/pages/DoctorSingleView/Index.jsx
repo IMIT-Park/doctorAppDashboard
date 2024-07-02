@@ -41,6 +41,7 @@ const SinglePage = () => {
 
   const [buttonLoading, setButtonLoading] = useState(false);
   const [timeslotsLoading, setTimeslotsLoading] = useState(false);
+  const [leavesLoading, setLeavesLoading] = useState(false);
   const [active, setActive] = useState(null);
   const [editDetailsModal, setEditDetailsModal] = useState(false);
   const [editPhotoModal, setEditPhotoModal] = useState(false);
@@ -71,6 +72,7 @@ const SinglePage = () => {
   });
   const [timeSlotId, setTimeSlotId] = useState("");
   const [doctorTimeSlots, setDoctorTimeSlots] = useState([]);
+  const [doctorLeaves, setDoctorLeaves] = useState([]);
   const [selectedDay, setSelectedDay] = useState("");
   const [addLeaveModal, setAddLeaveModal] = useState(false);
   const [deleteLeaveModal, setDeleteLeaveModal] = useState(false);
@@ -99,14 +101,6 @@ const SinglePage = () => {
   } = useFetchData(`/v1/doctor/getbyId/${doctorId}`, {}, [doctorId]);
   const doctorDetails = doctorData?.Doctor;
 
-  // fetch leaves data function
-  const {
-    data: doctorLeavesData,
-    loading: leavesLoading,
-    refetch: fetchLeaveData,
-  } = useFetchData(`/v1/leave/getdrleave/${doctorId}`, {}, [doctorId]);
-  const doctorLeaves = doctorLeavesData?.leaveDetails;
-
   // fetch timeslots data function
   const getDoctorTimeslots = async () => {
     setTimeslotsLoading(true);
@@ -129,9 +123,31 @@ const SinglePage = () => {
     }
   };
 
+  // fetch Leaves data function
+  const getDoctorLeaves = async () => {
+    setLeavesLoading(true);
+
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        "/v1/leave/getdrleave",
+        { doctor_id: doctorId, clinic_id: clinicId }
+      );
+      if (response.status === 201) {
+        setLeavesLoading(false);
+        setDoctorLeaves(response?.data?.leaveDetails);
+      }
+    } catch (error) {
+      setLeavesLoading(false);
+      console.log(error);
+    } finally {
+      setTimeslotsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (clinicId) {
       getDoctorTimeslots();
+      getDoctorLeaves();
     }
   }, [clinicId]);
 
@@ -301,7 +317,7 @@ const SinglePage = () => {
       );
 
       if (response.status === 201) {
-        fetchDoctorData();
+        getDoctorTimeslots();
         showMessage("Timeslot Added successfully.", "success");
         closeAddTimeSlotModal();
       }
@@ -376,7 +392,7 @@ const SinglePage = () => {
       );
 
       if (response.status === 200) {
-        fetchDoctorData();
+        getDoctorTimeslots();
         showMessage("Timeslot Updated successfully.", "success");
         closeEditTimeSlotModal();
       }
@@ -408,7 +424,7 @@ const SinglePage = () => {
       );
 
       if (response.status === 201) {
-        fetchDoctorData();
+        getDoctorTimeslots();
         showMessage("Timeslot Deleted successfully.", "success");
         closeDeletTimeSlotModal();
       }
@@ -727,41 +743,51 @@ const SinglePage = () => {
                 )}
               </div>
               {doctorLeaves && doctorLeaves?.length > 0 ? (
-                <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
-                  {doctorLeaves?.map((leave, index) => (
-                    <div
-                      key={leave?.leave_date + index}
-                      className="w-full flex items-center justify-between flex-wrap gap-2 py-6 border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
-                    >
-                      <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
-                        {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
-                      </span>
-                      <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-1 font-bold text-base text-slate-500 ml-auto">
-                        <span>{formatDate(leave?.leave_date)}</span>
-                        {!leave?.fullday && (
-                          <div className="flex items-center flex-wrap">
-                            {leave?.leaves?.map((slot, slotIndex) => (
-                              <span key={slot?.DoctorTimeSlot_id}>
-                                (Slot:{" "}
-                                {formatTime(slot?.DoctorTimeSlot?.startTime)} -{" "}
-                                {formatTime(slot?.DoctorTimeSlot?.endTime)})
-                                {slotIndex < leave.leaves.length - 1 && ", "}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        <button
-                          type="button"
-                          className="text-red-500 hover:text-red-700 ml-2"
-                          onClick={() => openDeleteLeaveModal(leave)}
-                          title="Delete leave"
+                <>
+                  {leavesLoading ? (
+                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+                  ) : (
+                    <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
+                      {doctorLeaves?.map((leave, index) => (
+                        <div
+                          key={leave?.leave_date + index}
+                          className="w-full flex items-center justify-between flex-wrap gap-2 py-6 border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
                         >
-                          <IconTrashLines />
-                        </button>
-                      </div>
+                          <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
+                            {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
+                          </span>
+                          <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-1 font-bold text-base text-slate-500 ml-auto">
+                            <span>{formatDate(leave?.leave_date)}</span>
+                            {!leave?.fullday && (
+                              <div className="flex items-center flex-wrap">
+                                {leave?.leaves?.map((slot, slotIndex) => (
+                                  <span key={slot?.DoctorTimeSlot_id}>
+                                    (Slot:{" "}
+                                    {formatTime(
+                                      slot?.DoctorTimeSlot?.startTime
+                                    )}{" "}
+                                    -{" "}
+                                    {formatTime(slot?.DoctorTimeSlot?.endTime)})
+                                    {slotIndex < leave.leaves.length - 1 &&
+                                      ", "}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              className="text-red-500 hover:text-red-700 ml-2"
+                              onClick={() => openDeleteLeaveModal(leave)}
+                              title="Delete leave"
+                            >
+                              <IconTrashLines />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  )}
+                </>
               ) : (
                 <div className="text-xs text-gray-600">No Leaves Found</div>
               )}
@@ -828,7 +854,7 @@ const SinglePage = () => {
         buttonLoading={buttonLoading}
         clinicId={clinicId}
         doctorId={doctorId}
-        fetchLeaveData={fetchLeaveData}
+        fetchLeaveData={getDoctorLeaves}
       />
 
       <DeleteLeave
@@ -836,7 +862,7 @@ const SinglePage = () => {
         closeModal={closeDeleteLeaveModal}
         buttonLoading={buttonLoading}
         leave={selectedLeave}
-        fetchLeaveData={fetchLeaveData}
+        fetchLeaveData={getDoctorLeaves}
         selectedTimeSlots={selectedTimeSlots}
         setSelectedTimeSlots={setSelectedTimeSlots}
       />

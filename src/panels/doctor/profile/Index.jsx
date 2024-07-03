@@ -812,72 +812,7 @@ const Profile = () => {
                 <div className="text-xs text-gray-600">No Timeslots Found</div>
               )}
             </div>
-
-            <div className="mt-4">
-              <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5 className="text-base font-semibold mb-1 text-white-dark">
-                  Leaves:
-                </h5>
-                {!isSuperAdmin && (
-                  <CustomButton onClick={openAddLeaveModal}>
-                    <IconPlus className="ltr:mr-2 rtl:ml-2" />
-                    Add Leave
-                  </CustomButton>
-                )}
-              </div>
-              {doctorLeaves && doctorLeaves?.length > 0 ? (
-                <>
-                  {leavesLoading ? (
-                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
-                  ) : (
-                    <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
-                      {doctorLeaves?.map((leave, index) => (
-                        <div
-                          key={leave?.leave_date + index}
-                          className={`w-full flex items-center justify-between flex-wrap gap-2 py-6 ${
-                            index < leave.leaves.length - 1 &&
-                            "border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
-                          }`}
-                        >
-                          <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
-                            {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
-                          </span>
-                          <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-1 font-bold text-base text-slate-500 ml-auto">
-                            <span>{formatDate(leave?.leave_date)}</span>
-                            {!leave?.fullday && (
-                              <div className="flex items-center flex-wrap">
-                                {leave?.leaves?.map((slot, slotIndex) => (
-                                  <span key={slot?.DoctorTimeSlot_id}>
-                                    (Slot:{" "}
-                                    {formatTime(
-                                      slot?.DoctorTimeSlot?.startTime
-                                    )}{" "}
-                                    -{" "}
-                                    {formatTime(slot?.DoctorTimeSlot?.endTime)})
-                                    {slotIndex < leave.leaves.length - 1 &&
-                                      ", "}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                            <button
-                              type="button"
-                              className="text-red-500 hover:text-red-700 ml-2"
-                              onClick={() => openDeleteLeaveModal(leave)}
-                              title="Delete leave"
-                            >
-                              <IconTrashLines />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-xs text-gray-600">No Leaves Found</div>
-              )}
-            </div>
+           
           </>
         )}
       </div>
@@ -934,16 +869,16 @@ const Profile = () => {
       />
 
       {/* add leave modal */}
-      <AddLeave
+      {/* <AddLeave
         open={addLeaveModal}
         closeModal={closeAddLeaveModal}
         // buttonLoading={buttonLoading}
         clinicId={clinicId}
         doctorId={doctorId}
         fetchLeaveData={getDoctorLeaves}
-      />
+      /> */}
 
-      <DeleteLeave
+      {/* <DeleteLeave
         open={deleteLeaveModal}
         closeModal={closeDeleteLeaveModal}
         buttonLoading={buttonLoading}
@@ -951,7 +886,7 @@ const Profile = () => {
         fetchLeaveData={getDoctorLeaves}
         selectedTimeSlots={selectedTimeSlots}
         setSelectedTimeSlots={setSelectedTimeSlots}
-      />
+      /> */}
     </div>
   );
 };

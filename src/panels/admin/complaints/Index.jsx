@@ -1,8 +1,7 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -11,10 +10,7 @@ import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { useNavigate } from "react-router-dom";
 import ViewReport from "./ViewReport";
-import DeleteReport from "./DeleteReport";
-import { formatDate } from "../../../utils/formatDate";
 import NetworkHandler from "../../../utils/NetworkHandler";
-import { showMessage } from "../../../utils/showMessage";
 import IconEye from "../../../components/Icon/IconEye";
 
 const Complaints = () => {
@@ -31,7 +27,7 @@ const Complaints = () => {
   const [totalComplaints, setTotalComplaints] = useState(0);
   const [allComplaints, setAllComplaints] = useState([]);
   const [singleDetails, setSingleDetails] = useState({});
-  const [viewModal, setViewModal] = useState(false); 
+  const [viewModal, setViewModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -46,7 +42,6 @@ const Complaints = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/complaint/getallComplaint?pageSize=${pageSize}&page=${page}`
       );
-      console.log(response);
       setTotalComplaints(response?.data?.allComplaint?.count);
       setAllComplaints(response?.data?.allComplaint?.rows);
       setLoading(false);
@@ -62,19 +57,6 @@ const Complaints = () => {
     fetchData();
   }, [page, pageSize]);
 
-  // handle view modal
-  const openDeleteModal = () => {
-    setDeleteModal(true);
-  };
-  const closeDeleteModal = () => {
-    setDeleteModal(false);
-  };
-
-  const deleteUser = () => {
-    showMessage("User has been deleted successfully.");
-    setDeleteModal(false);
-  };
-
   const openViewModal = (user) => {
     setSingleDetails(user);
     setViewModal(true);
@@ -83,7 +65,6 @@ const Complaints = () => {
   const closeViewModal = () => {
     setViewModal(false);
   };
-
 
   return (
     <div>
@@ -116,11 +97,20 @@ const Complaints = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allComplaints}
+              idAccessor="complaint_id"
               columns={[
-                { accessor: "No", title: "NO",
-                render: (row, rowIndex) => rowIndex + 1,},
+                {
+                  accessor: "No",
+                  title: "NO",
+                  render: (row, rowIndex) => rowIndex + 1,
+                },
                 { accessor: "email", title: "email" },
-                { accessor: "content", title: "content", ellipsis:true, width:350},
+                {
+                  accessor: "content",
+                  title: "content",
+                  ellipsis: true,
+                  width: 350,
+                },
                 { accessor: "phone", title: "phone" },
 
                 {
@@ -137,18 +127,6 @@ const Complaints = () => {
                           }}
                         >
                           <IconEye />
-                        </button>
-                      </Tippy>
-                      <Tippy content="Delete">
-                        <button
-                          type="button"
-                          className="flex hover:text-danger"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openDeleteModal();
-                          }}
-                        >
-                          <IconTrashLines />
                         </button>
                       </Tippy>
                     </div>
@@ -170,11 +148,12 @@ const Complaints = () => {
         )}
       </div>
 
-      {/* view user modal */}
-      <ViewReport open={viewModal} closeModal={closeViewModal}  details={singleDetails}/>
-
-      {/* delete user modal */}
-      <DeleteReport open={deleteModal} closeModal={closeDeleteModal} />
+      {/* view report modal */}
+      <ViewReport
+        open={viewModal}
+        closeModal={closeViewModal}
+        details={singleDetails}
+      />
     </div>
   );
 };

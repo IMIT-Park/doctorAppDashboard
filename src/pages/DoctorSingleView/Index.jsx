@@ -508,8 +508,8 @@ const SinglePage = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="flex flex-wrap gap-6 min-[1159px]:gap-16 md:pr-20">
-              <div className="relative">
+            <div className="flex flex-wrap  gap-6 min-[1159px]:gap-16 md:pr-20">
+              <div className="relative flex flex-row">
                 {doctorDetails?.photo ? (
                   <img
                     src={imageBaseUrl + doctorDetails?.photo}
@@ -530,89 +530,135 @@ const SinglePage = () => {
                     <IconEdit className="w-4" />
                   </button>
                 )}
-                <div className="text-2xl dark:text-slate-300 font-semibold capitalize">
+              </div>
+              <div className="border w-1/2">
+                <div className="text-2xl mb-3 dark:text-slate-300 font-semibold capitalize">
                   {doctorDetails?.name || ""}
+                </div>
+                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
+                  <div className="text-dark text-base min-w-[105px]">
+                    Address:
+                  </div>
+                  <textarea
+                    type="text"
+                    value={doctorDetails?.address || ""}
+                    readOnly
+                    className="text-base border bg-transparent w-full p-1"
+                  />
                 </div>
               </div>
               <div className="flex items-start flex-col md:flex-row flex-wrap md:gap-10 w-full md:w-auto">
                 <div>
+                  {/* <div className="text-2xl mb-3 dark:text-slate-300 font-semibold capitalize">
+                    {doctorDetails?.name || ""}
+                  </div>
                   <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Address <span>:</span>
+                    <div className="text-dark text-base min-w-[105px]">
+                      Address:
                     </div>
-                    <div className="dark:text-slate-300 md:max-w-80">
-                      {doctorDetails?.address || ""}
+                    <textarea
+                      type="text"
+                      value={doctorDetails?.address || ""}
+                      readOnly
+                      className="text-base border bg-transparent w-full p-1"
+                    />
+                  </div> */}
+
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
+                    <div className="text-dark text-base min-w-[105px] mt-3">
+                      Email:
                     </div>
+                    <input
+                      type="text"
+                      value={doctorDetails?.email || ""}
+                      readOnly
+                      className="text-base border bg-transparent w-full p-1"
+                    />
                   </div>
                   <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Email <span>:</span>
+                    <div className="text-dark mt-3 text-base min-w-[105px] flex justify-between">
+                      Fees:
                     </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.email || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Phone <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.phone || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Date of Birth <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300">
-                      {formatDate(doctorDetails?.dateOfBirth)}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Fees <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300">
-                      {" "}
-                      {` ₹${doctorDetails?.fees}` || ""}
-                    </div>
+                    <input
+                      type="text"
+                      value={` ₹${doctorDetails?.fees}` || ""}
+                      readOnly
+                      className="text-base border bg-transparent w-full p-1"
+                    />
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Gender <span>:</span>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
+                    <div className="text-dark text-base min-w-[105px] flex justify-between mt-11">
+                      Phone:
                     </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.gender || ""}
-                    </div>
+                    <input
+                      type="text"
+                      value={doctorDetails?.phone || ""}
+                      readOnly
+                      className="text-base border bg-transparent w-full p-1"
+                    />
                   </div>
                   <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Qualification <span>:</span>
+                    <div className="text-dark text-base mt-3 min-w-[105px] flex justify-between">
+                      Specialization:
                     </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.qualification || ""}
-                    </div>
+                    <input
+                      type="text"
+                      value={doctorDetails?.specialization || ""}
+                      readOnly
+                      className="text-base border bg-transparent w-full p-1"
+                    />
                   </div>
                   <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Specialization <span>:</span>
+                    <div className="text-dark text-base mt-3 min-w-[105px] flex justify-between">
+                      Qualification:
                     </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.specialization || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Profile Visibility <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
-                    </div>
+                    <input
+                      type="text"
+                      value={doctorDetails?.qualification || ""}
+                      readOnly
+                      className="text-base border bg-transparent w-full p-1"
+                    />
                   </div>
                 </div>
+
+                {/* <div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
+                    <div className="text-dark text-base mt-11 min-w-[105px] flex justify-between">
+                      Gender:
+                    </div>
+                    <input
+                      type="text"
+                      value={doctorDetails?.gender || ""}
+                      readOnly
+                      className="text-base border bg-transparent w-full p-1"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
+                    <div className="text-dark text-base mt-3 min-w-[105px] flex justify-between">
+                      Date of Birth:
+                    </div> 
+                    <input
+                      type="text"
+                      value={formatDate(doctorDetails?.dateOfBirth)}
+                      readOnly
+                      className="text-base border bg-transparent w-full p-1"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                    <div className="text-dark text-base mt-3 min-w-[105px] flex justify-between">
+                      Profile Visibility:
+                    </div>
+                    <input
+                      type="text"
+                      value={doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
+                      readOnly
+                      className="text-base border bg-transparent w-full p-1"
+                    />
+                  </div>
+                </div> */}
               </div>
               <div className="absolute top-5 right-5 flex flex-col items-center gap-4">
                 <CustomSwitch
@@ -894,7 +940,9 @@ const SinglePage = () => {
                   )}
                 </>
               ) : (
-                <div className="text-base text-dark dark:text-slate-300">No Leaves Found</div>
+                <div className="text-base text-dark dark:text-slate-300">
+                  No Leaves Found
+                </div>
               )}
             </div>
           </>

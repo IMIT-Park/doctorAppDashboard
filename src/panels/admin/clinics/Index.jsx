@@ -23,9 +23,6 @@ const Clinics = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { userDetails } = useContext(UserContext);
-  const ownerId = userDetails?.UserOwner?.[0]?.owner_id || 0;
-
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
   });
@@ -40,8 +37,6 @@ const Clinics = () => {
   const [subscriptionAddModal, setsubscriptionAddModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-
-
 
   useEffect(() => {
     setPage(1);
@@ -78,16 +73,15 @@ const Clinics = () => {
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchData);
 
-    const handleSubButtonClick = (clinic) => {
-      setCurrentClinicId(clinic.clinic_id);
-      setsubscriptionAddModal(true);
-    };
+  const handleSubButtonClick = (clinic) => {
+    setCurrentClinicId(clinic.clinic_id);
+    setsubscriptionAddModal(true);
+  };
 
-    const closeSubscriptionModal = () => {
-      setsubscriptionAddModal(false);
-      setSelectedPlan(null);
-    };
-  
+  const closeSubscriptionModal = () => {
+    setsubscriptionAddModal(false);
+    setSelectedPlan(null);
+  };
 
   return (
     <div>
@@ -159,7 +153,7 @@ const Clinics = () => {
                 { accessor: "phone" },
                 { accessor: "place", title: "Place" },
                 { accessor: "address", title: "Address" },
-                 {
+                {
                   accessor: "clinic_id",
                   title: "Plan Details",
                   textAlignment: "center",
@@ -234,12 +228,6 @@ const Clinics = () => {
         open={subscriptionAddModal}
         closeModal={closeSubscriptionModal}
         clinicId={currentClinicId}
-        ownerId={ownerId}
-        buttonLoading={buttonLoading}
-        setButtonLoading={setButtonLoading}
-        fetchClinicData={fetchData}
-        selectedPlan={selectedPlan}
-        setSelectedPlan={setSelectedPlan}
       />
     </div>
   );

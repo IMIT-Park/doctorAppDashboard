@@ -1,12 +1,8 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
-import IconLoader from "../../../components/Icon/IconLoader";
-import IconMail from "../../../components/Icon/IconMail";
-import IconPhone from "../../../components/Icon/IconPhone";
-import IconOpenBook from "../../../components/Icon/IconOpenBook";
 
-const ViewReport = ({ open, closeModal,details }) => {
+const ViewReport = ({ open, closeModal, details }) => {
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -39,39 +35,24 @@ const ViewReport = ({ open, closeModal,details }) => {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                >
-                  <IconX />
-                </button>
+                <div className="flex items-start justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
+                  <div>
+                    <h5 className="text-base text-[#006241] mb-2">
+                      {details?.email}
+                    </h5>
+                    <p>{details?.phone}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="text-white-dark hover:text-dark"
+                    onClick={closeModal}
+                  >
+                    <IconX />
+                  </button>
+                </div>
                 <div className="p-5">
-                  <ul className="flex flex-col space-y-4 font-semibold text-white-dark">
-                    <li>
-                      <button className="flex items-start gap-2">
-                        {/* <IconMail className="w-5 h-5 shrink-0" /> */}
-                        <div className="text-gray-500 flex justify-between min-w-16">Email <span>:</span></div>
-                        <span className="text-gray-500 dark:text-slate-300">
-                          {details.email}
-                        </span>
-                      </button>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      {/* <IconPhone className="w-5 h-5 shrink-0" /> */}
-                      <div className="text-gray-500 flex justify-between min-w-16">Phone <span>:</span></div>
-                      <span className="whitespace-nowrap text-gray-500 dark:text-slate-300" dir="ltr">
-                        {details.phone}
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      {/* <IconOpenBook className="w-5 h-5 shrink-0" /> */}
-                      <div className="text-gray-500 flex justify-between min-w-16">Content <span>:</span></div>
-                      <span className="text-gray-500 dark:text-slate-300" dir="ltr">
-                        {details.content}
-                      </span>
-                    </li>
-                  </ul>
+                  {/* <p>{details?.phone}</p> */}
+                  <p>{details?.content}</p>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

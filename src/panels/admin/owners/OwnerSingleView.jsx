@@ -37,8 +37,6 @@ const OwnerSingleView = () => {
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [subscriptionAddModal, setsubscriptionAddModal] = useState(false);
   const [currentClinicId, setCurrentClinicId] = useState("");
-  const [buttonLoading, setButtonLoading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
 
   useEffect(() => {
     setPage(1);
@@ -289,12 +287,6 @@ const OwnerSingleView = () => {
         open={subscriptionAddModal}
         closeModal={closeSubscriptionModal}
         clinicId={currentClinicId}
-        ownerId={ownerId}
-        buttonLoading={buttonLoading}
-        setButtonLoading={setButtonLoading}
-        fetchClinicData={fetchData}
-        selectedPlan={selectedPlan}
-        setSelectedPlan={setSelectedPlan}
       />
     </div>
   );

@@ -94,6 +94,8 @@ const Sidebar = () => {
       setCurrentMenu("doctor-dashboard");
     } else if (location.pathname === "/doctor/requests") {
       setCurrentMenu("doctor-requests");
+    } else if (location.pathname === "/doctor/leaves") {
+      setCurrentMenu("doctor-leaves");
     } else if (location.pathname === "/sales/dashboard") {
       setCurrentMenu("sales-dashboard");
     } else {
@@ -319,6 +321,22 @@ const Sidebar = () => {
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Profile"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+
+                <li className="nav-item">
+                  <NavLink to="/doctor/leaves" className="group">
+                    <div className="flex items-center">
+                      <IconUser
+                        fill
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "clinic-chats" ? "!text-primary" : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Leaves"}
                       </span>
                     </div>
                   </NavLink>

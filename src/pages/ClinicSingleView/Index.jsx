@@ -333,131 +333,149 @@ const ClinicSingleView = () => {
 
   return (
     <div>
-      <ScrollToTop />
-      <button
-        onClick={() => navigate(-1)}
-        type="button"
-        className="btn btn-green btn-sm -mt-4 mb-4"
-      >
-        <IconCaretDown className="w-4 h-4 rotate-90" />
-      </button>
+      <div className="flex justify-between items-center">
+        <ScrollToTop />
+
+        <button
+          onClick={() => navigate(-1)}
+          type="button"
+          className="btn btn-green btn-sm mt-1 mb-4"
+        >
+          <IconCaretDown className="w-4 h-4 rotate-90" />
+        </button>
+
+        <div className="flex items-center">
+          {/* Your CustomSwitch component here */}
+          <CustomSwitch
+            checked={clinicDetails?.User?.status}
+            onChange={() =>
+              showClinicAlert(
+                clinicDetails?.User?.user_id,
+                clinicDetails?.User?.status ? "block" : "activate",
+                "clinic"
+              )
+            }
+            tooltipText={clinicDetails?.User?.status ? "Block" : "Unblock"}
+            uniqueId={`clinic${clinicDetails?.clinic_id}`}
+            size="large"
+          />
+        </div>
+      </div>
+
       <div className="panel mb-1">
         {detailsLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="flex justify-between flex-wrap">
-              <div className="w-full max-w-96">
-                <div className="rounded-md overflow-hidden">
+            <div className="relative flex flex-col lg:flex-row gap-5">
+              <div className="w-full lg:w-1/2 overflow-hidden flex flex-col items-center">
+                <div>
                   <img
                     src={imageBaseUrl + clinicDetails?.banner_img_url}
                     className="w-full h-80 object-cover"
                     alt="Banner"
                   />
                 </div>
-                {/* <div className="text-2xl font-semibold capitalize mt-2 mb-4">
-                  {clinicDetails?.name || ""}
-                </div> */}
-                {/* <QRCodeComponent qrUrl={qrUrl} /> */}
-              </div>
-
-              <div className="text-left mr-96">
-                <div className="mt-5">
-                  <div className="text-4xl text-green-800 font-semibold capitalize mt-2 mb-4">
-                    {clinicDetails?.name || ""}
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Address <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.address || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Place <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.place || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Email <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.User?.email || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Username <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.User?.user_name || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Phone <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.phone || ""}
-                    </div>
-                  </div>
+                <div className="mt-5 mb-2">
+                  <QRCodeComponent qrUrl={qrUrl} />
                 </div>
               </div>
 
-              <div className="flex flex-col items-center gap-4">
-                <CustomSwitch
-                  checked={clinicDetails?.User?.status}
-                  onChange={() =>
-                    showClinicAlert(
-                      clinicDetails?.User?.user_id,
-                      clinicDetails?.User?.status ? "block" : "activate",
-                      "clinic"
-                    )
-                  }
-                  tooltipText={
-                    clinicDetails?.User?.status ? "Block" : "Unblock"
-                  }
-                  uniqueId={`clinic${clinicDetails?.clinic_id}`}
-                  size="large"
-                />
-                {!isSuperAdmin && (
-                  <button
-                    className="flex hover:text-info"
-                    onClick={openEditModal}
-                  >
-                    <IconEdit className="w-6 h-6" />
-                  </button>
-                )}
-              </div>
-
-              <div className="mt-5">
-                <div className="flex flex-row gap-3">
-                  <QRCodeComponent qrUrl={qrUrl} />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleGetLocation(clinicDetails?.googleLocation)
-                    }
-                    className="btn btn-success mb-1"
-                  >
-                    <IconMenuContacts className="mr-1 w-5" />
-                    View Location
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary mb-1"
-                    onClick={openSubscriptionModal}
-                  >
-                    View Plan Details
-                  </button>
+              <div className="w-full lg:w-1/2">
+                <div className="rounded-lg h-full -mt-5 flex flex-col justify-between">
+                  <div className="p-4">
+                    <div className="text-4xl text-green-800 font-semibold capitalize mb-4">
+                      {clinicDetails?.name || ""}
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-start gap-2">
+                        <div className="text-base font-medium text-gray-700 min-w-[75px]">
+                          Address:
+                        </div>
+                        <input
+                          type="text"
+                          value={clinicDetails?.address || ""}
+                          readOnly
+                          className="text-base dark:text-gray-300 border bg-transparent w-full p-1"
+                        />
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="text-base font-medium text-gray-700 min-w-[75px]">
+                          Place:
+                        </div>
+                        <input
+                          type="text"
+                          value={clinicDetails?.place || ""}
+                          readOnly
+                          className="text-base dark:text-gray-300 border bg-transparent w-full p-1"
+                        />
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="text-base font-medium text-gray-700 min-w-[75px]">
+                          Email:
+                        </div>
+                        <input
+                          type="text"
+                          value={clinicDetails?.User?.email || ""}
+                          readOnly
+                          className="text-base dark:text-gray-300 border bg-transparent w-full p-1"
+                        />
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="text-base font-medium text-gray-700 min-w-[75px]">
+                          Username:
+                        </div>
+                        <input
+                          type="text"
+                          value={clinicDetails?.User?.user_name || ""}
+                          readOnly
+                          className="text-base dark:text-gray-300 border bg-transparent w-full p-1"
+                        />
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="text-base font-medium text-gray-700 min-w-[75px]">
+                          Phone:
+                        </div>
+                        <input
+                          type="text"
+                          value={clinicDetails?.phone || ""}
+                          readOnly
+                          className="text-base dark:text-gray-300 border bg-transparent w-full p-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {!isSuperAdmin && (
+                    <button
+                      className="flex hover:text-info p-4"
+                      onClick={openEditModal}
+                    >
+                      <IconEdit className="w-6 h-6" />
+                    </button>
+                  )}
+                  <div className="flex justify-between flex-col lg:flex-row p-4 gap-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleGetLocation(clinicDetails?.googleLocation)
+                      }
+                      className="btn btn-success mt-9 flex items-center gap-1 w-full lg:w-auto"
+                    >
+                      <IconMenuContacts className="w-5" />
+                      View Location
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary mt-9 w-full lg:w-auto"
+                      onClick={openSubscriptionModal}
+                    >
+                      View Plan Details
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+
             {/* <div className="text-left">
               <div className="mt-5">
                 <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">

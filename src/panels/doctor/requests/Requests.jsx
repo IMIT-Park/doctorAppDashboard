@@ -11,9 +11,10 @@ import emptyBox from "/assets/images/empty-box.svg";
 import { useNavigate } from "react-router-dom";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
-import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
-
+import CustomButton from "../../../components/CustomButton";
+import Swal from "sweetalert2";
+import DoctorRequestAccept from "../../../pages/DoctorSingleView/components/DoctorRequestAccept";
 
 const Requests = () => {
   const dispatch = useDispatch();
@@ -30,6 +31,8 @@ const Requests = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [totalRequests, setTotalRequests] = useState(0);
   const [allRequests, setAllRequests] = useState([]);
+  const [accepRequestModal,setAcceptRequestModal] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -59,6 +62,66 @@ const Requests = () => {
     }
   };
 
+  const openAcceptRequestModal = () => {
+    setAcceptRequestModal(true);
+   }
+  
+
+
+ const closeAcceptRequestModal = () => {
+  setAcceptRequestModal(false);
+ }
+
+  const showAlert = async () => {
+    if (type === 10) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            padding: '2em',
+            customClass: 'sweet-alerts',
+        }).then((result) => {
+            if (result.value) {
+                Swal.fire({ title: 'Deleted!', text: 'Your file has been deleted.', icon: 'success', customClass: 'sweet-alerts' });
+            }
+        });
+    }
+}
+// const acceptRequest =async () => {
+//   setLoading(true);
+//   try {
+//     const response = await NetworkHandler.makePostRequest(`v1/doctor/acceptRequest/${doctorId}`);
+//     setLoading(false);
+//   } catch (error) {
+//     setLoading(false);
+//   }
+// }
+
+
+// const showAlert = async (type: number) => {
+//   if (type === 10) {
+//       Swal.fire({
+//           icon: 'warning',
+//           title: 'Are you sure?',
+//           text: "You won't be able to revert this!",
+//           showCancelButton: true,
+//           confirmButtonText: 'Delete',
+//           padding: '2em',
+//           customClass: 'sweet-alerts',
+//       }).then((result) => {
+//           if (result.value) {
+//               Swal.fire({ title: 'Deleted!', text: 'Your file has been deleted.', icon: 'success', customClass: 'sweet-alerts' });
+//           }
+//       });
+//   }
+// }
+
+
+
+
+
   // fetching Mds
   useEffect(() => {
     fetchData();
@@ -68,7 +131,7 @@ const Requests = () => {
   const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =
     useBlockUnblock(fetchData);
 
-console.log(allRequests);
+  console.log(allRequests);
 
   return (
     <div>
@@ -99,7 +162,6 @@ console.log(allRequests);
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allRequests}
-              onRowClick={(row) => navigate(`/admin/owners/${row?.owner_id}`)}
               idAccessor="clinic_id"
               columns={[
                 {
@@ -110,30 +172,26 @@ console.log(allRequests);
                 {
                   accessor: "name",
                   title: "Name",
+                  render: (row) => row?.Clinic?.name || "",
                 },
-                { accessor: "email" },
-                { accessor: "phone" },
-                { accessor: "address", title: "Address" },
+                { accessor: "email" ,
+                  render: (row) => row?.Clinic?.email || "",
+                },
+                { accessor: "phone",
+                  render: (row) => row?.Clinic?.phone || "",
+                 },
+                { accessor: "address", title: "Address",
+                  render: (row) => row?.Clinic?.address || "",
+                 },
                 {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <div className="grid place-items-center">
-                      <CustomSwitch
-                        checked={rowData?.User?.status}
-                        onChange={() =>
-                          showOwnerAlert(
-                            rowData?.user_id,
-                            rowData?.User?.status ? "block" : "activate",
-                            "owner"
-                          )
-                        }
-                        tooltipText={
-                          rowData?.User?.status ? "Block" : "Unblock"
-                        }
-                        uniqueId={`owner${rowData?.owner_id}`}
-                        size="normal"
-                      />
+                    <div className="flex gap-4 justify-center">
+                     <CustomButton 
+                      onClick={openAcceptRequestModal}
+                     >Accept</CustomButton>
+                     <CustomButton>Cancel</CustomButton>
                     </div>
                   ),
                 },
@@ -152,6 +210,11 @@ console.log(allRequests);
           </div>
         )}
       </div>
+      <DoctorRequestAccept
+      open={accepRequestModal}
+      closeModal={closeAcceptRequestModal}
+      />
+
     </div>
   );
 };

@@ -516,8 +516,8 @@ const ClinicSingleView = () => {
                       className="btn btn-green w-full md:w-72 lg:text-sm max-lg:text-base md:text-sm sm:text-base mb-2 md:mb-0 md:px-2 sm:px-2 lg:px-0"
                       onClick={downloadQRCode}
                     >
-                      <IconDownload className="ltr:mr-2 rtl:ml-2" />
-                      Download QR code
+                      <IconDownload className="md:mr-2 lg:mr-1" />
+                      Download QRcode
                     </button>
                     <button
                       type="button"
@@ -526,7 +526,7 @@ const ClinicSingleView = () => {
                       }
                       className="btn btn-green flex items-center gap-1 w-full md:w-72 md:text-sm lg:text-sm max-lg:text-base sm:text-base mb-2 md:mb-0 md:px-2 sm:px-2 lg:px-0"
                     >
-                      <IconMenuContacts className="ltr:mr-2 rtl:ml-2" />
+                      <IconMenuContacts className="md:mr-2 lg:mr-0" />
                       View Location
                     </button>
                     <button

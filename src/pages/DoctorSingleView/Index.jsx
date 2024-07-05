@@ -495,21 +495,44 @@ const SinglePage = () => {
 
   return (
     <div>
-      <ScrollToTop />
-      <button
-        onClick={() => navigate(-1)}
-        type="button"
-        className="btn btn-green btn-sm -mt-4 mb-4"
-      >
-        <IconCaretDown className="w-4 h-4 rotate-90" />
-      </button>
+      <div className="flex justify-between items-center">
+        <ScrollToTop />
+        <button
+          onClick={() => navigate(-1)}
+          type="button"
+          className="btn btn-green btn-sm mt-1 mb-4"
+        >
+          <IconCaretDown className="w-4 h-4 rotate-90" />
+        </button>
+        <CustomSwitch
+          checked={doctorDetails?.status}
+          onChange={() =>
+            showDoctorAlert(
+              doctorDetails?.user_id,
+              doctorDetails?.status ? "block" : "activate",
+              "doctor"
+            )
+          }
+          tooltipText={doctorDetails?.status ? "Block" : "Unblock"}
+          uniqueId={`doctor${doctorDetails?.clinic_id}`}
+          size="large"
+        />
+        {/* {!isSuperAdmin && (
+          <button
+            className="flex hover:text-info"
+            onClick={openEditDetailsModal}
+          >
+            <IconEdit className="w-6 h-6" />
+          </button>
+        )} */}
+      </div>
       <div className="panel mb-1">
         {detailsLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="flex flex-wrap  gap-6 min-[1159px]:gap-16 md:pr-20">
-              <div className="relative flex flex-row">
+            <div className="w-full flex flex-wrap gap-3 ">
+              <div className="relative flex flex-row justify-center">
                 {doctorDetails?.photo ? (
                   <img
                     src={imageBaseUrl + doctorDetails?.photo}
@@ -531,157 +554,122 @@ const SinglePage = () => {
                   </button>
                 )}
               </div>
-              <div className="border w-1/2">
-                <div className="text-2xl mb-3 dark:text-slate-300 font-semibold capitalize">
+              {/* <div className="lg:w-[1370px] md:w-[1800px] sm:w-max--[1000px] sm:min-w-[570px] ">
+                <div className="text-2xl mb-2 text-[#006241] font-semibold capitalize p-2 ">
                   {doctorDetails?.name || ""}
                 </div>
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
-                  <div className="text-dark text-base min-w-[105px]">
-                    Address:
+                <div className="flex flex-col flex-wrap mb-2">
+                  <div className="text-base p-2 text-[#AAAAAA]">Address:</div>
+                  <div className="text-base h-32 w-full p-2 border dark:border-none dark:bg-gray-800">
+                    {doctorDetails?.address || ""}
                   </div>
-                  <textarea
-                    type="text"
-                    value={doctorDetails?.address || ""}
-                    readOnly
-                    className="text-base border bg-transparent w-full p-1"
-                  />
                 </div>
-              </div>
-              <div className="flex items-start flex-col md:flex-row flex-wrap md:gap-10 w-full md:w-auto">
-                <div>
-                  {/* <div className="text-2xl mb-3 dark:text-slate-300 font-semibold capitalize">
+              </div> */}
+              
+              <div className="w-full flex flex-col mb-2 mt-2 px-4">
+                <div className="w-full">
+                  <div className="text-2xl mb-3 text-[#006241] font-semibold capitalize p-2 ">
                     {doctorDetails?.name || ""}
                   </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-dark text-base min-w-[105px]">
-                      Address:
+                  <div className="flex flex-col flex-wrap mb-2">
+                    <div className="text-base p-2 text-[#AAAAAA]">Address:</div>
+                    <div className="text-base h-32 w-full p-2 border dark:border-none dark:bg-gray-800">
+                      {doctorDetails?.address || ""}
                     </div>
-                    <textarea
-                      type="text"
-                      value={doctorDetails?.address || ""}
-                      readOnly
-                      className="text-base border bg-transparent w-full p-1"
-                    />
-                  </div> */}
-
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-dark text-base min-w-[105px] mt-3">
-                      Email:
-                    </div>
-                    <input
-                      type="text"
-                      value={doctorDetails?.email || ""}
-                      readOnly
-                      className="text-base border bg-transparent w-full p-1"
-                    />
                   </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-dark mt-3 text-base min-w-[105px] flex justify-between">
-                      Fees:
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Email:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.email || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
                     </div>
-                    <input
-                      type="text"
-                      value={` ₹${doctorDetails?.fees}` || ""}
-                      readOnly
-                      className="text-base border bg-transparent w-full p-1"
-                    />
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Fees:
+                      </div>
+                      <input
+                        type="text"
+                        value={` ₹${doctorDetails?.fees}` || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
+                    </div>
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Phone:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.phone || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
+                    </div>
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Specialization:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.specialization || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
+                    </div>
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Qualification:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.qualification || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
+                    </div>
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Gender:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.gender || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
+                    </div>
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Date of Birth:
+                      </div>
+                      <input
+                        type="text"
+                        value={formatDate(doctorDetails?.dateOfBirth)}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
+                    </div>
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Profile Visibility:
+                      </div>
+                      <input
+                        type="text"
+                        value={
+                          doctorDetails?.visibility ? "Visible" : "Hidden" || ""
+                        }
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
+                    </div>
                   </div>
                 </div>
-
-                <div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-dark text-base min-w-[105px] flex justify-between mt-11">
-                      Phone:
-                    </div>
-                    <input
-                      type="text"
-                      value={doctorDetails?.phone || ""}
-                      readOnly
-                      className="text-base border bg-transparent w-full p-1"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base mt-3 min-w-[105px] flex justify-between">
-                      Specialization:
-                    </div>
-                    <input
-                      type="text"
-                      value={doctorDetails?.specialization || ""}
-                      readOnly
-                      className="text-base border bg-transparent w-full p-1"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base mt-3 min-w-[105px] flex justify-between">
-                      Qualification:
-                    </div>
-                    <input
-                      type="text"
-                      value={doctorDetails?.qualification || ""}
-                      readOnly
-                      className="text-base border bg-transparent w-full p-1"
-                    />
-                  </div>
-                </div>
-
-                {/* <div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base mt-11 min-w-[105px] flex justify-between">
-                      Gender:
-                    </div>
-                    <input
-                      type="text"
-                      value={doctorDetails?.gender || ""}
-                      readOnly
-                      className="text-base border bg-transparent w-full p-1"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-dark text-base mt-3 min-w-[105px] flex justify-between">
-                      Date of Birth:
-                    </div> 
-                    <input
-                      type="text"
-                      value={formatDate(doctorDetails?.dateOfBirth)}
-                      readOnly
-                      className="text-base border bg-transparent w-full p-1"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                    <div className="text-dark text-base mt-3 min-w-[105px] flex justify-between">
-                      Profile Visibility:
-                    </div>
-                    <input
-                      type="text"
-                      value={doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
-                      readOnly
-                      className="text-base border bg-transparent w-full p-1"
-                    />
-                  </div>
-                </div> */}
-              </div>
-              <div className="absolute top-5 right-5 flex flex-col items-center gap-4">
-                <CustomSwitch
-                  checked={doctorDetails?.status}
-                  onChange={() =>
-                    showDoctorAlert(
-                      doctorDetails?.user_id,
-                      doctorDetails?.status ? "block" : "activate",
-                      "doctor"
-                    )
-                  }
-                  tooltipText={doctorDetails?.status ? "Block" : "Unblock"}
-                  uniqueId={`doctor${doctorDetails?.clinic_id}`}
-                  size="large"
-                />
-                {!isSuperAdmin && (
-                  <button
-                    className="flex hover:text-info"
-                    onClick={openEditDetailsModal}
-                  >
-                    <IconEdit className="w-6 h-6" />
-                  </button>
-                )}
               </div>
             </div>
 

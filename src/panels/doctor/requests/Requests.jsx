@@ -25,14 +25,18 @@ const Requests = () => {
   });
   const { userDetails } = useContext(UserContext);
   const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id || "";
-
+  const doctorclinicid = userDetails?.UserDoctor?.[0]?.doctor_clinic_id || "";
+  // console.log(doctorclinicid);
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [totalRequests, setTotalRequests] = useState(0);
   const [allRequests, setAllRequests] = useState([]);
-  const [accepRequestModal,setAcceptRequestModal] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const [accepRequestModal, setAcceptRequestModal] = useState(false);
+  const [rejectRequestModal, setRejectRequestModal] = useState(false);
+  const [acceptRequestResponse, setAcceptRequestResponse] = useState("");
+  const [rejectionRequestResponse, setRejectionRequestResponse] = useState("");
+  const [selectedRowData, setSelectedRowData] = useState();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -62,66 +66,63 @@ const Requests = () => {
     }
   };
 
-  const openAcceptRequestModal = () => {
+  const openAcceptRequestModal = (rowData) => {
+    setSelectedRowData(rowData?.doctor_clinic_id);
     setAcceptRequestModal(true);
-   }
-  
+    // console.log(selectedData);
+  };
 
+  const closeAcceptRequestModal = () => {
+    setAcceptRequestModal(false);
+  };
 
- const closeAcceptRequestModal = () => {
-  setAcceptRequestModal(false);
- }
+  const openRejectRequestModal = (rowData) => {
+    setSelectedRowData(rowData?.doctor_clinic_id);
+    setRejectRequestModal(true);
+  };
 
-  const showAlert = async () => {
-    if (type === 10) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            showCancelButton: true,
-            confirmButtonText: 'Delete',
-            padding: '2em',
-            customClass: 'sweet-alerts',
-        }).then((result) => {
-            if (result.value) {
-                Swal.fire({ title: 'Deleted!', text: 'Your file has been deleted.', icon: 'success', customClass: 'sweet-alerts' });
-            }
-        });
+  const closeRejectRequestModal = () => {
+    setRejectRequestModal(false);
+  };
+
+  //  doctor accept request
+  const acceptRequest = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/acceptRequest/${selectedRowData}`
+      );
+      if (response.status === 201) {
+        fetchData();
+        closeAcceptRequestModal();
+        setLoading(false);
+       
+      }
+    } catch (error) {
+      setAcceptRequestResponse("Failed to accept request.");
+      setLoading(false);
     }
-}
-// const acceptRequest =async () => {
-//   setLoading(true);
-//   try {
-//     const response = await NetworkHandler.makePostRequest(`v1/doctor/acceptRequest/${doctorId}`);
-//     setLoading(false);
-//   } catch (error) {
-//     setLoading(false);
-//   }
-// }
+  };
 
+  // doctor reject request
 
-// const showAlert = async (type: number) => {
-//   if (type === 10) {
-//       Swal.fire({
-//           icon: 'warning',
-//           title: 'Are you sure?',
-//           text: "You won't be able to revert this!",
-//           showCancelButton: true,
-//           confirmButtonText: 'Delete',
-//           padding: '2em',
-//           customClass: 'sweet-alerts',
-//       }).then((result) => {
-//           if (result.value) {
-//               Swal.fire({ title: 'Deleted!', text: 'Your file has been deleted.', icon: 'success', customClass: 'sweet-alerts' });
-//           }
-//       });
-//   }
-// }
-
-
-
-
-
+  const rejectRequest = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/cancelRequest/${selectedRowData}`
+      );
+      if (response.status === 201) {
+        fetchData();
+        closeRejectRequestModal();
+        setLoading(false);
+        
+      }
+    } catch (error) {
+      setRejectionRequestResponse("Failed to reject request.");
+      setLoading(false);
+    }
+  };
   // fetching Mds
   useEffect(() => {
     fetchData();
@@ -174,24 +175,38 @@ const Requests = () => {
                   title: "Name",
                   render: (row) => row?.Clinic?.name || "",
                 },
-                { accessor: "email" ,
+                {
+                  accessor: "email",
                   render: (row) => row?.Clinic?.email || "",
                 },
-                { accessor: "phone",
+                {
+                  accessor: "phone",
                   render: (row) => row?.Clinic?.phone || "",
-                 },
-                { accessor: "address", title: "Address",
+                },
+                {
+                  accessor: "address",
+                  title: "Address",
                   render: (row) => row?.Clinic?.address || "",
-                 },
+                },
                 {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex gap-4 justify-center">
-                     <CustomButton 
-                      onClick={openAcceptRequestModal}
-                     >Accept</CustomButton>
-                     <CustomButton>Cancel</CustomButton>
+                      <CustomButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openAcceptRequestModal(rowData);
+                        }}
+                      >
+                        Accept
+                      </CustomButton>
+                      <CustomButton onClick={(e) => {
+                          e.stopPropagation();
+                          openRejectRequestModal(rowData);
+                        }}>
+                        Cancel
+                      </CustomButton>
                     </div>
                   ),
                 },
@@ -211,10 +226,18 @@ const Requests = () => {
         )}
       </div>
       <DoctorRequestAccept
-      open={accepRequestModal}
-      closeModal={closeAcceptRequestModal}
+        open={accepRequestModal}
+        closeModal={closeAcceptRequestModal}
+        formSubmit={acceptRequest}
+        message={"Do yo want to Accept this request"}
       />
 
+      <DoctorRequestAccept
+        open={rejectRequestModal}
+        closeModal={closeRejectRequestModal}
+        formSubmit={rejectRequest}
+        message={"Do yo want to Reject this request"}
+      />
     </div>
   );
 };

@@ -1,27 +1,20 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
-const DoctorRequestAccept = ({ open, closeModal }) => {
-    
-   
+import { useState , useEffect } from "react";
+const DoctorRequestAccept = ({ open, closeModal, formSubmit,message}) => {
+  const [messages, setMessage] = useState({message});
 
-    const showAlert = async () => {
-         if (type === 10) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                showCancelButton: true,
-                confirmButtonText: 'Delete',
-                padding: '2em',
-                customClass: 'sweet-alerts',
-            }).then((result) => {
-                if (result.value) {
-                    Swal.fire({ title: 'Deleted!', text: 'Your file has been deleted.', icon: 'success', customClass: 'sweet-alerts' });
-                }
-            });
-        
-        }
-    };
+
+  useEffect(() => {
+    
+      setMessage(messages);
+    
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    formSubmit();
+  };
   return (
     <Transition appear show={open} as={Fragment}>
      <Dialog
@@ -53,13 +46,17 @@ const DoctorRequestAccept = ({ open, closeModal }) => {
               leaveTo="opacity-0 scale-95"
 
             >
-              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-3xl text-black dark:text-white-dark">
+              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-2xl text-black dark:text-white-dark">
               <div className="panel">
                         
                         <div className="mb-5">
-                            <div className="flex items-center justify-center">
-                                <button type="button" className="btn btn-success">
-                                    Ok
+                          <div className="flex item-center justify-center pb-5">{message}</div>
+                            <div className="flex items-center justify-center gap-5">
+                                <button type="button" className="btn btn-success w-1/5" onClick={handleSubmit}>
+                                    Yes
+                                </button>
+                                <button type="button" className="btn btn-success w-1/5" onClick={closeModal}>
+                                    No
                                 </button>
                             </div>
                         </div>

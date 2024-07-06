@@ -7,15 +7,19 @@ import { UserContext } from "../../../contexts/UseContext";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
 
-const RequestToDoctor = ({ open, closeModal, fetchClinicData }) => {
+const RequestToDoctor = ({
+  open,
+  closeModal,
+  email,
+  setEmail,
+  fetchClinicData,
+}) => {
   const { userDetails } = useContext(UserContext);
   const clinicId = userDetails?.UserClinic?.[0]?.clinic_id || "";
 
   const [message, setMessage] = useState("");
-  const [email, setEmail] = useState("");
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [buttonLoading, setButtonLoading] = useState(false);
-
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,21 +45,25 @@ const RequestToDoctor = ({ open, closeModal, fetchClinicData }) => {
         }
       );
 
-      console.log(response);
       if (response?.status === 201) {
         showMessage("Request sent successfully!", "success");
         setMessage("Request sent successfully!");
-        setEmail("");
-        closeModal(); // Close the modal after a successful request
-        fetchClinicData(); // Fetch updated clinic data
+        closeModal();
+        fetchClinicData();
       } else {
         showMessage("Failed to send request.", "error");
         setMessage("Failed to send request.");
       }
     } catch (error) {
-      console.error("Error creating request:", error);
-      showMessage("An error occurred. Please try again.", "error");
-      setMessage("Error: " + error.message);
+      if (error?.response?.status === 401) {
+        showMessage(
+          error?.response?.data?.error ||
+            "An error occurred. Please try again.",
+          "error"
+        );
+      } else {
+        showMessage("An error occurred. Please try again.", "error");
+      }
     } finally {
       setButtonLoading(false);
     }
@@ -63,7 +71,12 @@ const RequestToDoctor = ({ open, closeModal, fetchClinicData }) => {
 
   return (
     <Transition appear show={open} as={Fragment}>
-      <Dialog as="div" open={open} onClose={closeModal} className="relative z-[51]">
+      <Dialog
+        as="div"
+        open={open}
+        onClose={closeModal}
+        className="relative z-[51]"
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -105,7 +118,9 @@ const RequestToDoctor = ({ open, closeModal, fetchClinicData }) => {
                         id="full-name"
                         type="text"
                         placeholder="Enter Email"
-                        className={`form-input form-input-green ${isValidEmail ? "" : "border-red-500"}`}
+                        className={`form-input form-input-green ${
+                          isValidEmail ? "" : "border-red-500"
+                        }`}
                         value={email}
                         onChange={(e) => {
                           setEmail(e.target.value);

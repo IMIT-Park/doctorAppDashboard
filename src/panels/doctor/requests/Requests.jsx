@@ -8,25 +8,21 @@ import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { useNavigate } from "react-router-dom";
 import NetworkHandler from "../../../utils/NetworkHandler";
-import useBlockUnblock from "../../../utils/useBlockUnblock";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomButton from "../../../components/CustomButton";
+import AcceptRejectModal from "./AcceptRejectModal";
 import Swal from "sweetalert2";
-import DoctorRequestAccept from "../../../pages/DoctorSingleView/components/DoctorRequestAccept";
 
 const Requests = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(setPageTitle("Requets"));
+    dispatch(setPageTitle("Requests"));
   });
   const { userDetails } = useContext(UserContext);
   const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id || "";
-  const doctorclinicid = userDetails?.UserDoctor?.[0]?.doctor_clinic_id || "";
-  // console.log(doctorclinicid);
+
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
@@ -69,7 +65,6 @@ const Requests = () => {
   const openAcceptRequestModal = (rowData) => {
     setSelectedRowData(rowData?.doctor_clinic_id);
     setAcceptRequestModal(true);
-    // console.log(selectedData);
   };
 
   const closeAcceptRequestModal = () => {
@@ -94,17 +89,22 @@ const Requests = () => {
       );
       if (response.status === 201) {
         fetchData();
-        closeAcceptRequestModal();
-        setLoading(false);
+        Swal.fire({
+          title: "Accepted!",
+          text: "Request has been accepted.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
       }
     } catch (error) {
       setAcceptRequestResponse("Failed to accept request.");
+    } finally {
       setLoading(false);
+      closeAcceptRequestModal();
     }
   };
 
   // doctor reject request
-
   const rejectRequest = async () => {
     setLoading(true);
     try {
@@ -113,24 +113,25 @@ const Requests = () => {
       );
       if (response.status === 201) {
         fetchData();
-        closeRejectRequestModal();
-        setLoading(false);
+        Swal.fire({
+          title: "Rejected!",
+          text: "Request has been rejected.",
+          icon: "success",
+          customClass: "sweet-alerts",
+        });
       }
     } catch (error) {
       setRejectionRequestResponse("Failed to reject request.");
+    } finally {
       setLoading(false);
+      closeRejectRequestModal();
     }
   };
+
   // fetching Mds
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
-
-  // block and unblock handler
-  const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =
-    useBlockUnblock(fetchData);
-
-  console.log(allRequests);
 
   return (
     <div>
@@ -151,7 +152,7 @@ const Requests = () => {
         ) : (
           <div className="datatables">
             <DataTable
-              noRecordsText="No Owners to show"
+              noRecordsText="No Requests Found"
               noRecordsIcon={
                 <span className="mb-2">
                   <img src={emptyBox} alt="" className="w-10" />
@@ -200,13 +201,13 @@ const Requests = () => {
                         Accept
                       </CustomButton>
                       <CustomButton
-                        className="bg-transparent border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                        className="btn btn-danger"
                         onClick={(e) => {
                           e.stopPropagation();
                           openRejectRequestModal(rowData);
                         }}
                       >
-                        Cancel
+                        Reject
                       </CustomButton>
                     </div>
                   ),
@@ -226,18 +227,19 @@ const Requests = () => {
           </div>
         )}
       </div>
-      <DoctorRequestAccept
-        open={accepRequestModal}
-        closeModal={closeAcceptRequestModal}
-        formSubmit={acceptRequest}
-        message={"Do yo want to Accept this request"}
-      />
 
-      <DoctorRequestAccept
-        open={rejectRequestModal}
-        closeModal={closeRejectRequestModal}
-        formSubmit={rejectRequest}
-        message={"Do yo want to Reject this request"}
+      {/* request accept modal */}
+      <AcceptRejectModal
+        show={accepRequestModal}
+        onConfirm={acceptRequest}
+        onClose={closeAcceptRequestModal}
+      />
+      {/* request reject modal */}
+      <AcceptRejectModal
+        show={rejectRequestModal}
+        onConfirm={rejectRequest}
+        isReject={true}
+        onClose={closeRejectRequestModal}
       />
     </div>
   );

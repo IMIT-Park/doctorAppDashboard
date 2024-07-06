@@ -34,8 +34,6 @@ const Requests = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
 
-
-
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
@@ -49,35 +47,38 @@ const Requests = () => {
   const closeModal = () => setIsModalOpen(false);
 
   // Get request
- const fetchData = async () => {
+  const fetchData = async () => {
     setLoading(true);
-  try {
-    const response = await NetworkHandler.makeGetRequest(
-      `/v1/clinic/getrequest/${clinicId}?page=${page}&pageSize=${pageSize}`
-    );
-    setTotalRequests(response.data?.Clinic?.count);
-    setAllRequests(response.data?.Clinic?.rows);
-    console.log(allRequests);
-    setLoading(false);
-  } catch (error) {
-    console.log(error);
-    setLoading(false);
-  } finally {
-    setLoading(false);
-  }
-  }
-
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/clinic/getrequest/${clinicId}?page=${page}&pageSize=${pageSize}`
+      );
+      console.log(response);
+      setTotalRequests(response.data?.Clinic?.count);
+      setAllRequests(response.data?.Clinic?.rows);
+      console.log(allRequests);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
-  }, [page , pageSize]);
+  }, [page, pageSize]);
+
 
   return (
     <div>
       <ScrollToTop />
       <div className="panel">
         <div className="flex items-center gap-1 mb-3">
-          <h5 className="font-semibold text-lg dark:text-white-light">Requests</h5>
+          <h5 className="font-semibold text-lg dark:text-white-light">
+            Requests
+          </h5>
           <Tippy content="Total Owners">
             <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
               <CountUp start={0} end={totalRequests} duration={3}></CountUp>
@@ -85,13 +86,9 @@ const Requests = () => {
           </Tippy>
 
           <div className="ml-auto flex text-gray-500 font-semibold dark:text-white-dark gap-y-4 mb-3">
-              <button
-                type="button"
-                className="btn btn-green"
-                onClick={openModal}
-              >
-                Send Request
-              </button>
+            <button type="button" className="btn btn-green" onClick={openModal}>
+              Send Request
+            </button>
           </div>
         </div>
 
@@ -141,13 +138,12 @@ const Requests = () => {
         )}
       </div>
 
-      {/* <ModalRequests
+      <ModalRequests
         open={isModalOpen}
         closeModal={closeModal}
         fetchClinicData={fetchData}
         setButtonLoading={setButtonLoading}
-
-      /> */}
+      />
     </div>
   );
 };

@@ -30,7 +30,7 @@ const Requests = () => {
   const [totalRequests, setTotalRequests] = useState(0);
   const [allRequests, setAllRequests] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [email, setEmail] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
 
@@ -43,9 +43,13 @@ const Requests = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEmail("");
+  };
   // Get request
   const fetchData = async () => {
     setLoading(true);
@@ -69,7 +73,6 @@ const Requests = () => {
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
-
 
   return (
     <div>
@@ -141,6 +144,8 @@ const Requests = () => {
       <ModalRequests
         open={isModalOpen}
         closeModal={closeModal}
+        email={email}
+        setEmail={setEmail}
         fetchClinicData={fetchData}
         setButtonLoading={setButtonLoading}
       />

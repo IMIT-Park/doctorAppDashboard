@@ -46,16 +46,16 @@ const DoctorRequestAccept = ({ open, closeModal, formSubmit,message}) => {
               leaveTo="opacity-0 scale-95"
 
             >
-              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-2xl text-black dark:text-white-dark">
+              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden  max-w-2xl text-black dark:text-white-dark">
               <div className="panel">
                         
                         <div className="mb-5">
                           <div className="flex item-center justify-center pb-5">{message}</div>
                             <div className="flex items-center justify-center gap-5">
-                                <button type="button" className="btn btn-success w-1/5" onClick={handleSubmit}>
+                                <button type="button" className="btn btn-green" onClick={handleSubmit}>
                                     Yes
                                 </button>
-                                <button type="button" className="btn btn-success w-1/5" onClick={closeModal}>
+                                <button type="button" className="btn btn-outline-danger" onClick={closeModal}>
                                     No
                                 </button>
                             </div>

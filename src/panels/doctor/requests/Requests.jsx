@@ -96,7 +96,6 @@ const Requests = () => {
         fetchData();
         closeAcceptRequestModal();
         setLoading(false);
-       
       }
     } catch (error) {
       setAcceptRequestResponse("Failed to accept request.");
@@ -116,7 +115,6 @@ const Requests = () => {
         fetchData();
         closeRejectRequestModal();
         setLoading(false);
-        
       }
     } catch (error) {
       setRejectionRequestResponse("Failed to reject request.");
@@ -201,10 +199,13 @@ const Requests = () => {
                       >
                         Accept
                       </CustomButton>
-                      <CustomButton onClick={(e) => {
+                      <CustomButton
+                        className="bg-transparent border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                        onClick={(e) => {
                           e.stopPropagation();
                           openRejectRequestModal(rowData);
-                        }}>
+                        }}
+                      >
                         Cancel
                       </CustomButton>
                     </div>

@@ -57,6 +57,7 @@ const Requests = () => {
       );
       setTotalRequests(response?.data?.allRequest?.count);
       setAllRequests(response?.data?.allRequest?.rows);
+      console.log(allRequests);
       setLoading(false);
     } catch (error) {
       console.log(error);

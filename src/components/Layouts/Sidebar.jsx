@@ -358,6 +358,23 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+
+                <li className="nav-item">
+                  <NavLink to="/doctor/bookings" className="group">
+                    <div className="flex items-center">
+                      <IconMenuDashboard
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "doctor-bookings"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Bookings"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
               </ul>
             ) : role === "salesPerson" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">

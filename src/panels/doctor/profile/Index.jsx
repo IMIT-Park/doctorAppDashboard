@@ -643,8 +643,8 @@ const Profile = () => {
             </div>
             {/* clinics list starts here */}
 
-            <h5 className="mt-5 mb-2 text-lg font-semibold text-white-dark">
-              Clinics:
+            <h5 className="mt-5 mb-8 text-xl font-semibold text-dark dark:text-white-dark">
+              Clinics :
             </h5>
             {doctorClinics && doctorClinics?.length ? (
               <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
@@ -691,8 +691,8 @@ const Profile = () => {
             {/* clinics list ends here */}
 
             <div className="my-10">
-              <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5 className="text-base font-semibold text-white-dark">
+              <div className="flex items-end justify-between gap-2 flex-wrap mb-5">
+                <h5 className="text-xl font-semibold text-dark dark:text-white-dark">
                   Available Days & Time Slots:
                 </h5>
                 {!isSuperAdmin && (

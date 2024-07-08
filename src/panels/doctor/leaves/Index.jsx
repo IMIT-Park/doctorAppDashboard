@@ -20,7 +20,6 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomButton from "../../../components/CustomButton";
 
-
 const DoctorLeaves = () => {
   const { userDetails } = useContext(UserContext);
 
@@ -44,9 +43,6 @@ const DoctorLeaves = () => {
   const [deleteLeaveModal, setDeleteLeaveModal] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
-
- 
-
 
   // fetch doctor data function
   const {
@@ -72,7 +68,6 @@ const DoctorLeaves = () => {
     }
   }, [doctorClinics]);
 
-
   // fetch Leaves data function
   const getDoctorLeaves = async () => {
     setLeavesLoading(true);
@@ -97,7 +92,6 @@ const DoctorLeaves = () => {
 
   useEffect(() => {
     if (clinicId) {
-     
       getDoctorLeaves();
     }
   }, [clinicId]);
@@ -107,9 +101,6 @@ const DoctorLeaves = () => {
     setSelectedClinic(clinic);
     setClinicId(clinic?.clinic_id);
   };
-
- 
-
 
   // Group time slots by day
   const timeSlotsByDay = {};
@@ -140,9 +131,6 @@ const DoctorLeaves = () => {
     setSelectedLeave(null);
   };
 
- 
-
-
   return (
     <div>
       <ScrollToTop />
@@ -158,10 +146,9 @@ const DoctorLeaves = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-          
             {/* clinics list starts here */}
 
-            <h5 className="mt-5 mb-2 text-lg font-semibold text-white-dark">
+            <h5 className="mt-5 mb-4 text-xl font-semibold text-dark dark:text-white-dark">
               Clinics:
             </h5>
             {doctorClinics && doctorClinics?.length ? (
@@ -208,10 +195,9 @@ const DoctorLeaves = () => {
             )}
             {/* clinics list ends here */}
 
-
             <div className="mt-4">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5 className="text-base font-semibold mb-1 text-white-dark">
+                <h5  className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-white-dark">
                   Leaves:
                 </h5>
                 {!isSuperAdmin && (
@@ -231,15 +217,16 @@ const DoctorLeaves = () => {
                         <div
                           key={leave?.leave_date + index}
                           className={`w-full flex items-center justify-between flex-wrap gap-2 py-6 ${
-                            index < leave.leaves.length - 1 &&
-                            "border-b border-[#d3d3d3] dark:border-[#1b2e4b]"
+                            index !== doctorLeaves.length - 1
+                              ? "border-b border-[#D3D3D3] dark:border-[#1B2E4B]"
+                              : ""
                           }`}
                         >
                           <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
                             {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
                           </span>
-                          <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-1 font-bold text-base text-slate-500 ml-auto">
-                            <span>{formatDate(leave?.leave_date)}</span>
+                          <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-5 font-bold text-base text-slate-500 ml-auto">
+                            <span>{formatDate(leave?.leave_date)} </span>
                             {!leave?.fullday && (
                               <div className="flex items-center flex-wrap">
                                 {leave?.leaves?.map((slot, slotIndex) => (
@@ -256,13 +243,15 @@ const DoctorLeaves = () => {
                                 ))}
                               </div>
                             )}
+                           
                             <button
                               type="button"
-                              className="text-red-500 hover:text-red-700 ml-2"
-                              onClick={() => openDeleteLeaveModal(leave)}
+                              className="btn btn-danger btn-sm rounded-sm py-1 min-w-10 sm:min-w-24"
                               title="Delete leave"
-                            >
-                              <IconTrashLines />
+                              onClick={() => openDeleteLeaveModal(leave)}
+                            > 
+                               Delete
+
                             </button>
                           </div>
                         </div>
@@ -277,7 +266,6 @@ const DoctorLeaves = () => {
           </>
         )}
       </div>
-         
 
       {/* add leave modal */}
       <AddLeave
@@ -303,6 +291,3 @@ const DoctorLeaves = () => {
 };
 
 export default DoctorLeaves;
-
-
-

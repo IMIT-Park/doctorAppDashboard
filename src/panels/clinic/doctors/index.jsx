@@ -302,12 +302,12 @@ const ClinicDoctor = () => {
                 },
 
                 {
-                  accessor: "photo",
+                  accessor: ".photo",
                   title: "Photo",
                   render: (row) =>
-                    row?.photo ? (
+                  row?.photo ? (
                       <img
-                        src={imageBaseUrl + row?.photo}
+                        src={imageBaseUrl +  row?.photo }
                         alt="Doctor's photo"
                         className="w-10 h-10 rounded-[50%]"
                       />
@@ -334,7 +334,7 @@ const ClinicDoctor = () => {
                   render: (row) => (row.visibility ? "Visible" : "Hidden"),
                 },
                 {
-                  accessor: "Actions",
+                  accessor: "status",
                   textAlignment: "center",
                   render: (rowData) => (
                     <CustomSwitch

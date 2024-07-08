@@ -55,12 +55,11 @@ const Requests = () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/clinic/getrequest/${clinicId}?page=${page}&pageSize=${pageSize}`
+        `/v1/clinic/veiwRequest/${clinicId}?page=${page}&pageSize=${pageSize}`
       );
-      console.log(response);
-      setTotalRequests(response.data?.Clinic?.count);
-      setAllRequests(response.data?.Clinic?.rows);
-      console.log(allRequests);
+      setTotalRequests(response?.data?.allRequest?.count);
+      setAllRequests(response?.data?.allRequest?.rows);
+
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -110,21 +109,32 @@ const Requests = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allRequests}
-              onRowClick={(row) => navigate(`/admin/owners/${row?.owner_id}`)}
-              idAccessor="clinic_id"
+              // onRowClick={(row) => navigate(`/admin/owners/${row?.owner_id}`)}
+              idAccessor="doctor_clinic_id"
               columns={[
                 {
-                  accessor: "owner_id",
+                  accessor: "doctor_clinic_id",
                   title: "No.",
                   render: (row, rowIndex) => rowIndex + 1,
                 },
                 {
-                  accessor: "name",
+                  accessor: "Doctor.name",
                   title: "Name",
+                  render: (row) => row?.Doctor?.name || "",
                 },
-                { accessor: "email" },
-                { accessor: "phone" },
-                { accessor: "address", title: "Address" },
+                {
+                  accessor: "email",
+                  render: (row) => row?.Doctor?.email || "",
+                },
+                {
+                  accessor: "phone",
+                  render: (row) => row?.Doctor?.phone || "",
+                },
+                {
+                  accessor: "address",
+                  title: "Address",
+                  render: (row) => row?.Doctor?.address || "",
+                },
               ]}
               totalRecords={totalRequests}
               recordsPerPage={pageSize}

@@ -333,7 +333,7 @@ const Users = () => {
       );
       setDetails(response?.data?.salespersons);
       setMessage1(
-        `${websiteUrl}signup/${response?.data?.salespersons?.salespersoncode}`
+        `${websiteUrl}owner-signup/${response?.data?.salespersons?.salespersoncode}`
       );
       setLoading(false);
     } catch (error) {

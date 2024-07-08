@@ -43,7 +43,6 @@ const Owners = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/salesperson/getsalespersonid/${salespersonId}?page=${page}&pageSize=${pageSize}`
       );
-
       setTotalOwners(response?.data?.Owner?.count);
       setAllOwners(response?.data?.Owner?.rows);
 

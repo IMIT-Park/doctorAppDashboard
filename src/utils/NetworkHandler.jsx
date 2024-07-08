@@ -7,8 +7,6 @@ export const baseUrl = "https://doctorbackend.gitdr.com/api";
 
 export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
 
-// export const imageBaseUrl = "https://doctorbackend.gitdr.com/";
-
 // dashboard url
 export const dashboardUrl = "https://mydoctorsdashboard.gitdr.com/";
 

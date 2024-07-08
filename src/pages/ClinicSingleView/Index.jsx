@@ -403,7 +403,7 @@ const ClinicSingleView = () => {
                         className="form-input form-input-green rounded w-full"
                         readOnly
                       />
-                      <div> 
+                      <div>
                         <CopyToClipboard
                           text={qrUrl}
                           onCopy={(text, result) => {
@@ -429,8 +429,16 @@ const ClinicSingleView = () => {
               <div className="w-full xl:w-1/2">
                 <div className="rounded-lg h-full -mt-5 flex flex-col justify-between">
                   <div className="p-4">
-                    <div className="text-4xl text-green-800 font-semibold capitalize mb-4">
+                    <div className="text-4xl text-green-800 font-semibold capitalize mb-4 flex flex-row justify-between">
                       {clinicDetails?.name || ""}
+                      {!isSuperAdmin && (
+                        <button
+                          className="flex hover:text-info p-4"
+                          onClick={openEditModal}
+                        >
+                          <IconEdit className="w-6 h-6" />
+                        </button>
+                      )}
                     </div>
                     <div className="flex flex-col gap-4">
                       <div className="flex flex-col items-start gap-2">
@@ -496,20 +504,13 @@ const ClinicSingleView = () => {
                       </div>
                     </div>
                   </div>
-                  {!isSuperAdmin && (
-                    <button
-                      className="flex hover:text-info p-4"
-                      onClick={openEditModal}
-                    >
-                      <IconEdit className="w-6 h-6" />
-                    </button>
-                  )}
+
                   <div className="flex flex-col md:flex-row px-2 gap-3 mt-4.5">
                     <QRCode
                       id="qrcode-canvas"
                       value={qrUrl}
                       size={220}
-                      style={{ display: "none"}}
+                      style={{ display: "none" }}
                     />
                     <button
                       type="button"

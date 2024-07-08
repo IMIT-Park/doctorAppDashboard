@@ -565,7 +565,7 @@ const SinglePage = () => {
                   </div>
                 </div>
               </div> */}
-              
+
               <div className="w-full flex flex-col mb-2 mt-2 px-4">
                 <div className="w-full">
                   <div className="text-2xl mb-3 text-[#006241] font-semibold capitalize p-2 ">
@@ -673,15 +673,15 @@ const SinglePage = () => {
               </div>
             </div>
 
-            {/* <div className="flex items-center">
-              <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
+            <div className="flex items-center">
+              <h5 className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-slate-300">
                 Clinics:
               </h5>
-              <div className="border flex-grow ml-4"></div>
-            </div> */}
-            <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
+              <div className="border flex-grow ml-4 dark:border-gray-700"></div>
+            </div>
+            {/* <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
               Clinics:
-            </h5>
+            </h5> */}
             {doctorClinics && doctorClinics?.length ? (
               <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
                 {doctorClinics?.map((clinic) => (
@@ -746,7 +746,6 @@ const SinglePage = () => {
             ) : (
               <div className="text-xs text-gray-600">No clinics Found</div>
             )}
-
             <div className="my-10">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
                 <h5 className="text-xl font-semibold text-dark dark:text-slate-300">
@@ -772,7 +771,7 @@ const SinglePage = () => {
                               <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
                                 <button
                                   type="button"
-                                  className={`p-4 w-full text-base flex items-center text-dark dark:bg-[#1b2e4b] ${
+                                  className={`p-4 w-full text-base flex items-center text-[#AAAAAA] dark:bg-[#1b2e4b] ${
                                     active === day.id
                                       ? "!text-[#006241] dark:!text-[#4ec37bfb]"
                                       : ""
@@ -895,12 +894,17 @@ const SinglePage = () => {
                           <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
                             {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
                           </span>
-                          <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-1 font-bold text-base text-slate-500 ml-auto">
-                            <span>{formatDate(leave?.leave_date)}</span>
+                          <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-1 font-bold text-base text-slate-500  ">
+                            <span className="w-24 sm:ml-28 md:ml-28 ml-28 sm:w-auto  ">
+                              {formatDate(leave?.leave_date)}
+                            </span>
                             {!leave?.fullday && (
-                              <div className="flex items-center flex-wrap">
+                              <div className="flex items-center flex-wrap w-full sm:w-auto">
                                 {leave?.leaves?.map((slot, slotIndex) => (
-                                  <span key={slot?.DoctorTimeSlot_id}>
+                                  <span
+                                    key={slot?.DoctorTimeSlot_id}
+                                    className="w-full sm:w-auto"
+                                  >
                                     (Slot:{" "}
                                     {formatTime(
                                       slot?.DoctorTimeSlot?.startTime
@@ -915,7 +919,7 @@ const SinglePage = () => {
                             )}
                             <button
                               type="button"
-                              className="text-red-500 hover:text-red-700 ml-2"
+                              className="text-red-500 hover:text-red-700 mt-2 sm:mt-0 sm:ml-2 lg:w-auto sm:w-11 md:w-11 ml-44"
                               onClick={() => openDeleteLeaveModal(leave)}
                               title="Delete leave"
                             >

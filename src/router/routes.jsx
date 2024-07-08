@@ -18,7 +18,6 @@ const AdminOwnerSingleView = lazy(() =>
 );
 const AdminClinics = lazy(() => import("../panels/admin/clinics/Index"));
 const AdminDoctors = lazy(() => import("../panels/admin/doctors/Index"));
-const AdminComplaints = lazy(() => import("../panels/admin/complaints/Index"));
 const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
 const AdminSalesOwners = lazy(() =>
   import("../panels/admin/Sales-team/owners/Index")
@@ -63,7 +62,7 @@ const DoctorIndex = lazy(() => import("../panels/doctor/Index"));
 const DoctorProfile = lazy(() => import("../panels/doctor/profile/Index"));
 const DoctorLeaves = lazy(() => import("../panels/doctor/leaves/Index"));
 const DoctorRequests = lazy(() => import("../panels/doctor/requests/Requests"));
-const DoctorBookings = lazy(() => import("../panels/doctor/bookings/Index"));
+const DoctorAppointments = lazy(() => import("../panels/doctor/appointments/Index"));
 
 // <--------------> doctor panel imports ends here <-------------->
 
@@ -77,6 +76,9 @@ const SupportUserIndex = lazy(() => import("../panels/supportUser/Index"));
 const SupportUserChats = lazy(() =>
   import("../panels/supportUser/chats/Index")
 );
+
+const SupportUserComplaints = lazy(() => import("../panels/supportUser/complaints/Index"));
+
 // <--------------> supportUser panel imports ends here <-------------->
 
 // <--------------> clinic single-view imports starts here <-------------->
@@ -156,8 +158,8 @@ const routes = [
   },
   // reports
   {
-    path: "/admin/complaints",
-    element: <AdminComplaints />,
+    path: "/supportUser/complaints",
+    element: <SupportUserComplaints />,
     layout: "default",
   },
 
@@ -309,10 +311,10 @@ const routes = [
     layout: "default",
   },
 
-  // DoctorBookings
+  // DoctorAppointments
    {
-    path: "/doctor/bookings",
-    element: <DoctorBookings />,
+    path: "/doctor/appointments",
+    element: <DoctorAppointments />,
     layout: "default",
   },
 

@@ -833,7 +833,7 @@ const SinglePage = () => {
 
             <div className="mt-4">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5 className="text-xl font-semibold mb-1 text-dark dark:text-slate-300">
+                <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
                   Leaves:
                 </h5>
                 {!isSuperAdmin && (

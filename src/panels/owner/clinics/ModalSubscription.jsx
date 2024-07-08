@@ -1,10 +1,11 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { formatDate } from "../../../utils/formatDate";
 import { showMessage } from "../../../utils/showMessage";
+import { UserContext } from "../../../contexts/UseContext";
 
 const ModalPage = ({
   open,
@@ -17,6 +18,9 @@ const ModalPage = ({
   selectedPlan,
   setSelectedPlan,
 }) => {
+  const { userDetails } = useContext(UserContext);
+  const isSuperAdmin = userDetails?.role_id === 1;
+
   const [loading, setLoading] = useState(false);
   const [planLoading, setPlanLoading] = useState(false);
 
@@ -145,7 +149,7 @@ const ModalPage = ({
                   <IconX />
                 </button>
                 <div className="text-lg  font-semibold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px] pb-1">
-                  Subscription Plans
+                  Subscription Details
                 </div>
                 {planLoading ? (
                   <IconLoader className="animate-[spin_2s_linear_infinite]  w-7 h-28 my-5 align-middle shrink-0 mx-auto" />
@@ -207,80 +211,91 @@ const ModalPage = ({
                         </div>
                       </>
                     ) : (
-                      <div className="px-5">
-                        <p className="text-base text-gray-700 dark:text-gray-400 text-[16px] text-center mt-4">
-                          You haven't subscribed yet! Choose one of the plans
-                          below to unlock features and exclusive content.
-                        </p>
-                        <div className="mt-5 text-slate- 800 dark:text-slate-300">
-                          Available Plans:
-                        </div>
-                        <div className="mt-2 flex gap-3 items-start flex-wrap sm:flex-nowrap">
-                          {allPlans.length > 0 ? (
-                            <>
-                              {allPlans.map((plan) => (
-                                <div
-                                  key={plan.plan_id}
-                                  className="w-full"
-                                  onClick={() =>
-                                    handlePlanSelection(plan?.plan_id)
-                                  }
-                                >
-                                  <div
-                                    className={`border ${
-                                      selectedPlan === plan?.plan_id
-                                        ? "border-[#006241]"
-                                        : "dark:border-slate-800"
-                                    } py-4 px-2 rounded-lg flex items-center cursor-pointer`}
-                                  >
+                      <>
+                        {isSuperAdmin ? (
+                          <div className="px-5 h-28 grid place-items-center">
+                            <p className="text-base text-gray-700 dark:text-gray-400 text-[16px] text-center">
+                              Clinic haven't subscribed yet!
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="px-5">
+                            <p className="text-base text-gray-700 dark:text-gray-400 text-[16px] text-center mt-4">
+                              You haven't subscribed yet! Choose one of the
+                              plans below to unlock features and exclusive
+                              content.
+                            </p>
+                            <div className="mt-5 text-slate- 800 dark:text-slate-300">
+                              Available Plans:
+                            </div>
+                            <div className="mt-2 flex gap-3 items-start flex-wrap sm:flex-nowrap">
+                              {allPlans.length > 0 ? (
+                                <>
+                                  {allPlans.map((plan) => (
                                     <div
-                                      className={`w-5 h-5 rounded-full border p-0.5 ${
-                                        selectedPlan === plan?.plan_id
-                                          ? "border-[#006241]"
-                                          : "dark:border-slate-800"
-                                      } mr-3`}
+                                      key={plan.plan_id}
+                                      className="w-full"
+                                      onClick={() =>
+                                        handlePlanSelection(plan?.plan_id)
+                                      }
                                     >
                                       <div
-                                        className={`w-full h-full ${
-                                          selectedPlan === plan?.plan_id &&
-                                          "bg-[#006241]"
-                                        } rounded-full`}
-                                      />
-                                    </div>
-                                    <div>
-                                      <h3 className="text-lg font-semibold">
-                                        {plan.plan_name}
-                                      </h3>
-                                      <div className="flex items-center gap-2">
-                                        <p className="text-sm text-gray-500 min-w-[110px] flex justify-between">
-                                          Price Per Doctor <span>:</span>
-                                        </p>
-                                        <p className="text-sm text-slate-800 dark:text-slate-300">
-                                          ₹{plan.price_per_doctor}
-                                        </p>
+                                        className={`border ${
+                                          selectedPlan === plan?.plan_id
+                                            ? "border-[#006241]"
+                                            : "dark:border-slate-800"
+                                        } py-4 px-2 rounded-lg flex items-center cursor-pointer`}
+                                      >
+                                        <div
+                                          className={`w-5 h-5 rounded-full border p-0.5 ${
+                                            selectedPlan === plan?.plan_id
+                                              ? "border-[#006241]"
+                                              : "dark:border-slate-800"
+                                          } mr-3`}
+                                        >
+                                          <div
+                                            className={`w-full h-full ${
+                                              selectedPlan === plan?.plan_id &&
+                                              "bg-[#006241]"
+                                            } rounded-full`}
+                                          />
+                                        </div>
+                                        <div>
+                                          <h3 className="text-lg font-semibold">
+                                            {plan.plan_name}
+                                          </h3>
+                                          <div className="flex items-center gap-2">
+                                            <p className="text-sm text-gray-500 min-w-[110px] flex justify-between">
+                                              Price Per Doctor <span>:</span>
+                                            </p>
+                                            <p className="text-sm text-slate-800 dark:text-slate-300">
+                                              ₹{plan.price_per_doctor}
+                                            </p>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <p className="text-sm text-gray-500 flex gap-1">
+                                              Frequency <span>:</span>
+                                            </p>
+                                            <p className="text-sm text-slate-800 dark:text-slate-300">
+                                              {plan.frequency_in_days} days
+                                            </p>
+                                          </div>
+                                        </div>
                                       </div>
-                                      <div className="flex items-center gap-2">
-                                        <p className="text-sm text-gray-500 flex gap-1">
-                                          Frequency <span>:</span>
-                                        </p>
-                                        <p className="text-sm text-slate-800 dark:text-slate-300">
-                                          {plan.frequency_in_days} days
-                                        </p>
-                                      </div>
                                     </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </>
-                          ) : (
-                            <p>No plans available</p>
-                          )}
-                        </div>
-                      </div>
+                                  ))}
+                                </>
+                              ) : (
+                                <p>No plans available</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </>
                 )}
-                {!subscriptionData && (
+                {!subscriptionData && !isSuperAdmin && (
                   <div className="p-5">
                     <div className="flex justify-end items-center mt-8">
                       <button

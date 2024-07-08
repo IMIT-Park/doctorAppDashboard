@@ -21,27 +21,12 @@ const QRCodeComponent = ({ qrUrl }) => {
 
   return (
     <div className="w-fit flex items-start gap-3 flex-wrap ">
-      <div className="flex items-center flex-wrap gap-4 bg-[#f1f2f3] dark:bg-[#060818] rounded p-2">
-        <QRCode
-          id="qrcode-canvas"
-          value={qrUrl}
-          size={220}
-          style={{ display: "none" }}
-        />
-        <button
-          type="button"
-          className="btn btn-green w-fit"
-          onClick={downloadQRCode}
-        >
-          <IconDownload className="mr-2" />
-          Download QR code
-        </button>
-        {/* <div className="bg-[#f1f2f3] p-2 rounded dark:bg-[#060818] w-full max-w-80"> */}
+      <div className="flex items-center gap-8 flex-wrap rounded mt-3">
         <form className="flex items-center">
           <input
             type="text"
             defaultValue={qrUrl}
-            className="form-input form-input-green rounded-none"
+            className="form-input form-input-green rounded-none w-64"
             readOnly
           />
           <div>
@@ -60,6 +45,21 @@ const QRCodeComponent = ({ qrUrl }) => {
             </CopyToClipboard>
           </div>
         </form>
+        <QRCode
+          id="qrcode-canvas"
+          value={qrUrl}
+          size={220}
+          style={{ display: "none" }}
+        />
+        <button
+          type="button"
+          className="btn btn-green w-52"
+          onClick={downloadQRCode}
+        >
+          <IconDownload className="mr-2" />
+          Download QR code
+        </button>
+        {/* <div className="bg-[#f1f2f3] p-2 rounded dark:bg-[#060818] w-full max-w-80"> */}
       </div>
 
       {/* </div> */}

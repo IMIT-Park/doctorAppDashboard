@@ -31,6 +31,10 @@ import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
 import CustomButton from "../../components/CustomButton";
 import ModalSubscription from "../../panels/owner/clinics/ModalSubscription";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import IconCopy from "../../components/Icon/IconCopy";
+import QRCode from "qrcode.react";
+import IconDownload from "../../components/Icon/IconDownload";
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -331,194 +335,211 @@ const ClinicSingleView = () => {
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchDoctorData);
 
+  //QRCodeComponent
+  const downloadQRCode = () => {
+    const canvas = document.getElementById("qrcode-canvas");
+    const pngUrl = canvas
+      .toDataURL("image/png")
+      .replace("image/png", "image/octet-stream");
+    let downloadLink = document.createElement("a");
+    downloadLink.href = pngUrl;
+    downloadLink.download = "qrcode.png";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
   return (
     <div>
-      <ScrollToTop />
-      <button
-        onClick={() => navigate(-1)}
-        type="button"
-        className="btn btn-green btn-sm -mt-4 mb-4"
-      >
-        <IconCaretDown className="w-4 h-4 rotate-90" />
-      </button>
+      <div className="flex justify-between items-center">
+        <ScrollToTop />
+
+        <button
+          onClick={() => navigate(-1)}
+          type="button"
+          className="btn btn-green btn-sm mt-1 mb-4"
+        >
+          <IconCaretDown className="w-4 h-4 rotate-90" />
+        </button>
+
+        <div className="flex items-center">
+          {/* Your CustomSwitch component here */}
+          <CustomSwitch
+            checked={clinicDetails?.User?.status}
+            onChange={() =>
+              showClinicAlert(
+                clinicDetails?.User?.user_id,
+                clinicDetails?.User?.status ? "block" : "activate",
+                "clinic"
+              )
+            }
+            tooltipText={clinicDetails?.User?.status ? "Block" : "Unblock"}
+            uniqueId={`clinic${clinicDetails?.clinic_id}`}
+            size="large"
+          />
+        </div>
+      </div>
+
       <div className="panel mb-1">
         {detailsLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="flex justify-between flex-wrap">
-              <div className="w-full max-w-96">
-                <div className="rounded-md overflow-hidden">
+            <div className="relative flex flex-col xl:flex-row md:gap-3 sm:gap-3 lg:gap-0 max-lg:gap-0">
+              <div className="w-full xl:w-1/2 overflow-hidden flex flex-col items-center">
+                <div className="w-full h-80">
                   <img
                     src={imageBaseUrl + clinicDetails?.banner_img_url}
-                    className="w-full h-80 object-cover"
+                    className="w-full h-full object-cover"
                     alt="Banner"
                   />
                 </div>
-                {/* <div className="text-2xl font-semibold capitalize mt-2 mb-4">
-                  {clinicDetails?.name || ""}
-                </div> */}
-                {/* <QRCodeComponent qrUrl={qrUrl} /> */}
-              </div>
-
-              <div className="text-left mr-96">
-                <div className="mt-5">
-                  <div className="text-4xl text-green-800 font-semibold capitalize mt-2 mb-4">
-                    {clinicDetails?.name || ""}
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Address <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.address || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Place <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.place || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Email <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.User?.email || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Username <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.User?.user_name || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-dark text-base min-w-[75px] flex items-start justify-between">
-                      Phone <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 text-base">
-                      {clinicDetails?.phone || ""}
-                    </div>
+                <div className="w-full flex items-start gap-3 flex-wrap mt-3">
+                  <div className="flex items-center gap-8 flex-wrap rounded mt-4 mb-5 w-full">
+                    <form className="flex items-center w-full">
+                      <input
+                        type="text"
+                        defaultValue={qrUrl}
+                        className="form-input form-input-green rounded w-full"
+                        readOnly
+                      />
+                      <div> 
+                        <CopyToClipboard
+                          text={qrUrl}
+                          onCopy={(text, result) => {
+                            if (result) {
+                              showMessage("Copied Successfully");
+                            }
+                          }}
+                        >
+                          <button
+                            type="button"
+                            className="btn btn-green px-2 rounded lg:w-32 sm:w-24"
+                          >
+                            <IconCopy className="ltr:mr-2 rtl:ml-2" />
+                            Copy
+                          </button>
+                        </CopyToClipboard>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col items-center gap-4">
-                <CustomSwitch
-                  checked={clinicDetails?.User?.status}
-                  onChange={() =>
-                    showClinicAlert(
-                      clinicDetails?.User?.user_id,
-                      clinicDetails?.User?.status ? "block" : "activate",
-                      "clinic"
-                    )
-                  }
-                  tooltipText={
-                    clinicDetails?.User?.status ? "Block" : "Unblock"
-                  }
-                  uniqueId={`clinic${clinicDetails?.clinic_id}`}
-                  size="large"
-                />
-                {!isSuperAdmin && (
-                  <button
-                    className="flex hover:text-info"
-                    onClick={openEditModal}
-                  >
-                    <IconEdit className="w-6 h-6" />
-                  </button>
-                )}
-              </div>
+              <div className="w-full xl:w-1/2">
+                <div className="rounded-lg h-full -mt-5 flex flex-col justify-between">
+                  <div className="p-4">
+                    <div className="text-4xl text-green-800 font-semibold capitalize mb-4">
+                      {clinicDetails?.name || ""}
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex flex-col items-start gap-2">
+                        <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                          Address:
+                        </div>
+                        <input
+                          type="text"
+                          value={clinicDetails?.address || ""}
+                          readOnly
+                          className="text-base border bg-transparent rounded w-full p-3 focus:outline-none dark:border-none dark:bg-gray-800"
+                        />
+                      </div>
 
-              <div className="mt-5">
-                <div className="flex flex-row gap-3">
-                  <QRCodeComponent qrUrl={qrUrl} />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleGetLocation(clinicDetails?.googleLocation)
-                    }
-                    className="btn btn-success mb-1"
-                  >
-                    <IconMenuContacts className="mr-1 w-5" />
-                    View Location
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary mb-1"
-                    onClick={openSubscriptionModal}
-                  >
-                    View Plan Details
-                  </button>
+                      <div className="flex flex-col md:flex-row items-start gap-10">
+                        <div className="flex flex-col items-start w-full md:w-1/2">
+                          <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                            Place:
+                          </div>
+                          <input
+                            type="text"
+                            value={clinicDetails?.place || ""}
+                            readOnly
+                            className="text-base border bg-transparent rounded p-2 w-full focus:outline-none dark:border-none dark:bg-gray-800"
+                          />
+                        </div>
+                        <div className="flex flex-col items-start w-full md:w-1/2">
+                          <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                            Email:
+                          </div>
+                          <input
+                            type="text"
+                            value={clinicDetails?.User?.email || ""}
+                            readOnly
+                            className="text-base border bg-transparent rounded p-2 w-full focus:outline-none dark:border-none dark:bg-gray-800"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col md:flex-row items-start gap-10">
+                        <div className="flex flex-col items-start w-full md:w-1/2">
+                          <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                            Username:
+                          </div>
+                          <input
+                            type="text"
+                            value={clinicDetails?.User?.user_name || ""}
+                            readOnly
+                            className="text-base border bg-transparent rounded p-2 w-full focus:outline-none dark:border-none dark:bg-gray-800"
+                          />
+                        </div>
+                        <div className="flex flex-col items-start w-full md:w-1/2">
+                          <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                            Phone:
+                          </div>
+                          <input
+                            type="text"
+                            value={clinicDetails?.phone || ""}
+                            readOnly
+                            className="text-base border bg-transparent rounded p-2 w-full focus:outline-none dark:border-none dark:bg-gray-800"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {!isSuperAdmin && (
+                    <button
+                      className="flex hover:text-info p-4"
+                      onClick={openEditModal}
+                    >
+                      <IconEdit className="w-6 h-6" />
+                    </button>
+                  )}
+                  <div className="flex flex-col md:flex-row px-2 gap-3 mt-4.5">
+                    <QRCode
+                      id="qrcode-canvas"
+                      value={qrUrl}
+                      size={220}
+                      style={{ display: "none"}}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-green w-full md:w-72 lg:text-sm max-lg:text-base md:text-sm sm:text-base mb-2 md:mb-0 md:px-2 sm:px-2 lg:px-0"
+                      onClick={downloadQRCode}
+                    >
+                      <IconDownload className="md:mr-2 lg:mr-1" />
+                      Download QRcode
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleGetLocation(clinicDetails?.googleLocation)
+                      }
+                      className="btn btn-green flex items-center gap-1 w-full md:w-72 md:text-sm lg:text-sm max-lg:text-base sm:text-base mb-2 md:mb-0 md:px-2 sm:px-2 lg:px-0"
+                    >
+                      <IconMenuContacts className="md:mr-2 lg:mr-0" />
+                      View Location
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-white text-green-600 border-green-600 w-full md:text-sm sm:text-base md:w-72 lg:text-sm max-lg:text-base shadow-sm md:px-2 sm:px-2 lg:px-0"
+                      onClick={openSubscriptionModal}
+                    >
+                      View Plan Details
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-            {/* <div className="text-left">
-              <div className="mt-5">
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Address <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {clinicDetails?.address || ""}
-                  </div>
-                </div>
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Place <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {clinicDetails?.place || ""}
-                  </div>
-                </div>
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Email <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {clinicDetails?.User?.email || ""}
-                  </div>
-                </div>
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Username <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {clinicDetails?.User?.user_name || ""}
-                  </div>
-                </div>
-                <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2">
-                  <div className="text-white-dark min-w-[75px] flex items-start justify-between">
-                    Phone <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">
-                    {clinicDetails?.phone || ""}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleGetLocation(clinicDetails?.googleLocation)
-                  }
-                  className="btn btn-success mt-5"
-                >
-                  <IconMenuContacts className="mr-1 w-5" />
-                  View Location
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary mt-5"
-                  onClick={openSubscriptionModal}
-                >
-                  View Plan Details
-                </button>
-              </div>
-            </div> */}
           </>
         )}
       </div>

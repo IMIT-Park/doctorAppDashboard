@@ -495,21 +495,44 @@ const SinglePage = () => {
 
   return (
     <div>
-      <ScrollToTop />
-      <button
-        onClick={() => navigate(-1)}
-        type="button"
-        className="btn btn-green btn-sm -mt-4 mb-4"
-      >
-        <IconCaretDown className="w-4 h-4 rotate-90" />
-      </button>
+      <div className="flex justify-between items-center">
+        <ScrollToTop />
+        <button
+          onClick={() => navigate(-1)}
+          type="button"
+          className="btn btn-green btn-sm mt-1 mb-4"
+        >
+          <IconCaretDown className="w-4 h-4 rotate-90" />
+        </button>
+        <CustomSwitch
+          checked={doctorDetails?.status}
+          onChange={() =>
+            showDoctorAlert(
+              doctorDetails?.user_id,
+              doctorDetails?.status ? "block" : "activate",
+              "doctor"
+            )
+          }
+          tooltipText={doctorDetails?.status ? "Block" : "Unblock"}
+          uniqueId={`doctor${doctorDetails?.clinic_id}`}
+          size="large"
+        />
+        {/* {!isSuperAdmin && (
+          <button
+            className="flex hover:text-info"
+            onClick={openEditDetailsModal}
+          >
+            <IconEdit className="w-6 h-6" />
+          </button>
+        )} */}
+      </div>
       <div className="panel mb-1">
         {detailsLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="flex flex-wrap gap-6 min-[1159px]:gap-16 md:pr-20">
-              <div className="relative">
+            <div className="w-full flex flex-wrap gap-3 ">
+              <div className="relative flex flex-row justify-center">
                 {doctorDetails?.photo ? (
                   <img
                     src={imageBaseUrl + doctorDetails?.photo}
@@ -530,124 +553,135 @@ const SinglePage = () => {
                     <IconEdit className="w-4" />
                   </button>
                 )}
-                <div className="text-2xl dark:text-slate-300 font-semibold capitalize">
+              </div>
+              {/* <div className="lg:w-[1370px] md:w-[1800px] sm:w-max--[1000px] sm:min-w-[570px] ">
+                <div className="text-2xl mb-2 text-[#006241] font-semibold capitalize p-2 ">
                   {doctorDetails?.name || ""}
                 </div>
-              </div>
-              <div className="flex items-start flex-col md:flex-row flex-wrap md:gap-10 w-full md:w-auto">
-                <div>
-                  <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Address <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300 md:max-w-80">
+                <div className="flex flex-col flex-wrap mb-2">
+                  <div className="text-base p-2 text-[#AAAAAA]">Address:</div>
+                  <div className="text-base h-32 w-full p-2 border dark:border-none dark:bg-gray-800">
+                    {doctorDetails?.address || ""}
+                  </div>
+                </div>
+              </div> */}
+
+              <div className="w-full flex flex-col mb-2 mt-2 px-4">
+                <div className="w-full">
+                  <div className="text-2xl mb-3 text-[#006241] font-semibold capitalize p-2 ">
+                    {doctorDetails?.name || ""}
+                  </div>
+                  <div className="flex flex-col flex-wrap mb-2">
+                    <div className="text-base p-2 text-[#AAAAAA]">Address:</div>
+                    <div className="text-base h-32 w-full p-2 border dark:border-none dark:bg-gray-800">
                       {doctorDetails?.address || ""}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Email <span>:</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Email:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.email || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
                     </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.email || ""}
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Fees:
+                      </div>
+                      <input
+                        type="text"
+                        value={` ₹${doctorDetails?.fees}` || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Phone <span>:</span>
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Phone:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.phone || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
                     </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.phone || ""}
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Specialization:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.specialization || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Date of Birth <span>:</span>
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Qualification:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.qualification || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
                     </div>
-                    <div className="dark:text-slate-300">
-                      {formatDate(doctorDetails?.dateOfBirth)}
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Gender:
+                      </div>
+                      <input
+                        type="text"
+                        value={doctorDetails?.gender || ""}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Fees <span>:</span>
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Date of Birth:
+                      </div>
+                      <input
+                        type="text"
+                        value={formatDate(doctorDetails?.dateOfBirth)}
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
                     </div>
-                    <div className="dark:text-slate-300">
-                      {" "}
-                      {` ₹${doctorDetails?.fees}` || ""}
+                    <div className="mb-1 w-full">
+                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                        Profile Visibility:
+                      </div>
+                      <input
+                        type="text"
+                        value={
+                          doctorDetails?.visibility ? "Visible" : "Hidden" || ""
+                        }
+                        readOnly
+                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
+                      />
                     </div>
                   </div>
                 </div>
-
-                <div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Gender <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.gender || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Qualification <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.qualification || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Specialization <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.specialization || ""}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                    <div className="text-white-dark min-w-[105px] flex justify-between">
-                      Profile Visibility <span>:</span>
-                    </div>
-                    <div className="dark:text-slate-300">
-                      {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute top-5 right-5 flex flex-col items-center gap-4">
-                <CustomSwitch
-                  checked={doctorDetails?.status}
-                  onChange={() =>
-                    showDoctorAlert(
-                      doctorDetails?.user_id,
-                      doctorDetails?.status ? "block" : "activate",
-                      "doctor"
-                    )
-                  }
-                  tooltipText={doctorDetails?.status ? "Block" : "Unblock"}
-                  uniqueId={`doctor${doctorDetails?.clinic_id}`}
-                  size="large"
-                />
-                {!isSuperAdmin && (
-                  <button
-                    className="flex hover:text-info"
-                    onClick={openEditDetailsModal}
-                  >
-                    <IconEdit className="w-6 h-6" />
-                  </button>
-                )}
               </div>
             </div>
 
-            {/* <div className="flex items-center">
-              <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
+            <div className="flex items-center">
+              <h5 className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-slate-300">
                 Clinics:
               </h5>
-              <div className="border flex-grow ml-4"></div>
-            </div> */}
-            <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
+              <div className="border flex-grow ml-4 dark:border-gray-700"></div>
+            </div>
+            {/* <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
               Clinics:
-            </h5>
+            </h5> */}
             {doctorClinics && doctorClinics?.length ? (
               <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
                 {doctorClinics?.map((clinic) => (
@@ -712,7 +746,6 @@ const SinglePage = () => {
             ) : (
               <div className="text-xs text-gray-600">No clinics Found</div>
             )}
-
             <div className="my-10">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
                 <h5 className="text-xl font-semibold text-dark dark:text-slate-300">
@@ -738,7 +771,7 @@ const SinglePage = () => {
                               <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
                                 <button
                                   type="button"
-                                  className={`p-4 w-full text-base flex items-center text-dark dark:bg-[#1b2e4b] ${
+                                  className={`p-4 w-full text-base flex items-center text-[#AAAAAA] dark:bg-[#1b2e4b] ${
                                     active === day.id
                                       ? "!text-[#006241] dark:!text-[#4ec37bfb]"
                                       : ""
@@ -861,12 +894,17 @@ const SinglePage = () => {
                           <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
                             {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
                           </span>
-                          <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-1 font-bold text-base text-slate-500 ml-auto">
-                            <span>{formatDate(leave?.leave_date)}</span>
+                          <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-1 font-bold text-base text-slate-500  ">
+                            <span className="w-24 sm:ml-28 md:ml-28 ml-28 sm:w-auto  ">
+                              {formatDate(leave?.leave_date)}
+                            </span>
                             {!leave?.fullday && (
-                              <div className="flex items-center flex-wrap">
+                              <div className="flex items-center flex-wrap w-full sm:w-auto">
                                 {leave?.leaves?.map((slot, slotIndex) => (
-                                  <span key={slot?.DoctorTimeSlot_id}>
+                                  <span
+                                    key={slot?.DoctorTimeSlot_id}
+                                    className="w-full sm:w-auto"
+                                  >
                                     (Slot:{" "}
                                     {formatTime(
                                       slot?.DoctorTimeSlot?.startTime
@@ -881,7 +919,7 @@ const SinglePage = () => {
                             )}
                             <button
                               type="button"
-                              className="text-red-500 hover:text-red-700 ml-2"
+                              className="text-red-500 hover:text-red-700 mt-2 sm:mt-0 sm:ml-2 lg:w-auto sm:w-11 md:w-11 ml-44"
                               onClick={() => openDeleteLeaveModal(leave)}
                               title="Delete leave"
                             >
@@ -894,7 +932,9 @@ const SinglePage = () => {
                   )}
                 </>
               ) : (
-                <div className="text-base text-dark dark:text-slate-300">No Leaves Found</div>
+                <div className="text-base text-dark dark:text-slate-300">
+                  No Leaves Found
+                </div>
               )}
             </div>
           </>

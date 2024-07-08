@@ -13,13 +13,16 @@ import { UserContext } from "../../../contexts/UseContext";
 import CustomButton from "../../../components/CustomButton";
 import AcceptRejectModal from "./AcceptRejectModal";
 import Swal from "sweetalert2";
+
 const Requests = () => {
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(setPageTitle("Requests"));
   });
   const { userDetails } = useContext(UserContext);
   const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id || "";
+
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
@@ -31,13 +34,16 @@ const Requests = () => {
   const [rejectionRequestResponse, setRejectionRequestResponse] = useState("");
   const [selectedRowData, setSelectedRowData] = useState();
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     setPage(1);
   }, [pageSize]);
+
   useEffect(() => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
   }, [page, pageSize]);
+
   // fetch function
   const fetchData = async () => {
     setLoading(true);
@@ -47,6 +53,7 @@ const Requests = () => {
       );
       setTotalRequests(response?.data?.allRequest?.count);
       setAllRequests(response?.data?.allRequest?.rows);
+      console.log(allRequests);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -55,20 +62,25 @@ const Requests = () => {
       setLoading(false);
     }
   };
+
   const openAcceptRequestModal = (rowData) => {
     setSelectedRowData(rowData?.doctor_clinic_id);
     setAcceptRequestModal(true);
   };
+
   const closeAcceptRequestModal = () => {
     setAcceptRequestModal(false);
   };
+
   const openRejectRequestModal = (rowData) => {
     setSelectedRowData(rowData?.doctor_clinic_id);
     setRejectRequestModal(true);
   };
+
   const closeRejectRequestModal = () => {
     setRejectRequestModal(false);
   };
+
   //  doctor accept request
   const acceptRequest = async () => {
     setLoading(true);
@@ -92,6 +104,7 @@ const Requests = () => {
       closeAcceptRequestModal();
     }
   };
+
   // doctor reject request
   const rejectRequest = async () => {
     setLoading(true);
@@ -115,10 +128,12 @@ const Requests = () => {
       closeRejectRequestModal();
     }
   };
+
   // fetching Mds
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
+
   return (
     <div>
       <ScrollToTop />
@@ -213,6 +228,7 @@ const Requests = () => {
           </div>
         )}
       </div>
+
       {/* request accept modal */}
       <AcceptRejectModal
         show={accepRequestModal}
@@ -229,11 +245,5 @@ const Requests = () => {
     </div>
   );
 };
+
 export default Requests;
-
-
-
-
-
-
-

@@ -500,13 +500,6 @@ const Profile = () => {
   return (
     <div>
       <ScrollToTop />
-      <button
-        onClick={() => navigate(-1)}
-        type="button"
-        className="btn btn-green btn-sm -mt-4 mb-4"
-      >
-        <IconCaretDown className="w-4 h-4 rotate-90" />
-      </button>
       <div className="panel mb-1">
         {detailsLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />

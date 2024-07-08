@@ -531,8 +531,9 @@ const SinglePage = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="w-full flex flex-wrap gap-3 ">
-              <div className="relative flex flex-row justify-center">
+            <div className="w-full flex flex-wrap gap-3"> 
+              <div className="flex flex-row">
+                <div className="relative flex flex-row justify-center">
                 {doctorDetails?.photo ? (
                   <img
                     src={imageBaseUrl + doctorDetails?.photo}
@@ -554,32 +555,21 @@ const SinglePage = () => {
                   </button>
                 )}
               </div>
-              {/* <div className="lg:w-[1370px] md:w-[1800px] sm:w-max--[1000px] sm:min-w-[570px] ">
-                <div className="text-2xl mb-2 text-[#006241] font-semibold capitalize p-2 ">
-                  {doctorDetails?.name || ""}
-                </div>
-                <div className="flex flex-col flex-wrap mb-2">
-                  <div className="text-base p-2 text-[#AAAAAA]">Address:</div>
-                  <div className="text-base h-32 w-full p-2 border dark:border-none dark:bg-gray-800">
-                    {doctorDetails?.address || ""}
-                  </div>
-                </div>
-              </div> */}
-
+              </div>
               <div className="w-full flex flex-col mb-2 mt-2 px-4">
                 <div className="w-full">
                   <div className="text-2xl mb-3 text-[#006241] font-semibold capitalize p-2 ">
                     {doctorDetails?.name || ""}
                   </div>
                   <div className="flex flex-col flex-wrap mb-2">
-                    <div className="text-base p-2 text-[#AAAAAA]">Address:</div>
+                    <div className="text-xl p-2 text-[#AAAAAA]">Address:</div>
                     <div className="text-base h-32 w-full p-2 border dark:border-none dark:bg-gray-800">
                       {doctorDetails?.address || ""}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
                         Email:
                       </div>
                       <input
@@ -590,7 +580,7 @@ const SinglePage = () => {
                       />
                     </div>
                     <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
                         Fees:
                       </div>
                       <input
@@ -601,7 +591,7 @@ const SinglePage = () => {
                       />
                     </div>
                     <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
                         Phone:
                       </div>
                       <input
@@ -612,7 +602,7 @@ const SinglePage = () => {
                       />
                     </div>
                     <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
                         Specialization:
                       </div>
                       <input
@@ -623,7 +613,7 @@ const SinglePage = () => {
                       />
                     </div>
                     <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
                         Qualification:
                       </div>
                       <input
@@ -634,7 +624,7 @@ const SinglePage = () => {
                       />
                     </div>
                     <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
                         Gender:
                       </div>
                       <input
@@ -645,7 +635,7 @@ const SinglePage = () => {
                       />
                     </div>
                     <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
                         Date of Birth:
                       </div>
                       <input
@@ -656,7 +646,7 @@ const SinglePage = () => {
                       />
                     </div>
                     <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-base mt-1 p-2">
+                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
                         Profile Visibility:
                       </div>
                       <input
@@ -673,21 +663,21 @@ const SinglePage = () => {
               </div>
             </div>
 
-            <div className="flex items-center">
+            {/* <div className="flex items-center mt-5">
               <h5 className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-slate-300">
                 Clinics:
               </h5>
               <div className="border flex-grow ml-4 dark:border-gray-700"></div>
-            </div>
-            {/* <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
+            </div> */}
+            <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
               Clinics:
-            </h5> */}
+            </h5>
             {doctorClinics && doctorClinics?.length ? (
-              <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-3 gap-4">
                 {doctorClinics?.map((clinic) => (
                   <div
                     key={clinic?.clinic_id}
-                    className={`Sm:min-w-[413px] border bg-[#F6F6F6] dark:bg-slate-900 ${
+                    className={`border bg-[#F6F6F6] dark:bg-slate-900 ${
                       selectedClinic?.clinic_id === clinic?.clinic_id
                         ? "border-[#006241]"
                         : "border-slate-200 dark:border-slate-800"
@@ -700,44 +690,22 @@ const SinglePage = () => {
                       className="w-[76px] h-[62px] rounded-md object-cover"
                     />
                     <div>
-                      <h4 className="text-xl font-semibold text-slate-800 dark:text-slate-300 capitalize">
+                      <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-300 capitalize mb-1">
                         {clinic?.name || ""}
                       </h4>
-                      <p className="text-base font-semibold text-slate-500 capitalize">
+                      <p className="text-lg font-semibold text-slate-500 capitalize">
                         {clinic?.place || ""}
                       </p>
                     </div>
-                    <div className="ml-auto mr-2">
-                      {selectedClinic?.clinic_id === clinic?.clinic_id ? (
-                        <svg
-                          className="w-6 h-6 text-green-700"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M19 9l-7 7-7-7"
-                          ></path>
-                        </svg>
-                      ) : (
-                        <svg
-                          className="w-6 h-6 text-slate-500"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 15l7-7 7 7"
-                          ></path>
-                        </svg>
+                    <div
+                      className={`ml-auto mr-2 w-4 h-4 rounded-full border ${
+                        selectedClinic?.clinic_id === clinic?.clinic_id
+                          ? "border-[#006241] bg-slate-400"
+                          : "border-slate-200 dark:border-slate-800"
+                      } p-[1px] bg-slate-200 dark:bg-slate-800`}
+                    >
+                      {selectedClinic?.clinic_id === clinic?.clinic_id && (
+                        <div className="bg-[#006241] w-full h-full rounded-full" />
                       )}
                     </div>
                   </div>
@@ -747,7 +715,7 @@ const SinglePage = () => {
               <div className="text-xs text-gray-600">No clinics Found</div>
             )}
             <div className="my-10">
-              <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
+              <div className="flex items-end justify-between gap-2 flex-wrap mb-2 mt-2">
                 <h5 className="text-xl font-semibold text-dark dark:text-slate-300">
                   Available Days & Time Slots:
                 </h5>

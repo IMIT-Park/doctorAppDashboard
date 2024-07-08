@@ -121,7 +121,7 @@ const OwnerSingleView = () => {
         ) : (
           <>
             <div className="flex justify-between flex-wrap gap-4">
-              <div className="text-2xl font-semibold capitalize dark:text-slate-300">
+              <div className="text-3xl font-semibold capitalize text-green-700 ">
                 {ownerInfo?.name || ""}
               </div>
               <CustomSwitch
@@ -140,25 +140,33 @@ const OwnerSingleView = () => {
             </div>
             <div className="text-left">
               <div className="mt-5">
-                <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark min-w-16 flex items-end justify-between">
-                    Address <span>:</span>
+                <div className="flex lg:flex-row md:flex-col sm:flex-col flex-wrap gap-6 mb-2">
+                  <div className="flex flex-col lg:w-7/12 w-full mb-5">
+                    <div className="text-white-dark min-w-96 text-base mb-2">
+                      Address
+                    </div>
+                    <div className="dark:text-slate-300 border rounded p-1 text-base h-36 dark:border-none dark:bg-gray-800">
+                      {ownerInfo?.address} 
+                    </div>
                   </div>
-                  <div className="dark:text-slate-300">
-                    {ownerInfo?.address}
+                  <div className="lg:w-4/12 w-full flex flex-col gap-4">
+                    <div className="gap-1 mb-2 w-full">
+                      <div className="text-white-dark min-w-96 text-base mb-2">
+                        Email
+                      </div>
+                      <div className="dark:text-slate-300 border rounded p-1 text-base h-11 dark:border-none dark:bg-gray-800">
+                        {ownerInfo?.email}
+                      </div>
+                    </div>
+                    <div className="gap-1 mb-2 w-full">
+                      <div className="text-white-dark min-w-96 text-base mb-2">
+                        Phone Number
+                      </div>
+                      <div className="dark:text-slate-300 border rounded p-1 text-base h-11 dark:border-none dark:bg-gray-800">
+                        {ownerInfo?.phone}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 sm:mb-1">
-                  <div className="text-white-dark min-w-16 flex items-end justify-between">
-                    Email <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">{ownerInfo?.email}</div>
-                </div>
-                <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                  <div className="text-white-dark min-w-16 flex items-end justify-between">
-                    Phone <span>:</span>
-                  </div>
-                  <div className="dark:text-slate-300">{ownerInfo?.phone}</div>
                 </div>
               </div>
             </div>

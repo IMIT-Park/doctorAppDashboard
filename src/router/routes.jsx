@@ -62,7 +62,7 @@ const RequestToDoctor = lazy(() =>
 const DoctorIndex = lazy(() => import("../panels/doctor/Index"));
 const DoctorProfile = lazy(() => import("../panels/doctor/profile/Index"));
 const DoctorLeaves = lazy(() => import("../panels/doctor/leaves/Index"));
-const DoctorRequests = lazy(() => import("../panels/doctor/requests/Index"));
+const DoctorRequests = lazy(() => import("../panels/doctor/requests/Requests"));
 const DoctorBookings = lazy(() => import("../panels/doctor/bookings/Index"));
 
 // <--------------> doctor panel imports ends here <-------------->

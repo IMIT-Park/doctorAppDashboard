@@ -96,7 +96,9 @@ const Sidebar = () => {
       setCurrentMenu("doctor-requests");
     } else if (location.pathname === "/doctor/leaves") {
       setCurrentMenu("doctor-leaves");
-    } else if (location.pathname === "/sales/dashboard") {
+    } else if (location.pathname === "/doctor/appointments") {
+      setCurrentMenu("doctor-appointments");
+    }else if (location.pathname === "/sales/dashboard") {
       setCurrentMenu("sales-dashboard");
     } else {
       setCurrentMenu("admin-dashboard");
@@ -360,17 +362,17 @@ const Sidebar = () => {
                 </li>
 
                 <li className="nav-item">
-                  <NavLink to="/doctor/bookings" className="group">
+                  <NavLink to="/doctor/appointments" className="group">
                     <div className="flex items-center">
                       <IconMenuDashboard
                         className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "doctor-bookings"
+                          currentMenu === "doctor-appointments"
                             ? "!text-primary"
                             : ""
                         }`}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Bookings"}
+                        {"Appointments "}
                       </span>
                     </div>
                   </NavLink>
@@ -439,6 +441,24 @@ const Sidebar = () => {
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
                         {"Chats"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+
+
+                <li className="nav-item">
+                  <NavLink to="/supportuser/complaints" className="group">
+                    <div className="flex items-center">
+                      <IconMenuChat
+                        className={`group-hover:!text-primary shrink-0 ${
+                          currentMenu === "supportuser-complaints"
+                            ? "!text-primary"
+                            : ""
+                        }`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Complaints"}
                       </span>
                     </div>
                   </NavLink>
@@ -547,22 +567,7 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
-                <li className="nav-item">
-                  <NavLink to="/admin/complaints" className="group">
-                    <div className="flex items-center">
-                      <IconMenuDocumentation
-                        className={`group-hover:!text-primary shrink-0 ${
-                          currentMenu === "admin-complaints"
-                            ? "!text-primary"
-                            : ""
-                        }`}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Complaints"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
+               
                 <li className="nav-item">
                   <NavLink to="/admin/messages" className="group">
                     <div className="flex items-center">

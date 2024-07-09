@@ -19,6 +19,8 @@ import DeleteLeave from "../../../pages/DoctorSingleView/components/DeleteLeave"
 import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomButton from "../../../components/CustomButton";
+import emptyBox from "/assets/images/empty-box.svg";
+
 
 const DoctorLeaves = () => {
   const { userDetails } = useContext(UserContext);
@@ -197,7 +199,7 @@ const DoctorLeaves = () => {
 
             <div className="mt-4">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5  className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-white-dark">
+                <h5 className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-white-dark">
                   Leaves:
                 </h5>
                 {!isSuperAdmin && (
@@ -243,15 +245,14 @@ const DoctorLeaves = () => {
                                 ))}
                               </div>
                             )}
-                           
+
                             <button
                               type="button"
                               className="btn btn-danger btn-sm rounded-sm py-1 min-w-10 sm:min-w-24"
                               title="Delete leave"
                               onClick={() => openDeleteLeaveModal(leave)}
-                            > 
-                               Delete
-
+                            >
+                              Delete
                             </button>
                           </div>
                         </div>
@@ -260,7 +261,12 @@ const DoctorLeaves = () => {
                   )}
                 </>
               ) : (
-                <div className="text-xs text-gray-600">No Leaves Found</div>
+                <div className="text-xs text-gray-600">
+                  <span className="mb-2">
+                    <img src={emptyBox} alt="" className="w-10" />
+                  </span>
+                  No Leaves Found
+                </div>
               )}
             </div>
           </>

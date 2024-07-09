@@ -35,6 +35,7 @@ const Appointments = () => {
   const { userDetails } = useContext(UserContext);
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [clinicId, setClinicId] = useState(null);
+  const [selectedDate, setSelectedDate] = useState("");
 
   const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id;
   const isSuperAdmin = userDetails?.role_id === 1;
@@ -62,6 +63,11 @@ const Appointments = () => {
     }
   }, [doctorClinics]);
 
+  const handleDateChange = (e) => {
+    const date = e.target.value;
+    setSelectedDate(date);
+  };
+
   const handleClinicSelect = (clinic) => {
     setSelectedClinic(clinic);
     setClinicId(clinic?.clinic_id);
@@ -74,7 +80,7 @@ const Appointments = () => {
         `/v1/consultation/getallConsultation/${doctorId}?pageSize=${pageSize}&page=${page}`,
         {
           clinic_id: clinicId,
-          schedule_date: null,
+          schedule_date: selectedDate || null,
         }
       );
       setAllAppointments(response?.data?.Consultations?.rows || []);
@@ -92,7 +98,7 @@ const Appointments = () => {
       console.log("Selected Clinic ID:", clinicId);
       getallConsultation();
     }
-  }, [clinicId, page, pageSize]);
+  }, [clinicId, selectedDate, page, pageSize]);
 
   return (
     <div>
@@ -161,6 +167,7 @@ const Appointments = () => {
                   start={0}
                   end={totalAppointments}
                   duration={3}
+                  redraw={true}
                 ></CountUp>
               </span>
             </Tippy>
@@ -168,19 +175,31 @@ const Appointments = () => {
 
           <div>
             <form className="mx-auto w-full mb-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  // value={search}
-                  placeholder="Search Doctor..."
-                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
-                  // onChange={(e) => setSearch(e.target.value)}
-                />
+              <div className="relative flex items-center flex-wrap gap-3 justify-between">
+                <div>
+                  <label
+                    htmlFor="Date"
+                    className="block text-gray-700 text-base"
+                  >
+                    Select a date to view appointment
+                  </label>
+                </div>
+                <div>
+                  <input
+                    id="Date"
+                    type="date"
+                    className="form-input"
+                    value={selectedDate || ""}
+                    onChange={handleDateChange}
+                    disabled={loading}
+                    // placeholder="Select a date to view appointment"
+                  />
+                </div>
               </div>
             </form>
           </div>
         </div>
-        {allAppointments && allAppointments?.length > 0 ? (
+        {allAppointments && allAppointments.length > 0 ? (
           <>
             {loading ? (
               <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -198,6 +217,9 @@ const Appointments = () => {
                   className="whitespace-nowrap table-hover"
                   records={allAppointments}
                   idAccessor="booking_id"
+                  onRowClick={(row) =>
+                    navigate(`/patient-details/${row.booking_id}`)
+                  }
                   columns={[
                     {
                       accessor: "booking_id",
@@ -207,6 +229,11 @@ const Appointments = () => {
                     {
                       accessor: "Patient.name",
                       title: "Name",
+                    },
+
+                    {
+                      accessor: "token",
+                      title: "Token",
                     },
 
                     {
@@ -244,7 +271,7 @@ const Appointments = () => {
             )}
           </>
         ) : (
-          <div className="text-xs  text-gray-600">
+          <div className="text-xs text-gray-600">
             <span className="mb-2">
               <img src={emptyBox} alt="" className="w-10" />
             </span>

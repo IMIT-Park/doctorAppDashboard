@@ -63,6 +63,7 @@ const DoctorProfile = lazy(() => import("../panels/doctor/profile/Index"));
 const DoctorLeaves = lazy(() => import("../panels/doctor/leaves/Index"));
 const DoctorRequests = lazy(() => import("../panels/doctor/requests/Requests"));
 const DoctorAppointments = lazy(() => import("../panels/doctor/appointments/Index"));
+const DoctorAppointmentsDetails = lazy(() => import("../panels/doctor/appointments/PatientDetails"));
 
 // <--------------> doctor panel imports ends here <-------------->
 
@@ -317,6 +318,15 @@ const routes = [
     element: <DoctorAppointments />,
     layout: "default",
   },
+
+  // DoctorAppointmentsDetails
+  {
+    path:"/patient-details/:bookingId",
+    element: <DoctorAppointmentsDetails />,
+    layout: "default",
+  },
+
+
 
   // <--------------> doctor panel ends here <-------------->
 

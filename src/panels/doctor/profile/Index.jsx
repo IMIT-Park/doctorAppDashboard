@@ -69,7 +69,7 @@ const Profile = () => {
     endTime: "",
     noOfConsultationsPerDay: 0,
     time_slot: 0,
-    clinic_id: clinicId,
+    clinic_id: null,
     day_id: "",
   });
   const [timeSlotId, setTimeSlotId] = useState("");
@@ -320,6 +320,7 @@ const Profile = () => {
       startTime: ensureTimeFormat(timesInput.startTime),
       endTime: ensureTimeFormat(timesInput.endTime),
       day_id: selectedDay,
+      clinic_id: clinicId,
     };
 
     if (
@@ -494,8 +495,7 @@ const Profile = () => {
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchDoctorData);
 
-    console.log(doctorLeaves);
-
+  console.log(doctorLeaves);
 
   return (
     <div>
@@ -805,7 +805,6 @@ const Profile = () => {
                 <div className="text-xs text-gray-600">No Timeslots Found</div>
               )}
             </div>
-           
           </>
         )}
       </div>

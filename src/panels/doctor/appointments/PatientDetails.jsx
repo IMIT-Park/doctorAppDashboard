@@ -1,9 +1,64 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import ScrollToTop from "../../../components/ScrollToTop";
 import CustomButton from "../../../components/CustomButton";
 import { Tab } from "@headlessui/react";
+import NetworkHandler from "../../../utils/NetworkHandler";
+import { useParams } from "react-router-dom";
+import { formatDate } from "@fullcalendar/core";
+import { formatTime } from "../../../utils/formatTime";
 
-const Index = () => {
+const PatientDetails = () => {
+  const { bookingId } = useParams();
+  const [patientData, setPatientData] = useState(null);
+  const [viewPatientDetails, setViewPatientDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [input, setInput] = useState({
+    symptoms: "",
+    diagnosis: "",
+    prescription: "",
+    medicalTests: "",
+    notes: "",
+  });
+
+  useEffect(() => {
+    const fetchPatientDetails = async () => {
+      try {
+        const response = await NetworkHandler.makeGetRequest(
+          `/v1/consultation/takeConsultation/${bookingId}`
+        );
+        setPatientData(response.data.Consultation);
+        setViewPatientDetails(response.data.Consultation.Patient);
+        console.log(response);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching patient details:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchPatientDetails();
+  }, [bookingId]);
+
+
+  // Function to calculate age 
+  const calculateAge = (dateOfBirth) => {
+    const dob = new Date(dateOfBirth);
+    const currentDate = new Date();
+
+    let age = currentDate.getFullYear() - dob.getFullYear();
+    const monthDiff = currentDate.getMonth() - dob.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && currentDate.getDate() < dob.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
+
   return (
     <div>
       <ScrollToTop />
@@ -29,6 +84,7 @@ const Index = () => {
             <input
               id="first-name"
               type="text"
+              value={viewPatientDetails?.name}
               placeholder="loremipsum234@gmail.com"
               className="form-input form-input-green"
             />
@@ -39,6 +95,11 @@ const Index = () => {
               id="age"
               type="number"
               placeholder="Age"
+              value={
+                viewPatientDetails
+                  ? calculateAge(viewPatientDetails.dateOfBirth)
+                  : ""
+              }
               className="form-input form-input-green"
               autoComplete="off"
             />
@@ -48,7 +109,12 @@ const Index = () => {
             <input
               id="dob"
               type="email"
-              placeholder="Male"
+              placeholder="Date of Birth"
+              value={
+                viewPatientDetails
+                  ? formatDate(new Date(viewPatientDetails.dateOfBirth))
+                  : ""
+              }
               className="form-input form-input-green"
               autoComplete="off"
             />
@@ -61,7 +127,7 @@ const Index = () => {
             <input
               id="gender"
               type="text"
-              placeholder="loremipsum234@gmail.com"
+              value={viewPatientDetails?.gender}
               className="form-input form-input-green"
             />
           </div>
@@ -71,6 +137,7 @@ const Index = () => {
               id="phone-number"
               type="number"
               placeholder="loremipsum234@gmail.com"
+              value={viewPatientDetails?.phone}
               className="form-input form-input-green"
               autoComplete="off"
             />
@@ -81,6 +148,7 @@ const Index = () => {
               id="token-id"
               type="text"
               placeholder="asdvwveabe01"
+              value={patientData?.token}
               className="form-input form-input-green"
               autoComplete="off"
             />
@@ -93,6 +161,7 @@ const Index = () => {
             <input
               id="time"
               type="text"
+              value={patientData ? formatTime(patientData.schedule_time) : ""}
               placeholder="loremipsum234@gmail.com"
               className="form-input form-input-green"
             />
@@ -164,7 +233,7 @@ const Index = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5 ">
                     <div className="w-full">
                       <label htmlFor="first-name">Prescription</label>
@@ -186,68 +255,74 @@ const Index = () => {
                       />
                     </div>
                   </div>
+                  <div className="flex justify-end   text-gray-500 font-bold dark:text-white-dark">
+                  <CustomButton>Submit</CustomButton>
+                  </div>
                 </div>
               </div>
             </Tab.Panel>
+
+            
             <Tab.Panel>
               <div>
-              <div className="prose bg-[#f7f9fa] px-4 py-9 sm:px-8 sm:py-16 rounded max-w-full dark:bg-[#1b2e4b] dark:text-white-light w-full mb-5 mt-5 ">
-                <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark">
-                  <CustomButton>25 January 2024</CustomButton>
+                <div className="prose bg-[#f7f9fa] px-4 py-9 sm:px-8 sm:py-16 rounded max-w-full dark:bg-[#1b2e4b] dark:text-white-light w-full mb-5 mt-5 ">
+                  <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark">
+                    <CustomButton>25 January 2024</CustomButton>
+                  </div>
+                  <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5 mt-6">
+                    <div className="w-full">
+                      <label htmlFor="first-name">Symptoms</label>
+                      <input
+                        id="gender"
+                        type="text"
+                        placeholder="____________________"
+                        className="form-input form-input-green bg-transparent"
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label htmlFor="email">Diagnosis</label>
+                      <input
+                        id="phone-number"
+                        type="number"
+                        placeholder="______________________"
+                        className="form-input form-input-green bg-transparent"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label htmlFor="email">Medical Test</label>
+                      <input
+                        id="token-id"
+                        type="text"
+                        placeholder="______________________"
+                        className="form-input form-input-green bg-transparent"
+                        autoComplete="off"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5">
+                    <div className="w-full">
+                      <label htmlFor="first-name">Prescription</label>
+                      <textarea
+                        id="prescription"
+                        type="text"
+                        placeholder="____________________"
+                        className="form-input form-input-green bg-transparent"
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label htmlFor="email">Notes</label>
+                      <textarea
+                        id="Notes"
+                        type="text"
+                        placeholder="______________________"
+                        className="form-input form-input-green bg-transparent"
+                        autoComplete="off"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5 mt-6">
-                  <div className="w-full">
-                    <label htmlFor="first-name">Symptoms</label>
-                    <input
-                      id="gender"
-                      type="text"
-                      placeholder="____________________"
-                      className="form-input form-input-green bg-transparent"
-                    />
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="email">Diagnosis</label>
-                    <input
-                      id="phone-number"
-                      type="number"
-                      placeholder="______________________"
-                      className="form-input form-input-green bg-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="email">Medical Test</label>
-                    <input
-                      id="token-id"
-                      type="text"
-                      placeholder="______________________"
-                      className="form-input form-input-green bg-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5">
-                  <div className="w-full">
-                    <label htmlFor="first-name">Prescription</label>
-                    <textarea
-                      id="prescription"
-                      type="text"
-                      placeholder="____________________"
-                      className="form-input form-input-green bg-transparent"
-                    />
-                  </div>
-                  <div className="w-full">
-                    <label htmlFor="email">Notes</label>
-                    <textarea
-                      id="Notes"
-                      type="text"
-                      placeholder="______________________"
-                      className="form-input form-input-green bg-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-                </div>
-              </div>
+                
               </div>
             </Tab.Panel>
           </Tab.Panels>
@@ -257,6 +332,4 @@ const Index = () => {
   );
 };
 
-export default Index;
-
-
+export default PatientDetails;

@@ -14,7 +14,7 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
 import useFetchData from "../../../customHooks/useFetchData";
-import { formatDate } from "@fullcalendar/core";
+import { formatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
 import IconSearch from "../../../components/Icon/IconSearch";
 
@@ -35,7 +35,15 @@ const Appointments = () => {
   const { userDetails } = useContext(UserContext);
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [clinicId, setClinicId] = useState(null);
-  const [selectedDate, setSelectedDate] = useState("");
+
+  
+    const getCurrentDate = () => {
+      const currentDate = new Date();
+      return currentDate.toISOString().split('T')[0]; 
+    };
+  
+    const [selectedDate, setSelectedDate] = useState(getCurrentDate());
+  
 
   const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id;
   const isSuperAdmin = userDetails?.role_id === 1;
@@ -64,8 +72,7 @@ const Appointments = () => {
   }, [doctorClinics]);
 
   const handleDateChange = (e) => {
-    const date = e.target.value;
-    setSelectedDate(date);
+    setSelectedDate(e.target.value);
   };
 
   const handleClinicSelect = (clinic) => {
@@ -99,6 +106,10 @@ const Appointments = () => {
       getallConsultation();
     }
   }, [clinicId, selectedDate, page, pageSize]);
+
+
+  
+
 
   return (
     <div>
@@ -155,7 +166,7 @@ const Appointments = () => {
       )}
       {/* Clinics List Ends Here */}
 
-      <div className="panel">
+      <div className="panel mt-5">
         <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center  gap-1 mb-5 mt-5">
             <h5 className="font-semibold text-lg dark:text-white-light ">
@@ -179,7 +190,7 @@ const Appointments = () => {
                 <div>
                   <label
                     htmlFor="Date"
-                    className="block text-gray-700 text-base"
+                    className="block text-gray-700 text-base dark:text-white-dark"
                   >
                     Select a date to view appointment
                   </label>
@@ -271,8 +282,8 @@ const Appointments = () => {
             )}
           </>
         ) : (
-          <div className="text-xs text-gray-600">
-            <span className="mb-2">
+          <div className="text-md text-gray-600 text-center mt-10">
+            <span className="mb-2 flex justify-center">
               <img src={emptyBox} alt="" className="w-10" />
             </span>
             No Consultations Found

@@ -1,17 +1,30 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import ScrollToTop from "../../../components/ScrollToTop";
 import CustomButton from "../../../components/CustomButton";
 import { Tab } from "@headlessui/react";
 import NetworkHandler from "../../../utils/NetworkHandler";
-import { useParams } from "react-router-dom";
-import { formatDate } from "@fullcalendar/core";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { formatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
+import { UserContext } from "../../../contexts/UseContext";
+import IconLoader from "../../../components/Icon/IconLoader";
+import { showMessage } from "../../../utils/showMessage";
+import emptyBox from "/assets/images/empty-box.svg";
+import IconCaretDown from "../../../components/Icon/IconCaretDown";
 
 const PatientDetails = () => {
   const { bookingId } = useParams();
   const [patientData, setPatientData] = useState(null);
   const [viewPatientDetails, setViewPatientDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [patientId, setPatientId] = useState("");
+  const [medicalRecords, setMedicalRecords] = useState([]);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const { userDetails } = useContext(UserContext);
+
+  const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id;
+  const isSuperAdmin = userDetails?.role_id === 1;
+  const navigate = useNavigate();
 
   const [input, setInput] = useState({
     symptoms: "",
@@ -21,27 +34,27 @@ const PatientDetails = () => {
     notes: "",
   });
 
+  const fetchPatientDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/consultation/takeConsultation/${bookingId}`
+      );
+      setPatientData(response?.data?.Consultation);
+      setPatientId(response?.data?.Consultation?.patient_id);
+      setViewPatientDetails(response?.data?.Consultation?.Patient);
+      setMedicalRecords(response?.data?.medicalrecords);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching patient details:", error);
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await NetworkHandler.makeGetRequest(
-          `/v1/consultation/takeConsultation/${bookingId}`
-        );
-        setPatientData(response.data.Consultation);
-        setViewPatientDetails(response.data.Consultation.Patient);
-        console.log(response);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching patient details:", error);
-        setLoading(false);
-      }
-    };
-
     fetchPatientDetails();
   }, [bookingId]);
 
-
-  // Function to calculate age 
+  // Function to calculate age
   const calculateAge = (dateOfBirth) => {
     const dob = new Date(dateOfBirth);
     const currentDate = new Date();
@@ -58,10 +71,101 @@ const PatientDetails = () => {
     return age;
   };
 
+  // const handleInputChange = (e) => {
+  //   const { id, value } = e.target;
+  //   setInput((prevInput) => ({
+  //     ...prevInput,
+  //     [id]: value,
+  //   }));
+  // };
+
+  const resetInput = () => {
+    setInput({
+      symptoms: "",
+      diagnosis: "",
+      prescription: "",
+      medicalTests: "",
+      notes: "",
+    });
+  };
+
+  //Add addMedicalReport function
+  const addMedicalReport = async (e) => {
+    e.preventDefault();
+    if (
+      !input.symptoms ||
+      !input.diagnosis ||
+      !input.prescription ||
+      !input.medicalTests ||
+      !input.notes
+    ) {
+      showMessage("Please fill in all required fields", "warning");
+      return;
+    }
+
+    const updatedInput = {
+      ...input,
+      booking_id: bookingId,
+      doctor_id: doctorId,
+    };
+    setButtonLoading(true);
+
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/consultation/takePrescription/${patientId}`,
+        updatedInput
+      );
+      if (response.status === 201) {
+        showMessage("Report added successfully.");
+        fetchPatientDetails();
+        resetInput();
+        setButtonLoading(false);
+      } else {
+        showMessage("Failed to add Report. Please try again.", "error");
+        setButtonLoading(false);
+      }
+    } catch (error) {
+      showMessage("An error occurred. Please try again.", "error");
+      setButtonLoading(false);
+    } finally {
+      setButtonLoading(false);
+    }
+  };
+  // console.log(medicalRecords);
+
+  const handleComplete = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makePutRequest(
+        `/v1/consultation/MarkComplete/${bookingId}`
+      );
+      if (response.status === 200) {
+        showMessage("Marked as completed successfully.");
+        navigate("/doctor/appointments");
+      } else {
+        showMessage("Failed to mark as completed. Please try again.", "error");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 403) {
+        showMessage("Only today's booking can be marked as complete.", "warning");
+      } else {
+        showMessage("An error occurred. Please try again.", "error");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
       <ScrollToTop />
+      <button
+        onClick={() => navigate(-1)}
+        type="button"
+        className="btn btn-green btn-sm -mt-4 mb-4"
+      >
+        <IconCaretDown className="w-4 h-4 rotate-90" />
+      </button>
       <div className="panel mt-1">
         <div className="flex items-center flex-wrap gap-1 justify-between mb-8">
           <div className="flex items-center gap-1 flex-grow">
@@ -71,103 +175,117 @@ const PatientDetails = () => {
             <div className="border-t border-gray-300 dark:border-gray-600 flex-grow ml-2"></div>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <button type="button" className="btn btn-outline-danger mr-3">
-              Emergency
+            <button type="button" className="btn btn-outline-primary mr-3">
+              {patientData?.type}
             </button>
-            <CustomButton>Completed</CustomButton>
+            <CustomButton onClick={handleComplete} disabled={loading}>
+              Completed
+            </CustomButton>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
-          <div className="w-full">
-            <label htmlFor="first-name">Name</label>
-            <input
-              id="first-name"
-              type="text"
-              value={viewPatientDetails?.name}
-              placeholder="loremipsum234@gmail.com"
-              className="form-input form-input-green"
-            />
-          </div>
-          <div className="w-full">
-            <label htmlFor="email">Age</label>
-            <input
-              id="age"
-              type="number"
-              placeholder="Age"
-              value={
-                viewPatientDetails
-                  ? calculateAge(viewPatientDetails.dateOfBirth)
-                  : ""
-              }
-              className="form-input form-input-green"
-              autoComplete="off"
-            />
-          </div>
-          <div className="w-full">
-            <label htmlFor="email">Date of Birth</label>
-            <input
-              id="dob"
-              type="email"
-              placeholder="Date of Birth"
-              value={
-                viewPatientDetails
-                  ? formatDate(new Date(viewPatientDetails.dateOfBirth))
-                  : ""
-              }
-              className="form-input form-input-green"
-              autoComplete="off"
-            />
-          </div>
-        </div>
+        {loading ? (
+          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
+              <div className="w-full">
+                <label htmlFor="first-name">Name</label>
+                <input
+                  id="first-name"
+                  type="text"
+                  value={viewPatientDetails?.name}
+                  placeholder="loremipsum234@gmail.com"
+                  className="form-input form-input-green"
+                  readOnly
+                />
+              </div>
+              <div className="w-full">
+                <label htmlFor="email">Age</label>
+                <input
+                  id="age"
+                  type="number"
+                  placeholder="Age"
+                  value={
+                    viewPatientDetails
+                      ? calculateAge(viewPatientDetails?.dateOfBirth)
+                      : ""
+                  }
+                  className="form-input form-input-green"
+                  autoComplete="off"
+                  readOnly
+                />
+              </div>
+              <div className="w-full">
+                <label htmlFor="email">Date of Birth</label>
+                <input
+                  id="dob"
+                  type="email"
+                  placeholder="Date of Birth"
+                  value={
+                    viewPatientDetails
+                      ? formatDate(new Date(viewPatientDetails?.dateOfBirth))
+                      : ""
+                  }
+                  className="form-input form-input-green"
+                  autoComplete="off"
+                  readOnly
+                />
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5">
-          <div className="w-full">
-            <label htmlFor="first-name">Gender</label>
-            <input
-              id="gender"
-              type="text"
-              value={viewPatientDetails?.gender}
-              className="form-input form-input-green"
-            />
-          </div>
-          <div className="w-full">
-            <label htmlFor="email">Phone Number</label>
-            <input
-              id="phone-number"
-              type="number"
-              placeholder="loremipsum234@gmail.com"
-              value={viewPatientDetails?.phone}
-              className="form-input form-input-green"
-              autoComplete="off"
-            />
-          </div>
-          <div className="w-full">
-            <label htmlFor="email">Token ID</label>
-            <input
-              id="token-id"
-              type="text"
-              placeholder="asdvwveabe01"
-              value={patientData?.token}
-              className="form-input form-input-green"
-              autoComplete="off"
-            />
-          </div>
-        </div>
+            <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5">
+              <div className="w-full">
+                <label htmlFor="first-name">Gender</label>
+                <input
+                  id="gender"
+                  type="text"
+                  value={viewPatientDetails?.gender}
+                  className="form-input form-input-green"
+                  readOnly
+                />
+              </div>
+              <div className="w-full">
+                <label htmlFor="email">Phone Number</label>
+                <input
+                  id="phone-number"
+                  type="number"
+                  placeholder="loremipsum234@gmail.com"
+                  value={viewPatientDetails?.phone}
+                  className="form-input form-input-green"
+                  autoComplete="off"
+                />
+              </div>
+              <div className="w-full">
+                <label htmlFor="email">Token ID</label>
+                <input
+                  id="token-id"
+                  type="text"
+                  placeholder="asdvwveabe01"
+                  value={patientData?.token}
+                  className="form-input form-input-green"
+                  autoComplete="off"
+                />
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
-          <div className="w-1/3">
-            <label htmlFor="first-name">Time</label>
-            <input
-              id="time"
-              type="text"
-              value={patientData ? formatTime(patientData.schedule_time) : ""}
-              placeholder="loremipsum234@gmail.com"
-              className="form-input form-input-green"
-            />
-          </div>
-        </div>
-
+            <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
+              <div className="w-1/3">
+                <label htmlFor="first-name">Time</label>
+                <input
+                  id="time"
+                  type="text"
+                  value={
+                    patientData ? formatTime(patientData?.schedule_time) : ""
+                  }
+                  placeholder="loremipsum234@gmail.com"
+                  className="form-input form-input-green"
+                  readOnly
+                />
+              </div>
+            </div>
+          </>
+        )}
         <Tab.Group>
           <Tab.List className="mt-3 flex flex-wrap font-bold">
             <Tab as={Fragment}>
@@ -201,129 +319,183 @@ const PatientDetails = () => {
           <Tab.Panels>
             <Tab.Panel>
               <div className="active pt-5">
-                <div className="prose bg-[#f7f9fa] px-4 py-9 sm:px-8 sm:py-16 rounded max-w-full dark:bg-[#1b2e4b] dark:text-white-light w-full mb-5">
-                  <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5">
-                    <div className="w-full">
-                      <label htmlFor="first-name">Symptoms</label>
-                      <input
-                        id="gender"
-                        type="text"
-                        placeholder="____________________"
-                        className="form-input form-input-green bg-transparent"
-                      />
-                    </div>
-                    <div className="w-full">
-                      <label htmlFor="email">Diagnosis</label>
-                      <input
-                        id="phone-number"
-                        type="number"
-                        placeholder="______________________"
-                        className="form-input form-input-green bg-transparent"
-                        autoComplete="off"
-                      />
-                    </div>
-                    <div className="w-full">
-                      <label htmlFor="email">Medical Test</label>
-                      <input
-                        id="token-id"
-                        type="text"
-                        placeholder="______________________"
-                        className="form-input form-input-green bg-transparent"
-                        autoComplete="off"
-                      />
-                    </div>
-                  </div>
+                <form onSubmit={addMedicalReport}>
+                  <div className="prose bg-[#f7f9fa] px-4 py-9 sm:px-8 sm:py-16 rounded max-w-full dark:bg-[#1d2c43] dark:text-white-light w-full mb-5">
+                    <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5">
+                      <div className="w-full">
+                        <label htmlFor="first-name">Symptoms</label>
+                        <input
+                          id="symptoms"
+                          type="text"
+                          placeholder=""
+                          value={input?.symptoms}
+                          onChange={(e) =>
+                            setInput({ ...input, symptoms: e.target.value })
+                          }
+                          className="form-input form-input-green bg-transparent"
+                          required
+                        />
+                      </div>
 
-                  <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5 ">
-                    <div className="w-full">
-                      <label htmlFor="first-name">Prescription</label>
-                      <textarea
-                        id="prescription"
-                        type="text"
-                        placeholder="____________________"
-                        className="form-input form-input-green bg-transparent"
-                      />
+                      <div className="w-full">
+                        <label htmlFor="email">Diagnosis</label>
+                        <input
+                          id="diagnosis"
+                          type="text"
+                          placeholder=""
+                          value={input?.diagnosis}
+                          onChange={(e) =>
+                            setInput({ ...input, diagnosis: e.target.value })
+                          }
+                          className="form-input form-input-green bg-transparent"
+                          autoComplete="off"
+                          required
+                        />
+                      </div>
+                      <div className="w-full">
+                        <label htmlFor="email">Medical Test</label>
+                        <input
+                          id="medicalTests"
+                          type="text"
+                          placeholder=""
+                          value={input?.medicalTests}
+                          onChange={(e) =>
+                            setInput({ ...input, medicalTests: e.target.value })
+                          }
+                          className="form-input form-input-green bg-transparent"
+                          autoComplete="off"
+                          required
+                        />
+                      </div>
                     </div>
-                    <div className="w-full">
-                      <label htmlFor="email">Notes</label>
-                      <textarea
-                        id="Notes"
-                        type="text"
-                        placeholder="______________________"
-                        className="form-input form-input-green bg-transparent"
-                        autoComplete="off"
-                      />
+
+                    <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5 ">
+                      <div className="w-full">
+                        <label htmlFor="first-name">Prescription</label>
+                        <textarea
+                          id="prescription"
+                          type="text"
+                          placeholder=""
+                          value={input?.prescription}
+                          onChange={(e) =>
+                            setInput({ ...input, prescription: e.target.value })
+                          }
+                          className="form-input form-input-green bg-transparent"
+                          required
+                        />
+                      </div>
+                      <div className="w-full">
+                        <label htmlFor="email">Notes</label>
+                        <textarea
+                          id="notes"
+                          type="text"
+                          placeholder=""
+                          value={input?.notes}
+                          onChange={(e) =>
+                            setInput({ ...input, notes: e.target.value })
+                          }
+                          className="form-input form-input-green bg-transparent"
+                          autoComplete="off"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-end   text-gray-500 font-bold dark:text-white-dark">
+                      <CustomButton type="submit" disabled={buttonLoading}>
+                        {" "}
+                        {buttonLoading ? (
+                          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle" />
+                        ) : (
+                          "Submit "
+                        )}
+                      </CustomButton>
                     </div>
                   </div>
-                  <div className="flex justify-end   text-gray-500 font-bold dark:text-white-dark">
-                  <CustomButton>Submit</CustomButton>
-                  </div>
-                </div>
+                </form>
               </div>
             </Tab.Panel>
 
-            
             <Tab.Panel>
-              <div>
-                <div className="prose bg-[#f7f9fa] px-4 py-9 sm:px-8 sm:py-16 rounded max-w-full dark:bg-[#1b2e4b] dark:text-white-light w-full mb-5 mt-5 ">
-                  <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark">
-                    <CustomButton>25 January 2024</CustomButton>
-                  </div>
-                  <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5 mt-6">
-                    <div className="w-full">
-                      <label htmlFor="first-name">Symptoms</label>
-                      <input
-                        id="gender"
-                        type="text"
-                        placeholder="____________________"
-                        className="form-input form-input-green bg-transparent"
-                      />
+              {medicalRecords && medicalRecords?.length > 0 ? (
+                <div>
+                  {medicalRecords?.[0]?.records?.map((record, index) => (
+                    <div
+                      key={index}
+                      className="prose bg-[#f7f9fa] px-4 py-9 sm:px-8 sm:py-16 rounded max-w-full dark:bg-[#1d2c43] dark:text-white-light w-full mb-5 mt-5 "
+                    >
+                      <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark">
+                        <CustomButton>
+                          {formatDate(new Date(record?.created_at))}
+                        </CustomButton>
+                      </div>
+                      <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5 mt-6">
+                        <div className="w-full">
+                          <label htmlFor="first-name">Symptoms</label>
+                          <input
+                            id="gender"
+                            type="text"
+                            value={record?.symptoms}
+                            className="form-input form-input-green bg-transparent"
+                            readOnly
+                          />
+                        </div>
+                        <div className="w-full">
+                          <label htmlFor="email">Diagnosis</label>
+                          <input
+                            id="diagnosis"
+                            type="text"
+                            value={record?.diagnosis}
+                            className="form-input form-input-green bg-transparent"
+                            autoComplete="off"
+                            readOnly
+                          />
+                        </div>
+                        <div className="w-full">
+                          <label htmlFor="email">Medical Test</label>
+                          <input
+                            id="token-id"
+                            type="text"
+                            value={record?.medicalTests}
+                            className="form-input form-input-green bg-transparent"
+                            autoComplete="off"
+                            readOnly
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5">
+                        <div className="w-full">
+                          <label htmlFor="first-name">Prescription</label>
+                          <textarea
+                            id="prescription"
+                            type="text"
+                            value={record?.prescription}
+                            className="form-input form-input-green bg-transparent"
+                            readOnly
+                          />
+                        </div>
+                        <div className="w-full">
+                          <label htmlFor="email">Notes</label>
+                          <textarea
+                            id="Notes"
+                            type="text"
+                            value={record?.notes}
+                            className="form-input form-input-green bg-transparent"
+                            autoComplete="off"
+                            readOnly
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="w-full">
-                      <label htmlFor="email">Diagnosis</label>
-                      <input
-                        id="phone-number"
-                        type="number"
-                        placeholder="______________________"
-                        className="form-input form-input-green bg-transparent"
-                        autoComplete="off"
-                      />
-                    </div>
-                    <div className="w-full">
-                      <label htmlFor="email">Medical Test</label>
-                      <input
-                        id="token-id"
-                        type="text"
-                        placeholder="______________________"
-                        className="form-input form-input-green bg-transparent"
-                        autoComplete="off"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5">
-                    <div className="w-full">
-                      <label htmlFor="first-name">Prescription</label>
-                      <textarea
-                        id="prescription"
-                        type="text"
-                        placeholder="____________________"
-                        className="form-input form-input-green bg-transparent"
-                      />
-                    </div>
-                    <div className="w-full">
-                      <label htmlFor="email">Notes</label>
-                      <textarea
-                        id="Notes"
-                        type="text"
-                        placeholder="______________________"
-                        className="form-input form-input-green bg-transparent"
-                        autoComplete="off"
-                      />
-                    </div>
-                  </div>
+                  ))}
                 </div>
-                
-              </div>
+              ) : (
+                <div className="text-xs text-gray-600 text-center mt-10">
+                  <span className="mb-2 flex justify-center">
+                    <img src={emptyBox} alt="" className="w-10" />
+                  </span>
+                  No Medical Records Found
+                </div>
+              )}
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>

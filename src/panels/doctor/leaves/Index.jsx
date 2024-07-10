@@ -5,28 +5,21 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import { useNavigate } from "react-router-dom";
 import IconCaretDown from "../../../components/Icon/IconCaretDown";
-import AnimateHeight from "react-animate-height";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import { formatDate, reverseformatDate } from "../../../utils/formatDate";
+import { formatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
-import { showMessage } from "../../../utils/showMessage";
 import IconPlus from "../../../components/Icon/IconPlus";
 import AddLeave from "../../../pages/DoctorSingleView/components/AddLeave";
-import "tippy.js/dist/tippy.css";
 import useFetchData from "../../../customHooks/useFetchData";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import DeleteLeave from "../../../pages/DoctorSingleView/components/DeleteLeave";
-import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomButton from "../../../components/CustomButton";
 import emptyBox from "/assets/images/empty-box.svg";
-
 
 const DoctorLeaves = () => {
   const { userDetails } = useContext(UserContext);
 
   const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id;
-  const isSuperAdmin = userDetails?.role_id === 1;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -124,7 +117,6 @@ const DoctorLeaves = () => {
   const openDeleteLeaveModal = (leave) => {
     setSelectedLeave(leave);
     setDeleteLeaveModal(true);
-    console.log(leave);
   };
 
   const closeDeleteLeaveModal = () => {
@@ -202,12 +194,10 @@ const DoctorLeaves = () => {
                 <h5 className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-white-dark">
                   Leaves:
                 </h5>
-                {!isSuperAdmin && (
-                  <CustomButton onClick={openAddLeaveModal}>
-                    <IconPlus className="ltr:mr-2 rtl:ml-2" />
-                    Add Leave
-                  </CustomButton>
-                )}
+                <CustomButton onClick={openAddLeaveModal}>
+                  <IconPlus className="ltr:mr-2 rtl:ml-2" />
+                  Add Leave
+                </CustomButton>
               </div>
               {doctorLeaves && doctorLeaves?.length > 0 ? (
                 <>
@@ -277,7 +267,6 @@ const DoctorLeaves = () => {
       <AddLeave
         open={addLeaveModal}
         closeModal={closeAddLeaveModal}
-        // buttonLoading={buttonLoading}
         clinicId={clinicId}
         doctorId={doctorId}
         fetchLeaveData={getDoctorLeaves}
@@ -286,8 +275,7 @@ const DoctorLeaves = () => {
       <DeleteLeave
         open={deleteLeaveModal}
         closeModal={closeDeleteLeaveModal}
-        buttonLoading={buttonLoading}
-        leave={selectedLeave}
+        leaveData={selectedLeave}
         fetchLeaveData={getDoctorLeaves}
         selectedTimeSlots={selectedTimeSlots}
         setSelectedTimeSlots={setSelectedTimeSlots}

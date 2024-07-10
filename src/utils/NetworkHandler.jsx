@@ -98,8 +98,11 @@ class NetworkHandler {
     return this.#axios.put(url, body, { headers });
   }
 
-  makeDeleteRequest(url, headers) {
-    return this.#axios.delete(url, { headers });
+  makeDeleteRequest(url, body, headers) {
+    return this.#axios.delete(url, {
+      data: body,
+      headers: headers,
+    });
   }
 }
 

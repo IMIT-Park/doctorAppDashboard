@@ -1,69 +1,48 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
 import { formatTime } from "../../../utils/formatTime";
 import NetworkHandler from "../../../utils/NetworkHandler";
+import { formatDate } from "../../../utils/formatDate";
+import { showMessage } from "../../../utils/showMessage";
 
 const DeleteLeave = ({
   open,
   closeModal,
-  buttonLoading,
   fetchLeaveData,
-  leave,
+  leaveData,
   selectedTimeSlots,
   setSelectedTimeSlots,
 }) => {
-  const [timeSlots, setTimeSlots] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const days = [
-    { name: "Sunday", id: "0" },
-    { name: "Monday", id: "1" },
-    { name: "Tuesday", id: "2" },
-    { name: "Wednesday", id: "3" },
-    { name: "Thursday", id: "4" },
-    { name: "Friday", id: "5" },
-    { name: "Saturday", id: "6" },
-  ];
-
-  useEffect(() => {
-    if (open && leave && leave.leaves) {
-      const extractedTimeSlots = leave.leaves.map((leaveItem) => ({
-        ...leaveItem.DoctorTimeSlot,
-        leave_id: leaveItem.leave_id,
-      }));
-      setTimeSlots(extractedTimeSlots);
-      setSelectedTimeSlots([]); 
-    } else {
-      setTimeSlots([]);
-    }
-  }, [open, leave]);
-
-
-  const handleTimeSlotChange = (e) => {
-    const { value, checked } = e.target;
-    const leaveId = parseInt(value);
-
-    if (checked) {
-      setSelectedTimeSlots((prevSelected) => [...prevSelected, leaveId]);
-    } else {
-      setSelectedTimeSlots((prevSelected) =>
-        prevSelected.filter((id) => id !== leaveId)
-      );
-    }
+  const handleCheckboxChange = (slotId) => {
+    setSelectedTimeSlots((prevSelected) => {
+      if (prevSelected.includes(slotId)) {
+        return prevSelected.filter((id) => id !== slotId);
+      } else {
+        return [...prevSelected, slotId];
+      }
+    });
   };
 
-
-
-  const getDayName = (dayId) => {
-    const day = days.find((d) => d.id === String(dayId));
-    return day ? day.name : "";
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedTimeSlots(leaveData?.leaves?.map((slot) => slot?.leave_id));
+    } else {
+      setSelectedTimeSlots([]);
+    }
   };
 
   const handleDelete = async (e) => {
     e.preventDefault();
 
-    console.log("Time slots to delete:", selectedTimeSlots);
+    if (selectedTimeSlots.length === 0) {
+      showMessage("Please select at least one time slot to delete.", "warning");
+      return;
+    }
+    setLoading(true);
 
     try {
       const response = await NetworkHandler.makeDeleteRequest(
@@ -72,14 +51,14 @@ const DeleteLeave = ({
           leave_ids: selectedTimeSlots,
         }
       );
-      console.log("Delete successful:", response.data);
       closeModal();
       fetchLeaveData();
     } catch (error) {
       console.error("Delete error:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -125,35 +104,59 @@ const DeleteLeave = ({
 
               <div className="mb-4">
                 <div className="w-full">
-                  {timeSlots.length > 0 && (
-                    <div className="mt-5 w-full">
-                      <label className="block mb-2">Select Time Slots:</label>
-                      <div className="flex flex-wrap mt-2">
-                        {timeSlots.map((slot) => (
-                          <div
-                            key={slot.leave_id}
-                            className="flex items-center mb-2"
-                          >
-                            <input
-                              type="checkbox"
-                              id={`slot-${slot.leave_id}`}
-                              value={slot.leave_id}
-                              className="form-checkbox mr-2 ml-2"
-                              onChange={handleTimeSlotChange}
-                            />
-                            <label
-                              htmlFor={`slot-${slot.leave_id}`}
-                              className="badge badge-outline-dark text-gray-500 p-2 text-lg"
-                            >
-                              {getDayName(slot.day_id)}:{" "}
-                              {formatTime(slot.startTime)} -{" "}
-                              {formatTime(slot.endTime)}
-                            </label>
-                          </div>
-                        ))}
+                  <div className="mt-5 w-full">
+                    <div className="flex items-center gap-5 justify-between flex-wrap">
+                      <label className="text-slate-600 dark:text-slate-300">
+                        Select Time Slots of "
+                        {formatDate(leaveData?.leave_date)}" to Delete:
+                      </label>
+                      <div className="flex items-start">
+                        <input
+                          id="select-all"
+                          type="checkbox"
+                          className="form-checkbox"
+                          onChange={handleSelectAll}
+                          checked={
+                            selectedTimeSlots?.length ===
+                            leaveData?.leaves?.length
+                          }
+                        />
+                        <label
+                          htmlFor="select-all"
+                          className="text-primary text-base mb-1"
+                        >
+                          Select All
+                        </label>
                       </div>
                     </div>
-                  )}
+                    <div className="flex flex-wrap gap-4 mt-4 mb-10">
+                      {leaveData?.leaves?.map((slot) => (
+                        <div
+                          key={slot?.leave_id}
+                          className="flex items-center border border-gray-500 rounded px-2 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            id={`slot-${slot?.leave_id}`}
+                            className="form-checkbox"
+                            checked={selectedTimeSlots?.includes(
+                              slot?.leave_id
+                            )}
+                            onChange={() =>
+                              handleCheckboxChange(slot?.leave_id)
+                            }
+                          />
+                          <label
+                            htmlFor={`slot-${slot?.leave_id}`}
+                            className="text-gray-500 mt-2 cursor-pointer"
+                          >
+                            {formatTime(slot?.DoctorTimeSlot?.startTime)} -{" "}
+                            {formatTime(slot?.DoctorTimeSlot?.endTime)}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -169,9 +172,9 @@ const DeleteLeave = ({
                   type="button"
                   className="btn btn-green"
                   onClick={handleDelete}
-                  disabled={buttonLoading}
+                  disabled={loading}
                 >
-                  {buttonLoading ? (
+                  {loading ? (
                     <IconLoader className="animate-spin inline-block h-5 w-5 mr-3" />
                   ) : (
                     "Delete"

@@ -8,6 +8,7 @@ import CountUp from "react-countup";
 import IconMenuUsers from "../../components/Icon/Menu/IconMenuUsers";
 import IconMenuDatatables from "../../components/Icon/Menu/IconMenuDatatables";
 import IconMenuInvoice from "../../components/Icon/Menu/IconMenuInvoice";
+import IconLoader from "../../components/Icon/IconLoader";
 
 const Index = () => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +21,6 @@ const Index = () => {
   useEffect(() => {
     dispatch(setPageTitle("Dashboard"));
   });
-
 
   const revenueChart = {
     series: [
@@ -276,10 +276,139 @@ const Index = () => {
     },
   };
 
+  const clinicsData = [
+    {
+      id: 1,
+      name: "Dr. Luffy Clinic",
+      description:
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+      daysLeft: 10,
+      imageUrl:
+        "https://wallpapers-clan.com/wp-content/uploads/2024/02/monkey-d-luffy-clouds-one-piece-desktop-wallpaper-preview.jpg",
+    },
+    {
+      id: 2,
+      name: "Dr. Luffy Clinic",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+      daysLeft: 10,
+      imageUrl:
+        "https://wallpapers-clan.com/wp-content/uploads/2024/02/monkey-d-luffy-clouds-one-piece-desktop-wallpaper-preview.jpg",
+    },
+    {
+      id: 3,
+      name: "Dr. Sanji Clinic",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+      daysLeft: 5,
+      imageUrl:
+        "https://wallpapers-clan.com/wp-content/uploads/2024/04/sanji-smoking-one-piece-desktop-wallpaper-preview.jpg",
+    },
+    {
+      id: 4,
+      name: "Dr. Usopp Clinic",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+      daysLeft: 5,
+      imageUrl:
+        "https://e1.pxfuel.com/desktop-wallpaper/292/261/desktop-wallpaper-70-god-usopp-god-usopp-thumbnail.jpg",
+    },
+    {
+      id: 5,
+      name: "Dr. Zoro Clinic",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+      daysLeft: 8,
+      imageUrl:
+        "https://wallpapers-clan.com/wp-content/uploads/2024/02/one-piece-roronoa-zoro-with-sword-turquoise-desktop-wallpaper-cover.jpg",
+    },
+  ];
 
   return (
     <div>
-      <ul className="flex space-x-2 rtl:space-x-reverse">
+      {loading ? (
+        <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+      ) : (
+        <>
+          <div
+          className={`w-full ${
+            clinicsData.length > 1
+              ? "grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-3 gap-2"
+              : "flex flex-col lg:flex-row xl:flex-row border"
+          }`}
+        >
+          {clinicsData.map((clinic) => (
+            <div
+              key={clinic.id}
+              className={`w-full ${
+                clinicsData.length > 1 ? "text-sm md:text-base" : "text-base md:text-lg"
+              } flex flex-col lg:flex-row xl:flex-row ${
+                isDark ? "bg-gray-800" : "bg-gray-100"
+              } rounded-lg p-4`}
+            >
+              <div className={`relative w-full lg:w-1/2 aspect-video ${clinicsData.length > 1 ? "h-full" : "h-full"}`}>
+                {clinic.imageUrl ? (
+                  <img
+                    src={clinic.imageUrl}
+                    className="w-full h-full rounded-lg"
+                    alt="Clinic Banner"
+                  />
+                ) : (
+                  <div className="w-full h-40 bg-gray-200 rounded-lg" />
+                )}
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent to-gray-500 opacity-50 rounded-lg blur-sm"></div>
+                
+              </div>
+              <div className="relative w-full lg:w-2/3 xl:w-2/3 flex flex-col justify-between lg:ml-0 xl:ml-0 mt-4 lg:mt-0 xl:mt-0">
+                <div
+                  className={`text-[#000000] dark:text-green-800 font-semibold ${
+                    clinicsData.length > 1
+                      ? "text-xl"
+                      : "text-2xl lg:text-2xl mt-5 sm:mt-5 lg:-mt-0"
+                  } p-1`}
+                >
+                  {clinic.name}
+                </div>
+                <div
+                  className={`text-gray-600 dark:text-slate-300 p-1 ${
+                    clinicsData.length > 1
+                      ? "text-sm"
+                      : "text-xl lg:text-xl sm:mt-5"
+                  }`}
+                >
+                  {clinic.description}
+                </div>
+                <div
+                  className={`flex p-1 ${
+                    clinicsData.length > 1
+                      ? "sm:flex-col sm:items-center xl:items-start gap-2"
+                      : "items-center justify-between sm:mt-5 lg:mb-10"
+                  }`}
+                >
+                  <div
+                    className={`text-blue-800 font-bold ${
+                      clinicsData.length > 1 ? "text-base" : "text-xl lg:text-xl"
+                    }`}
+                  >
+                    ({clinic.daysLeft} days left for subscription)
+                  </div>
+                  <div className="flex items-center">
+                    <button
+                      className={`bg-green-900 text-white px-4 py-2 rounded-lg ${
+                        clinicsData.length > 1 ? "text-sm" : "text-xl lg:text-xl"
+                      }`}
+                    >
+                      Pay Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        </>
+      )}
+      <ul className="flex space-x-2 rtl:space-x-reverse mt-5">
         <li className="ltr:before:mr-2 rtl:before:ml-2">
           <span>Dashboard</span>
         </li>

@@ -387,7 +387,7 @@ const ClinicSingleView = () => {
           <>
             <div className="relative flex flex-col xl:flex-row md:gap-3 sm:gap-3 lg:gap-0 max-lg:gap-0">
               <div className="w-full xl:w-1/2 overflow-hidden flex flex-col items-center">
-                <div className="w-full h-80">
+                <div className="w-full aspect-video xl:h-80 ">
                   <img
                     src={imageBaseUrl + clinicDetails?.banner_img_url}
                     className="w-full h-full object-cover"

@@ -110,6 +110,8 @@ const ModalPage = ({
     }
   };
 
+  console.log(allPlans);
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -228,25 +230,117 @@ const ModalPage = ({
                             <div className="mt-5 text-slate- 800 dark:text-slate-300">
                               Available Plans:
                             </div>
-                            <div className="mt-2 flex gap-3 items-start flex-wrap sm:flex-nowrap">
+                            <div className="mt-5 grid place-items-center sm:grid-cols-2 gap-7 sm:gap-3 ">
                               {allPlans.length > 0 ? (
                                 <>
-                                  {allPlans.map((plan) => (
+                                  {allPlans?.map((plan) => (
                                     <div
-                                      key={plan.plan_id}
-                                      className="w-full"
+                                      key={plan?.plan_id}
+                                      className={`border ${
+                                        selectedPlan === plan?.plan_id
+                                          ? "border-[#006241]"
+                                          : "dark:border-slate-800"
+                                      } py-4 px-2 rounded-md cursor-pointer w-full min-h-[19.5rem] max-w-64 relative`}
                                       onClick={() =>
                                         handlePlanSelection(plan?.plan_id)
                                       }
                                     >
-                                      <div
-                                        className={`border ${
-                                          selectedPlan === plan?.plan_id
-                                            ? "border-[#006241]"
-                                            : "dark:border-slate-800"
-                                        } py-4 px-2 rounded-lg flex items-center cursor-pointer`}
-                                      >
-                                        <div
+                                      {plan?.plan_name === "Monthly" ? (
+                                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-800 px-5 py-1 rounded-sm text-white text-xs font-bold">
+                                          Basic Plan
+                                        </div>
+                                      ) : (
+                                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-600 px-4 py-1 rounded-sm text-white text-xs font-bold">
+                                          Premium Plan
+                                        </div>
+                                      )}
+
+                                      {plan?.plan_name === "Monthly" ? (
+                                        <div className="flex flex-col items-center w-full h-full">
+                                          <img
+                                            src="/assets/images/stethoscope.png"
+                                            alt="stethoscope"
+                                            className="h-20"
+                                          />
+                                          <div>
+                                            <span className="line-through text-xs text-slate text-opacity-20 text-slate-950">
+                                              ₹ 499
+                                            </span>
+                                            <span className="text-2xl font-bold">
+                                              ₹ 199
+                                            </span>
+                                            <span className="text-xs">
+                                              /Month
+                                            </span>
+                                          </div>
+                                          <div className="text-center font-bold mt-5">
+                                            Basic <br /> Dashboards
+                                          </div>
+                                          <button
+                                            type="button"
+                                            className="bg-blue-700 w-full rounded-sm text-white text-sm font-bold py-1 mt-16"
+                                          >
+                                            Select
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <div className="flex flex-col items-center">
+                                          <img
+                                            src="/assets/images/stethoscope_group.png"
+                                            alt="stethoscope"
+                                            className="h-20 "
+                                          />
+                                          <div className="sm:text-[25px]">
+                                            <span className="line-through text-xs text-slate text-opacity-20 text-slate-950">
+                                              ₹ 999
+                                            </span>
+                                            <span className="text-2xl font-bold text-yellow-600">
+                                              ₹ 499
+                                            </span>
+                                            <span className="text-xs">
+                                              /Year
+                                            </span>
+                                          </div>
+                                          <div className="text-left text-[10px] pl-3 ">
+                                            <ul className="list-disc ">
+                                              <li>
+                                                linic waiting area screen for
+                                                token number and consulting room
+                                                (Voice over).
+                                              </li>
+                                            </ul>
+                                            <ul className="list-disc">
+                                              <li>
+                                                {" "}
+                                                Bulk Cancel or Day cancel
+                                                option. Pro Dashboards (Trend
+                                                reports, forecasted cash in
+                                                flow(Account admin)).
+                                              </li>
+                                            </ul>
+                                            <ul className="list-disc">
+                                              <li>
+                                                {" "}
+                                                Digital prescription sent by SMS
+                                                and Email.
+                                              </li>
+                                            </ul>
+                                            <ul className="list-disc">
+                                              <li> Patient clinic history.</li>
+                                            </ul>
+                                          </div>
+                                          <button
+                                            type="button"
+                                            className="bg-blue-700 w-full rounded-sm mt-5 text-white text-sm font-bold py-1"
+                                          >
+                                            Select
+                                          </button>
+                                        </div>
+                                      )}
+                                      {/* <div className={`${selectedPlan === plan?.plan_id ? "/assets/images/stethoscope.png w-10" : "/assets/images/stethoscope_group.png w-10" }`}> */}
+
+                                      {/* </div> */}
+                                      {/* <div
                                           className={`w-5 h-5 rounded-full border p-0.5 ${
                                             selectedPlan === plan?.plan_id
                                               ? "border-[#006241]"
@@ -259,8 +353,8 @@ const ModalPage = ({
                                               "bg-[#006241]"
                                             } rounded-full`}
                                           />
-                                        </div>
-                                        <div>
+                                        </div> */}
+                                      {/* <div>
                                           <h3 className="text-lg font-semibold">
                                             {plan.plan_name}
                                           </h3>
@@ -280,8 +374,7 @@ const ModalPage = ({
                                               {plan.frequency_in_days} days
                                             </p>
                                           </div>
-                                        </div>
-                                      </div>
+                                        </div> */}
                                     </div>
                                   ))}
                                 </>

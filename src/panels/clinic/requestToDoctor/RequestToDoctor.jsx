@@ -9,7 +9,7 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { useNavigate } from "react-router-dom";
-import NetworkHandler from "../../../utils/NetworkHandler";
+import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { UserContext } from "../../../contexts/UseContext";
 import ModalRequests from "./ModalRequests";
 
@@ -57,6 +57,7 @@ const Requests = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/veiwRequest/${clinicId}?page=${page}&pageSize=${pageSize}`
       );
+      console.log(response);
       setTotalRequests(response?.data?.allRequest?.count);
       setAllRequests(response?.data?.allRequest?.rows);
 
@@ -116,6 +117,20 @@ const Requests = () => {
                   accessor: "doctor_clinic_id",
                   title: "No.",
                   render: (row, rowIndex) => rowIndex + 1,
+                },
+                {
+                  accessor: "Doctor.photo",
+                  title: "Photo",
+                  render: (row) =>
+                    row?.Doctor?.photo ? (
+                      <img
+                        src={imageBaseUrl + row?.Doctor?.photo}
+                        alt="Doctor's photo"
+                        className="w-10 h-10 rounded-[50%]"
+                      />
+                    ) : (
+                      "---"
+                    ),
                 },
                 {
                   accessor: "Doctor.name",

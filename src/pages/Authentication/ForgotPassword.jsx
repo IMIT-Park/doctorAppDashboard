@@ -31,18 +31,20 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!email) {
+      showMessage("Please Enter your Email", "warning");
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await fetch(
-        `${baseUrl}/v1/auth/forgotPasword`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ user_name: email }),
-        }
-      );
+      const response = await fetch(`${baseUrl}/v1/auth/forgotPasword`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_name: email }),
+      });
 
       console.log(response);
 

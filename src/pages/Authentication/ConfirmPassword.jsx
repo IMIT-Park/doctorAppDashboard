@@ -22,6 +22,7 @@ const LoginBoxed = () => {
   const themeConfig = useSelector((state) => state.themeConfig);
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [data, setData] = useState({ newPassword: "", confirmPassword: "" });
   const [showAlert, setShowAlert] = useState({
     show: false,
@@ -95,19 +96,16 @@ const LoginBoxed = () => {
     }
 
     try {
-      const response = await fetch(
-        `${baseUrl}/v1/auth/updatePassword`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            newpassword: data.newPassword,
-            token: token,
-          }),
-        }
-      );
+      const response = await fetch(`${baseUrl}/v1/auth/updatePassword`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          newpassword: data.newPassword,
+          token: token,
+        }),
+      });
       console.log(response);
       if (response.status === 201) {
         setShowAlert({
@@ -269,7 +267,7 @@ const LoginBoxed = () => {
                   >
                     <input
                       id="ConfirmPassword"
-                      type={showPassword ? "text" : "password"}
+                      type={showConfirmPassword ? "text" : "password"}
                       placeholder="Confirm Password"
                       className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
                       value={data.confirmPassword}
@@ -282,11 +280,15 @@ const LoginBoxed = () => {
                       <IconLockDots fill={true} />
                     </span>
                     <span
-                      title={showPassword ? "hide password" : "show password"}
+                      title={
+                        showConfirmPassword ? "hide password" : "show password"
+                      }
                       className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                     >
-                      {showPassword ? <IconEye /> : <IconCloseEye />}
+                      {showConfirmPassword ? <IconEye /> : <IconCloseEye />}
                     </span>
                   </div>
                   {notMatch && (

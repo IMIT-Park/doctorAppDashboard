@@ -223,6 +223,9 @@ const ClinicDoctor = () => {
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchData);
 
+
+    console.log(allDoctors);
+
   return (
     <div>
       <ScrollToTop />
@@ -317,6 +320,7 @@ const ClinicDoctor = () => {
                 },
 
                 { accessor: "name", title: "Name" },
+                { accessor: "email", title: "Email" },
                 { accessor: "phone", title: "Phone" },
                 { accessor: "gender", title: "Gender" },
                 {
@@ -324,8 +328,8 @@ const ClinicDoctor = () => {
                   title: "Date of Birth",
                   render: (row) => formatDate(row?.dateOfBirth),
                 },
-                { accessor: "qualification", title: "Qualification" },
-                { accessor: "specialization", title: "Specialization" },
+                { accessor: "qualification", title: "Qualification" ,textAlignment:"center"},
+                { accessor: "specialization", title: "Specialization",textAlignment:"center" },
                 { accessor: "address", title: "Address" },
                 { accessor: "fees", title: "Fees" },
                 {

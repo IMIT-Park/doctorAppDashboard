@@ -1,10 +1,11 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
 import { formatTime } from "../../../utils/formatTime";
+import { formatDate } from "../../../utils/formatDate";
 
 const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
   const [leaveType, setLeaveType] = useState("Full Day");
@@ -29,13 +30,20 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
 
   // Function to reset the form
   const resetForm = () => {
+    setLeaveType("Full Day");
     setSelectedDate("");
     setStartDate("");
     setEndDate("");
     setErrorMessage("");
     setTimeSlots([]);
-    // setSelectedTimeSlots([]);
+    setSelectedTimeSlots([]);
   };
+
+  useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+  }, [open]);
 
   // Handle date change to fetch time slots
   const handleDateChange = async (e) => {
@@ -44,25 +52,23 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
     setErrorMessage("");
     setTimeSlots([]);
     setLoading(true);
-    console.log("Selected Date:", date);
 
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/leave/getTimeSlot/${doctorId}`,
         { date }
       );
-      console.log("API Response:", response.data);
 
-      if (response.data.doctorTimeSlots.count === 0) {
+      if (response?.data?.doctorTimeSlots?.count === 0) {
         setErrorMessage("No Timeslots found for this day");
       } else {
         // Filter time slots based on clinicId
-        const filteredTimeSlots = response.data.doctorTimeSlots.rows.filter(
-          (slot) => slot.clinic_id === clinicId
+        const filteredTimeSlots = response?.data?.doctorTimeSlots?.rows?.filter(
+          (slot) => slot?.clinic_id === clinicId
         );
 
-        if (filteredTimeSlots.length === 0) {
-          setErrorMessage("No Timeslots found for this clinic on this day");
+        if (filteredTimeSlots?.length === 0) {
+          setErrorMessage("No Timeslots found for this day");
         } else {
           setTimeSlots(filteredTimeSlots);
         }
@@ -107,7 +113,13 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
         return;
       }
       if (leaveType === "Full Day" && !selectedDate) {
-        showMessage("Select a date for leave", "error");
+        showMessage("Select a date for leave", "warning");
+        setButtonLoading(false);
+        return;
+      }
+
+      if (leaveType === "Full Day" && !timeSlots?.length) {
+        showMessage("No slots found for this day", "warning");
         setButtonLoading(false);
         return;
       }
@@ -164,6 +176,7 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
       setButtonLoading(false);
     }
   };
+
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -256,27 +269,33 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                       </label>
                     </div>
                     {leaveType === "Full Day" && (
-                      <div className="mb-8 flex items-center flex-col md:flex-row justify-between gap-8">
-                        <div className="w-full">
+                      <div className="mb-8 flex items-start flex-col">
+                        <div className="w-full md:w-1/2">
                           <label htmlFor="Date">Date</label>
                           <input
                             id="Date"
                             type="date"
-                            className="form-input"
+                            className="form-input form-input-green"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
                             disabled={loading}
                           />
                         </div>
-                        <div className="w-full mt-5">
+                        <div className="w-full mt-2">
                           {loading ? (
-                            <div className="flex  items-center">
+                            <div className="flex items-center">
                               <IconLoader className="animate-spin" />
                             </div>
+                          ) : errorMessage ? (
+                            <div className="text-red-500 mt-2">
+                              {errorMessage}
+                            </div>
                           ) : (
-                            errorMessage && (
-                              <div className="text-red-500 mt-2">
-                                {errorMessage}
+                            selectedDate &&
+                            timeSlots?.length > 0 && (
+                              <div className="text-slate-200 mt-2">
+                                You want to add Fullday leave on{" "}
+                                {formatDate(selectedDate)}
                               </div>
                             )
                           )}
@@ -327,41 +346,40 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                             disabled={loading}
                           />
                           {loading ? (
-                            <div className="flex  items-center mt-2">
+                            <div className="flex items-center mt-4">
                               <IconLoader className="animate-spin" />
                             </div>
                           ) : (
                             errorMessage && (
-                              <div className="text-red-500 mt-2">
+                              <div className="text-red-500 mt-4">
                                 {errorMessage}
                               </div>
                             )
                           )}
                         </div>
                         <div className="w-full">
-                          {timeSlots.length > 0 && (
+                          {timeSlots?.length > 0 && (
                             <div className="mt-5 w-full">
                               <label className="block mb-2">
-                                Doctor Time Slots:
+                                Select Time Slots:
                               </label>
                               <div className="flex flex-wrap mt-2">
-                                {timeSlots.map((slot) => (
+                                {timeSlots?.map((slot) => (
                                   <div
                                     key={slot.DoctorTimeSlot_id}
                                     className="flex items-center mb-2"
                                   >
                                     <input
                                       type="checkbox"
-                                      id={`slot-${slot.DoctorTimeSlot_id}`}
+                                      id={`slot-${slot?.DoctorTimeSlot_id}`}
                                       value={slot.DoctorTimeSlot_id}
                                       className="form-checkbox mr-2 ml-2"
                                       onChange={handleTimeSlotChange}
                                     />
                                     <label
-                                      htmlFor={`slot-${slot.DoctorTimeSlot_id}`}
+                                      htmlFor={`slot-${slot?.DoctorTimeSlot_id}`}
                                       className="badge badge-outline-dark text-gray-500 p-2 text-lg"
                                     >
-                                      {getDayName(slot.day_id)}:{" "}
                                       {formatTime(slot.startTime)} -{" "}
                                       {formatTime(slot.endTime)}
                                     </label>
@@ -383,7 +401,7 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                         Cancel
                       </button>
                       <button
-                        type="submit" // Change to type="submit" to trigger handleSubmit
+                        type="submit"
                         className="btn btn-green ltr:ml-4 rtl:mr-4"
                         disabled={buttonLoading}
                       >

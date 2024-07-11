@@ -17,11 +17,10 @@ import AddLeave from "./AddLeaveModal";
 import AnimateHeight from "react-animate-height";
 import IconCaretDown from "../../../components/Icon/IconCaretDown";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
-
 import { formatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
 import DeleteLeaveModal from "./DeleteLeaveModal";
-
+import DeleteLeave from "../../../pages/DoctorSingleView/components/DeleteLeave";
 
 const ClinicDoctorLeave = () => {
   const dispatch = useDispatch();
@@ -72,14 +71,12 @@ const ClinicDoctorLeave = () => {
   // Get Leave by Clinic
   const fetchLeaveData = async () => {
     const clinicId = userData?.UserClinic[0]?.clinic_id;
-    console.log(clinicId);
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/leave/getleave/${clinicId}`
       );
-      console.log(response);
-      // setTotalLeaves(response.data?.count);
-      setAllLeaves(response.data?.leaveDetails);
+
+      setAllLeaves(response.data?.leaveDetails || []);
 
       setLoading(false);
     } catch (error) {
@@ -129,10 +126,10 @@ const ClinicDoctorLeave = () => {
     fetchDoctorData();
   }, []);
 
-  const openDeleteLeaveModal = (leave) => {
-    setSelectedLeave(leave);
+  const openDeleteLeaveModal = (leave, leaveDate) => {
+    const leaveWithDate = { ...leave, leave_date: leaveDate };
+    setSelectedLeave(leaveWithDate);
     setDeleteLeaveModal(true);
-    console.log(leave);
   };
 
   const closeDeleteLeaveModal = () => {
@@ -153,47 +150,21 @@ const ClinicDoctorLeave = () => {
             </h5>
           </div>
 
-          <div>
-            <form
-              onSubmit={(e) => handleSubmit(e)}
-              className="mx-auto w-full mb-2"
-            >
-              <div className="relative">
-                <input
-                  type="text"
-                  value={search}
-                  placeholder="Search Doctor..."
-                  className="form-input shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  className="btn btn-primary absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
-                >
-                  <IconSearch className="mx-auto" />
-                </button>
-              </div>
-            </form>
-          </div>
-
           <div className="flex  text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <Tippy content="Click to Add Doctor">
-              <button
-                type="button"
-                className="btn btn-green"
-                onClick={openAddLeaveModal}
-              >
-                <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
-                New Leave
-              </button>
-            </Tippy>
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={openAddLeaveModal}
+            >
+              <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
+              New Leave
+            </button>
           </div>
         </div>
 
-        {/* basic */}
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
-        ) : allLeaves.length === 0 ? (
+        ) : allLeaves && allLeaves?.length === 0 ? (
           <div className="flex flex-col items-center justify-center">
             <img src={emptyBox} alt="" className="w-10" />
             <p className="text-gray-500 dark:text-white-dark mt-4">
@@ -204,7 +175,7 @@ const ClinicDoctorLeave = () => {
           <div className="panel" id="basic">
             <div className="mb-5">
               <div className="space-y-2 font-semibold">
-                {allLeaves.map((leaveDetail, index) => (
+                {allLeaves?.map((leaveDetail, index) => (
                   <div
                     key={index}
                     className="border border-[#d3d3d3] rounded dark:border-[#1b2e4b]"
@@ -218,7 +189,7 @@ const ClinicDoctorLeave = () => {
                       }`}
                       onClick={() => togglePara(index)}
                     >
-                      {formatDate(new Date(leaveDetail.date))}
+                      {formatDate(leaveDetail?.date)}
 
                       <div
                         className={`ltr:ml-auto rtl:mr-auto ${
@@ -234,45 +205,50 @@ const ClinicDoctorLeave = () => {
                         height={active === index ? "auto" : 0}
                       >
                         <div className="p-4 text-white-dark text-[15px] border-t border-[#D3D3D3] dark:border-[#1B2E4B] flex items-center justify-start flex-wrap gap-3 sm:gap-4">
-                          {leaveDetail.doctors.map((doctor, docIndex) => (
+                          {leaveDetail?.doctors?.map((doctor, docIndex) => (
                             <div
                               key={docIndex}
-                              className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
+                              className="flex flex-col items-start gap-2 border border-slate-300 dark:border-slate-500 pt-4 pl-3 pr-2 pb-2 rounded w-full max-w-[350px]"
                             >
-                              <Tippy content="Delete Leave">
-                                <button
-                                  type="button"
-                                  className="btn btn-dark w-9 h-9 p-0 rounded-full ml-auto"
-                                  onClick={() => openDeleteLeaveModal(leaveDetail)}
-                                >
-                                  <IconTrashLines />
-                                </button>
-                              </Tippy>
+                              <button
+                                type="button"
+                                className="btn btn-danger btn-sm rounded py-1 min-w-10 sm:min-w-20 ml-auto"
+                                onClick={() =>
+                                  openDeleteLeaveModal(
+                                    doctor,
+                                    leaveDetail?.date
+                                  )
+                                }
+                              >
+                                Delete
+                              </button>
 
-                              <div className="flex items-center gap-1 mt-3">
-                                <p>Dr.Name : </p>{" "}
-                                <div className="text-slate-700 dark:text-slate-300">
-                                  {doctor.doctor_name}
+                              <div className="flex items-start gap-1 flex-wrap mt-3">
+                                <p className="min-w-[75px]">Dr.Name : </p>{" "}
+                                <div className="text-slate-700 dark:text-slate-300 capitalize">
+                                  {doctor?.doctor_name}
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1">
-                                Duration :
+                              <div className="flex items-start gap-1 flex-wrap">
+                                <p className="min-w-[75px]">Duration :</p>
                                 <div className="text-slate-700 dark:text-slate-300">
-                                  {doctor.fullday ? "Full Day" : "By Shift"}
+                                  {doctor?.fullday ? "Full Day" : "By Shift"}
                                 </div>{" "}
                               </div>
-                              {doctor.leaves.map((leave, leaveIndex) => (
-                                <span
-                                  key={leaveIndex}
-                                  className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded mb-2"
-                                >
-                                  {/* {formatDate(leave.leave_date)} :{" "} */}
-                                  {formatTime(
-                                    leave.DoctorTimeSlot.startTime
-                                  )} -{" "}
-                                  {formatTime(leave.DoctorTimeSlot.endTime)}
-                                </span>
-                              ))}
+                              <div className="w-full flex items-start flex-wrap gap-2">
+                                {doctor?.leaves?.map((leave, leaveIndex) => (
+                                  <span
+                                    key={leaveIndex}
+                                    className="text-[#006241] text-xs sm:text-sm border border-[#006241] py-1 rounded min-w-[130px] sm:min-w-40 text-center"
+                                  >
+                                    {formatTime(
+                                      leave?.DoctorTimeSlot?.startTime
+                                    )}{" "}
+                                    -{" "}
+                                    {formatTime(leave?.DoctorTimeSlot?.endTime)}
+                                  </span>
+                                ))}
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -294,11 +270,18 @@ const ClinicDoctorLeave = () => {
         fetchLeaveData={fetchLeaveData}
       />
 
-      <DeleteLeaveModal
+      {/* <DeleteLeaveModal
         open={deleteLeaveModal}
         closeModal={closeDeleteLeaveModal}
-        buttonLoading={buttonLoading}
         leave={selectedLeave}
+        fetchLeaveData={fetchLeaveData}
+        selectedTimeSlots={selectedTimeSlots}
+        setSelectedTimeSlots={setSelectedTimeSlots}
+      /> */}
+      <DeleteLeave
+        open={deleteLeaveModal}
+        closeModal={closeDeleteLeaveModal}
+        leaveData={selectedLeave}
         fetchLeaveData={fetchLeaveData}
         selectedTimeSlots={selectedTimeSlots}
         setSelectedTimeSlots={setSelectedTimeSlots}

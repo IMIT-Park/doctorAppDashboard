@@ -63,7 +63,7 @@ const LoginBoxed = () => {
     if (!data.email && !data.password) {
       setShowAlert({
         show: true,
-        message: "Please enter your email and password.",
+        message: "Please enter your username and password.",
         type: "warning",
       });
       setLoading(false);
@@ -73,7 +73,7 @@ const LoginBoxed = () => {
     if (!data.email) {
       setShowAlert({
         show: true,
-        message: "Please enter your Email.",
+        message: "Please enter your Username.",
         type: "warning",
       });
       setLoading(false);
@@ -130,6 +130,8 @@ const LoginBoxed = () => {
         } else {
           navigate("/admin/dashboard");
         }
+
+        setData({ ...data, email: "", password: "" });
       } else if (response.status === 401) {
         setShowAlert({
           show: true,
@@ -140,7 +142,7 @@ const LoginBoxed = () => {
       } else {
         setShowAlert({
           show: true,
-          message: "Incorrect email or password. Please try again.",
+          message: "Incorrect username or password. Please try again.",
           type: "danger",
         });
       }

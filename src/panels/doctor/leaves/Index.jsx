@@ -125,6 +125,8 @@ const DoctorLeaves = () => {
     setSelectedLeave(null);
   };
 
+  console.log(selectedLeave);
+
   return (
     <div>
       <ScrollToTop />
@@ -238,7 +240,7 @@ const DoctorLeaves = () => {
 
                             <button
                               type="button"
-                              className="btn btn-danger btn-sm rounded-sm py-1 min-w-10 sm:min-w-24"
+                              className="btn btn-danger btn-sm rounded py-1 min-w-10 sm:min-w-24"
                               title="Delete leave"
                               onClick={() => openDeleteLeaveModal(leave)}
                             >
@@ -251,7 +253,7 @@ const DoctorLeaves = () => {
                   )}
                 </>
               ) : (
-                <div className="text-xs text-gray-600">
+                <div className="text-xs text-gray-600 flex justify-center flex-col items-center h-40">
                   <span className="mb-2">
                     <img src={emptyBox} alt="" className="w-10" />
                   </span>

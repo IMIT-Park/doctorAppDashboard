@@ -16,12 +16,9 @@ import DeleteTimeslot from "../../../pages/DoctorSingleView/components/DeleteTim
 import DoctorDetailsEdit from "../../../pages/DoctorSingleView/components/DoctorDetailsEdit";
 import DoctorProfileEdit from "../../../pages/DoctorSingleView/components/DoctorProfileEdit";
 import DoctorTimeSlotEdit from "../../../pages/DoctorSingleView/components/DoctorTimeSlotEdit";
-import AddLeave from "../../../pages/DoctorSingleView/components/AddLeave";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import "tippy.js/dist/tippy.css";
 import useFetchData from "../../../customHooks/useFetchData";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import DeleteLeave from "../../../pages/DoctorSingleView/components/DeleteLeave";
 import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomButton from "../../../components/CustomButton";
@@ -74,10 +71,7 @@ const Profile = () => {
   });
   const [timeSlotId, setTimeSlotId] = useState("");
   const [doctorTimeSlots, setDoctorTimeSlots] = useState([]);
-  const [doctorLeaves, setDoctorLeaves] = useState([]);
   const [selectedDay, setSelectedDay] = useState("");
-  const [addLeaveModal, setAddLeaveModal] = useState(false);
-  const [deleteLeaveModal, setDeleteLeaveModal] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
 
@@ -134,39 +128,17 @@ const Profile = () => {
         setDoctorTimeSlots(response?.data?.timeslots?.rows);
       }
     } catch (error) {
+      setDoctorTimeSlots([]);
       setTimeslotsLoading(false);
       console.log(error);
     } finally {
       setTimeslotsLoading(false);
-    }
-  };
-
-  // fetch Leaves data function
-  const getDoctorLeaves = async () => {
-    setLeavesLoading(true);
-
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        "/v1/leave/getdrleave",
-        { doctor_id: doctorId, clinic_id: clinicId }
-      );
-
-      if (response.status === 201) {
-        setLeavesLoading(false);
-        setDoctorLeaves(response?.data?.leaveDetails);
-      }
-    } catch (error) {
-      setLeavesLoading(false);
-      console.log(error);
-    } finally {
-      setLeavesLoading(false);
     }
   };
 
   useEffect(() => {
     if (clinicId) {
       getDoctorTimeslots();
-      getDoctorLeaves();
     }
   }, [clinicId]);
 
@@ -471,31 +443,9 @@ const Profile = () => {
     timeSlotsByDay[timeslot.day_id].push(timeslot);
   });
 
-  const openAddLeaveModal = () => {
-    setAddLeaveModal(true);
-  };
-
-  const closeAddLeaveModal = () => {
-    setAddLeaveModal(false);
-  };
-
-  const openDeleteLeaveModal = (leave) => {
-    setSelectedLeave(leave);
-    setDeleteLeaveModal(true);
-    console.log(leave);
-  };
-
-  const closeDeleteLeaveModal = () => {
-    setDeleteLeaveModal(false);
-    setSelectedTimeSlots([]);
-    setSelectedLeave(null);
-  };
-
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchDoctorData);
-
-  console.log(doctorLeaves);
 
   return (
     <div>
@@ -642,6 +592,21 @@ const Profile = () => {
               </div>
             </div> */}
             <div className="flex flex-wrap gap-10 md:pr-20">
+              <div className="absolute top-3 right-3 sm:right-5">
+                <CustomSwitch
+                  checked={doctorDetails?.status}
+                  onChange={() =>
+                    showDoctorAlert(
+                      doctorDetails?.user_id,
+                      doctorDetails?.status ? "block" : "activate",
+                      "doctor"
+                    )
+                  }
+                  tooltipText={doctorDetails?.status ? "Block" : "Unblock"}
+                  uniqueId={`doctor${doctorDetails?.clinic_id}`}
+                  size="large"
+                />
+              </div>
               <div className="relative flex flex-col items-center gap-2">
                 {doctorDetails?.photo ? (
                   <img
@@ -972,26 +937,6 @@ const Profile = () => {
         buttonLoading={buttonLoading}
         handleSubmit={deleteDoctorTimeSlot}
       />
-
-      {/* add leave modal */}
-      {/* <AddLeave
-        open={addLeaveModal}
-        closeModal={closeAddLeaveModal}
-        // buttonLoading={buttonLoading}
-        clinicId={clinicId}
-        doctorId={doctorId}
-        fetchLeaveData={getDoctorLeaves}
-      /> */}
-
-      {/* <DeleteLeave
-        open={deleteLeaveModal}
-        closeModal={closeDeleteLeaveModal}
-        buttonLoading={buttonLoading}
-        leave={selectedLeave}
-        fetchLeaveData={getDoctorLeaves}
-        selectedTimeSlots={selectedTimeSlots}
-        setSelectedTimeSlots={setSelectedTimeSlots}
-      /> */}
     </div>
   );
 };

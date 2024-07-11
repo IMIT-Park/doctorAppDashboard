@@ -87,7 +87,6 @@ const DeleteLeaveModal = ({
       console.error("Delete error:", error);
     }
   };
-  console.log("selectedTimeSlots", selectedTimeSlots);
 
   return (
     <Transition appear show={open} as={Fragment}>

@@ -44,11 +44,11 @@ const SubscriptionPlans = () => {
           ) : (
             <>
               {allPlans && allPlans?.length ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-5">
+                <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-10 md:gap-5">
                   {allPlans?.map((plan, index) => (
                     <div
                       key={index}
-                      className="p-3 lg:p-5 border border-black dark:border-[#1b2e4b] text-center rounded group hover:border-green-900 max-h-fit relative"
+                      className="p-3 lg:p-5 border border-black dark:border-[#1b2e4b] text-center rounded group hover:border-green-900  relative"
                     >
                       {/* <h3 className="text-xl lg:text-2xl">
                         {plan?.plan_name || ""}
@@ -58,17 +58,17 @@ const SubscriptionPlans = () => {
                         {plan.description ||
                           "For people who are starting out in the water saving business"}
                       </p> */}
-                       {plan?.plan_name === "Monthly" ? (
-                                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-800 px-8 py-1 rounded-sm text-white text-sm font-bold">
-                                          Basic Plan
-                                        </div>
-                                      ) : (
-                                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-600 px-7 py-1 rounded-sm text-white text-sm font-bold">
-                                          Premium Plan
-                                        </div>
-                                      )}
                       {plan?.plan_name === "Monthly" ? (
-                        <div className="flex flex-col ">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-800 px-8 py-1 rounded-sm text-white text-sm font-bold">
+                          Basic Plan
+                        </div>
+                      ) : (
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-600 px-7 py-1 rounded-sm text-white text-sm font-bold">
+                          Premium Plan
+                        </div>
+                      )}
+                      {plan?.plan_name === "Monthly" ? (
+                        <div className="flex flex-col h-full">
                           <div className="flex justify-center">
                             <img
                               className="h-40"
@@ -83,18 +83,18 @@ const SubscriptionPlans = () => {
                             <span className="text-4xl font-bold">₹ 199</span>
                             <span className="text-sm font-bold">/Month</span>
                           </div>
-                          <div className="text-center font-bold mt-5 text-xl">
+                          <div className="text-center font-bold mt-3 md:mt-10 text-xl">
                             Basic <br /> Dashboards
                           </div>
                           <button
                             type="button"
-                            className="bg-blue-700 w-full rounded-sm  text-white text-lg font-bold py-2 mt-5"
+                            className="bg-blue-700 w-full rounded-sm  text-white text-lg font-bold py-2 mt-5 md:mt-auto"
                           >
                             Select
                           </button>
                         </div>
                       ) : (
-                        <div className="flex flex-col">
+                        <div className="flex flex-col h-full">
                           <div className="flex justify-center pt-4">
                             <img
                               className="h-40"
@@ -111,7 +111,7 @@ const SubscriptionPlans = () => {
                             </span>
                             <span className="text-sm font-bold">/Year</span>
                           </div>
-                          <div className="text-left text-xs pl-3 ">
+                          <div className="text-left text-md pl-3 mt-5 md:mt-3">
                             <ul className="list-disc ">
                               <li>
                                 linic waiting area screen for token number and
@@ -138,7 +138,7 @@ const SubscriptionPlans = () => {
                           </div>
                           <button
                             type="button"
-                            className="bg-blue-700 w-full rounded-sm  text-white text-lg font-bold py-2"
+                            className="bg-blue-700 w-full rounded-sm  text-white text-lg font-bold py-2 mt-5 md:mt-2"
                           >
                             Select
                           </button>

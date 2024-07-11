@@ -142,16 +142,23 @@ const ModalPage = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                >
-                  <IconX />
-                </button>
-                <div className="text-lg  font-semibold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px] pb-1">
-                  Subscription Details
+              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-2xl text-black dark:text-white-dark">
+                <div className="flex items-center justify-between px-3 py-5">
+                  <div className="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c]">
+                    Subscription Details
+                  </div>
+                  <div className="flex items-center gap-5">
+                    <div className="bg-yellow-600 font-bold py-1 px-6 text-white rounded">
+                      Premium
+                    </div>
+                    <button
+                      type="button"
+                      onClick={closeModal}
+                      className="text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
+                    >
+                      <IconX />
+                    </button>
+                  </div>
                 </div>
                 {planLoading ? (
                   <IconLoader className="animate-[spin_2s_linear_infinite]  w-7 h-28 my-5 align-middle shrink-0 mx-auto" />
@@ -159,7 +166,41 @@ const ModalPage = ({
                   <>
                     {subscriptionData ? (
                       <>
-                        <div className="flex justify-between p-4 flex-wrap-reverse">
+                      <hr />
+                        <div className="px-10 pb-5">
+                          
+                          <div className="grid sm:grid-cols-2 gap-7 my-10">
+                            <div className="flex flex-col gap-5">
+                              <div>
+                                <div className="text-gray-400 font-bold text-sm sm:text-base">
+                                  Start Date
+                                </div>
+                                <div className="border border-gray-300 h-10 rounded flex items-center pl-4 text-sm sm:text-base">{formatDate(subscriptionData?.start_date)}</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-400 font-bold text-sm sm:text-base">
+                                  Next Billing Date
+                                </div>
+                                <div className="border border-gray-300 h-10 rounded flex items-center pl-4 text-sm sm:text-base">{formatDate(subscriptionData?.next_billing_date)}</div>
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-5">
+                              <div>
+                                <div className="text-gray-400 font-bold text-sm sm:text-base">
+                                  End Date
+                                </div>
+                                <div className="border border-gray-300 h-10 rounded flex items-center pl-4 text-sm sm:text-base">{formatDate(subscriptionData?.end_date)}</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-400 font-bold text-sm sm:text-base">
+                                  Price Per Doctor
+                                </div>
+                                <div className="border border-gray-300 h-10 rounded flex items-center pl-4 text-sm sm:text-base">₹{subscriptionData?.Plan?.price_per_doctor}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {/* <div className="flex justify-between p-4 flex-wrap-reverse">
                           <div className="flex items-center gap-1 sm:gap-2">
                             <div className="text-gray-500 min-w-[120px] flex justify-between">
                               Plan Name<span>:</span>{" "}
@@ -210,7 +251,7 @@ const ModalPage = ({
                               ₹{subscriptionData?.Plan?.price_per_doctor}
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                       </>
                     ) : (
                       <>
@@ -240,7 +281,7 @@ const ModalPage = ({
                                         selectedPlan === plan?.plan_id
                                           ? "border-[#006241]"
                                           : "dark:border-slate-800"
-                                      } py-4 px-2 rounded-md cursor-pointer w-full min-h-[19.5rem] max-w-64 relative`}
+                                      } py-2 px-2 rounded-md cursor-pointer w-full min-h-[15.5rem] max-w-70 h-full relative`}
                                       onClick={() =>
                                         handlePlanSelection(plan?.plan_id)
                                       }
@@ -256,7 +297,7 @@ const ModalPage = ({
                                       )}
 
                                       {plan?.plan_name === "Monthly" ? (
-                                        <div className="flex flex-col items-center w-full h-full">
+                                        <div className="flex flex-col items-center w-full h-full pt-5">
                                           <img
                                             src="/assets/images/stethoscope.png"
                                             alt="stethoscope"
@@ -278,13 +319,13 @@ const ModalPage = ({
                                           </div>
                                           <button
                                             type="button"
-                                            className="bg-blue-700 w-full rounded-sm text-white text-sm font-bold py-1 mt-16"
+                                            className="bg-blue-700 w-full rounded-sm text-white text-sm font-bold py-1 mt-auto"
                                           >
                                             Select
                                           </button>
                                         </div>
                                       ) : (
-                                        <div className="flex flex-col items-center">
+                                        <div className="flex flex-col items-center h-full pt-5">
                                           <img
                                             src="/assets/images/stethoscope_group.png"
                                             alt="stethoscope"
@@ -331,7 +372,7 @@ const ModalPage = ({
                                           </div>
                                           <button
                                             type="button"
-                                            className="bg-blue-700 w-full rounded-sm mt-5 text-white text-sm font-bold py-1"
+                                            className="bg-blue-700 w-full rounded-sm  text-white text-sm font-bold py-1 mt-auto"
                                           >
                                             Select
                                           </button>

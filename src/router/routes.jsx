@@ -271,15 +271,15 @@ const routes = [
 
   //ClinicPatientDetails
   {
-    path: "/clinic/booking/PatientDetails",
+    path: "/clinic/bookings/PatientDetails",
     element: <ClinicPatientDetails />,
     layout: "default",
   },
 
    //ClinicSelectDoctor
    {
-    path: "/clinic/booking/SelectorDoctor",
-    element: <ClinicPatientDetails />,
+    path: "/clinic/bookings/SelectorDoctor",
+    element: <ClinicSelectDoctor />,
     layout: "default",
   },
   // <--------------> clinic panel ends here <-------------->

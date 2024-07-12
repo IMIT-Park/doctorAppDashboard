@@ -79,16 +79,6 @@ const PatientDetails = () => {
   //   }));
   // };
 
-  const resetInput = () => {
-    setInput({
-      symptoms: "",
-      diagnosis: "",
-      prescription: "",
-      medicalTests: "",
-      notes: "",
-    });
-  };
-
   //Add addMedicalReport function
   const addMedicalReport = async (e) => {
     e.preventDefault();
@@ -118,7 +108,6 @@ const PatientDetails = () => {
       if (response.status === 201) {
         showMessage("Report added successfully.");
         fetchPatientDetails();
-        resetInput();
         setButtonLoading(false);
       } else {
         showMessage("Failed to add Report. Please try again.", "error");
@@ -147,7 +136,10 @@ const PatientDetails = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 403) {
-        showMessage("Only today's booking can be marked as complete.", "warning");
+        showMessage(
+          "Only today's booking can be marked as complete.",
+          "warning"
+        );
       } else {
         showMessage("An error occurred. Please try again.", "error");
       }
@@ -175,9 +167,10 @@ const PatientDetails = () => {
             <div className="border-t border-gray-300 dark:border-gray-600 flex-grow ml-2"></div>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <button type="button" className="btn btn-outline-primary mr-3">
+            <button className="btn btn-outline-primary mr-3 cursor-default hover:bg-transparent hover:text-primary ">
               {patientData?.type}
             </button>
+
             <CustomButton onClick={handleComplete} disabled={loading}>
               Completed
             </CustomButton>
@@ -382,6 +375,7 @@ const PatientDetails = () => {
                           }
                           className="form-input form-input-green bg-transparent"
                           required
+                          rows={10}
                         />
                       </div>
                       <div className="w-full">
@@ -397,6 +391,7 @@ const PatientDetails = () => {
                           className="form-input form-input-green bg-transparent"
                           autoComplete="off"
                           required
+                          rows={10}
                         />
                       </div>
                     </div>
@@ -445,6 +440,7 @@ const PatientDetails = () => {
                             id="diagnosis"
                             type="text"
                             value={record?.diagnosis}
+                            rows={8}
                             className="form-input form-input-green bg-transparent"
                             autoComplete="off"
                             readOnly
@@ -471,6 +467,7 @@ const PatientDetails = () => {
                             value={record?.prescription}
                             className="form-input form-input-green bg-transparent"
                             readOnly
+                            rows={10}
                           />
                         </div>
                         <div className="w-full">
@@ -482,6 +479,7 @@ const PatientDetails = () => {
                             className="form-input form-input-green bg-transparent"
                             autoComplete="off"
                             readOnly
+                            rows={10}
                           />
                         </div>
                       </div>

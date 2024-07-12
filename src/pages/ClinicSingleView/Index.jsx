@@ -14,7 +14,6 @@ import NetworkHandler, {
   imageBaseUrl,
   websiteUrl,
 } from "../../utils/NetworkHandler";
-import IconMenuContacts from "../../components/Icon/Menu/IconMenuContacts";
 import IconEdit from "../../components/Icon/IconEdit";
 import AddClinic from "../../panels/owner/clinics/AddClinic";
 import { formatDate } from "../../utils/formatDate";
@@ -25,16 +24,13 @@ import {
   handleGetLocation,
 } from "../../utils/getLocation";
 import useBlockUnblock from "../../utils/useBlockUnblock";
-// import QRCodeComponent from "../../components/QRCodeComponent";
+import QRCodeComponent from "../../components/QRCodeComponent";
 import useFetchData from "../../customHooks/useFetchData";
 import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
 import CustomButton from "../../components/CustomButton";
 import ModalSubscription from "../../panels/owner/clinics/ModalSubscription";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import IconCopy from "../../components/Icon/IconCopy";
-import QRCode from "qrcode.react";
-import IconDownload from "../../components/Icon/IconDownload";
+
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -335,19 +331,6 @@ const ClinicSingleView = () => {
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchDoctorData);
 
-  //QRCodeComponent
-  const downloadQRCode = () => {
-    const canvas = document.getElementById("qrcode-canvas");
-    const pngUrl = canvas
-      .toDataURL("image/png")
-      .replace("image/png", "image/octet-stream");
-    let downloadLink = document.createElement("a");
-    downloadLink.href = pngUrl;
-    downloadLink.download = "qrcode.png";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-  };
 
   return (
     <div>
@@ -394,42 +377,12 @@ const ClinicSingleView = () => {
                     alt="Banner"
                   />
                 </div>
-                {/* <div className="w-full flex items-start gap-3 flex-wrap mt-3">
-                  <div className="flex items-center gap-8 flex-wrap rounded mt-4 mb-5 w-full">
-                    <form className="flex items-center w-full">
-                      <input
-                        type="text"
-                        defaultValue={qrUrl}
-                        className="form-input form-input-green rounded w-full"
-                        readOnly
-                      />
-                      <div>
-                        <CopyToClipboard
-                          text={qrUrl}
-                          onCopy={(text, result) => {
-                            if (result) {
-                              showMessage("Copied Successfully");
-                            }
-                          }}
-                        >
-                          <button
-                            type="button"
-                            className="btn btn-green px-2 rounded lg:w-32 sm:w-24"
-                          >
-                            <IconCopy className="ltr:mr-2 rtl:ml-2" />
-                            Copy
-                          </button>
-                        </CopyToClipboard>
-                      </div>
-                    </form>
-                  </div>
-                </div> */}
               </div>
 
               <div className="w-full xl:w-1/2">
                 <div className="rounded-lg h-full mt-2 xl:mt-0 flex flex-col justify-between">
                   <div className="">
-                    <div className="text-2xl md:text-3xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
+                    <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
                       <div className=" w-full flex items-start justify-between">
                         {clinicDetails?.name || ""}
                         {!isSuperAdmin && (
@@ -443,7 +396,7 @@ const ClinicSingleView = () => {
                       </div>
                     </div>
                     <div className="flex flex-col gap-4">
-                      <div className="flex flex-col items-start gap-2">
+                      <div className="flex flex-col items-start gap-2 mt-0 xl:mt-3">
                         <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
                           Address:
                         </div>
@@ -455,7 +408,7 @@ const ClinicSingleView = () => {
                         />
                       </div>
 
-                      <div className="flex flex-col md:flex-row items-start gap-10 mt-0 xl:mt-3">
+                      <div className="flex flex-col md:flex-row items-start gap-10 mt-0">
                         <div className="flex flex-col items-start w-full md:w-1/2">
                           <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
                             Place:
@@ -480,7 +433,7 @@ const ClinicSingleView = () => {
                         </div>
                       </div>
 
-                      <div className="flex flex-col md:flex-row items-start gap-10 mt-0 xl:mt-3">
+                      <div className="flex flex-col md:flex-row items-start gap-10 mt-0">
                         <div className="flex flex-col items-start w-full md:w-1/2">
                           <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
                             Username:
@@ -506,106 +459,17 @@ const ClinicSingleView = () => {
                       </div>
                     </div>
                   </div>
-                  {/* <div className="flex flex-col md:flex-row px-2 gap-3 mt-4.5">
-                    <QRCode
-                      id="qrcode-canvas"
-                      value={qrUrl}
-                      size={220}
-                      style={{ display: "none" }}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-green w-full md:w-72 lg:text-sm max-lg:text-base md:text-sm sm:text-base mb-2 md:mb-0 md:px-2 sm:px-2 lg:px-0"
-                      onClick={downloadQRCode}
-                    >
-                      <IconDownload className="md:mr-2 lg:mr-1" />
-                      Download QRcode
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleGetLocation(clinicDetails?.googleLocation)
-                      }
-                      className="btn btn-green flex items-center gap-1 w-full md:w-72 md:text-sm lg:text-sm max-lg:text-base sm:text-base mb-2 md:mb-0 md:px-2 sm:px-2 lg:px-0"
-                    >
-                      <IconMenuContacts className="md:mr-2 lg:mr-0" />
-                      View Location
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-white text-green-600 border-green-600 w-full md:text-sm sm:text-base md:w-72 lg:text-sm max-lg:text-base shadow-sm md:px-2 sm:px-2 lg:px-0"
-                      onClick={openSubscriptionModal}
-                    >
-                      View Plan Details
-                    </button>
-                  </div> */}
                 </div>
               </div>
             </div>
-            <div className="flex flex-col md:flex-row w-full mt-5">
-              <div className="flex flex-col xl:flex-row items-start gap-3 w-full">
-                <div className="flex items-center flex-wrap rounded mt-4 mb-5 w-full xl:w-1/2">
-                  <form className="flex items-center w-full">
-                    <input
-                      type="text"
-                      defaultValue={qrUrl}
-                      className="form-input form-input-green rounded w-full"
-                      readOnly
-                    />
-                    <div className="">
-                      <CopyToClipboard
-                        text={qrUrl}
-                        onCopy={(text, result) => {
-                          if (result) {
-                            showMessage("Copied Successfully");
-                          }
-                        }}
-                      >
-                        <button
-                          type="button"
-                          className="btn btn-green rounded lg:w-32 sm:w-24"
-                        >
-                          <IconCopy className="ltr:mr-2 rtl:ml-2" />
-                          Copy
-                        </button>
-                      </CopyToClipboard>
-                    </div>
-                  </form>
-                </div>
-                <div className="flex flex-col md:flex-row gap-2 xl:w-1/2 w-full pl-2 p-0 mt-3.5 rounded sm:pb-2 md:pb-0 sm:pr-2">
-                  <QRCode
-                    id="qrcode-canvas"
-                    value={qrUrl}
-                    size={220}
-                    style={{ display: "none" }}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-green w-full md:w-72 gap-1 lg:text-base sm:text-sm mb-2 md:mb-0 lg:px-0"
-                    onClick={downloadQRCode}
-                  >
-                    <IconDownload className="md:mr-1 lg:mr-1" />
-                    Download QRcode
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleGetLocation(clinicDetails?.googleLocation)
-                    }
-                    className="btn btn-green flex items-center gap-1 w-full md:w-72 md:text-sm lg:text-sm max-lg:text-base sm:text-base mb-2 md:mb-0 md:px-2 sm:px-2 lg:px-0"
-                  >
-                    <IconMenuContacts className="md:mr-1 lg:mr-1" />
-                    View Location
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-white text-green-600 border-green-600 w-full md:text-sm sm:text-base md:w-72 lg:text-sm max-lg:text-base shadow-sm md:px-2 sm:px-2 lg:px-0"
-                    onClick={openSubscriptionModal}
-                  >
-                    View Plan Details
-                  </button>
-                </div>
-              </div>
+            <div>
+              <QRCodeComponent
+                qrUrl={qrUrl}
+                locationDetails={clinicDetails?.googleLocation}
+                clinicId={clinicId}
+                ownerId={ownerId}
+                fetchClinicData={fetchClinicData}
+              />
             </div>
           </>
         )}

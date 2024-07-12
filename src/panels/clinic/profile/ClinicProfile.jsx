@@ -27,6 +27,9 @@ import IconCopy from "../../../components/Icon/IconCopy";
 import QRCode from "qrcode.react";
 import IconDownload from "../../../components/Icon/IconDownload";
 import { Tab } from "@headlessui/react";
+import { DataTable } from "mantine-datatable";
+import emptyBox from "/assets/images/empty-box.svg";
+
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -60,6 +63,11 @@ const ClinicProfile = () => {
     defaultPicture: null,
     googleLocation: {},
   });
+
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [appointments, setAppointments] = useState([]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -178,9 +186,61 @@ const ClinicProfile = () => {
     fetchProfileData();
   }, []);
 
-  // block and unblock handler
-  const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
-    useBlockUnblock(fetchProfileData);
+  
+    useEffect(() => {
+      const fetchDoctors = async () => {
+        try {
+          const response = await NetworkHandler.makeGetRequest(
+            `/v1/doctor/getDoctorbyId/${clinicId}`
+          );
+          if (response.status === 200) {
+            setDoctors(response.data.doctors);
+          } else {
+            throw new Error("Failed to fetch doctors");
+          }
+        } catch (error) {
+          console.error("Error fetching doctors:", error);
+        }
+      };
+  
+      fetchDoctors();
+    }, [clinicId]);
+
+    const handleDoctorChange = (event) => {
+      setSelectedDoctor(event.target.value);
+    };
+  
+    const handleDateChange = (event) => {
+      setSelectedDate(event.target.value);
+    };
+
+    const fetchAppointments = async () => {
+      if (!selectedDoctor || !selectedDate) {
+        return;
+      }
+      try {
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/booking/getdoctordate/${selectedDoctor}`,
+          {
+            date: selectedDate,
+            clinic_id: clinicId,
+          }
+        );
+        if (response.status === 200) {
+          setAppointments(response.data.appointments);
+        } else {
+          throw new Error('Failed to fetch appointments');
+        }
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+      }
+    };
+  
+    useEffect(() => {
+      fetchAppointments();
+    }, [selectedDoctor, selectedDate]);
+  
+  
 
   return (
     <div>
@@ -403,17 +463,14 @@ const ClinicProfile = () => {
               id="ChooseDoctor"
               className="form-select text-white-dark bg-gray-200 rounded-full h-11 w-full"
               required
-              // onChange={handleDoctorChange}
+              onChange={handleDoctorChange}
             >
               <option value="">Select Doctors</option>
-              {/* {allDoctorNames.map((doctor) => (
-            // <option
-            //   key={doctor.doctor_id}
-            //   value={doctor.doctor_id}
-            // >
-            //   {doctor.name}
-            // </option>
-          ))} */}
+              {doctors.map((doctor) => (
+                <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                  {doctor.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -422,10 +479,9 @@ const ClinicProfile = () => {
               id="Date"
               type="date"
               className="form-input form-input-green w-full md:w-auto min-w-52 pr-2"
-              // value={selectedDate || ""}
-              // onChange={handleDateChange}
+              value={selectedDate}
+              onChange={handleDateChange}
               placeholder="Select date"
-              
             />
           </div>
 
@@ -456,6 +512,49 @@ const ClinicProfile = () => {
             </Tab>
           </Tab.List>
         </Tab.Group>
+
+        <div className="datatables mt-8">
+            <DataTable
+              noRecordsText="No Patients to show"
+              noRecordsIcon={
+                <span className="mb-2">
+                  <img src={emptyBox} alt="" className="w-10" />
+                </span>
+              }
+              mih={180}
+              highlightOnHover
+              className="whitespace-nowrap table-hover"
+              // records={}
+              // idAccessor="doctor_id"
+              // onRowClick={(row) =>
+              //   navigate(`/clinics/${clinicId}/${row?.doctor_id}`, {
+              //     state: { previousUrl: location?.pathname },
+              //   })
+              // }
+              columns={[
+                {
+                  accessor: "No",
+                  title: "No",
+                  // render: (row, rowIndex) => rowIndex + 1,
+                },
+
+              
+
+                { accessor: "name", title: "Name" },
+                { accessor: "phone", title: "Time" },
+                { accessor: "gender", title: "Gender" },
+              
+               
+                {
+                  accessor: "TokenNumber",
+                  title: "Token Number",
+                  // render: (row) => (row.visibility ? "Visible" : "Hidden"),
+                },
+               
+              ]}
+             
+            />
+          </div>
       </div>
 
       <AddClinic

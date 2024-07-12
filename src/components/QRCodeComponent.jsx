@@ -1,11 +1,30 @@
-import React from "react";
+import React,{useState} from "react";
 import QRCode from "qrcode.react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import IconDownload from "./Icon/IconDownload";
 import IconCopy from "./Icon/IconCopy";
 import { showMessage } from "../utils/showMessage";
+import { handleGetLocation } from "../utils/getLocation";
+import IconMenuContacts from "./Icon/Menu/IconMenuContacts";
+import ModalSubscription from "../panels/owner/clinics/ModalSubscription";
 
-const QRCodeComponent = ({ qrUrl }) => {
+const QRCodeComponent = ({ qrUrl, locationDetails, clinicId, ownerId, fetchClinicData }) => {
+
+  const [subscriptionModal, setsubscriptionModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [buttonLoading, setButtonLoading] = useState(false);
+
+
+  const openSubscriptionModal = () => {
+    console.log("iam working");
+    setsubscriptionModal(true);
+  };
+
+  const closeSubscriptionModal = () => {
+    setsubscriptionModal(false);
+    setSelectedPlan(null);
+  };
+
   const downloadQRCode = () => {
     const canvas = document.getElementById("qrcode-canvas");
     const pngUrl = canvas
@@ -20,49 +39,79 @@ const QRCodeComponent = ({ qrUrl }) => {
   };
 
   return (
-    <div className="w-fit flex items-start gap-3 flex-wrap ">
-      <div className="flex items-center gap-8 flex-wrap rounded mt-3">
-        <form className="flex items-center">
-          <input
-            type="text"
-            defaultValue={qrUrl}
-            className="form-input form-input-green rounded-none w-64"
-            readOnly
+    <div className="flex flex-col md:flex-row w-full mt-5">
+      <div className="flex flex-col xl:flex-row items-start gap-3 w-full">
+        <div className="flex items-center flex-wrap rounded mt-4 mb-5 w-full xl:w-1/2">
+          <form className="flex items-center w-full">
+            <input
+              type="text"
+              defaultValue={qrUrl}
+              className="form-input form-input-green rounded w-full"
+              readOnly
+            />
+            <div className="">
+              <CopyToClipboard
+                text={qrUrl}
+                onCopy={(text, result) => {
+                  if (result) {
+                    showMessage("Copied Successfully");
+                  }
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn btn-green rounded lg:w-32 sm:w-24"
+                >
+                  <IconCopy className="ltr:mr-2 rtl:ml-2" />
+                  Copy
+                </button>
+              </CopyToClipboard>
+            </div>
+          </form>
+        </div>
+        <div className="flex flex-col md:flex-row gap-2 xl:w-1/2 w-full pl-2 p-0 mt-3.5 rounded sm:pb-2 md:pb-0 sm:pr-2">
+          <QRCode
+            id="qrcode-canvas"
+            value={qrUrl}
+            size={220}
+            style={{ display: "none" }}
           />
-          <div>
-            <CopyToClipboard
-              text={qrUrl}
-              onCopy={(text, result) => {
-                if (result) {
-                  showMessage("Copied Successfully");
-                }
-              }}
-            >
-              <button type="button" className="btn btn-green px-2 rounded-none">
-                <IconCopy className="ltr:mr-2 rtl:ml-2" />
-                Copy
-              </button>
-            </CopyToClipboard>
-          </div>
-        </form>
-        <QRCode
-          id="qrcode-canvas"
-          value={qrUrl}
-          size={220}
-          style={{ display: "none" }}
-        />
-        <button
-          type="button"
-          className="btn btn-green w-52"
-          onClick={downloadQRCode}
-        >
-          <IconDownload className="mr-2" />
-          Download QR code
-        </button>
-        {/* <div className="bg-[#f1f2f3] p-2 rounded dark:bg-[#060818] w-full max-w-80"> */}
+          <button
+            type="button"
+            className="btn btn-green w-full md:w-72 gap-1 lg:text-sm sm:text-sm mb-2 md:mb-0 lg:px-0"
+            onClick={downloadQRCode}
+          >
+            <IconDownload className="md:mr-1 lg:mr-1" />
+            Download QRcode
+          </button>
+          <button
+            type="button"
+            onClick={() => handleGetLocation(locationDetails)}
+            className="btn btn-green flex items-center gap-1 w-full md:w-72 md:text-sm lg:text-sm max-lg:text-base sm:text-base mb-2 md:mb-0 md:px-2 sm:px-2 lg:px-0"
+          >
+            <IconMenuContacts className="md:mr-1 lg:mr-1" />
+            View Location
+          </button>
+          <button
+            type="button"
+            className="btn btn-white text-green-600 border-green-600 w-full md:text-sm sm:text-base md:w-72 lg:text-sm max-lg:text-base shadow-sm md:px-2 sm:px-2 lg:px-0"
+            onClick={openSubscriptionModal}
+          >
+            View Plan Details
+          </button>
+        </div>
       </div>
-
-      {/* </div> */}
+      <ModalSubscription
+        open={subscriptionModal}
+        closeModal={closeSubscriptionModal}
+        clinicId={clinicId}
+        ownerId={ownerId}
+        buttonLoading={buttonLoading}
+        setButtonLoading={setButtonLoading}
+        fetchClinicData={fetchClinicData}
+        selectedPlan={selectedPlan}
+        setSelectedPlan={setSelectedPlan}
+      />
     </div>
   );
 };

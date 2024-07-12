@@ -177,7 +177,6 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
     }
   };
 
-
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -293,9 +292,9 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                           ) : (
                             selectedDate &&
                             timeSlots?.length > 0 && (
-                              <div className="text-slate-200 mt-2">
+                              <div className="text-slate-800 mt-2 dark:text-slate-200">
                                 You want to add Fullday leave on{" "}
-                                {formatDate(selectedDate)}
+                                {formatDate(selectedDate)} ?
                               </div>
                             )
                           )}

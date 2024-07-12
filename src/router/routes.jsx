@@ -42,15 +42,12 @@ const OwnerChat = lazy(() => import("../panels/owner/chats/Index"));
 const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
 const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/index"));
 const ClinicLeaves = lazy(() => import("../panels/clinic/leaves/Index"));
+const ClinicProfile = lazy(() =>import("../panels/clinic/profile/ClinicProfile"));
+const RequestToDoctor = lazy(() =>import("../panels/clinic/requestToDoctor/RequestToDoctor"));
 const ClinicBookings = lazy(() => import("../panels/clinic/bookings/Index"));
+const ClinicPatientDetails = lazy(() => import("../panels/clinic/bookings/PatientDetails"));
+const ClinicSelectDoctor = lazy(() => import("../panels/clinic/bookings/SelectDoctor"));
 
-
-const ClinicProfile = lazy(() =>
-  import("../panels/clinic/profile/ClinicProfile")
-);
-const RequestToDoctor = lazy(() =>
-  import("../panels/clinic/requestToDoctor/RequestToDoctor")
-);
 // <--------------> clinic panel imports ends here <-------------->
 
 // <--------------> doctor panel imports starts here<-------------->
@@ -58,8 +55,12 @@ const DoctorIndex = lazy(() => import("../panels/doctor/Index"));
 const DoctorProfile = lazy(() => import("../panels/doctor/profile/Index"));
 const DoctorLeaves = lazy(() => import("../panels/doctor/leaves/Index"));
 const DoctorRequests = lazy(() => import("../panels/doctor/requests/Requests"));
-const DoctorAppointments = lazy(() => import("../panels/doctor/appointments/Index"));
-const DoctorAppointmentsDetails = lazy(() => import("../panels/doctor/appointments/PatientDetails"));
+const DoctorAppointments = lazy(() =>
+  import("../panels/doctor/appointments/Index")
+);
+const DoctorAppointmentsDetails = lazy(() =>
+  import("../panels/doctor/appointments/PatientDetails")
+);
 
 // <--------------> doctor panel imports ends here <-------------->
 
@@ -74,7 +75,9 @@ const SupportUserChats = lazy(() =>
   import("../panels/supportUser/chats/Index")
 );
 
-const SupportUserComplaints = lazy(() => import("../panels/supportUser/complaints/Index"));
+const SupportUserComplaints = lazy(() =>
+  import("../panels/supportUser/complaints/Index")
+);
 
 // <--------------> supportUser panel imports ends here <-------------->
 
@@ -252,7 +255,6 @@ const routes = [
     layout: "default",
   },
 
-
   // clinicprofile
   {
     path: "/clinic/profile",
@@ -264,6 +266,20 @@ const routes = [
   {
     path: "/clinic/requestToDoctor",
     element: <RequestToDoctor />,
+    layout: "default",
+  },
+
+  //ClinicPatientDetails
+  {
+    path: "/clinic/booking/PatientDetails",
+    element: <ClinicPatientDetails />,
+    layout: "default",
+  },
+
+   //ClinicSelectDoctor
+   {
+    path: "/clinic/booking/SelectorDoctor",
+    element: <ClinicPatientDetails />,
     layout: "default",
   },
   // <--------------> clinic panel ends here <-------------->
@@ -288,7 +304,7 @@ const routes = [
     element: <DoctorLeaves />,
     layout: "default",
   },
-  
+
   // doctorrequest
   {
     path: "/doctor/requests",
@@ -297,7 +313,7 @@ const routes = [
   },
 
   // DoctorAppointments
-   {
+  {
     path: "/doctor/appointments",
     element: <DoctorAppointments />,
     layout: "default",
@@ -305,12 +321,10 @@ const routes = [
 
   // DoctorAppointmentsDetails
   {
-    path:"/patient-details/:bookingId",
+    path: "/patient-details/:bookingId",
     element: <DoctorAppointmentsDetails />,
     layout: "default",
   },
-
-
 
   // <--------------> doctor panel ends here <-------------->
 

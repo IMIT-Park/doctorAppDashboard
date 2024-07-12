@@ -380,23 +380,23 @@ const ClinicSingleView = () => {
               </div>
 
               <div className="w-full xl:w-1/2">
-                <div className="rounded-lg h-full mt-2 xl:mt-0 flex flex-col justify-between">
+                <div className="rounded-lg h-full mt-2 xl:-mt-3 flex flex-col justify-between">
                   <div className="">
                     <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
-                      <div className=" w-full flex items-start justify-between">
+                      <div className=" w-full flex items-start justify-between h-16 mt-2">
                         {clinicDetails?.name || ""}
                         {!isSuperAdmin && (
                           <button
                             className="flex hover:text-info p-4"
                             onClick={openEditModal}
                           >
-                            <IconEdit className="w-6 h-6" />
+                            <IconEdit className="w-5 h-5" />
                           </button>
                         )}
                       </div>
                     </div>
                     <div className="flex flex-col gap-4">
-                      <div className="flex flex-col items-start gap-2 mt-0 xl:mt-3">
+                      <div className="flex flex-col items-start gap-2 mt-0 xl:mt-1">
                         <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
                           Address:
                         </div>

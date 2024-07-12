@@ -110,7 +110,7 @@ const ModalPage = ({
     }
   };
 
-  console.log(allPlans);
+  console.log(subscriptionData);
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -143,14 +143,24 @@ const ModalPage = ({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-2xl text-black dark:text-white-dark">
-                <div className="flex items-center justify-between px-3 py-5">
-                  <div className="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c]">
+                <div className="flex items-center justify-between px-3 py-5 border-b dark:border-slate-800">
+                  <div className="text-lg font-bold dark:text-slate-200">
                     Subscription Details
                   </div>
                   <div className="flex items-center gap-5">
-                    <div className="bg-yellow-600 font-bold py-1 px-6 text-white rounded">
-                      Premium
-                    </div>
+                    {subscriptionData && (
+                      <>
+                        {subscriptionData?.Plan?.plan_name === "Premium" ? (
+                          <div className="bg-yellow-600 text-center font-bold py-1 w-28 text-white rounded">
+                            Premium
+                          </div>
+                        ) : (
+                          <div className=" bg-green-800 text-center py-1 w-28 text-white rounded font-bold">
+                            Basic
+                          </div>
+                        )}
+                      </>
+                    )}
                     <button
                       type="button"
                       onClick={closeModal}
@@ -166,92 +176,49 @@ const ModalPage = ({
                   <>
                     {subscriptionData ? (
                       <>
-                      <hr />
                         <div className="px-10 pb-5">
-                          
-                          <div className="grid sm:grid-cols-2 gap-7 my-10">
-                            <div className="flex flex-col gap-5">
-                              <div>
-                                <div className="text-gray-400 font-bold text-sm sm:text-base">
+                          <div className="flex flex-col items-start gap-7 my-10">
+                            <div className="flex flex-col sm:flex-row gap-5 w-full">
+                              <div className="w-full">
+                                <div className="text-gray-400 font-normal text-sm sm:text-base mb-1">
                                   Start Date
                                 </div>
-                                <div className="border border-gray-300 h-10 rounded flex items-center pl-4 text-sm sm:text-base">{formatDate(subscriptionData?.start_date)}</div>
-                              </div>
-                              <div>
-                                <div className="text-gray-400 font-bold text-sm sm:text-base">
-                                  Next Billing Date
+                                <div className="border border-gray-300 dark:border-gray-700 h-10 rounded flex items-center pl-4 text-sm sm:text-base dark:text-slate-200">
+                                  {formatDate(subscriptionData?.start_date)}
                                 </div>
-                                <div className="border border-gray-300 h-10 rounded flex items-center pl-4 text-sm sm:text-base">{formatDate(subscriptionData?.next_billing_date)}</div>
                               </div>
-                            </div>
-                            <div className="flex flex-col gap-5">
-                              <div>
-                                <div className="text-gray-400 font-bold text-sm sm:text-base">
+
+                              <div className="w-full">
+                                <div className="text-gray-400 font-normal text-sm sm:text-base mb-1">
                                   End Date
                                 </div>
-                                <div className="border border-gray-300 h-10 rounded flex items-center pl-4 text-sm sm:text-base">{formatDate(subscriptionData?.end_date)}</div>
+                                <div className="border border-gray-300 dark:border-gray-700 h-10 rounded flex items-center pl-4 text-sm sm:text-base dark:text-slate-200">
+                                  {formatDate(subscriptionData?.end_date)}
+                                </div>
                               </div>
-                              <div>
-                                <div className="text-gray-400 font-bold text-sm sm:text-base">
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-5 w-full">
+                              <div className="w-full">
+                                <div className="text-gray-400 font-normal text-sm sm:text-base mb-1">
+                                  Next Billing Date
+                                </div>
+                                <div className="border border-gray-300 dark:border-gray-700 h-10 rounded flex items-center pl-4 text-sm sm:text-base dark:text-slate-200">
+                                  {formatDate(
+                                    subscriptionData?.next_billing_date
+                                  )}
+                                </div>
+                              </div>
+                              <div className="w-full">
+                                <div className="text-gray-400 font-normal text-sm sm:text-base mb-1">
                                   Price Per Doctor
                                 </div>
-                                <div className="border border-gray-300 h-10 rounded flex items-center pl-4 text-sm sm:text-base">₹{subscriptionData?.Plan?.price_per_doctor}</div>
+                                <div className="border border-gray-300 dark:border-gray-700 h-10 rounded flex items-center pl-4 text-sm sm:text-base dark:text-slate-200">
+                                  ₹{subscriptionData?.Plan?.price_per_doctor}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                        {/* <div className="flex justify-between p-4 flex-wrap-reverse">
-                          <div className="flex items-center gap-1 sm:gap-2">
-                            <div className="text-gray-500 min-w-[120px] flex justify-between">
-                              Plan Name<span>:</span>{" "}
-                            </div>
-                            <h2 className="text-lg font-semibold dark:text-slate-300">
-                              {subscriptionData?.Plan?.plan_name}
-                            </h2>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="bg-green-100 text-green-600 dark:bg-green-600 dark:text-white px-2 py-1 mr-3 rounded-md text-xs font-semibold uppercase">
-                              {subscriptionData?.status}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 p-4 text-[14px]">
-                          <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
-                            <div className="text-gray-500 min-w-[120px] flex justify-between">
-                              Start Date<span>:</span>
-                            </div>
-                            <div className="dark:text-slate-300 md:max-w-80">
-                              {formatDate(subscriptionData?.start_date)}
-                            </div>
-                          </div>
-
-                          <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
-                            <div className="text-gray-500 min-w-[120px] flex justify-between">
-                              End Date<span>:</span>{" "}
-                            </div>
-                            <div className="dark:text-slate-300 md:max-w-80">
-                              {formatDate(subscriptionData?.end_date)}
-                            </div>
-                          </div>
-
-                          <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
-                            <div className="text-gray-500 min-w-[120px] flex justify-between">
-                              Next Billing Date<span>:</span>{" "}
-                            </div>
-                            <div className="dark:text-slate-300 md:max-w-80">
-                              {formatDate(subscriptionData?.next_billing_date)}
-                            </div>
-                          </div>
-
-                          <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
-                            <div className="text-gray-500 min-w-[120px] flex justify-between">
-                              Price Per Doctor <span>:</span>
-                            </div>
-                            <div className="dark:text-slate-300 md:max-w-80">
-                              ₹{subscriptionData?.Plan?.price_per_doctor}
-                            </div>
-                          </div>
-                        </div> */}
                       </>
                     ) : (
                       <>
@@ -272,7 +239,7 @@ const ModalPage = ({
                               Available Plans:
                             </div>
                             <div className="mt-5 grid place-items-center sm:grid-cols-2 gap-7 sm:gap-3 ">
-                              {allPlans.length > 0 ? (
+                              {allPlans?.length > 0 ? (
                                 <>
                                   {allPlans?.map((plan) => (
                                     <div
@@ -281,7 +248,7 @@ const ModalPage = ({
                                         selectedPlan === plan?.plan_id
                                           ? "border-[#006241]"
                                           : "dark:border-slate-800"
-                                      } py-2 px-2 rounded-md cursor-pointer w-full min-h-[15.5rem] max-w-70 h-full relative`}
+                                      } py-2 px-2 rounded-md cursor-pointer w-full min-h-80 max-w-80 h-full relative`}
                                       onClick={() =>
                                         handlePlanSelection(plan?.plan_id)
                                       }
@@ -304,17 +271,17 @@ const ModalPage = ({
                                             className="h-20"
                                           />
                                           <div>
-                                            <span className="line-through text-xs text-slate text-opacity-20 text-slate-950">
+                                            <span className="line-through text-xs text-slate text-slate-400 mr-2">
                                               ₹ 499
                                             </span>
-                                            <span className="text-2xl font-bold">
-                                              ₹ 199
+                                            <span className="text-2xl font-bold dark:text-slate-200">
+                                              ₹ {plan?.price_per_doctor}
                                             </span>
-                                            <span className="text-xs">
+                                            <span className="text-xs dark:text-slate-200">
                                               /Month
                                             </span>
                                           </div>
-                                          <div className="text-center font-bold mt-5">
+                                          <div className="text-center font-bold mt-8 leading-4">
                                             Basic <br /> Dashboards
                                           </div>
                                           <button
@@ -332,44 +299,39 @@ const ModalPage = ({
                                             className="h-20 "
                                           />
                                           <div className="sm:text-[25px]">
-                                            <span className="line-through text-xs text-slate text-opacity-20 text-slate-950">
+                                            <span className="line-through text-xs text-slate-400 mr-2">
                                               ₹ 999
                                             </span>
                                             <span className="text-2xl font-bold text-yellow-600">
-                                              ₹ 499
+                                              ₹ {plan?.price_per_doctor}
                                             </span>
-                                            <span className="text-xs">
+                                            <span className="text-xs dark:text-slate-200">
                                               /Year
                                             </span>
                                           </div>
-                                          <div className="text-left text-[10px] pl-3 ">
-                                            <ul className="list-disc ">
-                                              <li>
-                                                linic waiting area screen for
-                                                token number and consulting room
-                                                (Voice over).
-                                              </li>
-                                            </ul>
-                                            <ul className="list-disc">
-                                              <li>
-                                                {" "}
-                                                Bulk Cancel or Day cancel
-                                                option. Pro Dashboards (Trend
-                                                reports, forecasted cash in
-                                                flow(Account admin)).
-                                              </li>
-                                            </ul>
-                                            <ul className="list-disc">
-                                              <li>
-                                                {" "}
-                                                Digital prescription sent by SMS
-                                                and Email.
-                                              </li>
-                                            </ul>
-                                            <ul className="list-disc">
-                                              <li> Patient clinic history.</li>
-                                            </ul>
-                                          </div>
+                                          <ul className="list-disc text-xs pl-4 mb-5">
+                                            <li className="mb-1">
+                                              Clinic waiting area screen for
+                                              token number and consulting room
+                                              (Voice over).
+                                            </li>
+                                            <li className="mb-1">
+                                              {" "}
+                                              Bulk Cancel or Day cancel option.
+                                              Pro Dashboards (Trend reports,
+                                              forecasted cash in flow(Account
+                                              admin)).
+                                            </li>
+                                            <li className="mb-1">
+                                              {" "}
+                                              Digital prescription sent by SMS
+                                              and Email.
+                                            </li>
+                                            <li className="mb-1">
+                                              {" "}
+                                              Patient clinic history.
+                                            </li>
+                                          </ul>
                                           <button
                                             type="button"
                                             className="bg-blue-700 w-full rounded-sm  text-white text-sm font-bold py-1 mt-auto"

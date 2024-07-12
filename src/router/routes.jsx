@@ -47,6 +47,8 @@ const RequestToDoctor = lazy(() =>import("../panels/clinic/requestToDoctor/Reque
 const ClinicBookings = lazy(() => import("../panels/clinic/bookings/Index"));
 const ClinicPatientDetails = lazy(() => import("../panels/clinic/bookings/PatientDetails"));
 const ClinicSelectDoctor = lazy(() => import("../panels/clinic/bookings/SelectDoctor"));
+const ClinicSelectDateAndTime = lazy(() => import("../panels/clinic/bookings/SelectDateAndTime"));
+
 
 // <--------------> clinic panel imports ends here <-------------->
 
@@ -280,6 +282,14 @@ const routes = [
    {
     path: "/clinic/bookings/SelectorDoctor",
     element: <ClinicSelectDoctor />,
+    layout: "default",
+  },
+
+
+   //ClinicSelectDateAndTime
+   {
+    path: "/clinic/bookings/SelectDateAndTime",
+    element: <ClinicSelectDateAndTime />,
     layout: "default",
   },
   // <--------------> clinic panel ends here <-------------->

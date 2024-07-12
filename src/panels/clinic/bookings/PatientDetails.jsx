@@ -121,7 +121,7 @@ const ClinicBookingDoctor = () => {
                 type="submit"
                 className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 style={{ fontSize: "19px" }}
-                onClick={()=> navigate("/clinic/booking/PatientDetails")}
+                onClick={()=> navigate("/clinic/bookings/SelectorDoctor")}
               >
                 Next
               </button>

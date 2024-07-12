@@ -152,7 +152,7 @@ const ClinicBookingDoctor = () => {
               <div className="flex text-gray-500 font-semibold dark:text-white-dark gap-y-4 w-full max-w-md">
                 <button type="button" className="btn btn-green w-full"
                 style={{ fontSize: "17px" }}
-                onClick={()=> navigate("/clinic/booking/PatientDetails")}
+                onClick={()=> navigate("/clinic/bookings/PatientDetails")}
                 >
                   New User
                 </button>

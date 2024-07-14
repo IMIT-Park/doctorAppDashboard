@@ -3,25 +3,17 @@ import { useDispatch } from "react-redux";
 import { DataTable } from "mantine-datatable";
 import CountUp from "react-countup";
 import { setPageTitle } from "../../../store/themeConfigSlice";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
-import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
-import IconEdit from "../../../components/Icon/IconEdit";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
-import IconEye from "../../../components/Icon/IconEye";
 import ScrollToTop from "../../../components/ScrollToTop";
 import IconSearch from "../../../components/Icon/IconSearch";
 import IconLoader from "../../../components/Icon/IconLoader";
 import emptyBox from "/assets/images/empty-box.svg";
+import noProfile from "/assets/images/empty-user.png";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate } from "../../../utils/formatDate";
-import { showMessage } from "../../../utils/showMessage";
-import AddDoctor from "../../../pages/ClinicSingleView/components/AddDoctor";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 
-const rowData = [];
 const ClinicDoctor = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,31 +30,10 @@ const ClinicDoctor = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const [addDoctorModal, setaddDoctorModal] = useState(false);
-  const [data, setData] = useState({ password: "", confirmPassword: "" });
-  const [buttonLoading, setButtonLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState(1);
-  const [input, setInput] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: "",
-    gender: "",
-    dateOfBirth: "",
-    qualification: "",
-    specialization: "",
-    fees: "",
-    visibility: true,
-    photo: null,
-    timeSlots: [],
-    password: "",
-    confirmPassword: "",
-  });
-  const [timeSlotInput, setTimeSlotInput] = useState({});
 
   useEffect(() => {
     setPage(1);
@@ -82,9 +53,11 @@ const ClinicDoctor = () => {
         `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
       );
       setTotalDoctors(response.data?.count);
-      setAllDoctors(response.data?.alldoctors);
+      setAllDoctors(response.data?.alldoctors || []);
       setLoading(false);
     } catch (error) {
+      setAllDoctors([]);
+
       console.log(error);
       setLoading(false);
     } finally {
@@ -97,134 +70,9 @@ const ClinicDoctor = () => {
     fetchData();
   }, [page, pageSize]);
 
-  // doctor image picker
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setInput({ ...input, photo: file });
-  };
-
-  const openAddDoctorModal = () => {
-    setaddDoctorModal(true);
-  };
-
-  const closeAddDoctorModal = () => {
-    setInput({
-      ...input,
-      name: "",
-      phone: "",
-      email: "",
-      address: "",
-      gender: "",
-      dateOfBirth: "",
-      qualification: "",
-      specialization: "",
-      fees: "",
-      visibility: true,
-      photo: null,
-      timeSlots: [],
-      password: "",
-      confirmPassword: "",
-    });
-    setActiveTab(1);
-    setaddDoctorModal(false);
-  };
-
-  //  doctor adding function
-  const addDoctor = async () => {
-    if (
-      !input.name ||
-      !input.phone ||
-      !input.email ||
-      !input.address ||
-      !input.gender ||
-      !input.dateOfBirth ||
-      !input.qualification ||
-      !input.specialization ||
-      !input.fees ||
-      !input.photo ||
-      !input.password ||
-      !input.confirmPassword
-    ) {
-      showMessage("Please fill in all required fields", "warning");
-      return true;
-    }
-
-    if (!input.timeSlots || input.timeSlots.length === 0) {
-      showMessage("Please add at least one time slot", "warning");
-      return true;
-    }
-
-    if (input.password !== input.confirmPassword) {
-      showMessage("Passwords are not match", "warning");
-      return true;
-    }
-
-    const basicDetails = {
-      clinic_id: clinicId,
-      name: input.name,
-      email: input.email,
-      address: input.address,
-      phone: input.phone,
-      gender: input.gender,
-      dateOfBirth: input.dateOfBirth,
-      qualification: input.qualification,
-      specialization: input.specialization,
-      fees: input.fees,
-      visibility: input.visibility,
-      password: input.password,
-    };
-
-    const formData = new FormData();
-    formData.append("image_url[]", input.photo);
-
-    setButtonLoading(true);
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        "/v1/doctor/createDoctor",
-        basicDetails
-      );
-
-      console.log(response);
-
-      if (response.status === 201) {
-        const doctorId = response.data.Doctor.doctor_id;
-
-        // Calling the add photo API
-        const additionalResponse1 = await NetworkHandler.makePostRequest(
-          `/v1/doctor/upload/${doctorId}`,
-          formData
-        );
-
-        input.timeSlots.forEach((slot) => {
-          slot.startTime += ":00";
-          slot.endTime += ":00";
-        });
-
-        // Calling the add timeslot API
-        const additionalResponse2 = await NetworkHandler.makePostRequest(
-          `/v1/doctor/createtimeSlots/${doctorId}`,
-          { timeslots: input.timeSlots }
-        );
-
-        fetchData();
-
-        showMessage("Doctor added successfully.", "success");
-        closeAddDoctorModal();
-      }
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-      setButtonLoading(false);
-    } finally {
-      setButtonLoading(false);
-    }
-  };
-
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchData);
-
-
-    console.log(allDoctors);
 
   return (
     <div>
@@ -235,11 +83,9 @@ const ClinicDoctor = () => {
             <h5 className="font-semibold text-lg dark:text-white-light">
               Doctors
             </h5>
-            <Tippy content="Total Doctors">
-              <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
-              </span>
-            </Tippy>
+            <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
+              <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
+            </span>
           </div>
 
           <div>
@@ -263,17 +109,6 @@ const ClinicDoctor = () => {
                 </button>
               </div>
             </form>
-          </div>
-
-          <div className="flex  text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <button
-              type="button"
-              className="btn btn-green"
-              onClick={openAddDoctorModal}
-            >
-              <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
-              Add Doctor
-            </button>
           </div>
         </div>
         {loading ? (
@@ -307,16 +142,13 @@ const ClinicDoctor = () => {
                 {
                   accessor: ".photo",
                   title: "Photo",
-                  render: (row) =>
-                  row?.photo ? (
-                      <img
-                        src={imageBaseUrl +  row?.photo }
-                        alt="Doctor's photo"
-                        className="w-10 h-10 rounded-[50%]"
-                      />
-                    ) : (
-                      "---"
-                    ),
+                  render: (row) => (
+                    <img
+                      src={row?.photo ? imageBaseUrl + row?.photo : noProfile}
+                      alt="Doctor's photo"
+                      className="w-10 h-10 rounded-[50%] object-cover"
+                    />
+                  ),
                 },
 
                 { accessor: "name", title: "Name" },
@@ -328,8 +160,16 @@ const ClinicDoctor = () => {
                   title: "Date of Birth",
                   render: (row) => formatDate(row?.dateOfBirth),
                 },
-                { accessor: "qualification", title: "Qualification" ,textAlignment:"center"},
-                { accessor: "specialization", title: "Specialization",textAlignment:"center" },
+                {
+                  accessor: "qualification",
+                  title: "Qualification",
+                  textAlignment: "center",
+                },
+                {
+                  accessor: "specialization",
+                  title: "Specialization",
+                  textAlignment: "center",
+                },
                 { accessor: "address", title: "Address" },
                 { accessor: "fees", title: "Fees" },
                 {
@@ -371,22 +211,6 @@ const ClinicDoctor = () => {
           </div>
         )}
       </div>
-
-      {/* add doctor modal */}
-      <AddDoctor
-        open={addDoctorModal}
-        closeAddDoctorModal={closeAddDoctorModal}
-        buttonLoading={buttonLoading}
-        handleFileChange={handleFileChange}
-        input={input}
-        setInput={setInput}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        clinicId={clinicId}
-        timeSlotInput={timeSlotInput}
-        setTimeSlotInput={setTimeSlotInput}
-        formSubmit={addDoctor}
-      />
     </div>
   );
 };

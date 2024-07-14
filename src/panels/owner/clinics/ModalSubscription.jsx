@@ -110,8 +110,6 @@ const ModalPage = ({
     }
   };
 
-  console.log(subscriptionData);
-
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -144,20 +142,24 @@ const ModalPage = ({
             >
               <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-2xl text-black dark:text-white-dark">
                 <div className="flex items-center justify-between px-3 py-5 border-b dark:border-slate-800">
-                  <div className="text-lg font-bold dark:text-slate-200">
+                  <div className="text-lg font-semibold dark:text-slate-200">
                     Subscription Details
                   </div>
                   <div className="flex items-center gap-5">
-                    {subscriptionData && (
+                    {!planLoading && (
                       <>
-                        {subscriptionData?.Plan?.plan_name === "Premium" ? (
-                          <div className="bg-yellow-600 text-center font-bold py-1 w-28 text-white rounded">
-                            Premium
-                          </div>
-                        ) : (
-                          <div className=" bg-green-800 text-center py-1 w-28 text-white rounded font-bold">
-                            Basic
-                          </div>
+                        {subscriptionData && (
+                          <>
+                            {subscriptionData?.Plan?.plan_name === "Premium" ? (
+                              <div className="bg-yellow-600 text-center font-bold py-1 w-28 text-white rounded">
+                                Premium
+                              </div>
+                            ) : (
+                              <div className=" bg-green-800 text-center py-1 w-28 text-white rounded font-bold">
+                                Basic
+                              </div>
+                            )}
+                          </>
                         )}
                       </>
                     )}
@@ -231,7 +233,7 @@ const ModalPage = ({
                         ) : (
                           <div className="px-5">
                             <p className="text-base text-gray-700 dark:text-gray-400 text-[16px] text-center mt-4">
-                              You haven't subscribed yet! Choose one of the
+                              Clinic haven't subscribed yet! Choose one of the
                               plans below to unlock features and exclusive
                               content.
                             </p>

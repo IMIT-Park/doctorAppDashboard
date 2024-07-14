@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import App from "../../App";
 import { toggleSidebar } from "../../store/themeConfigSlice";
@@ -7,11 +7,13 @@ import Setting from "./Setting";
 import Sidebar from "./Sidebar";
 import Portals from "../../components/Portals";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../contexts/UseContext";
 
 const DefaultLayout = ({ children }) => {
   const themeConfig = useSelector((state) => state.themeConfig);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { userDetails } = useContext(UserContext);
 
   const [showLoader, setShowLoader] = useState(true);
   const [showTopButton, setShowTopButton] = useState(false);
@@ -47,16 +49,6 @@ const DefaultLayout = ({ children }) => {
       window.removeEventListener("onscroll", onScrollHandler);
     };
   }, []);
-
-  // useEffect(() => {
-  //   const strigifyTokens = sessionStorage.getItem("accessToken");
-  //   const tokens = JSON.parse(strigifyTokens);
-  //   const accessToken = tokens?.accessToken;
-
-  //   if (!accessToken) {
-  //     navigate("/");
-  //   }
-  // }, []);
 
   return (
     <App>

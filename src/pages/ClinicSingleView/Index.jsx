@@ -402,7 +402,7 @@ const ClinicSingleView = () => {
                   width: 220,
                   ellipsis: true,
                 },
-                { accessor: "fees" },
+                { accessor: "fees", render: (row) => `₹${row?.fees}` },
                 {
                   accessor: "visibility",
                   title: "Visibility",

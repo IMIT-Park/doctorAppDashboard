@@ -22,6 +22,7 @@ import useFetchData from "../../../customHooks/useFetchData";
 import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomButton from "../../../components/CustomButton";
+import noProfile from "/assets/images/empty-user.png";
 
 const Profile = () => {
   const { userDetails } = useContext(UserContext);
@@ -455,143 +456,7 @@ const Profile = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            {/* <div className="flex flex-wrap gap-6 min-[1159px]:gap-16 md:pr-20">
-              <div className="relative">
-                {doctorDetails?.photo ? (
-                  <img
-                    src={imageBaseUrl + doctorDetails?.photo}
-                    alt={doctorDetails?.name || ""}
-                    className="w-40 h-40 rounded-full object-cover mb-2"
-                  />
-                ) : (
-                  <div className="w-40 h-40 rounded-full grid place-items-center bg-slate-300 dark:bg-slate-700 mb-2">
-                    No photo
-                  </div>
-                )}
-                {!isSuperAdmin && (
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 btn btn-dark w-8 h-8 p-0 rounded-full"
-                    onClick={openEditProfileModal}
-                  >
-                    <IconEdit className="w-4" />
-                  </button>
-                )}
-                <div className="text-2xl dark:text-slate-300 font-semibold capitalize">
-                  {doctorDetails?.name || ""}
-                </div>
-              </div>
-              {doctorDetails ? (
-                <div className="flex items-start flex-col md:flex-row flex-wrap md:gap-10 w-full md:w-auto">
-                  <div>
-                    <div className="flex items-start gap-1 sm:gap-2 flex-wrap mb-2 ">
-                      <div className="text-white-dark min-w-[105px] flex justify-between">
-                        Address <span>:</span>
-                      </div>
-                      <div className="dark:text-slate-300 md:max-w-80">
-                        {doctorDetails?.address || ""}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                      <div className="text-white-dark min-w-[105px] flex justify-between">
-                        Email <span>:</span>
-                      </div>
-                      <div className="dark:text-slate-300">
-                        {doctorDetails?.email || ""}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                      <div className="text-white-dark min-w-[105px] flex justify-between">
-                        Phone <span>:</span>
-                      </div>
-                      <div className="dark:text-slate-300">
-                        {doctorDetails?.phone || ""}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                      <div className="text-white-dark min-w-[105px] flex justify-between">
-                        Date of Birth <span>:</span>
-                      </div>
-                      <div className="dark:text-slate-300">
-                        {formatDate(doctorDetails?.dateOfBirth)}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 ">
-                      <div className="text-white-dark min-w-[105px] flex justify-between">
-                        Fees <span>:</span>
-                      </div>
-                      <div className="dark:text-slate-300">
-                        {" "}
-                        {` ₹${doctorDetails?.fees}` || ""}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                      <div className="text-white-dark min-w-[105px] flex justify-between">
-                        Gender <span>:</span>
-                      </div>
-                      <div className="dark:text-slate-300 capitalize">
-                        {doctorDetails?.gender || ""}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                      <div className="text-white-dark min-w-[105px] flex justify-between">
-                        Qualification <span>:</span>
-                      </div>
-                      <div className="dark:text-slate-300">
-                        {doctorDetails?.qualification || ""}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2">
-                      <div className="text-white-dark min-w-[105px] flex justify-between">
-                        Specialization <span>:</span>
-                      </div>
-                      <div className="dark:text-slate-300">
-                        {doctorDetails?.specialization || ""}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                      <div className="text-white-dark min-w-[105px] flex justify-between">
-                        Profie Visibility <span>:</span>
-                      </div>
-                      <div className="dark:text-slate-300">
-                        {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-gray-500 text-xs grid place-items-center">
-                  Details Not Found{" "}
-                </div>
-              )}
-              <div className="absolute top-5 right-5 flex flex-col items-center gap-4">
-                <CustomSwitch
-                  checked={doctorDetails?.status}
-                  onChange={() =>
-                    showDoctorAlert(
-                      doctorDetails?.user_id,
-                      doctorDetails?.status ? "block" : "activate",
-                      "doctor"
-                    )
-                  }
-                  tooltipText={doctorDetails?.status ? "Block" : "Unblock"}
-                  uniqueId={`doctor${doctorDetails?.clinic_id}`}
-                  size="large"
-                />
-                {!isSuperAdmin && (
-                  <button
-                    className="flex hover:text-info"
-                    onClick={openEditDetailsModal}
-                  >
-                    <IconEdit className="w-6 h-6" />
-                  </button>
-                )}
-              </div>
-            </div> */}
-            <div className="flex flex-wrap gap-10 md:pr-20">
+            <div className="flex flex-col items-start gap-4">
               <div className="absolute top-3 right-3 sm:right-5">
                 <CustomSwitch
                   checked={doctorDetails?.status}
@@ -607,113 +472,100 @@ const Profile = () => {
                   size="large"
                 />
               </div>
-              <div className="relative flex flex-col items-center gap-2">
-                {doctorDetails?.photo ? (
-                  <img
-                    src={imageBaseUrl + doctorDetails?.photo}
-                    alt={doctorDetails?.name || ""}
-                    className="w-40 h-40 rounded-full object-cover mb-2"
-                  />
-                ) : (
-                  <div className="w-40 h-40 rounded-full grid place-items-center bg-slate-300 dark:bg-slate-700 mb-2">
-                    No photo
-                  </div>
-                )}
-                {!isSuperAdmin && (
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 btn btn-dark w-8 h-8 p-0 rounded-full"
-                    onClick={openEditProfileModal}
-                  >
-                    <IconEdit className="w-4" />
-                  </button>
-                )}{" "}
-                {!isSuperAdmin && (
-                  <CustomButton
-                    onClick={openEditDetailsModal}
-                    className="pl-10 pr-10 "
-                  >
-                    Edit
-                  </CustomButton>
-                )}
+              <div className="relative">
+                <img
+                  src={
+                    doctorDetails?.photo
+                      ? imageBaseUrl + doctorDetails?.photo
+                      : noProfile
+                  }
+                  alt={doctorDetails?.name || ""}
+                  className="w-40 h-40 rounded-full object-cover mb-2"
+                />
+                <button
+                  type="button"
+                  className="absolute top-0 right-0 btn btn-dark w-8 h-8 p-0 rounded-full"
+                  onClick={openEditProfileModal}
+                >
+                  <IconEdit className="w-4" />
+                </button>
               </div>
-              <div className="w-full flex flex-wrap xl:flex-row lg:flex-col md:flex-col sm:flex-col xl:gap-5">
-                <div className="flex flex-col sm:w-full md:w-full lg:w-full 2xl:w-8/12 ">
-                  <div className="text-2xl dark:text-slate-300 font-semibold capitalize">
-                    {doctorDetails?.name || ""}
-                  </div>
-                  <div className="flex flex-col flex-wrap mb-1">
-                    <div className="text-base p-1 text-[#AAAAAA]">Address:</div>
-                    <div className="text-base h-32 p-2 border dark:border-none dark:bg-gray-800">
-                      {doctorDetails?.address || ""}
+              <div className="w-full flex items-start justify-between flex-wrap gap-2">
+                <div className="text-2xl dark:text-slate-300 font-semibold capitalize">
+                  {doctorDetails?.name || ""}
+                </div>
+                <CustomButton
+                  onClick={openEditDetailsModal}
+                  className="min-w-32 py-1.5"
+                >
+                  Edit
+                </CustomButton>
+              </div>
+              <div className="w-full grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="flex flex-col w-full xl:col-span-2">
+                  <div className="flex flex-col gap-4 flex-wrap">
+                    <div>
+                      <div className="text-base text-gray-500">Address:</div>
+                      <div className="text-base dark:text-slate-300 min-h-[124px] p-2 border dark:border-slate-800 rounded">
+                        {doctorDetails?.address || ""}
+                      </div>
                     </div>
-                    <div className="flex flex-col lg:flex-row gap-7 mt-3 lg:w-full">
-                      <div className="md:w-full xl:w-6/12">
-                        <div className="text-white-dark text-base">Email</div>
-                        <div className="dark:text-slate-300 text-base border dark:border-none dark:bg-gray-800 p-2 h-10">
+                    <div className="w-full grid md:grid-cols-2 gap-4">
+                      <div className="w-full">
+                        <div className="text-base text-gray-500">Email</div>
+                        <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
                           {doctorDetails?.email || ""}
                         </div>
                       </div>
-                      <div className="md:w-full xl:w-6/12 lg:ml-0">
-                        <div className="text-white-dark text-base">Phone</div>
-                        <div className="dark:text-slate-300 text-base border dark:border-none dark:bg-gray-800 p-2 h-10">
+                      <div className="w-full">
+                        <div className="text-base text-gray-500">Phone</div>
+                        <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
                           {doctorDetails?.phone || ""}
                         </div>
                       </div>
-                    </div>
-                    <div className="flex flex-col lg:flex-row gap-7 mt-3 lg:w-full">
-                      <div className="md:w-full xl:w-6/12">
-                        <div className="text-white-dark text-base">Fees</div>
-                        <div className="dark:text-slate-300 text-base border dark:border-none dark:bg-gray-800 p-2 h-10">
-                          {doctorDetails?.fees || ""}
+                      <div className="w-full">
+                        <div className="text-base text-gray-500">Fees</div>
+                        <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                          ₹{doctorDetails?.fees || ""}
                         </div>
                       </div>
-                      <div className="md:w-full xl:w-6/12 lg:ml-0">
-                        <div className="text-white-dark text-base">
+                      <div className="w-full">
+                        <div className="text-base text-gray-500">
                           Specialization
                         </div>
-                        <div className="dark:text-slate-300 text-base border dark:border-none dark:bg-gray-800 p-2 h-10">
+                        <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
                           {doctorDetails?.specialization || ""}
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="mt-0 flex flex-wrap lg:flex-col lg:w-full 2xl:w-80 xl:mt-8 gap-5">
-                  <div className="flex flex-col lg:flex-row xl:flex-col gap-5 mt-1 md:w-full sm:w-full">
-                    <div className="w-full">
-                      <div className="text-white-dark text-base mb-1">
-                        Qualification
-                      </div>
-                      <div className="dark:text-slate-300 text-base border dark:border-none dark:bg-gray-800 p-2 h-10">
-                        {doctorDetails?.qualification || ""}
-                      </div>
-                    </div>
-                    <div className="w-full">
-                      <div className="text-white-dark text-base mb-1">
-                        Profile Visibility
-                      </div>
-                      <div className="dark:text-slate-300 text-base border dark:border-none dark:bg-gray-800 p-2 h-10">
-                        {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
-                      </div>
+
+                <div className="w-full grid md:grid-cols-2 xl:grid-cols-1 gap-4 xl:col-span-1">
+                  <div className="w-full">
+                    <div className="text-base text-gray-500">Qualification</div>
+                    <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                      {doctorDetails?.qualification || ""}
                     </div>
                   </div>
-                  <div className="w-full flex flex-col lg:flex-row xl:flex-col gap-5 -mt-3">
-                    <div className="w-full -mb-3">
-                      <div className="text-white-dark text-base mb-1">
-                        Gender
-                      </div>
-                      <div className="dark:text-slate-300 text-base border dark:border-none dark:bg-gray-800 p-2 h-10">
-                        {doctorDetails?.gender || ""}
-                      </div>
+                  <div className="w-full">
+                    <div className="text-base text-gray-500">
+                      Profile Visibility
                     </div>
-                    <div className="w-full ">
-                      <div className="text-white-dark text-base mb-1">
-                        Date of Birth
-                      </div>
-                      <div className="dark:text-slate-300 text-base border dark:border-none dark:bg-gray-800 p-2 h-10">
-                        {formatDate(doctorDetails?.dateOfBirth)}
-                      </div>
+                    <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                      {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <div className="text-base text-gray-500">Gender</div>
+                    <div className="capitalize text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                      {doctorDetails?.gender || ""}
+                    </div>
+                  </div>
+                  <div className="w-full ">
+                    <div className="text-base text-gray-500">Date of Birth</div>
+                    <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                      {formatDate(doctorDetails?.dateOfBirth)}
                     </div>
                   </div>
                 </div>

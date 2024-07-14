@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import "flatpickr/dist/flatpickr.css";
-import IconPlus from "../../../components/Icon/IconPlus";
 import IconX from "../../../components/Icon/IconX";
 import NetworkHandler from "../../../utils/NetworkHandler";
-import Swal from "sweetalert2";
 import { formatTime } from "../../../utils/formatTime";
 import { formatDate } from "../../../utils/formatDate";
 import { showMessage } from "../../../utils/showMessage";
@@ -188,7 +186,10 @@ const AddLeave = ({
       <Dialog
         as="div"
         open={addLeaveModal}
-        onClose={(e) => {}}
+        onClose={() => {
+          closeAddLeaveModal();
+          resetForm();
+        }}
         className="relative z-[51]"
       >
         <Transition.Child
@@ -433,13 +434,13 @@ const AddLeave = ({
                       </button>
                       <button
                         type="button"
-                        className="btn btn-outline-primary ltr:ml-4 rtl:mr-4"
+                        className="btn btn-green ltr:ml-4 rtl:mr-4"
                         onClick={handleSaveLeave}
                       >
                         {buttonLoading ? (
                           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />
                         ) : (
-                          "Save"
+                          "Submit"
                         )}
                       </button>
                     </div>

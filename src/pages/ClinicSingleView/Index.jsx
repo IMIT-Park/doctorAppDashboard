@@ -8,8 +8,6 @@ import IconLoader from "../../components/Icon/IconLoader";
 import ScrollToTop from "../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import IconMenuScrumboard from "../../components/Icon/Menu/IconMenuScrumboard";
-import AddDoctor from "./components/AddDoctor";
 import NetworkHandler, {
   imageBaseUrl,
   websiteUrl,
@@ -19,18 +17,13 @@ import AddClinic from "../../panels/owner/clinics/AddClinic";
 import { formatDate } from "../../utils/formatDate";
 import { showMessage } from "../../utils/showMessage";
 import IconCaretDown from "../../components/Icon/IconCaretDown";
-import {
-  convertLocationDetail,
-  handleGetLocation,
-} from "../../utils/getLocation";
+import { convertLocationDetail } from "../../utils/getLocation";
 import useBlockUnblock from "../../utils/useBlockUnblock";
 import QRCodeComponent from "../../components/QRCodeComponent";
 import useFetchData from "../../customHooks/useFetchData";
 import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
-import CustomButton from "../../components/CustomButton";
-import ModalSubscription from "../../panels/owner/clinics/ModalSubscription";
-
+import emptyUser from "/assets/images/empty-user.png";
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -52,7 +45,6 @@ const ClinicSingleView = () => {
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [editModal, setEditModal] = useState(false);
-  const [addDoctorModal, setaddDoctorModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [clinicInput, setClinicInput] = useState({
     name: "",
@@ -67,7 +59,6 @@ const ClinicSingleView = () => {
     defaultPicture: null,
     googleLocation: {},
   });
-  const [activeTab, setActiveTab] = useState(1);
   const [input, setInput] = useState({
     name: "",
     phone: "",
@@ -84,9 +75,6 @@ const ClinicSingleView = () => {
     password: "",
     confirmPassword: "",
   });
-  const [timeSlotInput, setTimeSlotInput] = useState({});
-  const [subscriptionModal, setsubscriptionModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
 
   useEffect(() => {
     setPage(1);
@@ -131,11 +119,12 @@ const ClinicSingleView = () => {
 
   // edit modal handler
   const openEditModal = () => {
+    const phoneWithoutCountryCode = clinicDetails.phone.replace(/^\+91/, "");
     setClinicInput({
       name: clinicDetails.name,
       email: clinicDetails.User.email,
       username: clinicDetails.User.user_name,
-      phone: clinicDetails.phone,
+      phone: phoneWithoutCountryCode,
       address: clinicDetails.address,
       place: clinicDetails.place,
       picture: null,
@@ -153,14 +142,16 @@ const ClinicSingleView = () => {
   const updateClinic = async () => {
     if (
       !clinicInput.name ||
-      !clinicInput.email ||
-      !clinicInput.username ||
       !clinicInput.phone ||
       !clinicInput.address ||
-      !clinicInput.place ||
-      !clinicInput.googleLocation
+      !clinicInput.place
     ) {
       showMessage("Please fill in all required fields", "warning");
+      return true;
+    }
+
+    if (!clinicInput.googleLocation) {
+      showMessage("Please select clinic location", "warning");
       return true;
     }
 
@@ -170,7 +161,7 @@ const ClinicSingleView = () => {
     formData.append("name", clinicInput.name);
     formData.append("email", clinicInput.email);
     formData.append("user_name", clinicInput.username);
-    formData.append("phone", clinicInput.phone);
+    formData.append("phone", `+91${clinicInput.phone}`);
     formData.append("address", clinicInput.address);
     formData.append("place", clinicInput.place);
     formData.append(
@@ -201,136 +192,11 @@ const ClinicSingleView = () => {
     }
   };
 
-  // subscription modal handler
-  const openSubscriptionModal = () => {
-    setsubscriptionModal(true);
-  };
-
-  const closeSubscriptionModal = () => {
-    setsubscriptionModal(false);
-    setSelectedPlan(null);
-  };
-
-  const openAddDoctorModal = () => {
-    setaddDoctorModal(true);
-  };
-
-  const closeAddDoctorModal = () => {
-    setInput({
-      ...input,
-      name: "",
-      phone: "",
-      email: "",
-      address: "",
-      gender: "",
-      dateOfBirth: "",
-      qualification: "",
-      specialization: "",
-      fees: "",
-      visibility: true,
-      photo: null,
-      timeSlots: [],
-      password: "",
-      confirmPassword: "",
-    });
-    setActiveTab(1);
-    setaddDoctorModal(false);
-  };
-
-  //  doctor adding function
-  const addDoctor = async () => {
-    if (
-      !input.name ||
-      !input.phone ||
-      !input.email ||
-      !input.address ||
-      !input.gender ||
-      !input.dateOfBirth ||
-      !input.qualification ||
-      !input.specialization ||
-      !input.fees ||
-      !input.photo ||
-      !input.password ||
-      !input.confirmPassword
-    ) {
-      showMessage("Please fill in all required fields", "warning");
-      return true;
-    }
-
-    if (!input.timeSlots || input.timeSlots.length === 0) {
-      showMessage("Please add at least one time slot", "warning");
-      return true;
-    }
-
-    if (input.password !== input.confirmPassword) {
-      showMessage("Passwords are not match", "warning");
-      return true;
-    }
-
-    const basicDetails = {
-      clinic_id: clinicId,
-      name: input.name,
-      email: input.email,
-      address: input.address,
-      phone: input.phone,
-      gender: input.gender,
-      dateOfBirth: input.dateOfBirth,
-      qualification: input.qualification,
-      specialization: input.specialization,
-      fees: input.fees,
-      visibility: input.visibility,
-      password: input.password,
-    };
-
-    const formData = new FormData();
-    formData.append("image_url[]", input.photo);
-
-    setButtonLoading(true);
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        "/v1/doctor/createDoctor",
-        basicDetails
-      );
-
-      if (response.status === 201) {
-        const doctorId = response.data.Doctor.doctor_id;
-
-        // Calling the add photo API
-        const additionalResponse1 = await NetworkHandler.makePostRequest(
-          `/v1/doctor/upload/${doctorId}`,
-          formData
-        );
-
-        input.timeSlots.forEach((slot) => {
-          slot.startTime += ":00";
-          slot.endTime += ":00";
-        });
-
-        // Calling the add timeslot API
-        const additionalResponse2 = await NetworkHandler.makePostRequest(
-          `/v1/doctor/createtimeSlots/${doctorId}`,
-          { timeslots: input.timeSlots }
-        );
-
-        fetchDoctorData();
-
-        showMessage("Doctor added successfully.", "success");
-        closeAddDoctorModal();
-      }
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-      setButtonLoading(false);
-    } finally {
-      setButtonLoading(false);
-    }
-  };
-
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchClinicData);
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchDoctorData);
-
 
   return (
     <div>
@@ -346,7 +212,6 @@ const ClinicSingleView = () => {
         </button>
 
         <div className="flex items-center">
-          {/* Your CustomSwitch component here */}
           <CustomSwitch
             checked={clinicDetails?.User?.status}
             onChange={() =>
@@ -383,11 +248,11 @@ const ClinicSingleView = () => {
                 <div className="rounded-lg h-full mt-2 xl:-mt-3 flex flex-col justify-between">
                   <div className="">
                     <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
-                      <div className=" w-full flex items-start justify-between h-16 mt-2">
+                      <div className=" w-full flex items-start justify-between gap-2 mt-2 ">
                         {clinicDetails?.name || ""}
                         {!isSuperAdmin && (
                           <button
-                            className="flex hover:text-info p-4"
+                            className="flex text-slate-500 hover:text-info"
                             onClick={openEditModal}
                           >
                             <IconEdit className="w-5 h-5" />
@@ -396,65 +261,50 @@ const ClinicSingleView = () => {
                       </div>
                     </div>
                     <div className="flex flex-col gap-4">
-                      <div className="flex flex-col items-start gap-2 mt-0 xl:mt-1">
-                        <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                      <div className="flex flex-col items-start">
+                        <div className="text-base font-medium text-gray-500">
                           Address:
                         </div>
-                        <input
-                          type="text"
-                          value={clinicDetails?.address || ""}
-                          readOnly
-                          className="text-base border bg-transparent rounded w-full p-3 focus:outline-none dark:border-none dark:bg-gray-800"
-                        />
+                        <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2 min-h-20">
+                          {clinicDetails?.address || ""}
+                        </div>
                       </div>
 
-                      <div className="flex flex-col md:flex-row items-start gap-10 mt-0">
-                        <div className="flex flex-col items-start w-full md:w-1/2">
-                          <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                      <div className="flex flex-col md:flex-row items-start gap-5">
+                        <div className="flex flex-col items-start w-full">
+                          <div className="text-base font-medium text-gray-500 ">
                             Place:
                           </div>
-                          <input
-                            type="text"
-                            value={clinicDetails?.place || ""}
-                            readOnly
-                            className="text-base border bg-transparent rounded p-2 w-full focus:outline-none dark:border-none dark:bg-gray-800"
-                          />
+                          <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                            {clinicDetails?.place || ""}
+                          </div>
                         </div>
-                        <div className="flex flex-col items-start w-full md:w-1/2 -mt-6 md:mt-0">
-                          <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                        <div className="flex flex-col items-start w-full">
+                          <div className="text-base font-medium text-gray-500">
                             Email:
                           </div>
-                          <input
-                            type="text"
-                            value={clinicDetails?.User?.email || ""}
-                            readOnly
-                            className="text-base border bg-transparent rounded p-2 w-full focus:outline-none dark:border-none dark:bg-gray-800"
-                          />
+                          <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                            {clinicDetails?.User?.email || ""}
+                          </div>
                         </div>
                       </div>
 
-                      <div className="flex flex-col md:flex-row items-start gap-10 mt-0">
-                        <div className="flex flex-col items-start w-full md:w-1/2">
-                          <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                      <div className="flex flex-col md:flex-row items-start gap-5">
+                        <div className="flex flex-col items-start w-full">
+                          <div className="text-base font-medium text-gray-500">
                             Username:
                           </div>
-                          <input
-                            type="text"
-                            value={clinicDetails?.User?.user_name || ""}
-                            readOnly
-                            className="text-base border bg-transparent rounded p-2 w-full focus:outline-none dark:border-none dark:bg-gray-800"
-                          />
+                          <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                            {clinicDetails?.User?.user_name || ""}
+                          </div>
                         </div>
-                        <div className="flex flex-col items-start w-full md:w-1/2 -mt-6 md:mt-0">
-                          <div className="text-base font-medium text-[#AAAAAA] min-w-[75px]">
+                        <div className="flex flex-col items-start w-full">
+                          <div className="text-base font-medium text-gray-500">
                             Phone:
                           </div>
-                          <input
-                            type="text"
-                            value={clinicDetails?.phone || ""}
-                            readOnly
-                            className="text-base border bg-transparent rounded p-2 w-full focus:outline-none dark:border-none dark:bg-gray-800"
-                          />
+                          <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                            {clinicDetails?.phone || ""}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -481,16 +331,9 @@ const ClinicSingleView = () => {
             <h5 className="font-semibold text-lg dark:text-white-light">
               Doctors
             </h5>
-            <span className="badge bg-lime-600 p-0.5 px-1 rounded-full">
+            <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
               <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
             </span>
-          </div>
-
-          <div className="flex items-right text-gray-500 font-semibold dark:text-white-dark gap-y-4">
-            <CustomButton onClick={openAddDoctorModal}>
-              <IconMenuScrumboard className="ltr:mr-2 rtl:ml-2" />
-              Add Doctor
-            </CustomButton>
           </div>
         </div>
         {doctorLoading ? (
@@ -524,16 +367,13 @@ const ClinicSingleView = () => {
                 {
                   accessor: "photo",
                   title: "Photo",
-                  render: (row) =>
-                    row?.photo ? (
-                      <img
-                        src={imageBaseUrl + row.photo}
-                        alt="Doctor's photo"
-                        className="w-10 h-10 rounded-[50%]"
-                      />
-                    ) : (
-                      "---"
-                    ),
+                  render: (row) => (
+                    <img
+                      src={row?.photo ? imageBaseUrl + row.photo : emptyUser}
+                      alt={row?.name}
+                      className="w-10 h-10 rounded-[50%] object-cover"
+                    />
+                  ),
                 },
                 {
                   accessor: "name",
@@ -615,35 +455,6 @@ const ClinicSingleView = () => {
         handleSubmit={updateClinic}
         buttonLoading={buttonLoading}
         isEdit={true}
-      />
-
-      {/* subscription modal */}
-      <ModalSubscription
-        open={subscriptionModal}
-        closeModal={closeSubscriptionModal}
-        clinicId={clinicId}
-        ownerId={ownerId}
-        buttonLoading={buttonLoading}
-        setButtonLoading={setButtonLoading}
-        fetchClinicData={fetchClinicData}
-        selectedPlan={selectedPlan}
-        setSelectedPlan={setSelectedPlan}
-      />
-
-      {/* add doctor modal */}
-      <AddDoctor
-        open={addDoctorModal}
-        closeAddDoctorModal={closeAddDoctorModal}
-        buttonLoading={buttonLoading}
-        handleFileChange={handleFileChange}
-        input={input}
-        setInput={setInput}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        clinicId={clinicId}
-        timeSlotInput={timeSlotInput}
-        setTimeSlotInput={setTimeSlotInput}
-        formSubmit={addDoctor}
       />
     </div>
   );

@@ -142,27 +142,27 @@ const OwnerSingleView = () => {
               <div className="mt-5">
                 <div className="flex lg:flex-row md:flex-col sm:flex-col flex-wrap gap-6 mb-2">
                   <div className="flex flex-col lg:w-7/12 w-full mb-5">
-                    <div className="text-white-dark min-w-96 text-base mb-2">
+                    <div className="text-white-dark min-w-96 text-base mb-1">
                       Address
                     </div>
-                    <div className="dark:text-slate-300 border rounded p-1 text-base h-36 dark:border-none dark:bg-gray-800">
-                      {ownerInfo?.address} 
+                    <div className="dark:text-slate-300 border dark:border-slate-800 rounded p-2 text-base h-36">
+                      {ownerInfo?.address}
                     </div>
                   </div>
                   <div className="lg:w-4/12 w-full flex flex-col gap-4">
                     <div className="gap-1 mb-2 w-full">
-                      <div className="text-white-dark min-w-96 text-base mb-2">
+                      <div className="text-white-dark text-base mb-1">
                         Email
                       </div>
-                      <div className="dark:text-slate-300 border rounded p-1 text-base h-11 dark:border-none dark:bg-gray-800">
+                      <div className="dark:text-slate-300 border dark:border-slate-800 rounded p-2 text-base">
                         {ownerInfo?.email}
                       </div>
                     </div>
                     <div className="gap-1 mb-2 w-full">
-                      <div className="text-white-dark min-w-96 text-base mb-2">
+                      <div className="text-white-dark text-base mb-1">
                         Phone Number
                       </div>
-                      <div className="dark:text-slate-300 border rounded p-1 text-base h-11 dark:border-none dark:bg-gray-800">
+                      <div className="dark:text-slate-300 border dark:border-slate-800 rounded p-2 text-base">
                         {ownerInfo?.phone}
                       </div>
                     </div>

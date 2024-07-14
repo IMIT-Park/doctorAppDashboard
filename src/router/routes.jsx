@@ -22,7 +22,6 @@ const AdminSales = lazy(() => import("../panels/admin/Sales-team/Index"));
 const AdminSalesOwners = lazy(() =>
   import("../panels/admin/Sales-team/owners/Index")
 );
-const AdminMessages = lazy(() => import("../panels/admin/messages/Index"));
 const AdminSubscriptionPlans = lazy(() =>
   import("../panels/admin/subscription-plans/Index")
 );
@@ -42,13 +41,22 @@ const OwnerChat = lazy(() => import("../panels/owner/chats/Index"));
 const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
 const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/index"));
 const ClinicLeaves = lazy(() => import("../panels/clinic/leaves/Index"));
-const ClinicProfile = lazy(() =>import("../panels/clinic/profile/ClinicProfile"));
-const RequestToDoctor = lazy(() =>import("../panels/clinic/requestToDoctor/RequestToDoctor"));
+const ClinicProfile = lazy(() =>
+  import("../panels/clinic/profile/ClinicProfile")
+);
+const RequestToDoctor = lazy(() =>
+  import("../panels/clinic/requestToDoctor/RequestToDoctor")
+);
 const ClinicBookings = lazy(() => import("../panels/clinic/bookings/Index"));
-const ClinicPatientDetails = lazy(() => import("../panels/clinic/bookings/PatientDetails"));
-const ClinicSelectDoctor = lazy(() => import("../panels/clinic/bookings/SelectDoctor"));
-const ClinicSelectDateAndTime = lazy(() => import("../panels/clinic/bookings/SelectDateAndTime"));
-
+const ClinicPatientDetails = lazy(() =>
+  import("../panels/clinic/bookings/PatientDetails")
+);
+const ClinicSelectDoctor = lazy(() =>
+  import("../panels/clinic/bookings/SelectDoctor")
+);
+const ClinicSelectDateAndTime = lazy(() =>
+  import("../panels/clinic/bookings/SelectDateAndTime")
+);
 
 // <--------------> clinic panel imports ends here <-------------->
 
@@ -165,13 +173,6 @@ const routes = [
     layout: "default",
   },
 
-  // messages
-  {
-    path: "/admin/messages",
-    element: <AdminMessages />,
-    layout: "default",
-  },
-
   // sales-team
   {
     path: "/admin/sales",
@@ -278,16 +279,15 @@ const routes = [
     layout: "default",
   },
 
-   //ClinicSelectDoctor
-   {
+  //ClinicSelectDoctor
+  {
     path: "/clinic/bookings/SelectorDoctor",
     element: <ClinicSelectDoctor />,
     layout: "default",
   },
 
-
-   //ClinicSelectDateAndTime
-   {
+  //ClinicSelectDateAndTime
+  {
     path: "/clinic/bookings/SelectDateAndTime",
     element: <ClinicSelectDateAndTime />,
     layout: "default",

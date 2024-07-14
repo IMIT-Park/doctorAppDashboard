@@ -20,7 +20,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { userDetails } = useContext(UserContext);
+  const { userDetails, setUserDetails } = useContext(UserContext);
 
   const createUserData = (userDetails) => {
     const userData = {
@@ -115,6 +115,7 @@ const Header = () => {
 
   const handleLogout = () => {
     sessionStorage.clear();
+    setUserDetails(null);
     navigate("/");
   };
 

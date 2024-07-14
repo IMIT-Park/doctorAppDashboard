@@ -40,7 +40,7 @@ const LoginBoxed = () => {
   const [loading, setLoading] = useState(false);
   const [isIncorrect, setIsIncorrect] = useState(false);
 
-  const { setUserDetails } = useContext(UserContext); // Using UserContext
+  const { userDetails, setUserDetails } = useContext(UserContext);
 
   // warning alert closer
   useEffect(() => {

@@ -29,6 +29,11 @@ const RequestToDoctor = ({
   const handleRequest = async (e) => {
     e.preventDefault();
 
+    if(!email) {
+      showMessage("Please enter email address.", "warning");
+      return;
+    }
+
     if (!validateEmail(email)) {
       showMessage("Please enter a valid email address.", "error");
       setIsValidEmail(false);

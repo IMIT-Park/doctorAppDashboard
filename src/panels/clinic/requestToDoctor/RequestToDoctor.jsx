@@ -12,10 +12,10 @@ import { useNavigate } from "react-router-dom";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { UserContext } from "../../../contexts/UseContext";
 import ModalRequests from "./ModalRequests";
+import noProfile from "/assets/images/empty-user.png";
 
 const Requests = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(setPageTitle("RequestsToDoctor"));
@@ -57,7 +57,7 @@ const Requests = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/veiwRequest/${clinicId}?page=${page}&pageSize=${pageSize}`
       );
-      console.log(response);
+
       setTotalRequests(response?.data?.allRequest?.count);
       setAllRequests(response?.data?.allRequest?.rows);
 
@@ -110,7 +110,6 @@ const Requests = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allRequests}
-              // onRowClick={(row) => navigate(`/admin/owners/${row?.owner_id}`)}
               idAccessor="doctor_clinic_id"
               columns={[
                 {
@@ -121,21 +120,23 @@ const Requests = () => {
                 {
                   accessor: "Doctor.photo",
                   title: "Photo",
-                  render: (row) =>
-                    row?.Doctor?.photo ? (
-                      <img
-                        src={imageBaseUrl + row?.Doctor?.photo}
-                        alt="Doctor's photo"
-                        className="w-10 h-10 rounded-[50%]"
-                      />
-                    ) : (
-                      "---"
-                    ),
+                  render: (row) => (
+                    <img
+                      src={
+                        row?.Doctor?.photo
+                          ? imageBaseUrl + row?.Doctor?.photo
+                          : noProfile
+                      }
+                      alt={row?.Doctor?.name}
+                      className="w-10 h-10 rounded-[50%] object-cover"
+                    />
+                  ),
                 },
                 {
                   accessor: "Doctor.name",
                   title: "Name",
                   render: (row) => row?.Doctor?.name || "",
+                  cellsClassName: "capitalize",
                 },
                 {
                   accessor: "email",

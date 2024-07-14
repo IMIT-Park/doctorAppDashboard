@@ -1,30 +1,21 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
-import { DataTable } from "mantine-datatable";
-import Swal from "sweetalert2";
-import CountUp from "react-countup";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import IconSearch from "../../../components/Icon/IconSearch";
-import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
+import { useNavigate } from "react-router-dom";
+import NetworkHandler from "../../../utils/NetworkHandler";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
 import AddLeave from "./AddLeaveModal";
 import AnimateHeight from "react-animate-height";
 import IconCaretDown from "../../../components/Icon/IconCaretDown";
-import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import { formatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
-import DeleteLeaveModal from "./DeleteLeaveModal";
 import DeleteLeave from "../../../pages/DoctorSingleView/components/DeleteLeave";
 
 const ClinicDoctorLeave = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(setPageTitle("Doctors"));
@@ -261,6 +252,8 @@ const ClinicDoctorLeave = () => {
           </div>
         )}
       </div>
+
+      {/* add leave modal */}
       <AddLeave
         addLeaveModal={addLeaveModal}
         setAddLeaveModal={setAddLeaveModal}
@@ -270,14 +263,7 @@ const ClinicDoctorLeave = () => {
         fetchLeaveData={fetchLeaveData}
       />
 
-      {/* <DeleteLeaveModal
-        open={deleteLeaveModal}
-        closeModal={closeDeleteLeaveModal}
-        leave={selectedLeave}
-        fetchLeaveData={fetchLeaveData}
-        selectedTimeSlots={selectedTimeSlots}
-        setSelectedTimeSlots={setSelectedTimeSlots}
-      /> */}
+      {/* delete leave modal  */}
       <DeleteLeave
         open={deleteLeaveModal}
         closeModal={closeDeleteLeaveModal}

@@ -7,6 +7,8 @@ import IconLockDots from "../../../components/Icon/IconLockDots";
 import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
 import GoogleLocationPicker from "../../../components/GoogleLocationPicker/GoogleLocationPicker";
+import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
+import { showMessage } from "../../../utils/showMessage";
 
 const AddClinic = ({
   open,
@@ -19,40 +21,49 @@ const AddClinic = ({
   isEdit,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    if (data.password !== data.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    if (data.phone.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+      showMessage("Phone number must be exactly 10 digits", "warning");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handlePasswordChange = (e) => {
     setData({ ...data, password: e.target.value });
-    setPasswordError("");
+    setErrors({ ...errors, confirmPassword: "" });
   };
 
   const handleConfirmPasswordChange = (e) => {
     setData({ ...data, confirmPassword: e.target.value });
     if (e.target.value !== data.password) {
-      setPasswordError("Passwords do not match");
+      setErrors({ ...errors, confirmPassword: "Passwords do not match" });
     } else {
-      setPasswordError("");
+      setErrors({ ...errors, confirmPassword: "" });
+    }
+  };
+
+  const handlePhoneChange = (value) => {
+    setData({ ...data, phone: value });
+    if (value.length === 10) {
+      setErrors((prevErrors) => ({ ...prevErrors, phone: "" }));
     }
   };
 
   const handleSubmitAdd = (e) => {
     e.preventDefault();
-    if (data.password !== data.confirmPassword) {
-      setPasswordError("Passwords do not match");
-      return;
+    if (validate()) {
+      handleSubmit();
     }
-    handleSubmit();
   };
-
-  useEffect(() => {
-    if (data.email) {
-      setData((prevInput) => ({
-        ...prevInput,
-        user_name: data.email,
-      }));
-    }
-  }, [data.email]);
-
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -97,7 +108,9 @@ const AddClinic = ({
                 </div>
                 <div className="p-5">
                   <form onSubmit={handleSubmitAdd}>
-                    <div className={`grid grid-cols-1 ${isEdit ? "sm:grid-cols-2" : "sm:flex justify-between"} gap-4 mb-5`}>
+                    <div
+                      className={`grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5`}
+                    >
                       <div className="w-full">
                         <label htmlFor="first-name">Name</label>
                         <input
@@ -111,50 +124,46 @@ const AddClinic = ({
                           }
                         />
                       </div>
-                      {!isEdit && (
-                        <div className="w-full">
-                          <label htmlFor="email">Email</label>
-                          <input
-                            id="email"
-                            type="email"
-                            placeholder="Enter Email"
-                            className="form-input form-input-green"
-                            value={data.email}
-                            onChange={(e) =>
-                              setData({ ...data, email: e.target.value })
-                            }
-                            autoComplete="off"
-                          />
-                        </div>
-                      )}
+                      <div className="w-full">
+                        <label htmlFor="email">Email</label>
+                        <input
+                          id="email"
+                          type="email"
+                          placeholder="Enter Email"
+                          className="form-input form-input-green"
+                          value={data.email}
+                          onChange={(e) =>
+                            setData({ ...data, email: e.target.value })
+                          }
+                          autoComplete="off"
+                          readOnly={isEdit}
+                        />
+                      </div>
                     </div>
-                    <div  className={`grid grid-cols-1 ${isEdit ? "sm:grid-cols-2" : "sm:flex justify-between"} gap-4 mb-5`}>
-                      {!isEdit && (
-                        <div className="w-full">
-                          <label htmlFor="username">Username</label>
-                          <input
-                            id="username"
-                            type="text"
-                            placeholder="Username"
-                            className="form-input form-input-green"
-                            value={data.user_name}
-                            onChange={(e) =>
-                              setData({ ...data, user_name: e.target.value })
-                            }
-                          />
-                        </div>
-                      )}
+                    <div
+                      className={`grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5`}
+                    >
+                      <div className="w-full">
+                        <label htmlFor="username">Username</label>
+                        <input
+                          id="username"
+                          type="text"
+                          placeholder="Username"
+                          className="form-input form-input-green"
+                          readOnly
+                          value={data.email}
+                          onChange={(e) =>
+                            setData({ ...data, email: e.target.value })
+                          }
+                        />
+                      </div>
                       <div className="w-full">
                         <label htmlFor="number">Phone Number</label>
-                        <input
-                          id="phone"
-                          type="number"
-                          placeholder="Phone Number"
-                          className="form-input form-input-green"
-                          value={data.phone}
-                          onChange={(e) =>
-                            setData({ ...data, phone: e.target.value })
-                          }
+                        <PhoneNumberInput
+                          value={data?.phone}
+                          onChange={handlePhoneChange}
+                          error={errors?.phone}
+                          maxLength="10"
                         />
                       </div>
                     </div>
@@ -271,10 +280,14 @@ const AddClinic = ({
                             <label htmlFor="confirm-password">
                               Confirm Password
                             </label>
-                            <div className="relative text-white-dark">
+                            <div
+                              className={`relative text-white-dark ${
+                                errors.confirmPassword && "has-error"
+                              }`}
+                            >
                               <input
                                 id="Confirm Password"
-                                type={showPassword ? "text" : "password"}
+                                type={showConfirmPassword ? "text" : "password"}
                                 placeholder="Enter Confirm Password"
                                 className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
                                 value={data.confirmPassword}
@@ -285,19 +298,25 @@ const AddClinic = ({
                               </span>
                               <span
                                 title={
-                                  showPassword
+                                  showConfirmPassword
                                     ? "hide password"
                                     : "show password"
                                 }
                                 className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                                onClick={() => setShowPassword(!showPassword)}
+                                onClick={() =>
+                                  setShowConfirmPassword(!showConfirmPassword)
+                                }
                               >
-                                {showPassword ? <IconEye /> : <IconCloseEye />}
+                                {showConfirmPassword ? (
+                                  <IconEye />
+                                ) : (
+                                  <IconCloseEye />
+                                )}
                               </span>
                             </div>
-                            {passwordError && (
-                              <p className="text-red-500 text-sm mt-2">
-                                {passwordError}
+                            {errors.confirmPassword && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {errors.confirmPassword}
                               </p>
                             )}
                           </div>

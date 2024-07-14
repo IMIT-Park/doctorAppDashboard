@@ -146,11 +146,12 @@ const Clinics = () => {
   };
 
   const openEditModal = (clinic) => {
+    const phoneWithoutCountryCode = clinic.phone.replace(/^\+91/, '');
     setInput({
       name: clinic.name,
       email: clinic.User.email,
       username: clinic.User.user_name,
-      phone: clinic.phone,
+      phone: phoneWithoutCountryCode,
       address: clinic.address,
       place: clinic.place,
       picture: null,
@@ -181,7 +182,6 @@ const Clinics = () => {
     if (
       !input.name ||
       !input.email ||
-      !input.user_name ||
       !input.phone ||
       !input.address ||
       !input.place ||
@@ -207,8 +207,8 @@ const Clinics = () => {
     const formData = new FormData();
     formData.append("name", input.name);
     formData.append("email", input.email);
-    formData.append("user_name", input.user_name);
-    formData.append("phone", input.phone);
+    formData.append("user_name", input.email);
+    formData.append("phone", `+91${input.phone}`);
     formData.append("address", input.address);
     formData.append("place", input.place);
 
@@ -248,14 +248,13 @@ const Clinics = () => {
   };
 
   const updateClinic = async () => {
-    if (
-      !input.name ||
-      !input.phone ||
-      !input.address ||
-      !input.place ||
-      !input.googleLocation
-    ) {
+    if (!input.name || !input.phone || !input.address || !input.place) {
       showMessage("Please fill in all required fields", "warning");
+      return true;
+    }
+
+    if (!input.googleLocation) {
+      showMessage("Please select clinic location", "warning");
       return true;
     }
 
@@ -263,7 +262,7 @@ const Clinics = () => {
 
     const formData = new FormData();
     formData.append("name", input.name);
-    formData.append("phone", input.phone);
+    formData.append("phone", `+91${input.phone}`);
     formData.append("address", input.address);
     formData.append("place", input.place);
     formData.append("googleLocation", JSON.stringify(input.googleLocation));

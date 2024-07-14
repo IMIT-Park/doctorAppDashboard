@@ -45,6 +45,7 @@ const SupportUser = () => {
     confirmPassword: "",
   });
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     setPage(1);
@@ -94,8 +95,22 @@ const SupportUser = () => {
       password: "",
       confirmPassword: "",
     });
-
+    setErrors(null);
     setAddModal(false);
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (input.password !== input.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      showMessage("Passwords do not match", "warning");
+    }
+    if (input.phone.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+      showMessage("Phone number must be exactly 10 digits", "warning");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   //Add Support User function
@@ -103,7 +118,6 @@ const SupportUser = () => {
     if (
       !input.name ||
       !input.email ||
-      !input.user_name ||
       !input.phone ||
       !input.address ||
       !input.password ||
@@ -113,45 +127,56 @@ const SupportUser = () => {
       return true;
     }
 
-    if (input.password !== input.confirmPassword) {
-      showMessage("Passwords do not match", "warning");
-      return true;
-    }
-    setButtonLoading(true);
+    if (validate()) {
+      setButtonLoading(true);
 
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        "/v1/supportuser/createSupportuser", 
-        input
-      );
+      const updatedData = {
+        ...input,
+        phone: `+91${input.phone}`,
+        user_name: input?.email,
+      };
 
-      if (response.status === 201) {
-        showMessage("Support User added successfully.");
+      try {
+        const response = await NetworkHandler.makePostRequest(
+          "/v1/supportuser/createSupportuser",
+          updatedData
+        );
+
+        if (response.status === 201) {
+          showMessage("Support User added successfully.");
+          setButtonLoading(false);
+          closeAddModal();
+          fetchData();
+        } else {
+          showMessage("Failed to add support user. Please try again.", "error");
+          setButtonLoading(false);
+        }
+      } catch (error) {
         setButtonLoading(false);
-        closeAddModal();
-        fetchData();
-      } else {
-        showMessage("Failed to add support user. Please try again.", "error");
+        if (error.response && error.response.status === 403) {
+          showMessage(
+            error?.response?.data?.error == "User Already Exists"
+              ? "Username Already Exists"
+              : "Email already exists.",
+            "error"
+          );
+        } else {
+          showMessage("An error occurred. Please try again.", "error");
+        }
+      } finally {
         setButtonLoading(false);
       }
-    } catch (error) {
-      setButtonLoading(false);
-      if (error.response && error.response.status === 403) {
-        showMessage(error?.response?.data?.error == "User Already Exists" ? "Username Already Exists" : "Email already exists.", "error");
-      } else {
-        showMessage("An error occurred. Please try again.", "error");
-      }
-    } finally {
-      setButtonLoading(false);
     }
   };
 
   // edit modal handler
   const openEditModal = (rowData) => {
+    const phoneWithoutCountryCode = rowData.phone.replace(/^\+91/, "");
+
     setSupportPersonId(rowData?.supportuser_id || "");
     setInput({
       name: rowData?.name || "",
-      phone: rowData?.phone || "",
+      phone: phoneWithoutCountryCode || "",
       address: rowData?.address || "",
     });
     setEditModal(true);
@@ -169,47 +194,52 @@ const SupportUser = () => {
       password: "",
       confirmPassword: "",
     });
+    setErrors(null);
     setEditModal(false);
   };
 
   //Edit support user function
   const editSupportUser = async () => {
-    if (
-      !input.name ||
-      !input.phone ||
-      !input.address
-    ) {
+    if (!input.name || !input.phone || !input.address) {
       showMessage("Please fill in all required fields", "warning");
       return true;
     }
 
-    setButtonLoading(true);
-    try {
-      const response = await NetworkHandler.makePutRequest(
-        `/v1/supportuser/updateSupportuser/${supportPersonId}`,
-        input
-      );
-      if (response.status === 200) {
-        showMessage("Support User updated successfully.");
-        setButtonLoading(false);
-        closeEditModal();
-        fetchData();
-      } else {
-        showMessage(
-          "Failed to update support user. Please try again.",
-          "error"
+    if (validate()) {
+      setButtonLoading(true);
+
+      const updatedData = {
+        ...input,
+        phone: `+91${input.phone}`,
+      };
+
+      try {
+        const response = await NetworkHandler.makePutRequest(
+          `/v1/supportuser/updateSupportuser/${supportPersonId}`,
+          updatedData
         );
+        if (response.status === 200) {
+          showMessage("Support User updated successfully.");
+          setButtonLoading(false);
+          closeEditModal();
+          fetchData();
+        } else {
+          showMessage(
+            "Failed to update support user. Please try again.",
+            "error"
+          );
+          setButtonLoading(false);
+        }
+      } catch (error) {
+        setButtonLoading(false);
+        if (error.response && error.response.status === 403) {
+          showMessage("Email already exists.", "error");
+        } else {
+          showMessage("An error occurred. Please try again.", "error");
+        }
+      } finally {
         setButtonLoading(false);
       }
-    } catch (error) {
-      setButtonLoading(false);
-      if (error.response && error.response.status === 403) {
-        showMessage("Email already exists.", "error");
-      } else {
-        showMessage("An error occurred. Please try again.", "error");
-      }
-    } finally {
-      setButtonLoading(false);
     }
   };
 
@@ -305,6 +335,7 @@ const SupportUser = () => {
                 {
                   accessor: "name",
                   title: "Name",
+                  cellsClassName: "capitalize",
                 },
                 { accessor: "email" },
                 { accessor: "phone" },
@@ -378,6 +409,8 @@ const SupportUser = () => {
         setInput={setInput}
         buttonLoading={buttonLoading}
         formSubmit={addSupportUser}
+        errors={errors}
+        setErrors={setErrors}
       />
 
       {/* edit support user modal */}
@@ -389,6 +422,8 @@ const SupportUser = () => {
         buttonLoading={buttonLoading}
         formSubmit={editSupportUser}
         isEditMode={true}
+        errors={errors}
+        setErrors={setErrors}
       />
 
       {/* delete support user modal */}

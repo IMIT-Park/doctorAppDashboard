@@ -47,11 +47,11 @@ const Sales = () => {
     password: "",
     confirmPassword: "",
   });
-  const [emailError, setEmailError] = useState("");
   const [buttonLoading, setButtonLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showComfirmPassword, setShowComfirmPassword] = useState(false);
   const [singleDetails, setSingleDetails] = useState({});
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     setPage(1);
@@ -78,7 +78,7 @@ const Sales = () => {
       phone: "",
       address: "",
     });
-    setEmailError("");
+    setErrors(null);
   };
 
   // get all Sales-Persons function
@@ -102,12 +102,25 @@ const Sales = () => {
     fetchData();
   }, [page, pageSize]);
 
+  const validate = () => {
+    const newErrors = {};
+    if (input.password !== input.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      showMessage("Passwords do not match", "warning");
+    }
+    if (input.phone.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+      showMessage("Phone number must be exactly 10 digits", "warning");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   //Add Sales Person function
   const saveSalesPerson = async () => {
     if (
       !input.name ||
       !input.email ||
-      !input.user_name ||
       !input.phone ||
       !input.address ||
       !input.password ||
@@ -116,35 +129,41 @@ const Sales = () => {
       showMessage("Please fill in all required fields", "warning");
       return true;
     }
+    if (validate()) {
+      setButtonLoading(true);
 
-    if (input.password !== input.confirmPassword) {
-      showMessage("Passwords do not match", "warning");
-      return true;
-    }
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        "/v1/salesperson/createsalesperson",
-        input
-      );
-      setAddSalesPersonModal(false);
-
-      if (response.status === 201) {
-        showMessage("Sales Person has been added successfully.");
-        closeAddSalesPersonModal();
-        fetchData();
-      } else {
-        showMessage("Failed to add sales person. Please try again.", "error");
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 403) {
-        showMessage(
-          error?.response?.data?.error == "User Already Exists"
-            ? "Username Already Exists"
-            : "Email already exists.",
-          "error"
+      const updatedData = {
+        ...input,
+        phone: `+91${input.phone}`,
+        user_name: input?.email,
+      };
+      try {
+        const response = await NetworkHandler.makePostRequest(
+          "/v1/salesperson/createsalesperson",
+          updatedData
         );
-      } else {
-        showMessage("Failed to add sales person. Please try again.", "error");
+        setAddSalesPersonModal(false);
+
+        if (response.status === 201) {
+          showMessage("Sales Person has been added successfully.");
+          closeAddSalesPersonModal();
+          fetchData();
+        } else {
+          showMessage("Failed to add sales person. Please try again.", "error");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          showMessage(
+            error?.response?.data?.error == "User Already Exists"
+              ? "Username Already Exists"
+              : "Email already exists.",
+            "error"
+          );
+        } else {
+          showMessage("Failed to add sales person. Please try again.", "error");
+        }
+      } finally {
+        setButtonLoading(false);
       }
     }
   };
@@ -159,31 +178,44 @@ const Sales = () => {
       showMessage("Please fill in all required fields", "error");
       return;
     }
+    if (validate()) {
+      setButtonLoading(true);
 
-    try {
-      const response = await NetworkHandler.makePutRequest(
-        `/v1/salesperson/updatesalesperson/${selectedSalesPerson.salesperson_id}`,
-        input
-      );
+      const updatedData = {
+        ...input,
+        phone: `+91${input.phone}`,
+      };
+      try {
+        const response = await NetworkHandler.makePutRequest(
+          `/v1/salesperson/updatesalesperson/${selectedSalesPerson.salesperson_id}`,
+          updatedData
+        );
 
-      if (response.status === 200) {
-        showMessage("Salesperson has been updated successfully.");
-        closeEditModal();
-        fetchData();
-      } else {
+        if (response.status === 200) {
+          showMessage("Salesperson has been updated successfully.");
+          closeEditModal();
+          fetchData();
+        } else {
+          showMessage(
+            "Failed to update salesperson. Please try again.",
+            "error"
+          );
+        }
+      } catch (error) {
         showMessage("Failed to update salesperson. Please try again.", "error");
+      } finally {
+        setButtonLoading(false);
       }
-    } catch (error) {
-      showMessage("Failed to update salesperson. Please try again.", "error");
     }
   };
 
   const openEditModal = (salesPerson) => {
+    const phoneWithoutCountryCode = salesPerson.phone.replace(/^\+91/, "");
     setSelectedSalesPerson(salesPerson);
     setEditSalesPersonModal(true);
     setInput({
       name: salesPerson?.name,
-      phone: salesPerson?.phone,
+      phone: phoneWithoutCountryCode,
       address: salesPerson?.address,
     });
   };
@@ -201,6 +233,7 @@ const Sales = () => {
       password: "",
       confirmPassword: "",
     });
+    setErrors(null);
   };
 
   const openViewModal = (user) => {
@@ -263,7 +296,11 @@ const Sales = () => {
                   title: "ID",
                   render: (row, rowIndex) => rowIndex + 1,
                 },
-                { accessor: "name", title: "Name" },
+                {
+                  accessor: "name",
+                  title: "Name",
+                  cellsClassName: "capitalize",
+                },
                 { accessor: "email", title: "Email" },
                 { accessor: "phone", title: "Phone" },
                 { accessor: "address", title: "Address" },
@@ -271,7 +308,7 @@ const Sales = () => {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (user) => (
-                    <div className="flex gap-4 items-center w-max mx-auto">
+                    <div className="flex gap-6 items-center w-max mx-auto">
                       <CustomSwitch
                         checked={user?.User?.status}
                         onChange={() =>
@@ -337,8 +374,8 @@ const Sales = () => {
         setShowPassword={setShowPassword}
         showComfirmPassword={showComfirmPassword}
         setShowComfirmPassword={setShowComfirmPassword}
-        emailError={emailError}
-        setEmailError={setEmailError}
+        errors={errors}
+        setErrors={setErrors}
       />
       <AddSalesPerson
         open={editSalesPersonModal}
@@ -349,6 +386,8 @@ const Sales = () => {
         isEditMode={true}
         buttonLoading={buttonLoading}
         setButtonLoading={setButtonLoading}
+        errors={errors}
+        setErrors={setErrors}
       />
       <ShowSalesPerson
         open={viewModal}

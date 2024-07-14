@@ -14,6 +14,7 @@ import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { formatDate } from "../../../utils/formatDate";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
+import noProfile from "/assets/images/empty-user.png";
 
 const Doctors = () => {
   const dispatch = useDispatch();
@@ -136,19 +137,20 @@ const Doctors = () => {
                 {
                   accessor: "photo",
                   title: "Photo",
-                  render: (row) =>
-                    row?.photo ? (
-                      <img
-                        src={imageBaseUrl + row?.photo}
-                        alt="Doctor's photo"
-                        className="w-10 h-10 rounded-[50%]"
-                      />
-                    ) : (
-                      "---"
-                    ),
+                  render: (row) => (
+                    <img
+                      src={row?.photo ? imageBaseUrl + row?.photo : noProfile}
+                      alt={row?.name}
+                      className="w-10 h-10 rounded-[50%] object-cover"
+                    />
+                  ),
                 },
 
-                { accessor: "name", title: "Name" },
+                {
+                  accessor: "name",
+                  title: "Name",
+                  cellsClassName: "capitalize",
+                },
                 { accessor: "email", title: "Email" },
                 { accessor: "phone", title: "Phone" },
                 {
@@ -164,7 +166,7 @@ const Doctors = () => {
                 { accessor: "qualification", title: "Qualification" },
                 { accessor: "specialization", title: "Specialization" },
                 { accessor: "address", title: "Address" },
-                { accessor: "fees", title: "Fees" },
+                { accessor: "fees", title: "Fees",render: (row) => `₹${row?.fees}`, },
                 {
                   accessor: "visibility",
                   title: "Visibility",

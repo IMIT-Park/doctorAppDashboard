@@ -3,28 +3,25 @@ import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../store/themeConfigSlice";
 import IconLoader from "../../components/Icon/IconLoader";
 import ScrollToTop from "../../components/ScrollToTop";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import IconCaretDown from "../../components/Icon/IconCaretDown";
 import AnimateHeight from "react-animate-height";
 import NetworkHandler, { imageBaseUrl } from "../../utils/NetworkHandler";
-import { formatDate, reverseformatDate } from "../../utils/formatDate";
+import { formatDate } from "../../utils/formatDate";
 import { formatTime } from "../../utils/formatTime";
-import IconEdit from "../../components/Icon/IconEdit";
 import { showMessage } from "../../utils/showMessage";
 import IconPlus from "../../components/Icon/IconPlus";
 import DeleteTimeslot from "./components/DeleteTimeslot";
-import DoctorDetailsEdit from "./components/DoctorDetailsEdit";
-import DoctorProfileEdit from "./components/DoctorProfileEdit";
 import DoctorTimeSlotEdit from "./components/DoctorTimeSlotEdit";
 import AddLeave from "./components/AddLeave";
 import useBlockUnblock from "../../utils/useBlockUnblock";
-import "tippy.js/dist/tippy.css";
 import useFetchData from "../../customHooks/useFetchData";
 import IconTrashLines from "../../components/Icon/IconTrashLines";
 import DeleteLeave from "./components/DeleteLeave";
 import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
 import CustomButton from "../../components/CustomButton";
+import noProfile from "/assets/images/empty-user.png";
 
 const SinglePage = () => {
   const { doctorId } = useParams();
@@ -173,119 +170,6 @@ const SinglePage = () => {
   const handleClinicSelect = (clinic) => {
     setSelectedClinic(clinic);
     setClinicId(clinic?.clinic_id);
-  };
-
-  // edit details modal handler
-  const openEditDetailsModal = () => {
-    setInput({
-      ...input,
-      name: doctorDetails?.name || "",
-      phone: doctorDetails?.phone || "",
-      email: doctorDetails?.email || "",
-      address: doctorDetails?.address || "",
-      gender: doctorDetails?.gender || "",
-      dateOfBirth: reverseformatDate(doctorDetails?.dateOfBirth) || "",
-      qualification: doctorDetails?.qualification || "",
-      specialization: doctorDetails?.specialization || "",
-      fees: doctorDetails?.fees || "",
-      visibility: doctorDetails?.visibility || true,
-    });
-    setEditDetailsModal(true);
-  };
-
-  const closeEditDetailsModal = () => {
-    setInput({
-      ...input,
-      name: "",
-      phone: "",
-      email: "",
-      address: "",
-      gender: "",
-      dateOfBirth: "",
-      qualification: "",
-      specialization: "",
-      fees: "",
-      visibility: true,
-    });
-    setEditDetailsModal(false);
-  };
-
-  //  Edit Doctor Details function
-  const editDoctorDetails = async () => {
-    if (
-      !input.name ||
-      !input.phone ||
-      !input.email ||
-      !input.address ||
-      !input.gender ||
-      !input.dateOfBirth ||
-      !input.qualification ||
-      !input.specialization ||
-      !input.fees
-    ) {
-      showMessage("Please fill in all required fields", "warning");
-      return true;
-    }
-
-    setButtonLoading(true);
-    try {
-      const response = await NetworkHandler.makePutRequest(
-        `/v1/doctor/editDoctor/${doctorId}`,
-        input
-      );
-
-      if (response.status === 200) {
-        fetchDoctorData();
-        showMessage("Details Updated successfully.", "success");
-        closeEditDetailsModal();
-      }
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-      setButtonLoading(false);
-    } finally {
-      setButtonLoading(false);
-    }
-  };
-
-  // edit photo modal handler
-  const openEditProfileModal = () => {
-    setEditPhotoModal(true);
-  };
-
-  const closeEditProfileModal = () => {
-    setProfilePicture(null);
-    setEditPhotoModal(false);
-  };
-
-  //  Edit Doctor Profile function
-  const editDoctorPhoto = async () => {
-    if (!profilePicture) {
-      showMessage("Please select a picture", "warning");
-      return true;
-    }
-
-    setButtonLoading(true);
-
-    const formData = new FormData();
-    formData.append("image_url[]", profilePicture);
-
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/doctor/upload/${doctorId}`,
-        formData
-      );
-
-      if (response.status === 201) {
-        fetchDoctorData();
-        showMessage("Photo Updated successfully.", "success");
-        closeEditProfileModal();
-      }
-    } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-      setButtonLoading(false);
-    } finally {
-      setButtonLoading(false);
-    }
   };
 
   // add timeslot modal handler
@@ -517,44 +401,25 @@ const SinglePage = () => {
           uniqueId={`doctor${doctorDetails?.clinic_id}`}
           size="large"
         />
-        {/* {!isSuperAdmin && (
-          <button
-            className="flex hover:text-info"
-            onClick={openEditDetailsModal}
-          >
-            <IconEdit className="w-6 h-6" />
-          </button>
-        )} */}
       </div>
       <div className="panel mb-1">
         {detailsLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="w-full flex flex-wrap gap-3"> 
+            <div className="w-full flex flex-wrap gap-3">
               <div className="flex flex-row">
                 <div className="relative flex flex-row justify-center">
-                {doctorDetails?.photo ? (
                   <img
-                    src={imageBaseUrl + doctorDetails?.photo}
+                    src={
+                      doctorDetails?.photo
+                        ? imageBaseUrl + doctorDetails?.photo
+                        : noProfile
+                    }
                     alt={doctorDetails?.name || ""}
                     className="w-40 h-40 rounded-full object-cover mb-2"
                   />
-                ) : (
-                  <div className="w-40 h-40 rounded-full grid place-items-center bg-slate-300 dark:bg-slate-700 mb-2">
-                    No photo
-                  </div>
-                )}
-                {!isSuperAdmin && (
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 btn btn-dark w-8 h-8 p-0 rounded-full"
-                    onClick={openEditProfileModal}
-                  >
-                    <IconEdit className="w-4" />
-                  </button>
-                )}
-              </div>
+                </div>
               </div>
               <div className="w-full flex flex-col mb-2 mt-2 px-4">
                 <div className="w-full">
@@ -721,7 +586,7 @@ const SinglePage = () => {
                 </h5>
                 {!isSuperAdmin && (
                   <CustomButton onClick={openAddTimeSlotModal}>
-                    <IconPlus className="ltr:mr-2 rtl:ml-2 text-dark" />
+                    <IconPlus className="ltr:mr-2 rtl:ml-2 " />
                     Add Time Slot
                   </CustomButton>
                 )}
@@ -908,25 +773,6 @@ const SinglePage = () => {
           </>
         )}
       </div>
-      {/* doctor details edit modal */}
-      <DoctorDetailsEdit
-        open={editDetailsModal}
-        closeModal={closeEditDetailsModal}
-        input={input}
-        setInput={setInput}
-        buttonLoading={buttonLoading}
-        formSubmit={editDoctorDetails}
-      />
-
-      {/* doctor photo edit modal */}
-      <DoctorProfileEdit
-        open={editPhotoModal}
-        closeModal={closeEditProfileModal}
-        profilePicture={profilePicture}
-        setProfilePicture={setProfilePicture}
-        formSubmit={editDoctorPhoto}
-        buttonLoading={buttonLoading}
-      />
 
       {/* doctor timeslot Add modal */}
       <DoctorTimeSlotEdit

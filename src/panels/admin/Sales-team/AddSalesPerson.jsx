@@ -1,9 +1,11 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
-import IconEye from "../../../components/Icon/IconEye"; // Ensure this path is correct
+import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
+import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
+
 const AddSalesPerson = ({
   open,
   closeModal,
@@ -11,10 +13,9 @@ const AddSalesPerson = ({
   setInput,
   formSubmit,
   isEditMode,
-  emailError,
-  setEmailError,
+  errors,
+  setErrors,
   buttonLoading,
-  setButtonLoading,
   showPassword,
   setShowPassword,
   showComfirmPassword,
@@ -23,30 +24,34 @@ const AddSalesPerson = ({
   const handleEmailChange = (e) => {
     const email = e.target.value;
     setInput({ ...input, email, user_name: email });
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (emailRegex.test(email)) {
-      setEmailError("");
+      setErrors({ ...errors, email: "" });
     } else {
-      setEmailError("Please enter a valid email address");
+      setErrors({ ...errors, email: "Please enter a valid email address" });
+    }
+  };
+  
+
+  const handlePhoneChange = (value) => {
+    setInput({ ...input, phone: value });
+    if (value.length === 10) {
+      setErrors((prevErrors) => ({ ...prevErrors, phone: "" }));
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleConfirmPasswordChange = (e) => {
+    const { value } = e.target;
+    setInput({ ...input, confirmPassword: value });
+    if (value === input.password) {
+      setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: "" }));
+    }
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setButtonLoading(true);
-    await formSubmit();
-    setButtonLoading(false);
+    formSubmit();
   };
-
-  useEffect(() => {
-    // Check if input.email exists and set the username accordingly
-    if (input.email) {
-      setInput((prevInput) => ({
-        ...prevInput,
-        user_name: input.email, // Extract username from email
-      }));
-    }
-  }, [input.email]);
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -104,23 +109,24 @@ const AddSalesPerson = ({
                         }
                       />
                     </div>
-                    {!isEditMode &&
-                    <div className="mb-5">
-                      <label htmlFor="email">Email</label>
-                      <input
-                        id="email"
-                        type="email"
-                        placeholder="Enter Email"
-                        className="form-input form-input-green"
-                        value={input?.email}
-                        onChange={handleEmailChange}
-                      />
-                      {emailError && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {emailError}
-                        </p>
-                      )}
-                    </div>}
+                    {!isEditMode && (
+                      <div className={`mb-5 ${errors?.email && "has-error"}`}>
+                        <label htmlFor="email">Email</label>
+                        <input
+                          id="email"
+                          type="email"
+                          placeholder="Enter Email"
+                          className="form-input form-input-green"
+                          value={input?.email}
+                          onChange={handleEmailChange}
+                        />
+                        {errors?.email && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors?.email}
+                          </p>
+                        )}
+                      </div>
+                    )}
                     {!isEditMode && (
                       <div className="mb-5">
                         <label htmlFor="user-name">User Name</label>
@@ -129,24 +135,21 @@ const AddSalesPerson = ({
                           type="text"
                           placeholder="Enter User Name"
                           className="form-input form-input-green"
-                          value={input?.user_name}
+                          value={input?.email}
                           onChange={(e) =>
-                            setInput({ ...input, user_name: e.target.value })
+                            setInput({ ...input, email: e.target.value })
                           }
+                          readOnly
                         />
                       </div>
                     )}
                     <div className="mb-5">
                       <label htmlFor="phone">Phone Number</label>
-                      <input
-                        id="phone"
-                        type="number"
-                        placeholder="Enter Phone Number"
-                        className="form-input form-input-green"
+                      <PhoneNumberInput
                         value={input?.phone}
-                        onChange={(e) =>
-                          setInput({ ...input, phone: e.target.value })
-                        }
+                        onChange={handlePhoneChange}
+                        error={errors?.phone}
+                        maxLength="10"
                       />
                     </div>
                     <div className="mb-5">
@@ -194,19 +197,18 @@ const AddSalesPerson = ({
                           <label htmlFor="confirm-password">
                             Confirm Password
                           </label>
-                          <div className="relative">
+                          <div
+                            className={`relative ${
+                              errors?.confirmPassword && "has-error"
+                            }`}
+                          >
                             <input
                               id="confirm-password"
                               type={showComfirmPassword ? "text" : "password"}
                               placeholder="Enter Confirm Password"
                               className="form-input form-input-green pr-10"
                               value={input?.confirmPassword}
-                              onChange={(e) =>
-                                setInput({
-                                  ...input,
-                                  confirmPassword: e.target.value,
-                                })
-                              }
+                              onChange={handleConfirmPasswordChange}
                             />
                             <span
                               title={
@@ -226,6 +228,11 @@ const AddSalesPerson = ({
                               )}
                             </span>
                           </div>
+                          {errors?.confirmPassword && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors?.confirmPassword}
+                            </p>
+                          )}
                         </div>
                       </>
                     )}

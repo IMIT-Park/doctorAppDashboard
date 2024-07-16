@@ -103,6 +103,7 @@ const Owners = () => {
                 {
                   accessor: "name",
                   title: "Name",
+                  cellsClassName: "capitalize",
                 },
                 { accessor: "email" },
                 { accessor: "phone" },

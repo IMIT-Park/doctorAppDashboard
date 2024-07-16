@@ -20,6 +20,24 @@ const DoctorTimeSlotEdit = ({
     formSubmit();
   };
 
+  const handleNoOfConsultationChange = (e) => {
+    const { value } = e.target;
+    const numericValue = value.replace(/\D/g, "");
+    setTimesInput({
+      ...timesInput,
+      noOfConsultationsPerDay: numericValue,
+    });
+  };
+
+  const handleTimeOfConsultationChange = (e) => {
+    const { value } = e.target;
+    const numericValue = value.replace(/\D/g, "");
+    setTimesInput({
+      ...timesInput,
+      time_slot: numericValue,
+    });
+  };
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -124,15 +142,10 @@ const DoctorTimeSlotEdit = ({
                           No. of Consultations:
                         </label>
                         <input
-                          type="number"
+                          type="tel"
                           className="form-input w-full"
                           value={timesInput?.noOfConsultationsPerDay}
-                          onChange={(e) =>
-                            setTimesInput({
-                              ...timesInput,
-                              noOfConsultationsPerDay: e.target.value,
-                            })
-                          }
+                          onChange={handleNoOfConsultationChange}
                           required
                         />
                       </div>
@@ -141,15 +154,10 @@ const DoctorTimeSlotEdit = ({
                           Time of Consultation:
                         </label>
                         <input
-                          type="number"
+                          type="tel"
                           className="form-input w-full"
                           value={timesInput?.time_slot}
-                          onChange={(e) =>
-                            setTimesInput({
-                              ...timesInput,
-                              time_slot: e.target.value,
-                            })
-                          }
+                          onChange={handleTimeOfConsultationChange}
                           required
                         />
                       </div>
@@ -164,7 +172,7 @@ const DoctorTimeSlotEdit = ({
                       </button>
                       <button
                         type="button"
-                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                        className="btn btn-green ltr:ml-4 rtl:mr-4"
                         onClick={handleSubmit}
                         disabled={buttonLoading}
                       >

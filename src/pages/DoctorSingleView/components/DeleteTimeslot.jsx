@@ -64,7 +64,7 @@ const DeleteTimeslot = ({ open, closeModal, buttonLoading, handleSubmit }) => {
                     </button>
                     <button
                       type="button"
-                      className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                      className="btn btn-green ltr:ml-4 rtl:mr-4"
                       onClick={handleSubmit}
                     >
                       {buttonLoading ? (

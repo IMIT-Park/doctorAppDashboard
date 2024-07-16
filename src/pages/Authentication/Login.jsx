@@ -122,7 +122,7 @@ const LoginBoxed = () => {
         } else if (user?.role_id === 3) {
           navigate("/clinic/dashboard");
         } else if (user?.role_id === 4) {
-          navigate("/doctor/dashboard");
+          navigate("/doctor/profile");
         } else if (user?.role_id === 5) {
           navigate("/sales/dashboard");
         } else if (user?.role_id === 6) {

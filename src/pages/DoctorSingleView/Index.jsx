@@ -24,7 +24,8 @@ import CustomButton from "../../components/CustomButton";
 import noProfile from "/assets/images/empty-user.png";
 
 const SinglePage = () => {
-  const { doctorId } = useParams();
+  const { doctorId, clinicId } = useParams();
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -38,34 +39,18 @@ const SinglePage = () => {
 
   const [buttonLoading, setButtonLoading] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState(null);
-  const [clinicId, setClinicId] = useState(null);
   const [timeslotsLoading, setTimeslotsLoading] = useState(false);
   const [leavesLoading, setLeavesLoading] = useState(false);
   const [active, setActive] = useState(null);
-  const [editDetailsModal, setEditDetailsModal] = useState(false);
-  const [editPhotoModal, setEditPhotoModal] = useState(false);
   const [addTimeSlotModal, setAddTimeSlotModal] = useState(false);
   const [editTimeSlotModal, setEditTimeSlotModal] = useState(false);
   const [deleteTimeSlotModal, setDeleteTimeSlotModal] = useState(false);
-  const [input, setInput] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: "",
-    gender: "",
-    dateOfBirth: "",
-    qualification: "",
-    specialization: "",
-    fees: "",
-    visibility: true,
-  });
-  const [profilePicture, setProfilePicture] = useState(null);
   const [timesInput, setTimesInput] = useState({
     timeslotId: "",
     startTime: "",
     endTime: "",
-    noOfConsultationsPerDay: 0,
-    time_slot: 0,
+    noOfConsultationsPerDay: "",
+    time_slot: "",
     clinic_id: clinicId,
     day_id: "",
   });
@@ -112,7 +97,6 @@ const SinglePage = () => {
   useEffect(() => {
     if (doctorClinics && doctorClinics.length > 0) {
       setSelectedClinic(doctorClinics[0]);
-      setClinicId(doctorClinics[0]?.clinic_id);
     }
   }, [doctorClinics]);
 
@@ -169,7 +153,6 @@ const SinglePage = () => {
   // clinic select funtion
   const handleClinicSelect = (clinic) => {
     setSelectedClinic(clinic);
-    setClinicId(clinic?.clinic_id);
   };
 
   // add timeslot modal handler
@@ -184,8 +167,8 @@ const SinglePage = () => {
       timeslotId: "",
       startTime: "",
       endTime: "",
-      noOfConsultationsPerDay: 0,
-      time_slot: 0,
+      noOfConsultationsPerDay: "",
+      time_slot: "",
       clinic_id: clinicId,
       day_id: "",
     });
@@ -244,8 +227,8 @@ const SinglePage = () => {
       timeslotId: timeslot?.DoctorTimeSlot_id || "",
       startTime: timeslot?.startTime || "",
       endTime: timeslot?.endTime || "",
-      noOfConsultationsPerDay: timeslot?.noOfConsultationsPerDay || 0,
-      time_slot: timeslot?.time_slot || 0,
+      noOfConsultationsPerDay: timeslot?.noOfConsultationsPerDay || "",
+      time_slot: timeslot?.time_slot || "",
       day_id:
         timeslot?.day_id !== undefined && timeslot?.day_id !== null
           ? String(timeslot.day_id)
@@ -262,8 +245,8 @@ const SinglePage = () => {
       timeslotId: "",
       startTime: "",
       endTime: "",
-      noOfConsultationsPerDay: 0,
-      time_slot: 0,
+      noOfConsultationsPerDay: "",
+      time_slot: "",
       clinic_id: clinicId,
       day_id: "",
     });
@@ -407,181 +390,96 @@ const SinglePage = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="w-full flex flex-wrap gap-3">
-              <div className="flex flex-row">
-                <div className="relative flex flex-row justify-center">
-                  <img
-                    src={
-                      doctorDetails?.photo
-                        ? imageBaseUrl + doctorDetails?.photo
-                        : noProfile
-                    }
-                    alt={doctorDetails?.name || ""}
-                    className="w-40 h-40 rounded-full object-cover mb-2"
-                  />
+            <div className="flex flex-col items-start gap-4">
+              <div className="relative">
+                <img
+                  src={
+                    doctorDetails?.photo
+                      ? imageBaseUrl + doctorDetails?.photo
+                      : noProfile
+                  }
+                  alt={doctorDetails?.name || ""}
+                  className="w-40 h-40 rounded-full object-cover mb-2"
+                />
+              </div>
+              <div className="w-full flex items-start justify-between flex-wrap gap-2">
+                <div className="text-2xl dark:text-slate-300 font-semibold capitalize">
+                  {doctorDetails?.name || ""}
                 </div>
               </div>
-              <div className="w-full flex flex-col mb-2 mt-2 px-4">
-                <div className="w-full">
-                  <div className="text-2xl mb-3 text-[#006241] font-semibold capitalize p-2 ">
-                    {doctorDetails?.name || ""}
-                  </div>
-                  <div className="flex flex-col flex-wrap mb-2">
-                    <div className="text-xl p-2 text-[#AAAAAA]">Address:</div>
-                    <div className="text-base h-32 w-full p-2 border dark:border-none dark:bg-gray-800">
-                      {doctorDetails?.address || ""}
+              <div className="w-full grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="flex flex-col w-full xl:col-span-2">
+                  <div className="flex flex-col gap-4 flex-wrap">
+                    <div>
+                      <div className="text-base text-gray-500">Address:</div>
+                      <div className="text-base dark:text-slate-300 min-h-[124px] p-2 border dark:border-slate-800 rounded">
+                        {doctorDetails?.address || ""}
+                      </div>
+                    </div>
+                    <div className="w-full grid md:grid-cols-2 gap-4">
+                      <div className="w-full">
+                        <div className="text-base text-gray-500">Email</div>
+                        <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                          {doctorDetails?.email || ""}
+                        </div>
+                      </div>
+                      <div className="w-full">
+                        <div className="text-base text-gray-500">Phone</div>
+                        <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                          {doctorDetails?.phone || ""}
+                        </div>
+                      </div>
+                      <div className="w-full">
+                        <div className="text-base text-gray-500">Fees</div>
+                        <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                          ₹{doctorDetails?.fees || ""}
+                        </div>
+                      </div>
+                      <div className="w-full">
+                        <div className="text-base text-gray-500">
+                          Specialization
+                        </div>
+                        <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                          {doctorDetails?.specialization || ""}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
-                        Email:
-                      </div>
-                      <input
-                        type="text"
-                        value={doctorDetails?.email || ""}
-                        readOnly
-                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
-                      />
+                </div>
+
+                <div className="w-full grid md:grid-cols-2 xl:grid-cols-1 gap-4 xl:col-span-1">
+                  <div className="w-full">
+                    <div className="text-base text-gray-500">Qualification</div>
+                    <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                      {doctorDetails?.qualification || ""}
                     </div>
-                    <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
-                        Fees:
-                      </div>
-                      <input
-                        type="text"
-                        value={` ₹${doctorDetails?.fees}` || ""}
-                        readOnly
-                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
-                      />
+                  </div>
+                  <div className="w-full">
+                    <div className="text-base text-gray-500">
+                      Profile Visibility
                     </div>
-                    <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
-                        Phone:
-                      </div>
-                      <input
-                        type="text"
-                        value={doctorDetails?.phone || ""}
-                        readOnly
-                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
-                      />
+                    <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                      {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
                     </div>
-                    <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
-                        Specialization:
-                      </div>
-                      <input
-                        type="text"
-                        value={doctorDetails?.specialization || ""}
-                        readOnly
-                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
-                      />
+                  </div>
+                  <div className="w-full">
+                    <div className="text-base text-gray-500">Gender</div>
+                    <div className="capitalize text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                      {doctorDetails?.gender || ""}
                     </div>
-                    <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
-                        Qualification:
-                      </div>
-                      <input
-                        type="text"
-                        value={doctorDetails?.qualification || ""}
-                        readOnly
-                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
-                      />
-                    </div>
-                    <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
-                        Gender:
-                      </div>
-                      <input
-                        type="text"
-                        value={doctorDetails?.gender || ""}
-                        readOnly
-                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
-                      />
-                    </div>
-                    <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
-                        Date of Birth:
-                      </div>
-                      <input
-                        type="text"
-                        value={formatDate(doctorDetails?.dateOfBirth)}
-                        readOnly
-                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
-                      />
-                    </div>
-                    <div className="mb-1 w-full">
-                      <div className="text-[#AAAAAA] text-xl mt-1 p-2">
-                        Profile Visibility:
-                      </div>
-                      <input
-                        type="text"
-                        value={
-                          doctorDetails?.visibility ? "Visible" : "Hidden" || ""
-                        }
-                        readOnly
-                        className="text-base border bg-transparent w-full p-2 focus:outline-none dark:border-none dark:bg-gray-800"
-                      />
+                  </div>
+                  <div className="w-full ">
+                    <div className="text-base text-gray-500">Date of Birth</div>
+                    <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
+                      {formatDate(doctorDetails?.dateOfBirth)}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* <div className="flex items-center mt-5">
-              <h5 className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-slate-300">
-                Clinics:
-              </h5>
-              <div className="border flex-grow ml-4 dark:border-gray-700"></div>
-            </div> */}
-            <h5 className="mt-5 mb-5 text-xl font-semibold text-dark">
-              Clinics:
-            </h5>
-            {doctorClinics && doctorClinics?.length ? (
-              <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-3 gap-4">
-                {doctorClinics?.map((clinic) => (
-                  <div
-                    key={clinic?.clinic_id}
-                    className={`border bg-[#F6F6F6] dark:bg-slate-900 ${
-                      selectedClinic?.clinic_id === clinic?.clinic_id
-                        ? "border-[#006241]"
-                        : "border-slate-200 dark:border-slate-800"
-                    } rounded flex gap-3 items-center p-1 cursor-pointer`}
-                    onClick={() => handleClinicSelect(clinic)}
-                  >
-                    <img
-                      src={imageBaseUrl + clinic?.banner_img_url}
-                      alt="Clinic"
-                      className="w-[76px] h-[62px] rounded-md object-cover"
-                    />
-                    <div>
-                      <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-300 capitalize mb-1">
-                        {clinic?.name || ""}
-                      </h4>
-                      <p className="text-lg font-semibold text-slate-500 capitalize">
-                        {clinic?.place || ""}
-                      </p>
-                    </div>
-                    <div
-                      className={`ml-auto mr-2 w-4 h-4 rounded-full border ${
-                        selectedClinic?.clinic_id === clinic?.clinic_id
-                          ? "border-[#006241] bg-slate-400"
-                          : "border-slate-200 dark:border-slate-800"
-                      } p-[1px] bg-slate-200 dark:bg-slate-800`}
-                    >
-                      {selectedClinic?.clinic_id === clinic?.clinic_id && (
-                        <div className="bg-[#006241] w-full h-full rounded-full" />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-xs text-gray-600">No clinics Found</div>
-            )}
             <div className="my-10">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2 mt-2">
-                <h5 className="text-xl font-semibold text-dark dark:text-slate-300">
+                <h5 className="text-lg font-semibold text-dark dark:text-white-dark">
                   Available Days & Time Slots:
                 </h5>
                 {!isSuperAdmin && (
@@ -604,7 +502,7 @@ const SinglePage = () => {
                               <div className="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded">
                                 <button
                                   type="button"
-                                  className={`p-4 w-full text-base flex items-center text-[#AAAAAA] dark:bg-[#1b2e4b] ${
+                                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
                                     active === day.id
                                       ? "!text-[#006241] dark:!text-[#4ec37bfb]"
                                       : ""
@@ -632,11 +530,11 @@ const SinglePage = () => {
                                             key={timeslot.DoctorTimeSlot_id}
                                             className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-500 pt-4 px-3 pb-2 rounded"
                                           >
-                                            <span className="text-[#ec3e73] text-base font-bold border border-[#006241] px-4 py-1 rounded">
+                                            <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
                                               {formatTime(timeslot?.startTime)}{" "}
                                               - {formatTime(timeslot?.endTime)}
                                             </span>
-                                            <div className="flex text-base items-center gap-1">
+                                            <div className="flex items-center gap-1">
                                               <p>No. of Consultations:</p>{" "}
                                               <div className="text-slate-700 dark:text-slate-300">
                                                 {
@@ -644,7 +542,7 @@ const SinglePage = () => {
                                                 }
                                               </div>
                                             </div>
-                                            <div className="text-base flex items-center gap-1">
+                                            <div className="flex items-center gap-1">
                                               <p>Consultation Time: </p>
                                               <div className="text-slate-700 dark:text-slate-300">
                                                 {timeslot?.time_slot} Min
@@ -691,9 +589,7 @@ const SinglePage = () => {
                   )}
                 </>
               ) : (
-                <div className="text-base text-dark dark:text-slate-300">
-                  No Timeslots Found
-                </div>
+                <div className="text-xs text-gray-600">No Timeslots Found</div>
               )}
             </div>
 

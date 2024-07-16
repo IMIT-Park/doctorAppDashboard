@@ -10,13 +10,10 @@ import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { useNavigate } from "react-router-dom";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
-import useBlockUnblock from "../../../utils/useBlockUnblock";
-import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
 import useFetchData from "../../../customHooks/useFetchData";
 import { formatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
-import IconSearch from "../../../components/Icon/IconSearch";
 
 const Appointments = () => {
   const dispatch = useDispatch();
@@ -120,7 +117,6 @@ const Appointments = () => {
         <h5 className="mt-5 mb-4 text-xl font-bold text-dark dark:text-white-dark">
           Clinics:
         </h5>
-        <div className="border-t border-gray-300 dark:border-gray-600 flex-grow ml-2"></div>
       </div>
       {doctorClinics && doctorClinics?.length ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
@@ -172,7 +168,6 @@ const Appointments = () => {
             <h5 className="font-semibold text-lg dark:text-white-light ">
               Appointments
             </h5>
-            <Tippy content="Total Owners">
               <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
                 <CountUp
                   start={0}
@@ -181,7 +176,6 @@ const Appointments = () => {
                   redraw={true}
                 ></CountUp>
               </span>
-            </Tippy>
           </div>
 
           <div>

@@ -240,7 +240,7 @@ const ModalPage = ({
                             <div className="mt-5 text-slate- 800 dark:text-slate-300">
                               Available Plans:
                             </div>
-                            <div className="mt-5 grid place-items-center sm:grid-cols-2 gap-7 sm:gap-3 ">
+                            <div className={`mt-5 ${allPlans?.length > 0 ? 'grid place-items-center sm:grid-cols-2 gap-7 sm:gap-3' : 'flex justify-center items-center'}`}>
                               {allPlans?.length > 0 ? (
                                 <>
                                   {allPlans?.map((plan) => (
@@ -384,7 +384,9 @@ const ModalPage = ({
                                   ))}
                                 </>
                               ) : (
-                                <p>No plans available</p>
+                                <div className="flex justify-center items-center w-full">
+                                  <p className="">No plans available</p>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -405,7 +407,7 @@ const ModalPage = ({
                       </button>
                       <button
                         type="submit"
-                        className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                        className="btn btn-green ltr:ml-4 rtl:mr-4"
                         onClick={createSubscription}
                       >
                         {buttonLoading ? (

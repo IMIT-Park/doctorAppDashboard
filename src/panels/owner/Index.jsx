@@ -276,57 +276,57 @@ const Index = () => {
     },
   };
 
-  const clinicsData = [
-    {
-      id: 1,
-      name: "Dr. Luffy Clinic",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-      daysLeft: 10,
-      imageUrl:
-        "https://wallpapers-clan.com/wp-content/uploads/2024/02/monkey-d-luffy-clouds-one-piece-desktop-wallpaper-preview.jpg",
-    },
-    {
-      id: 2,
-      name: "Dr. Luffy Clinic",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-      daysLeft: 10,
-      imageUrl:
-        "https://wallpapers-clan.com/wp-content/uploads/2024/02/monkey-d-luffy-clouds-one-piece-desktop-wallpaper-preview.jpg",
-    },
-    {
-      id: 3,
-      name: "Dr. Sanji Clinic",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-      daysLeft: 5,
-      imageUrl:
-        "https://wallpapers-clan.com/wp-content/uploads/2024/04/sanji-smoking-one-piece-desktop-wallpaper-preview.jpg",
-    },
-    {
-      id: 4,
-      name: "Dr. Usopp Clinic",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-      daysLeft: 5,
-      imageUrl:
-        "https://e1.pxfuel.com/desktop-wallpaper/292/261/desktop-wallpaper-70-god-usopp-god-usopp-thumbnail.jpg",
-    },
-    {
-      id: 5,
-      name: "Dr. Zoro Clinic",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-      daysLeft: 8,
-      imageUrl:
-        "https://wallpapers-clan.com/wp-content/uploads/2024/02/one-piece-roronoa-zoro-with-sword-turquoise-desktop-wallpaper-cover.jpg",
-    },
-  ];
+  // const clinicsData = [
+  //   {
+  //     id: 1,
+  //     name: "Dr. Luffy Clinic",
+  //     description:
+  //       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+  //     daysLeft: 10,
+  //     imageUrl:
+  //       "https://wallpapers-clan.com/wp-content/uploads/2024/02/monkey-d-luffy-clouds-one-piece-desktop-wallpaper-preview.jpg",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Dr. Luffy Clinic",
+  //     description:
+  //       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+  //     daysLeft: 10,
+  //     imageUrl:
+  //       "https://wallpapers-clan.com/wp-content/uploads/2024/02/monkey-d-luffy-clouds-one-piece-desktop-wallpaper-preview.jpg",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Dr. Sanji Clinic",
+  //     description:
+  //       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+  //     daysLeft: 5,
+  //     imageUrl:
+  //       "https://wallpapers-clan.com/wp-content/uploads/2024/04/sanji-smoking-one-piece-desktop-wallpaper-preview.jpg",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Dr. Usopp Clinic",
+  //     description:
+  //       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+  //     daysLeft: 5,
+  //     imageUrl:
+  //       "https://e1.pxfuel.com/desktop-wallpaper/292/261/desktop-wallpaper-70-god-usopp-god-usopp-thumbnail.jpg",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Dr. Zoro Clinic",
+  //     description:
+  //       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
+  //     daysLeft: 8,
+  //     imageUrl:
+  //       "https://wallpapers-clan.com/wp-content/uploads/2024/02/one-piece-roronoa-zoro-with-sword-turquoise-desktop-wallpaper-cover.jpg",
+  //   },
+  // ];
 
   return (
     <div>
-      {loading ? (
+      {/* {loading ? (
         <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
       ) : (
         <>
@@ -354,19 +354,17 @@ const Index = () => {
                   }`}
                 >
                   {clinic.imageUrl ? (
-                    <div className="relative w-full h-full rounded-lg">
+                    <div className="relative w-full h-full rounded-lg aspect-video">
                       <img
                         src={clinic.imageUrl}
                         className="relative w-full h-full rounded-lg"
                         alt="Clinic Banner"
                       />
-                      <div className="absolute -right-2 top-0 w-full h-full bg-gradient-to-r from-transparent to-gray-100 dark:to-gray-800" ></div>
+                      <div className="absolute lg:-right-2 lg:top-0 w-full h-full lg:bg-gradient-to-r from-transparent to-gray-100 dark:to-gray-800 bottom-0 left-0 bg-gradient-to-b"></div>
                     </div>
                   ) : (
                     <div className="w-full h-40 bg-gray-200 rounded-lg" />
                   )}
-                  {/* <div className="relative border border-gray-400  box-shadow-custom bg-cover bg-no-repeat"></div> */}
-                  {/* <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent to-gray-500 opacity-50 rounded-lg blur-sm"></div> */}
                 </div>
                 <div className="relative w-full lg:w-2/3 xl:w-2/3 flex flex-col justify-between lg:ml-0 xl:ml-0 mt-4 lg:mt-0 xl:mt-0">
                   <div
@@ -405,7 +403,7 @@ const Index = () => {
                     </div>
                     <div className="flex items-center">
                       <button
-                        className={`bg-green-900 text-white px-4 py-2 rounded-lg ${
+                        className={`bg-green-900 text-white px-4 py-2 rounded ${
                           clinicsData.length > 1
                             ? "text-sm"
                             : "text-xl lg:text-xl"
@@ -420,7 +418,7 @@ const Index = () => {
             ))}
           </div>
         </>
-      )}
+      )} */}
       <ul className="flex space-x-2 rtl:space-x-reverse mt-5">
         <li className="ltr:before:mr-2 rtl:before:ml-2">
           <span>Dashboard</span>

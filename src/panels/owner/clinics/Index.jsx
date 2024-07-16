@@ -101,6 +101,7 @@ const Clinics = () => {
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
       setLoading(false);
+      console.log(response.data?.Clinic?.rows);
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -108,6 +109,7 @@ const Clinics = () => {
       setLoading(false);
     }
   };
+
   // fetching Mds
   useEffect(() => {
     fetchData();
@@ -351,10 +353,11 @@ const Clinics = () => {
                   ),
                 },
                 { accessor: "name", title: "Name" },
+                { accessor: "User.email", title: "Email" },
+                { accessor: "User.user_name", title: "Username" },
                 { accessor: "phone", title: "Phone" },
                 { accessor: "address", title: "Address" },
                 { accessor: "place", title: "Place" },
-                { accessor: "User.email", title: "Email" },
                 {
                   accessor: "clinic_id",
                   title: "Plan Details",

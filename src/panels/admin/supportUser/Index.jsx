@@ -338,6 +338,11 @@ const SupportUser = () => {
                   cellsClassName: "capitalize",
                 },
                 { accessor: "email" },
+                {
+                  accessor: "user_name",
+                  title: "Username",
+                  render: (row) => row?.User?.user_name,
+                },
                 { accessor: "phone" },
                 { accessor: "address", title: "Address" },
                 {

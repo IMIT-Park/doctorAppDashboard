@@ -302,6 +302,11 @@ const Sales = () => {
                   cellsClassName: "capitalize",
                 },
                 { accessor: "email", title: "Email" },
+                {
+                  accessor: "user_name",
+                  title: "Username",
+                  render: (row) => row?.User?.user_name,
+                },
                 { accessor: "phone", title: "Phone" },
                 { accessor: "address", title: "Address" },
                 {

@@ -20,7 +20,7 @@ import { DataTable } from "mantine-datatable";
 import emptyBox from "/assets/images/empty-box.svg";
 import CountUp from "react-countup";
 import Dropdown from "../../../components/Dropdown";
-import IconHorizontalDots from '../../../components/Icon/IconHorizontalDots';
+import IconHorizontalDots from "../../../components/Icon/IconHorizontalDots";
 import IconSearch from "../../../components/Icon/IconSearch";
 import IconCopy from "../../../components/Icon/IconCopy";
 
@@ -222,32 +222,32 @@ const ClinicProfile = () => {
     setSelectedDate(event.target.value);
   };
 
- 
-    const fetchAppointments = async () => {
-      if (!selectedDoctor || !selectedDate) {
-        return;
-      }
-      console.log(selectedDoctorId);
-      try {
-        const response = await NetworkHandler.makePostRequest(
-          `/v1/consultation/getallConsultation/${selectedDoctorId}`,
-          {
-            schedule_date: selectedDate,
-            clinic_id: clinicId,
-          }
-        );
-
-        if (response.status === 200) {
-          setTotalAppointments(response.data?.Consultations?.count || 0);
-          setAppointments(response?.data?.Consultations?.rows);
-        } else {
-          throw new Error("Failed to fetch appointments");
+  useEffect(() => {
+  const fetchAppointments = async () => {
+    if (!selectedDoctor || !selectedDate) {
+      return;
+    }
+    console.log(selectedDoctorId);
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/consultation/getallConsultation/${selectedDoctorId}`,
+        {
+          schedule_date: selectedDate,
+          clinic_id: clinicId,
         }
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
+      );
+
+      if (response.status === 200) {
+        setTotalAppointments(response.data?.Consultations?.count || 0);
+        setAppointments(response?.data?.Consultations?.rows);
+      } else {
+        throw new Error("Failed to fetch appointments");
       }
-    };
-    useEffect(() => {
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
+  };
+ 
     fetchAppointments();
   }, [selectedDoctorId, selectedDate]);
 
@@ -426,27 +426,43 @@ const ClinicProfile = () => {
             </div>
 
             <Tab.Group>
-              <Tab.List className="flex flex-wrap font-bold text-lg">
-                <Tab as={Fragment}>
-                  {({ selected }) => (
-                    <button
-                      className={`${
-                        selected
-                          ? "text-success !outline-none before:!w-full before:bg-success"
-                          : "before:w-full before:bg-gray-100 dark:before:bg-gray-600"
-                      } relative -mb-[1px] p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[2px] before:transition-all before:duration-700 hover:text-success mt-5`}
-                    >
-                      Patients Appointments{" "}
-                      <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                        <CountUp
-                          start={0}
-                          end={totalAppointments}
-                          duration={3}
-                        ></CountUp>
-                      </span>
-                    </button>
-                  )}
-                </Tab>
+              <Tab.List className="flex flex-wrap font-bold text-lg justify-between">
+                <div className="flex gap-4 items-center">
+                  <Tab as={Fragment}>
+                    {({ selected }) => (
+                      <button
+                        className={`${
+                          selected
+                            ? "text-success !outline-none before:!w-full before:bg-success"
+                            : "before:w-full before:bg-gray-100 dark:before:bg-gray-600"
+                        } relative  -mb-[1px] p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[2px] before:transition-all before:duration-700 hover:text-success mt-4`}
+                      >
+                        Patients Appointments{" "}
+                        <span className="badge bg-[#006241] p-0.5 px-1 rounded-full ">
+                          <CountUp
+                            start={0}
+                            end={totalAppointments}
+                            duration={3}
+                          />
+                        </span>
+                      </button>
+                    )}
+                  </Tab>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-white  text-green-600 border-green-600  md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm md:px-2 sm:px-2 lg:px-0 whitespace-nowrap"
+                  >
+                    Reschedule Todays Bookings
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+                  >
+                    Cancel all Bookings
+                  </button>
+                </div>
               </Tab.List>
               <Tab.Panels>
                 <Tab.Panel>
@@ -460,7 +476,7 @@ const ClinicProfile = () => {
                       }
                       mih={180}
                       highlightOnHover
-                      className="whitespace-nowrap table-hover"
+                      className="whitespace-nowrap table-hover flex "
                       records={appointments}
                       idAccessor="booking_id"
                       // onRowClick={(row) =>
@@ -478,7 +494,6 @@ const ClinicProfile = () => {
                         { accessor: "Patient.name", title: "Name" },
                         { accessor: "Patient.gender", title: "Gender" },
                         { accessor: "schedule_time", title: "Time" },
-                        
 
                         {
                           accessor: "actions",
@@ -488,30 +503,22 @@ const ClinicProfile = () => {
                               <Dropdown
                                 placement="bottom-end"
                                 btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full flex justify-center items-center"
-                                button={<IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />}
+                                button={
+                                  <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
+                                }
                               >
                                 <ul className="text-black dark:text-white-dark">
                                   <li>
-                                    <button type="button">
-                                      <IconSearch className="ltr:mr-2 rtl:ml-2 shrink-0" />
-                                      Search
-                                    </button>
+                                    <button type="button">Reschedule</button>
                                   </li>
                                   <li>
-                                    <button type="button">
-                                      <IconCopy className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                                      Copy
-                                    </button>
+                                    <button type="button">Cancel</button>
                                   </li>
-                                 
-                                 
-                                 
                                 </ul>
                               </Dropdown>
                             </div>
                           ),
                         },
-                        
                       ]}
                       totalRecords={totalAppointments}
                       recordsPerPage={pageSize}
@@ -524,8 +531,6 @@ const ClinicProfile = () => {
                         `Showing  ${from} to ${to} of ${totalRecords} entries`
                       }
                     />
-
-                    
                   </div>
                 </Tab.Panel>
               </Tab.Panels>

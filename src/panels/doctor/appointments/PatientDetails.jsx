@@ -242,8 +242,8 @@ const PatientDetails = () => {
                 <label htmlFor="email">Phone Number</label>
                 <input
                   id="phone-number"
-                  type="number"
-                  placeholder="loremipsum234@gmail.com"
+                  type="text"
+                  // placeholder="loremipsum234@gmail.com"
                   value={viewPatientDetails?.phone}
                   className="form-input form-input-green"
                   autoComplete="off"

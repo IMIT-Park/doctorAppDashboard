@@ -377,6 +377,12 @@ const routes = [
     element: <DoctorSingleView />,
     layout: "default",
   },
+
+  {
+    path: "/doctors/:doctorId",
+    element: <DoctorSingleView />,
+    layout: "default",
+  },
   // <--------------> doctor single-view ends here <-------------->
 ];
 

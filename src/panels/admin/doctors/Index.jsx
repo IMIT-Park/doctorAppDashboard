@@ -123,7 +123,7 @@ const Doctors = () => {
               records={allDoctors}
               idAccessor="doctor_id"
               onRowClick={(row) =>
-                navigate(`/clinics/${0}/${row?.doctor_id}`, {
+                navigate(`/doctors/${row?.doctor_id}`, {
                   state: { previousUrl: location?.pathname },
                 })
               }

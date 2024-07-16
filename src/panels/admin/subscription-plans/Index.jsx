@@ -78,9 +78,9 @@ const SubscriptionPlans = () => {
                           </div>
                           <div className="sm:text-[25px]">
                             <span className="line-through text-sm text-slate  text-slate-400 dark:text-slate-500">
-                              ₹ 499
+                              ₹499
                             </span>
-                            <span className="text-4xl font-bold dark:text-white">₹{plan?.price_per_doctor}</span>
+                            <span className="text-4xl font-bold dark:text-white">₹{plan?.plan_name === "Monthly" ? plan?.price_per_doctor : 0}</span>
                             <span className="text-sm font-bold">/Month</span>
                           </div>
                           <div className="text-center font-bold mt-3 md:mt-10 text-xl">
@@ -107,7 +107,7 @@ const SubscriptionPlans = () => {
                               ₹ 999
                             </span>
                             <span className="text-4xl font-bold text-yellow-600">
-                              ₹ 499
+                              ₹{plan?.plan_name === "Premium" ? plan?.price_per_doctor : 0}
                             </span>
                             <span className="text-sm font-bold">/Year</span>
                           </div>

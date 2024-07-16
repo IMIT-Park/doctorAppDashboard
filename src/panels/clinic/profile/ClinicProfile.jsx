@@ -18,6 +18,11 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import { Tab } from "@headlessui/react";
 import { DataTable } from "mantine-datatable";
 import emptyBox from "/assets/images/empty-box.svg";
+import CountUp from "react-countup";
+import Dropdown from "../../../components/Dropdown";
+import IconHorizontalDots from '../../../components/Icon/IconHorizontalDots';
+import IconSearch from "../../../components/Icon/IconSearch";
+import IconCopy from "../../../components/Icon/IconCopy";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -56,7 +61,21 @@ const ClinicProfile = () => {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+  const [totalAppointments, setTotalAppointments] = useState("");
   const [appointments, setAppointments] = useState([]);
+  const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZES = [10, 20, 30, 50, 100];
+  const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [pageSize]);
+
+  useEffect(() => {
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize;
+  }, [page, pageSize]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -194,37 +213,43 @@ const ClinicProfile = () => {
 
   const handleDoctorChange = (event) => {
     setSelectedDoctor(event.target.value);
+    const selectedDoctorId = event.target.value;
+    console.log("Selected Doctor ID:", selectedDoctorId);
+    setSelectedDoctorId(selectedDoctorId);
   };
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
   };
 
-  const fetchAppointments = async () => {
-    if (!selectedDoctor || !selectedDate) {
-      return;
-    }
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/booking/getdoctordate/${selectedDoctor}`,
-        {
-          date: selectedDate,
-          clinic_id: clinicId,
-        }
-      );
-      if (response.status === 200) {
-        setAppointments(response.data.appointments);
-      } else {
-        throw new Error("Failed to fetch appointments");
+ 
+    const fetchAppointments = async () => {
+      if (!selectedDoctor || !selectedDate) {
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching appointments:", error);
-    }
-  };
+      console.log(selectedDoctorId);
+      try {
+        const response = await NetworkHandler.makePostRequest(
+          `/v1/consultation/getallConsultation/${selectedDoctorId}`,
+          {
+            schedule_date: selectedDate,
+            clinic_id: clinicId,
+          }
+        );
 
-  useEffect(() => {
+        if (response.status === 200) {
+          setTotalAppointments(response.data?.Consultations?.count || 0);
+          setAppointments(response?.data?.Consultations?.rows);
+        } else {
+          throw new Error("Failed to fetch appointments");
+        }
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    };
+    useEffect(() => {
     fetchAppointments();
-  }, [selectedDoctor, selectedDate]);
+  }, [selectedDoctorId, selectedDate]);
 
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
@@ -390,14 +415,14 @@ const ClinicProfile = () => {
                 />
               </div>
 
-              <div className="w-full md:w-auto">
+              {/* <div className="w-full md:w-auto">
                 <button
                   type="button"
                   className="btn btn-green btn-md mb-4 px-16 w-full md:w-auto whitespace-nowrap"
                 >
                   Book Now
                 </button>
-              </div>
+              </div> */}
             </div>
 
             <Tab.Group>
@@ -411,50 +436,100 @@ const ClinicProfile = () => {
                           : "before:w-full before:bg-gray-100 dark:before:bg-gray-600"
                       } relative -mb-[1px] p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[2px] before:transition-all before:duration-700 hover:text-success mt-5`}
                     >
-                      Patients Appointments (20)
+                      Patients Appointments{" "}
+                      <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
+                        <CountUp
+                          start={0}
+                          end={totalAppointments}
+                          duration={3}
+                        ></CountUp>
+                      </span>
                     </button>
                   )}
                 </Tab>
               </Tab.List>
+              <Tab.Panels>
+                <Tab.Panel>
+                  <div className="datatables mt-8">
+                    <DataTable
+                      noRecordsText="No Patients to show"
+                      noRecordsIcon={
+                        <span className="mb-2">
+                          <img src={emptyBox} alt="" className="w-10" />
+                        </span>
+                      }
+                      mih={180}
+                      highlightOnHover
+                      className="whitespace-nowrap table-hover"
+                      records={appointments}
+                      idAccessor="booking_id"
+                      // onRowClick={(row) =>
+                      //   navigate(`/clinics/${clinicId}/${row?.doctor_id}`, {
+                      //     state: { previousUrl: location?.pathname },
+                      //   })
+                      // }
+                      columns={[
+                        {
+                          accessor: "No",
+                          title: "No",
+                          render: (row, rowIndex) => rowIndex + 1,
+                        },
+
+                        { accessor: "Patient.name", title: "Name" },
+                        { accessor: "Patient.gender", title: "Gender" },
+                        { accessor: "schedule_time", title: "Time" },
+                        
+
+                        {
+                          accessor: "actions",
+                          title: "Actions",
+                          render: (row) => (
+                            <div className="dropdown">
+                              <Dropdown
+                                placement="bottom-end"
+                                btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full flex justify-center items-center"
+                                button={<IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />}
+                              >
+                                <ul className="text-black dark:text-white-dark">
+                                  <li>
+                                    <button type="button">
+                                      <IconSearch className="ltr:mr-2 rtl:ml-2 shrink-0" />
+                                      Search
+                                    </button>
+                                  </li>
+                                  <li>
+                                    <button type="button">
+                                      <IconCopy className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
+                                      Copy
+                                    </button>
+                                  </li>
+                                 
+                                 
+                                 
+                                </ul>
+                              </Dropdown>
+                            </div>
+                          ),
+                        },
+                        
+                      ]}
+                      totalRecords={totalAppointments}
+                      recordsPerPage={pageSize}
+                      page={page}
+                      onPageChange={(p) => setPage(p)}
+                      recordsPerPageOptions={PAGE_SIZES}
+                      onRecordsPerPageChange={setPageSize}
+                      minHeight={200}
+                      paginationText={({ from, to, totalRecords }) =>
+                        `Showing  ${from} to ${to} of ${totalRecords} entries`
+                      }
+                    />
+
+                    
+                  </div>
+                </Tab.Panel>
+              </Tab.Panels>
             </Tab.Group>
-
-            <div className="datatables mt-8">
-              <DataTable
-                noRecordsText="No Patients to show"
-                noRecordsIcon={
-                  <span className="mb-2">
-                    <img src={emptyBox} alt="" className="w-10" />
-                  </span>
-                }
-                mih={180}
-                highlightOnHover
-                className="whitespace-nowrap table-hover"
-                // records={}
-                // idAccessor="doctor_id"
-                // onRowClick={(row) =>
-                //   navigate(`/clinics/${clinicId}/${row?.doctor_id}`, {
-                //     state: { previousUrl: location?.pathname },
-                //   })
-                // }
-                columns={[
-                  {
-                    accessor: "No",
-                    title: "No",
-                    // render: (row, rowIndex) => rowIndex + 1,
-                  },
-
-                  { accessor: "name", title: "Name" },
-                  { accessor: "phone", title: "Time" },
-                  { accessor: "gender", title: "Gender" },
-
-                  {
-                    accessor: "TokenNumber",
-                    title: "Token Number",
-                    // render: (row) => (row.visibility ? "Visible" : "Hidden"),
-                  },
-                ]}
-              />
-            </div>
           </>
         )}
       </div>

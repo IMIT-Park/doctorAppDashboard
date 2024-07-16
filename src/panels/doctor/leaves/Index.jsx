@@ -190,77 +190,83 @@ const DoctorLeaves = () => {
               <div className="text-xs text-gray-600">No clinics Found</div>
             )}
             {/* clinics list ends here */}
-
-            <div className="mt-4">
-              <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
-                <h5 className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-white-dark">
-                  Leaves:
-                </h5>
-                <CustomButton onClick={openAddLeaveModal}>
-                  <IconPlus className="ltr:mr-2 rtl:ml-2" />
-                  Add Leave
-                </CustomButton>
-              </div>
-              {doctorLeaves && doctorLeaves?.length > 0 ? (
-                <>
-                  {leavesLoading ? (
-                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
-                  ) : (
-                    <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
-                      {doctorLeaves?.map((leave, index) => (
-                        <div
-                          key={leave?.leave_date + index}
-                          className={`w-full flex items-center justify-between flex-wrap gap-2 py-6 ${
-                            index !== doctorLeaves.length - 1
-                              ? "border-b border-[#D3D3D3] dark:border-[#1B2E4B]"
-                              : ""
-                          }`}
-                        >
-                          <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
-                            {leave?.fullday ? "Full Day Leave" : "Shift Leave"}
-                          </span>
-                          <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-5 font-bold text-base text-slate-500 ml-auto">
-                            <span>{formatDate(leave?.leave_date)} </span>
-                            {!leave?.fullday && (
-                              <div className="flex items-center flex-wrap">
-                                {leave?.leaves?.map((slot, slotIndex) => (
-                                  <span key={slot?.DoctorTimeSlot_id}>
-                                    (Slot:{" "}
-                                    {formatTime(
-                                      slot?.DoctorTimeSlot?.startTime
-                                    )}{" "}
-                                    -{" "}
-                                    {formatTime(slot?.DoctorTimeSlot?.endTime)})
-                                    {slotIndex < leave.leaves.length - 1 &&
-                                      ", "}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
-                            <button
-                              type="button"
-                              className="btn btn-danger btn-sm rounded py-1 min-w-10 sm:min-w-24"
-                              title="Delete leave"
-                              onClick={() => openDeleteLeaveModal(leave)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-xs text-gray-600 flex justify-center flex-col items-center h-40">
-                  <span className="mb-2">
-                    <img src={emptyBox} alt="" className="w-10" />
-                  </span>
-                  No Leaves Found
+            {doctorClinics && doctorClinics?.length > 0 && (
+              <div className="mt-4">
+                <div className="flex items-end justify-between gap-2 flex-wrap mb-2">
+                  <h5 className="mt-5 mb-5 text-xl font-semibold text-dark dark:text-white-dark">
+                    Leaves:
+                  </h5>
+                  <CustomButton onClick={openAddLeaveModal}>
+                    <IconPlus className="ltr:mr-2 rtl:ml-2" />
+                    Add Leave
+                  </CustomButton>
                 </div>
-              )}
-            </div>
+                {doctorLeaves && doctorLeaves?.length > 0 ? (
+                  <>
+                    {leavesLoading ? (
+                      <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+                    ) : (
+                      <div className="w-full border border-[#d3d3d3] dark:border-[#1b2e4b] rounded pt-2 pb-3 px-5">
+                        {doctorLeaves?.map((leave, index) => (
+                          <div
+                            key={leave?.leave_date + index}
+                            className={`w-full flex items-center justify-between flex-wrap gap-2 py-6 ${
+                              index !== doctorLeaves.length - 1
+                                ? "border-b border-[#D3D3D3] dark:border-[#1B2E4B]"
+                                : ""
+                            }`}
+                          >
+                            <span className="border border-[#006241] rounded py-1 px-5 text-[#006241] font-bold">
+                              {leave?.fullday
+                                ? "Full Day Leave"
+                                : "Shift Leave"}
+                            </span>
+                            <div className="flex flex-col md:flex-row md:items-center flex-wrap gap-5 font-bold text-base text-slate-500 ml-auto">
+                              <span>{formatDate(leave?.leave_date)} </span>
+                              {!leave?.fullday && (
+                                <div className="flex items-center flex-wrap">
+                                  {leave?.leaves?.map((slot, slotIndex) => (
+                                    <span key={slot?.DoctorTimeSlot_id}>
+                                      (Slot:{" "}
+                                      {formatTime(
+                                        slot?.DoctorTimeSlot?.startTime
+                                      )}{" "}
+                                      -{" "}
+                                      {formatTime(
+                                        slot?.DoctorTimeSlot?.endTime
+                                      )}
+                                      )
+                                      {slotIndex < leave.leaves.length - 1 &&
+                                        ", "}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+
+                              <button
+                                type="button"
+                                className="btn btn-danger btn-sm rounded py-1 min-w-10 sm:min-w-24"
+                                title="Delete leave"
+                                onClick={() => openDeleteLeaveModal(leave)}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-xs text-gray-600 flex justify-center flex-col items-center h-40">
+                    <span className="mb-2">
+                      <img src={emptyBox} alt="" className="w-10" />
+                    </span>
+                    No Leaves Found
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>

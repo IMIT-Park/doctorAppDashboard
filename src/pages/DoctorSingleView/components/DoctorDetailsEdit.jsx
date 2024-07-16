@@ -3,6 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
 import NetworkHandler from "../../../utils/NetworkHandler";
+import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
 
 const DoctorDetailsEdit = ({
   open,
@@ -11,6 +12,8 @@ const DoctorDetailsEdit = ({
   setInput,
   buttonLoading,
   formSubmit,
+  errors,
+  setErrors,
 }) => {
   const [specializations, setSpecializations] = useState([]);
 
@@ -38,6 +41,13 @@ const DoctorDetailsEdit = ({
   useEffect(() => {
     fetchSpecialization();
   }, []);
+
+  const handlePhoneChange = (value) => {
+    setInput({ ...input, phone: value });
+    if (value.length === 10) {
+      setErrors((prevErrors) => ({ ...prevErrors, phone: "" }));
+    }
+  };
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -99,15 +109,11 @@ const DoctorDetailsEdit = ({
 
                       <div className="mb-5">
                         <label htmlFor="dr-phone">Phone</label>
-                        <input
-                          id="dr-phone"
-                          type="number"
-                          placeholder="Enter Phone Number"
-                          className="form-input"
-                          value={input.phone}
-                          onChange={(e) =>
-                            setInput({ ...input, phone: e.target.value })
-                          }
+                        <PhoneNumberInput
+                          value={input?.phone}
+                          onChange={handlePhoneChange}
+                          error={errors?.phone}
+                          maxLength="10"
                         />
                       </div>
 
@@ -122,6 +128,7 @@ const DoctorDetailsEdit = ({
                           onChange={(e) =>
                             setInput({ ...input, email: e.target.value })
                           }
+                          readOnly
                         />
                       </div>
                       <div className="mb-5">
@@ -249,7 +256,7 @@ const DoctorDetailsEdit = ({
                         </button>
                         <button
                           type="button"
-                          className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                          className="btn btn-green ltr:ml-4 rtl:mr-4"
                           onClick={handleSubmit}
                           disabled={buttonLoading}
                         >

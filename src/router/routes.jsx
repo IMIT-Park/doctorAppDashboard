@@ -61,7 +61,6 @@ const ClinicSelectDateAndTime = lazy(() =>
 // <--------------> clinic panel imports ends here <-------------->
 
 // <--------------> doctor panel imports starts here<-------------->
-const DoctorIndex = lazy(() => import("../panels/doctor/Index"));
 const DoctorProfile = lazy(() => import("../panels/doctor/profile/Index"));
 const DoctorLeaves = lazy(() => import("../panels/doctor/leaves/Index"));
 const DoctorRequests = lazy(() => import("../panels/doctor/requests/Requests"));
@@ -295,13 +294,6 @@ const routes = [
   // <--------------> clinic panel ends here <-------------->
 
   // <--------------> doctor panel starts here <-------------->
-
-  // dashboard
-  {
-    path: "/doctor/dashboard",
-    element: <DoctorIndex />,
-    layout: "default",
-  },
 
   // doctor Profile
   {

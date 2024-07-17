@@ -31,7 +31,6 @@ const AddSalesPerson = ({
       setErrors({ ...errors, email: "Please enter a valid email address" });
     }
   };
-  
 
   const handlePhoneChange = (value) => {
     setInput({ ...input, phone: value });
@@ -129,11 +128,11 @@ const AddSalesPerson = ({
                     )}
                     {!isEditMode && (
                       <div className="mb-5">
-                        <label htmlFor="user-name">User Name</label>
+                        <label htmlFor="user-name">Username</label>
                         <input
                           id="user-name"
                           type="text"
-                          placeholder="Enter User Name"
+                          placeholder="Enter Username"
                           className="form-input form-input-green"
                           value={input?.email}
                           onChange={(e) =>

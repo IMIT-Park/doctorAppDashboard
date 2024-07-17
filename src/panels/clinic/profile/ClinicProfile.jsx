@@ -67,6 +67,8 @@ const ClinicProfile = () => {
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+  const [appointmentsLoading, setAppointmentsLoading] = useState(false);
+  const [noAppoinments, setNoAppoinments] = useState(false);
 
   useEffect(() => {
     setPage(1);
@@ -214,20 +216,20 @@ const ClinicProfile = () => {
   const handleDoctorChange = (event) => {
     setSelectedDoctor(event.target.value);
     const selectedDoctorId = event.target.value;
-    console.log("Selected Doctor ID:", selectedDoctorId);
     setSelectedDoctorId(selectedDoctorId);
   };
+
+  console.log(selectedDoctorId);
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
   };
 
-  useEffect(() => {
   const fetchAppointments = async () => {
     if (!selectedDoctor || !selectedDate) {
       return;
     }
-    console.log(selectedDoctorId);
+    setAppointmentsLoading(true);
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/consultation/getallConsultation/${selectedDoctorId}`,
@@ -239,15 +241,25 @@ const ClinicProfile = () => {
 
       if (response.status === 200) {
         setTotalAppointments(response.data?.Consultations?.count || 0);
-        setAppointments(response?.data?.Consultations?.rows);
+        setAppointments(response?.data?.Consultations?.rows || []);
+      } else if (response.status === 404) {
+        setAppointmentsLoading(false);
+        setTotalAppointments(0);
+        setAppointments([]);
+       
       } else {
         throw new Error("Failed to fetch appointments");
       }
     } catch (error) {
       console.error("Error fetching appointments:", error);
+      setTotalAppointments(0);
+      setAppointments([]);
+    } finally {
+      setAppointmentsLoading(false);
     }
   };
- 
+
+  useEffect(() => {
     fetchAppointments();
   }, [selectedDoctorId, selectedDate]);
 
@@ -427,7 +439,7 @@ const ClinicProfile = () => {
 
             <Tab.Group>
               <Tab.List className="flex flex-wrap font-bold text-lg justify-between">
-                <div className="flex gap-4 items-center">
+                <div className="flex gap-4 items-center ">
                   <Tab as={Fragment}>
                     {({ selected }) => (
                       <button
@@ -435,7 +447,7 @@ const ClinicProfile = () => {
                           selected
                             ? "text-success !outline-none before:!w-full before:bg-success"
                             : "before:w-full before:bg-gray-100 dark:before:bg-gray-600"
-                        } relative  -mb-[1px] p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[2px] before:transition-all before:duration-700 hover:text-success mt-4`}
+                        } relative -mb-[1px] p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[2px] before:transition-all before:duration-700 hover:text-success mt-4`}
                       >
                         Patients Appointments{" "}
                         <span className="badge bg-[#006241] p-0.5 px-1 rounded-full ">
@@ -449,10 +461,10 @@ const ClinicProfile = () => {
                     )}
                   </Tab>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
                   <button
                     type="button"
-                    className="btn btn-white  text-green-600 border-green-600  md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm md:px-2 sm:px-2 lg:px-0 whitespace-nowrap"
+                    className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
                   >
                     Reschedule Todays Bookings
                   </button>
@@ -466,72 +478,69 @@ const ClinicProfile = () => {
               </Tab.List>
               <Tab.Panels>
                 <Tab.Panel>
-                  <div className="datatables mt-8">
-                    <DataTable
-                      noRecordsText="No Patients to show"
-                      noRecordsIcon={
-                        <span className="mb-2">
-                          <img src={emptyBox} alt="" className="w-10" />
-                        </span>
-                      }
-                      mih={180}
-                      highlightOnHover
-                      className="whitespace-nowrap table-hover flex "
-                      records={appointments}
-                      idAccessor="booking_id"
-                      // onRowClick={(row) =>
-                      //   navigate(`/clinics/${clinicId}/${row?.doctor_id}`, {
-                      //     state: { previousUrl: location?.pathname },
-                      //   })
-                      // }
-                      columns={[
-                        {
-                          accessor: "No",
-                          title: "No",
-                          render: (row, rowIndex) => rowIndex + 1,
-                        },
-
-                        { accessor: "Patient.name", title: "Name" },
-                        { accessor: "Patient.gender", title: "Gender" },
-                        { accessor: "schedule_time", title: "Time" },
-
-                        {
-                          accessor: "actions",
-                          title: "Actions",
-                          render: (row) => (
-                            <div className="dropdown">
-                              <Dropdown
-                                placement="bottom-end"
-                                btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full flex justify-center items-center"
-                                button={
-                                  <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
-                                }
-                              >
-                                <ul className="text-black dark:text-white-dark">
-                                  <li>
-                                    <button type="button">Reschedule</button>
-                                  </li>
-                                  <li>
-                                    <button type="button">Cancel</button>
-                                  </li>
-                                </ul>
-                              </Dropdown>
-                            </div>
-                          ),
-                        },
-                      ]}
-                      totalRecords={totalAppointments}
-                      recordsPerPage={pageSize}
-                      page={page}
-                      onPageChange={(p) => setPage(p)}
-                      recordsPerPageOptions={PAGE_SIZES}
-                      onRecordsPerPageChange={setPageSize}
-                      minHeight={200}
-                      paginationText={({ from, to, totalRecords }) =>
-                        `Showing  ${from} to ${to} of ${totalRecords} entries`
-                      }
-                    />
-                  </div>
+                  {appointmentsLoading ? (
+                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0 mt-4"/>
+                  ) : (
+                    <div className="datatables mt-8">
+                      <DataTable
+                        noRecordsText="No appointments to show"
+                        noRecordsIcon={
+                          <span className="mb-2">
+                            <img src={emptyBox} alt="" className="w-10" />
+                          </span>
+                        }
+                        mih={180}
+                        highlightOnHover
+                        className="whitespace-nowrap table-hover flex"
+                        records={appointments}
+                        idAccessor="booking_id"
+                        columns={[
+                          {
+                            accessor: "No",
+                            title: "No",
+                            render: (row, rowIndex) => rowIndex + 1,
+                          },
+                          { accessor: "Patient.name", title: "Name" },
+                          { accessor: "Patient.gender", title: "Gender" },
+                          { accessor: "schedule_time", title: "Time" },
+                          {
+                            accessor: "actions",
+                            title: "Actions",
+                            render: (row) => (
+                              <div className="dropdown">
+                                <Dropdown
+                                  placement="bottom-end"
+                                  btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full flex justify-center items-center"
+                                  button={
+                                    <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
+                                  }
+                                >
+                                  <ul className="text-black dark:text-white-dark">
+                                    <li>
+                                      <button type="button">Reschedule</button>
+                                    </li>
+                                    <li>
+                                      <button type="button">Cancel</button>
+                                    </li>
+                                  </ul>
+                                </Dropdown>
+                              </div>
+                            ),
+                          },
+                        ]}
+                        totalRecords={totalAppointments}
+                        recordsPerPage={pageSize}
+                        page={page}
+                        onPageChange={(p) => setPage(p)}
+                        recordsPerPageOptions={PAGE_SIZES}
+                        onRecordsPerPageChange={setPageSize}
+                        minHeight={200}
+                        paginationText={({ from, to, totalRecords }) =>
+                          `Showing ${from} to ${to} of ${totalRecords} entries`
+                        }
+                      />
+                    </div>
+                  )}
                 </Tab.Panel>
               </Tab.Panels>
             </Tab.Group>

@@ -7,16 +7,17 @@ import NetworkHandler from "../../../utils/NetworkHandler";
 import { formatTime } from "../../../utils/formatTime";
 import { formatDate } from "../../../utils/formatDate";
 import { showMessage } from "../../../utils/showMessage";
+import IconLoader from "../../../components/Icon/IconLoader";
 
 const AddLeave = ({
   addLeaveModal,
-  buttonLoading,
   closeAddLeaveModal,
   allDoctorNames,
   fetchLeaveData,
 }) => {
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
+  const clinicId = userData?.UserClinic?.[0]?.clinic_id || 0;
 
   const [leaveType, setLeaveType] = useState("Full Day");
   const days = [
@@ -35,6 +36,8 @@ const AddLeave = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const resetForm = () => {
     setLeaveType("Full Day");
@@ -49,7 +52,6 @@ const AddLeave = ({
   const handleDoctorChange = (e) => {
     const selectedDoctorId = e.target.value;
     setSelectedDoctorId(selectedDoctorId);
-    console.log("Selected Doctor ID:", selectedDoctorId);
   };
 
   const handleDateChange = async (e) => {
@@ -58,27 +60,37 @@ const AddLeave = ({
     setErrorMessage("");
     setTimeSlots([]);
     setSelectedTimeSlots([]);
-    console.log("Selected Date:", date);
+    setLoading(true);
 
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/leave/getTimeSlot/${selectedDoctorId}`,
         { date }
       );
-      console.log("API Response:", response.data);
 
-      if (response.data.doctorTimeSlots.count === 0) {
+      if (response?.data?.doctorTimeSlots?.count === 0) {
         setErrorMessage("No Timeslots found for this day");
       } else {
-        setTimeSlots(response.data.doctorTimeSlots?.rows);
+        // Filter time slots based on clinicId
+        const filteredTimeSlots = response?.data?.doctorTimeSlots?.rows?.filter(
+          (slot) => slot?.clinic_id === clinicId
+        );
+
+        if (filteredTimeSlots?.length === 0) {
+          setErrorMessage("No Timeslots found for this day");
+        } else {
+          setTimeSlots(filteredTimeSlots);
+        }
       }
     } catch (error) {
       console.error("Error fetching time slots:", error);
       if (error.response && error.response.status === 404) {
         setErrorMessage("No Timeslots found for this day");
       } else {
-        setErrorMessage("An error occurred while fetching timeslots");
+        console.log("An error occurred while fetching timeslots");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,14 +108,19 @@ const AddLeave = ({
     }
   };
 
-  const handleSaveLeave = async () => {
+  const handleSaveLeave = async (e) => {
+    e.preventDefault();
+
     if (!selectedDoctorId) {
-      showMessage("No doctor selected", "error");
+      showMessage("No doctor selected", "warning");
       return;
     }
 
-    if (leaveType === "Full Day" && !selectedDate) {
-      showMessage("No date selected", "error");
+    if (
+      (leaveType === "Full Day" && !selectedDate) ||
+      (leaveType === "By Shift" && !selectedDate)
+    ) {
+      showMessage("Select a date for leave", "warning");
       return;
     }
 
@@ -113,17 +130,16 @@ const AddLeave = ({
     }
 
     if (leaveType === "Multiple" && (!startDate || !endDate)) {
-      showMessage("Please select a date range", "error");
+      showMessage("Please select a date range", "warning");
       return;
     }
 
-    if (
-      leaveType === "By Shift" &&
-      (!selectedDate || selectedTimeSlots.length === 0)
-    ) {
-      showMessage("Please select a date and at least one time slot", "error");
+    if (leaveType === "By Shift" && selectedTimeSlots.length === 0) {
+      showMessage("Please select a time slot", "warning");
       return;
     }
+
+    setButtonLoading(true);
 
     try {
       if (leaveType === "Full Day") {
@@ -146,12 +162,10 @@ const AddLeave = ({
           endDate: endDate,
           clinic_id: userData?.UserClinic[0]?.clinic_id,
         };
-        console.log(leaveData);
         const response = await NetworkHandler.makePostRequest(
           `/v1/leave/createBlukLeave/${selectedDoctorId}`,
           leaveData
         );
-        console.log(response);
         showMessage("Bulk leave added successfully.");
       } else if (leaveType === "By Shift") {
         const leaveData = {
@@ -178,6 +192,8 @@ const AddLeave = ({
       } else {
         showMessage("An error occurred while creating leave slots", "error");
       }
+    } finally {
+      setButtonLoading(false);
     }
   };
 
@@ -230,15 +246,15 @@ const AddLeave = ({
                   New Leave
                 </div>
                 <div className="p-5 ">
-                  <form>
+                  <form onSubmit={handleSaveLeave}>
                     <div className="mb-8 flex items-center flex-col md:flex-row justify-between gap-8">
                       <div className="w-full">
-                        <label htmlFor="ChooseDoctor" className="block mb-5">
+                        <label htmlFor="ChooseDoctor" className="">
                           Choose Doctor
                         </label>
                         <select
                           id="ChooseDoctor"
-                          className="form-select text-white-dark w-full"
+                          className="form-select form-select-green w-full dark:text-slate-400"
                           required
                           onChange={handleDoctorChange}
                         >
@@ -301,41 +317,37 @@ const AddLeave = ({
                     </div>
 
                     {leaveType === "Full Day" && (
-                      <div className="mb-8 flex items-center flex-col md:flex-row justify-between gap-8">
-                        <div className="w-full">
+                      <div className="mb-8 flex items-start flex-col">
+                        <div className="w-full md:w-[calc(50%-20px)]">
                           <label htmlFor="Date">Date</label>
 
                           <input
                             id="Date"
                             type="date"
-                            className="form-input"
+                            className="form-input form-input-green"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
                           />
                         </div>
-                        <div className="w-full">
-                          {errorMessage && (
+                        <div className="w-full mt-2">
+                          {loading ? (
+                            <div className="flex items-center">
+                              <IconLoader className="animate-spin" />
+                            </div>
+                          ) : errorMessage ? (
                             <div className="text-red-500 mt-2">
                               {errorMessage}
                             </div>
+                          ) : (
+                            selectedDate &&
+                            timeSlots?.length > 0 && (
+                              <div className="text-slate-800 mt-2 dark:text-slate-200">
+                                You want to add Fullday leave on{" "}
+                                {formatDate(selectedDate)} ?
+                              </div>
+                            )
                           )}
                         </div>
-                        {/* {timeSlots.length > 0 && (
-                          <div className="mt-5">
-                            <label>Doctor Time Slots:</label>
-                            <div className="flex flex-wrap mt-2">
-                              {timeSlots.map((slot) => (
-                                <div key={slot.DoctorTimeSlot_id}>
-                                  <div className="badge badge-outline-dark text-gray-500">
-                                    {getDayName(slot.day_id)}:{" "}
-                                    {formatTime(slot.startTime)} -{" "}
-                                    {formatTime(slot.endTime)}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )} */}
                       </div>
                     )}
 
@@ -344,13 +356,13 @@ const AddLeave = ({
                         <label htmlFor="date">
                           You can select multiple dates.
                         </label>
-                        <div className="mb-8 mt-2 flex items-center flex-col md:flex-row justify-between gap-8">
+                        <div className="mb-12 mt-2 flex items-center flex-col md:flex-row justify-between gap-8">
                           <div className="w-full">
                             <p className="mt-2">From</p>
                             <input
                               id="StartDate"
                               type="date"
-                              className="form-input"
+                              className="form-input form-input-green"
                               value={startDate || ""}
                               onChange={(e) => setStartDate(e.target.value)}
                             />
@@ -360,7 +372,7 @@ const AddLeave = ({
                             <input
                               id="EndDate"
                               type="date"
-                              className="form-input"
+                              className="form-input form-input-green"
                               value={endDate || ""}
                               onChange={(e) => setEndDate(e.target.value)}
                             />
@@ -370,13 +382,13 @@ const AddLeave = ({
                     )}
 
                     {leaveType === "By Shift" && (
-                      <div className="mb-8 flex flex-col gap-5 justify-between">
-                        <div>
+                      <div className="mb-2 flex items-start flex-col justify-between gap-5">
+                        <div className="w-full md:w-[calc(50%-20px)]">
                           <label htmlFor="Date">Date</label>
                           <input
                             id="Date"
                             type="date"
-                            className="form-input w-full max-w-[calc(50% - 3)]"
+                            className="form-input form-input-green"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
                           />
@@ -389,10 +401,10 @@ const AddLeave = ({
 
                         <div className="w-full">
                           {timeSlots.length > 0 && (
-                            <div className="mt-5 w-full">
-                              <label>Doctor Time Slots:</label>
+                            <div className="w-full">
+                              <label>Select Time Slots:</label>
                               <div className="flex flex-wrap mt-2">
-                                {timeSlots.map((slot) => (
+                                {timeSlots?.map((slot) => (
                                   <div
                                     key={slot.DoctorTimeSlot_id}
                                     className="flex items-center mb-2"
@@ -433,9 +445,8 @@ const AddLeave = ({
                         Cancel
                       </button>
                       <button
-                        type="button"
+                        type="submit"
                         className="btn btn-green ltr:ml-4 rtl:mr-4"
-                        onClick={handleSaveLeave}
                       >
                         {buttonLoading ? (
                           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />

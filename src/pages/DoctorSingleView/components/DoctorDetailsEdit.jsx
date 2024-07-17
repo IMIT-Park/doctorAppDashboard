@@ -99,7 +99,7 @@ const DoctorDetailsEdit = ({
                           id="dr-name"
                           type="text"
                           placeholder="Enter Doctor Name"
-                          className="form-input"
+                          className="form-input form-input-green"
                           value={input.name}
                           onChange={(e) =>
                             setInput({ ...input, name: e.target.value })
@@ -123,7 +123,7 @@ const DoctorDetailsEdit = ({
                           id="email"
                           type="email"
                           placeholder="Enter Email"
-                          className="form-input"
+                          className="form-input form-input-green"
                           value={input.email}
                           onChange={(e) =>
                             setInput({ ...input, email: e.target.value })
@@ -135,7 +135,7 @@ const DoctorDetailsEdit = ({
                         <label htmlFor="gender">Gender</label>
                         <select
                           id="gender"
-                          className="form-select text-white-dark"
+                          className="form-select form-input-green text-white-dark"
                           required
                           value={input.gender}
                           onChange={(e) =>
@@ -154,7 +154,7 @@ const DoctorDetailsEdit = ({
                         <input
                           id="dateOfBirth"
                           type="date"
-                          className="form-input"
+                          className="form-input form-input-green"
                           value={input.dateOfBirth}
                           onChange={(e) =>
                             setInput({ ...input, dateOfBirth: e.target.value })
@@ -167,7 +167,7 @@ const DoctorDetailsEdit = ({
                           id="dr-qualification"
                           type="text"
                           placeholder="Enter Qualification"
-                          className="form-input"
+                          className="form-input form-input-green"
                           value={input.qualification}
                           onChange={(e) =>
                             setInput({
@@ -183,7 +183,7 @@ const DoctorDetailsEdit = ({
                         </label>
                         <select
                           id="dr-specialization"
-                          className="form-select text-white-dark"
+                          className="form-select form-select-green text-white-dark"
                           required
                           value={input.specialization}
                           onChange={(e) =>
@@ -211,7 +211,7 @@ const DoctorDetailsEdit = ({
                           id="dr-fees"
                           type="number"
                           placeholder="Enter Fess"
-                          className="form-input"
+                          className="form-input form-input-green"
                           value={input.fees}
                           onChange={(e) =>
                             setInput({ ...input, fees: e.target.value })
@@ -223,7 +223,7 @@ const DoctorDetailsEdit = ({
                         <textarea
                           id="address"
                           rows={3}
-                          className="form-textarea resize-none min-h-[130px]"
+                          className="form-textarea form-textarea-green resize-none min-h-[130px]"
                           placeholder="Enter Address"
                           value={input.address}
                           onChange={(e) =>

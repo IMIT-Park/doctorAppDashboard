@@ -130,11 +130,11 @@ const AddSupportUser = ({
                     )}
                     {!isEditMode && (
                       <div className="mb-5">
-                        <label htmlFor="user-name">User Name</label>
+                        <label htmlFor="user-name">Username</label>
                         <input
                           id="user-name"
                           type="text"
-                          placeholder="Enter User Name"
+                          placeholder="Enter Username"
                           className="form-input form-input-green"
                           value={input?.email}
                           onChange={(e) =>

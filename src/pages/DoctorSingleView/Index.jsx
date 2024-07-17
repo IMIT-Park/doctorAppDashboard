@@ -38,13 +38,14 @@ const SinglePage = () => {
   });
 
   const [buttonLoading, setButtonLoading] = useState(false);
-  const [selectedClinic, setSelectedClinic] = useState(null);
   const [timeslotsLoading, setTimeslotsLoading] = useState(false);
   const [leavesLoading, setLeavesLoading] = useState(false);
   const [active, setActive] = useState(null);
   const [addTimeSlotModal, setAddTimeSlotModal] = useState(false);
   const [editTimeSlotModal, setEditTimeSlotModal] = useState(false);
   const [deleteTimeSlotModal, setDeleteTimeSlotModal] = useState(false);
+  const [selectedClinicId, setSelectedClinicId] = useState("");
+
   const [timesInput, setTimesInput] = useState({
     timeslotId: "",
     startTime: "",
@@ -88,33 +89,34 @@ const SinglePage = () => {
   const doctorDetails = doctorData?.Doctor;
 
   // fetch doctor's clinics function
-  // const fetchDoctorClinics = async () => {
-  //   setClinicsLoading(true);
+  const fetchDoctorClinics = async () => {
+    setClinicsLoading(true);
 
-  //   try {
-  //     const response = await NetworkHandler.makeGetRequest(
-  //       `/v1/doctor/getClincbydr/${doctorId}`
-  //     );
-  //     setDoctorClinics(response?.data?.allclinics);
-  //   } catch (error) {
-  //     setClinicsLoading(false);
-  //   } finally {
-  //     setClinicsLoading(false);
-  //   }
-  // };
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/doctor/getClincbydr/${doctorId}`
+      );
+      setDoctorClinics(response?.data?.allclinics);
+    } catch (error) {
+      setClinicsLoading(false);
+    } finally {
+      setClinicsLoading(false);
+    }
+  };
 
-  // useEffect(() => {
-  //   if (!clinicId) {
-  //     fetchDoctorClinics();
-  //   }
-  // }, [doctorId]);
+  useEffect(() => {
+    if (!clinicId) {
+      console.log("iam working");
+      fetchDoctorClinics();
+    }
+  }, [doctorId]);
 
-  // set the first clinic from the clinics list into the selectedClinic state
-  // useEffect(() => {
-  //   if (doctorClinics && doctorClinics.length > 0) {
-  //     setSelectedClinic(doctorClinics[0]);
-  //   }
-  // }, [doctorClinics]);
+  // set the first clinic's id from the clinics list into the selectedClinicId state
+  useEffect(() => {
+    if (doctorClinics && doctorClinics.length > 0) {
+      setSelectedClinicId(doctorClinics[0]?.clinic_id);
+    }
+  }, [doctorClinics]);
 
   // fetch timeslots data function
   const getDoctorTimeslots = async () => {
@@ -123,7 +125,7 @@ const SinglePage = () => {
     try {
       const response = await NetworkHandler.makePostRequest(
         "/v1/doctor/gettimeslots",
-        { doctor_id: doctorId, clinic_id: clinicId }
+        { doctor_id: doctorId, clinic_id: clinicId || selectedClinicId }
       );
 
       if (response.status === 201) {
@@ -145,7 +147,7 @@ const SinglePage = () => {
     try {
       const response = await NetworkHandler.makePostRequest(
         "/v1/leave/getdrleave",
-        { doctor_id: doctorId, clinic_id: clinicId }
+        { doctor_id: doctorId, clinic_id: clinicId || selectedClinicId }
       );
       if (response.status === 201) {
         setLeavesLoading(false);
@@ -160,15 +162,15 @@ const SinglePage = () => {
   };
 
   useEffect(() => {
-    if (clinicId) {
+    if (clinicId || selectedClinicId) {
       getDoctorTimeslots();
       getDoctorLeaves();
     }
-  }, [clinicId]);
+  }, [clinicId, selectedClinicId]);
 
   // clinic select funtion
   const handleClinicSelect = (clinic) => {
-    setSelectedClinic(clinic);
+    setSelectedClinicId(clinic?.clinic_id);
   };
 
   // add timeslot modal handler
@@ -185,7 +187,7 @@ const SinglePage = () => {
       endTime: "",
       noOfConsultationsPerDay: "",
       time_slot: "",
-      clinic_id: clinicId,
+      clinic_id: clinicId || selectedClinicId,
       day_id: "",
     });
     setAddTimeSlotModal(false);
@@ -202,6 +204,7 @@ const SinglePage = () => {
       startTime: ensureTimeFormat(timesInput.startTime),
       endTime: ensureTimeFormat(timesInput.endTime),
       day_id: selectedDay,
+      clinic_id: clinicId || selectedClinicId,
     };
 
     if (
@@ -249,7 +252,7 @@ const SinglePage = () => {
         timeslot?.day_id !== undefined && timeslot?.day_id !== null
           ? String(timeslot.day_id)
           : "",
-      clinic_id: clinicId,
+      clinic_id: clinicId || selectedClinicId,
     });
     setEditTimeSlotModal(true);
   };
@@ -263,7 +266,7 @@ const SinglePage = () => {
       endTime: "",
       noOfConsultationsPerDay: "",
       time_slot: "",
-      clinic_id: clinicId,
+      clinic_id: clinicId || selectedClinicId,
       day_id: "",
     });
   };
@@ -278,6 +281,7 @@ const SinglePage = () => {
       ...timesInput,
       startTime: ensureTimeFormat(timesInput.startTime),
       endTime: ensureTimeFormat(timesInput.endTime),
+      clinic_id: clinicId || selectedClinicId,
     };
 
     if (
@@ -495,7 +499,7 @@ const SinglePage = () => {
             </div>
             {/* clinics list starts here */}
 
-            {/* <h5 className="mt-14 mb-2 text-xl font-semibold text-dark dark:text-white-dark">
+            <h5 className="mt-14 mb-2 text-xl font-semibold text-dark dark:text-white-dark">
               Clinics :
             </h5>
             {clinicsLoading ? (
@@ -508,7 +512,7 @@ const SinglePage = () => {
                       <div
                         key={clinic?.clinic_id}
                         className={`Sm:min-w-[413px] border bg-[#F6F6F6] dark:bg-slate-900 ${
-                          selectedClinic?.clinic_id === clinic?.clinic_id
+                          selectedClinicId === clinic?.clinic_id
                             ? "border-[#006241]"
                             : "border-slate-200 dark:border-slate-800"
                         } rounded flex gap-3 items-center p-1 cursor-pointer`}
@@ -529,12 +533,12 @@ const SinglePage = () => {
                         </div>
                         <div
                           className={`ml-auto mr-2 w-4 h-4 rounded-full border ${
-                            selectedClinic?.clinic_id === clinic?.clinic_id
+                            selectedClinicId === clinic?.clinic_id
                               ? "border-[#006241] bg-slate-400"
                               : "border-slate-200 dark:border-slate-800"
                           } p-[1px] bg-slate-200 dark:bg-slate-800`}
                         >
-                          {selectedClinic?.clinic_id === clinic?.clinic_id && (
+                          {selectedClinicId === clinic?.clinic_id && (
                             <div className="bg-[#006241] w-full h-full rounded-full" />
                           )}
                         </div>
@@ -545,7 +549,7 @@ const SinglePage = () => {
                   <div className="text-xs text-gray-600">No clinics Found</div>
                 )}
               </>
-            )} */}
+            )}
             {/* clinics list ends here */}
             <div className="my-10">
               <div className="flex items-end justify-between gap-2 flex-wrap mb-2 mt-2">

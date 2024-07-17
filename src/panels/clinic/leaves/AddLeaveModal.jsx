@@ -7,6 +7,7 @@ import NetworkHandler from "../../../utils/NetworkHandler";
 import { formatTime } from "../../../utils/formatTime";
 import { formatDate } from "../../../utils/formatDate";
 import { showMessage } from "../../../utils/showMessage";
+import IconLoader from "../../../components/Icon/IconLoader";
 
 const AddLeave = ({
   addLeaveModal,

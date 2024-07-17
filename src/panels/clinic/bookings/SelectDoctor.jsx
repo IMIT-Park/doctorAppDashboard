@@ -12,24 +12,12 @@ const SelectDoctor = () => {
     dispatch(setPageTitle("ownerDoctor"));
   }, [dispatch]);
 
-  const [name, setName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
-  const [address, setAddress] = useState("");
-  const [remarks, setRemarks] = useState("");
+ 
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted:", {
-      name,
-      phoneNumber,
-      dob,
-      gender,
-      address,
-      remarks,
-    });
-  };
+  const handleDoctorClick = (doctorId) => {
+    setSelectedDoctor(doctorId);
+  }
 
   return (
     <div>
@@ -39,16 +27,19 @@ const SelectDoctor = () => {
         <h1 className="text-center font-bold text-2xl text-black m-8 dark:text-[#fbfbfb]">
           Select Doctors
         </h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          navigate("/clinic/bookings/SelectDateAndTime")
+        }}>
           <div className="flex flex-wrap justify-center mb-6 space-x-4">
             <div
-              className="text-center p-4"
+              className= {`text-center p-4 bg-gray-100 dark:bg-gray-800 ${selectedDoctor === 1 ? "border-4 border-green-500" : ""}`}
               style={{
-                backgroundColor: "#F3F3F3",
                 borderRadius: "8px",
                 minWidth: "223px",
                 flexBasis: "223px",
               }}
+              onClick={() => handleDoctorClick(1)}
             >
               <img
                 src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
@@ -56,20 +47,21 @@ const SelectDoctor = () => {
                 className="rounded"
                 style={{ width: "223px", height: "240px" }}
               />
-              <p className="font-bold text-lg mt-2">Dr. Anitta Charly</p>
-              <p className="text-sm text-gray-700 font-normal">
+              <p className="font-bold text-lg mt-2 dark:text-white">Dr. Anitta Charly</p>
+              <p className="text-sm text-gray-700 font-normal dark:text-slate-300">
                 General Surgery
               </p>
             </div>
 
             <div
-              className="text-center p-4"
+              className={`text-center p-4 bg-gray-100 dark:bg-gray-800 ${selectedDoctor === 2 ? "border-4 border-green-500" : ""}`}
               style={{
-                backgroundColor: "#F3F3F3",
+                // backgroundColor: "#F3F3F3",
                 borderRadius: "8px",
                 minWidth: "223px",
                 flexBasis: "223px",
               }}
+              onClick={() => handleDoctorClick(2)}
             >
               <img
                 src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
@@ -77,19 +69,20 @@ const SelectDoctor = () => {
                 className="rounded"
                 style={{ width: "223px", height: "240px" }}
               />
-              <p className="font-bold text-lg mt-2">Dr. Charly TP</p>
-              <p className="text-sm text-gray-700 font-normal">
+              <p className="font-bold text-lg mt-2 dark:text-white">Dr. Charly TP</p>
+              <p className="text-sm text-gray-700 font-normal dark:text-slate-300">
                 General Surgery
               </p>
             </div>
             <div
-              className="text-center p-4"
+              className={`text-center p-4 bg-gray-100 dark:bg-gray-800 ${selectedDoctor === 3 ? "border-4 border-green-500" : ""} `}
               style={{
-                backgroundColor: "#F3F3F3",
+                // backgroundColor: "#F3F3F3",
                 borderRadius: "8px",
                 minWidth: "223px",
                 flexBasis: "223px",
               }}
+              onClick={() => handleDoctorClick(3)}
             >
               <img
                 src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
@@ -97,8 +90,8 @@ const SelectDoctor = () => {
                 className="rounded"
                 style={{ width: "223px", height: "240px" }}
               />
-              <p className="font-bold text-lg mt-2">Dr. Praveena MV</p>
-              <p className="text-sm text-gray-700 font-normal">
+              <p className="font-bold text-lg mt-2 dark:text-white">Dr. Praveena MV</p>
+              <p className="text-sm text-gray-700 font-normal dark:text-slate-300">
                 General Surgery
               </p>
             </div>
@@ -108,7 +101,6 @@ const SelectDoctor = () => {
               type="submit"
               className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               style={{ fontSize: "19px" }}
-              onClick={() => navigate("/clinic/bookings/SelectDateAndTime")}
             >
               Next
             </button>

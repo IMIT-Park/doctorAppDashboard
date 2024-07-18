@@ -13,8 +13,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate } from "../../../utils/formatDate";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
-import RemoveDoctor from "../../../pages/DoctorSingleView/components/RemoveDoctor";
-import Swal from "sweetalert2";
 
 const ClinicDoctor = () => {
   const navigate = useNavigate();
@@ -36,8 +34,6 @@ const ClinicDoctor = () => {
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [removeModal, setRemoveModal] = useState(false);
-  const [selectedDoctorId, setSelectedDoctorId] = useState("");
 
   useEffect(() => {
     setPage(1);
@@ -61,7 +57,7 @@ const ClinicDoctor = () => {
       setLoading(false);
     } catch (error) {
       setAllDoctors([]);
-      setTotalDoctors(0);
+
       console.log(error);
       setLoading(false);
     } finally {
@@ -77,38 +73,6 @@ const ClinicDoctor = () => {
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchData);
-
-  // dr remove actions
-  const openRemoveModal = (doctorId) => {
-    setSelectedDoctorId(doctorId);
-    setRemoveModal(true);
-  };
-  const closeRemoveModal = () => {
-    setSelectedDoctorId("");
-    setRemoveModal(false);
-  };
-
-  const removeDoctor = async () => {
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/clinic/removeDR/${clinicId}`,
-        { doctor_id: selectedDoctorId }
-      );
-      if (response.status === 201) {
-        fetchData();
-        Swal.fire({
-          title: "Removed!",
-          text: "Doctor has been removed.",
-          icon: "success",
-          customClass: "sweet-alerts",
-          confirmButtonColor: "#006241",
-        });
-        closeRemoveModal();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <div>
@@ -187,18 +151,10 @@ const ClinicDoctor = () => {
                   ),
                 },
 
-                {
-                  accessor: "name",
-                  title: "Name",
-                  cellsClassName: "capitalize",
-                },
+                { accessor: "name", title: "Name" },
                 { accessor: "email", title: "Email" },
                 { accessor: "phone", title: "Phone" },
-                {
-                  accessor: "gender",
-                  title: "Gender",
-                  cellsClassName: "capitalize",
-                },
+                { accessor: "gender", title: "Gender" },
                 {
                   accessor: "dateOfBirth",
                   title: "Date of Birth",
@@ -214,48 +170,30 @@ const ClinicDoctor = () => {
                   title: "Specialization",
                   textAlignment: "center",
                 },
-                { accessor: "address", title: "Address" },
-                {
-                  accessor: "fees",
-                  title: "Fees",
-                  render: (row) => `₹${row?.fees}`,
-                },
+                { accessor: "address", title: "Addressd" },
+                { accessor: "fees", title: "Fees" },
                 {
                   accessor: "visibility",
                   title: "Visibility",
                   render: (row) => (row.visibility ? "Visible" : "Hidden"),
                 },
                 {
-                  accessor: "Actions",
-                  title: "Actions",
+                  accessor: "status",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <div className="flex items-center gap-5">
-                      <CustomSwitch
-                        checked={rowData?.status}
-                        onChange={() =>
-                          showDoctorAlert(
-                            rowData?.user_id,
-                            rowData?.status ? "block" : "activate",
-                            "doctor"
-                          )
-                        }
-                        tooltipText={rowData?.status ? "Block" : "Unblock"}
-                        uniqueId={`doctor${rowData?.doctor_id}`}
-                        size="normal"
-                      />
-
-                      <button
-                        type="button"
-                        className="btn btn-danger btn-sm h-fit"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openRemoveModal(rowData?.doctor_id);
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
+                    <CustomSwitch
+                      checked={rowData?.status}
+                      onChange={() =>
+                        showDoctorAlert(
+                          rowData?.user_id,
+                          rowData?.status ? "block" : "activate",
+                          "doctor"
+                        )
+                      }
+                      tooltipText={rowData?.status ? "Block" : "Unblock"}
+                      uniqueId={`doctor${rowData?.doctor_id}`}
+                      size="normal"
+                    />
                   ),
                 },
               ]}
@@ -273,12 +211,6 @@ const ClinicDoctor = () => {
           </div>
         )}
       </div>
-      {/* dr remove modal */}
-      <RemoveDoctor
-        show={removeModal}
-        onClose={closeRemoveModal}
-        onConfirm={removeDoctor}
-      />
     </div>
   );
 };

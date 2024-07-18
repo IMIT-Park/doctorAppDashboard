@@ -13,6 +13,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate } from "../../../utils/formatDate";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
+import IconUserPlus from "../../../components/Icon/IconUserPlus";
+import AddDoctor from "./AddDoctor";
+import { showMessage } from "../../../utils/showMessage";
+
 
 const ClinicDoctor = () => {
   const navigate = useNavigate();
@@ -34,6 +38,21 @@ const ClinicDoctor = () => {
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [addDoctorModal, setAddDoctorModal] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showComfirmPassword, setShowComfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const [input, setInput] = useState({
+    name: "",
+    email: "",
+    user_name: "",
+    phone: "",
+    address: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   useEffect(() => {
     setPage(1);
@@ -43,6 +62,25 @@ const ClinicDoctor = () => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
   }, [page, pageSize]);
+
+  const openAddDoctorModal = () => {
+    setAddDoctorModal(true);
+  };
+
+  const closeAddDoctorModal = () => {
+    setAddDoctorModal(false);
+    setInput({
+      ...input,
+      name: "",
+      email: "",
+      user_name: "",
+      password: "",
+      confirmPassword: "",
+      phone: "",
+      address: "",
+    });
+    setErrors(null);
+  };
 
   // fetch Doctors function
   const fetchData = async () => {
@@ -73,6 +111,82 @@ const ClinicDoctor = () => {
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchData);
+
+    const validate = () => {
+      const newErrors = {};
+      if (input.password !== input.confirmPassword) {
+        newErrors.confirmPassword = "Passwords do not match";
+        showMessage("Passwords do not match", "warning");
+      }
+      if (input.phone.length !== 10) {
+        newErrors.phone = "Phone number must be exactly 10 digits";
+        showMessage("Phone number must be exactly 10 digits", "warning");
+      }
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
+
+
+    const saveDoctorPerson = async () => {
+      if (
+        !input.name ||
+        !input.email ||
+        !input.phone ||
+        !input.dateOfBirth ||
+        !input.gender ||
+        !input.qualification ||
+        !input.specialization ||
+        !input.fees ||
+        !input.address ||
+        !input.password ||
+        !input.confirmPassword
+      ) {
+        showMessage("Please fill in all required fields", "warning");
+        return;
+      }
+      
+      if (validate()) {
+        setButtonLoading(true);
+    
+        const updatedData = {
+          ...input,
+          phone: `+91${input.phone}`,
+          user_name: input.email,
+          clinic_id: clinicId 
+        };
+    
+        try {
+          const response = await NetworkHandler.makePostRequest(
+            "v1/doctor/ClinicCreateDoctor",
+            updatedData
+          );
+    
+          setAddDoctorModal(false);
+    
+          if (response.status === 201) {
+            showMessage("Doctor has been added successfully.");
+            closeAddDoctorModal();
+            fetchData();
+          } else {
+            showMessage("Failed to add Doctor. Please try again.", "error");
+          }
+        } catch (error) {
+          if (error.response && error.response.status === 403) {
+            showMessage(
+              error.response.data.error === "User Already Exists"
+                ? "Username Already Exists"
+                : "Email already exists.",
+              "error"
+            );
+          } else {
+            showMessage("Failed to add Doctor. Please try again.", "error");
+          }
+        } finally {
+          setButtonLoading(false);
+        }
+      }
+    };
+    
 
   return (
     <div>
@@ -110,6 +224,16 @@ const ClinicDoctor = () => {
               </div>
             </form>
           </div>
+          <button
+            type="button"
+            className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+            onClick={openAddDoctorModal}
+          >
+    
+
+            <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
+            Add Doctor
+          </button>
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -211,6 +335,22 @@ const ClinicDoctor = () => {
           </div>
         )}
       </div>
+
+      <AddDoctor
+        open={addDoctorModal}
+        closeModal={closeAddDoctorModal}
+        input={input}
+        setInput={setInput}
+        formSubmit={saveDoctorPerson}
+        buttonLoading={buttonLoading}
+        setButtonLoading={setButtonLoading}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
+        showComfirmPassword={showComfirmPassword}
+        setShowComfirmPassword={setShowComfirmPassword}
+        errors={errors}
+        setErrors={setErrors}
+      />
     </div>
   );
 };

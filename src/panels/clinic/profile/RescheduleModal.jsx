@@ -5,7 +5,7 @@ import "flatpickr/dist/flatpickr.css";
 import IconX from "../../../components/Icon/IconX";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { formatTime } from "../../../utils/formatTime";
-import { formatDate } from "../../../utils/formatDate";
+import { formatDate, reverseformatDate } from "../../../utils/formatDate";
 import { showMessage } from "../../../utils/showMessage";
 import IconLoader from "../../../components/Icon/IconLoader";
 import Flatpickr from "react-flatpickr";
@@ -15,8 +15,57 @@ const RescheduleModal = ({
   addRescheduleModal,
   setAddRescheduleModal,
   closeAddRescheduleModal,
+  bookingId,
 }) => {
- 
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleReschedule = async (event) => {
+    event.preventDefault();
+    console.log("Selected Date:", selectedDate);
+    console.log("Booking ID:", bookingId);
+
+    if (!selectedDate) {
+      showMessage("Please select a date.", "error");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/consultation/Reschedule/${bookingId}`,
+        {
+          new_schedule_date: reverseformatDate(selectedDate),
+        }
+      );
+
+      console.log("Response:", response);
+
+      if (response.status === 200) {
+        showMessage("Rescheduled successfully!", "success");
+        closeAddRescheduleModal();
+      } else {
+        showMessage("Failed to reschedule. Please try again.", "error");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        showMessage(
+          `Doctor is on leave on ${formatDate(selectedDate)}`,
+          "warning"
+        );
+      } else if (error.response && error.response.status === 403) {
+        showMessage(
+          `Pick the date that corresponds to the day of the week`,
+          "warning"
+        );
+      } else {
+        showMessage("An error occurred. Please try again.", "error");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Transition appear show={addRescheduleModal} as={Fragment}>
@@ -67,18 +116,18 @@ const RescheduleModal = ({
                     <h1 className="text-center font-bold text-2xl text-black m-8 dark:text-[#fbfbfb]">
                       Select Date
                     </h1>
-                    <form>
+                    <form onSubmit={handleReschedule}>
                       <div className="flex flex-wrap justify-center mb-6 space-x-4">
                         <div className="mb-5">
                           <Flatpickr
-                            // value={date1}
+                            value={selectedDate}
                             options={{
                               dateFormat: "Y-m-d",
                               position: "auto left",
                               inline: true,
                             }}
                             className="form-input"
-                            // onChange={(date) => setDate1(date)}
+                            onChange={(date) => setSelectedDate(date)}
                           />
                         </div>
                       </div>
@@ -93,10 +142,14 @@ const RescheduleModal = ({
                           Cancel
                         </button>
                         <button
-                          type="button"
+                          type="submit"
                           className="btn btn-green ltr:ml-4 rtl:mr-4"
                         >
-                          Submit
+                          {loading ? (
+                            <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle" />
+                          ) : (
+                            "Submit"
+                          )}
                         </button>
                       </div>
                     </form>

@@ -73,31 +73,35 @@ const ClinicBookingDoctor = () => {
                   type="text"
                   value={search}
                   placeholder="Search by Name, Email, Phone no"
-                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-[#F3F3F3] rounded-full h-11 placeholder-gray-400 pr-10 pl-5 focus:outline-none focus:ring-2 focus:ring-green-500 w-full"
+                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] rounded-full h-11 pr-10 pl-5  w-full"
                   onChange={(e) => setSearch(e.target.value)}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                 />
                 <button
                   type="submit"
-                  className="btn-grey absolute right-0 top-0 bottom-0 rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                  className="btn-grey absolute right-0 top-0 bottom-0 rounded-full w-9 h-full p-0 flex items-center justify-center"
                   style={{ color: "#AAAAAA", right: "10px" }}
                 >
                   <IconSearch className="mx-auto" style={{ fill: "#AAAAAA" }} />
                 </button>
                 {showSuggestions && (
-                  <ul className="z-10 absolute top-10 bg-white border border-gray-300 rounded-md mt-1 w-full">
-                    {["Muhammed Jasil", "Amal Pradeep", "Prince"].map(
-                      (item) => (
-                        <li
-                          key={item}
-                          className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                          onMouseDown={() => setSearch(item)}
-                        >
-                          {item}
-                        </li>
-                      )
-                    )}
+                  <ul className="z-10 absolute top-11 bg-white dark:bg-slate-900 border border-gray-300 dark:border-gray-800 rounded-md w-full p-2">
+                    {[
+                      "Muhammed Jasil",
+                      "Amal Pradeep",
+                      "Prince",
+                      "Muhammed Jasil",
+                      "Muhammed Jasil",
+                    ].map((item) => (
+                      <li
+                        key={item}
+                        className="px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer"
+                        onMouseDown={() => setSearch(item)}
+                      >
+                        {item}
+                      </li>
+                    ))}
                   </ul>
                 )}
               </div>
@@ -105,8 +109,7 @@ const ClinicBookingDoctor = () => {
               <div className="flex text-gray-500 font-semibold dark:text-white-dark gap-y-4 w-full max-w-md">
                 <button
                   type="button"
-                  className="btn btn-green w-full"
-                  style={{ fontSize: "17px" }}
+                  className="btn btn-green w-full text-base"
                   onClick={() => navigate("/clinic/bookings/PatientDetails")}
                 >
                   New User

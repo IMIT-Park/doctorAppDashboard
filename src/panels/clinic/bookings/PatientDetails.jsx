@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { showMessage } from "../../../utils/showMessage";
 import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
 import IconLoader from "../../../components/Icon/IconLoader";
+import IconCaretDown from "../../../components/Icon/IconCaretDown";
 
 const ClinicBookingDoctor = () => {
   const dispatch = useDispatch();
@@ -103,14 +104,19 @@ const ClinicBookingDoctor = () => {
     setInput({ ...input, phone: value });
     if (value.length === 10) {
       setErrors((prevErrors) => ({ ...prevErrors, phone: "" }));
-    } else{
-      setErrors((prevErrors) => ({...prevErrors, phone: "Invalid Phone Number. Phone Number should be 10 digit number"}))
-    }
+    } 
   };
 
   return (
     <div>
       <ScrollToTop />
+      <button
+        onClick={() => navigate(-1)}
+        type="button"
+        className="btn btn-green btn-sm -mt-4 mb-2"
+      >
+        <IconCaretDown className="w-4 h-4 rotate-90" />
+      </button>
       <div className="panel flex justify-center items-center min-h-screen">
         <div className="w-full max-w-lg p-6 bg-[#fbfbfb] dark:bg-[#121c2c] rounded-lg shadow-lg">
           <h1 className="text-center font-bold text-2xl text-black mb-4 dark:text-[#fbfbfb]">
@@ -133,11 +139,11 @@ const ClinicBookingDoctor = () => {
               maxLength="10"
             />
 
-            <div className="flex flex-col md:flex-row md:space-x-4 mb-4 mt-2">
+            <div className="flex flex-col md:flex-row md:space-x-4 mb-4 mt-4">
               <div className="w-full mb-4 md:mb-0">
                 <label
                   htmlFor="dob"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-500 mb-1"
                 >
                   Date of Birth
                 </label>
@@ -157,7 +163,7 @@ const ClinicBookingDoctor = () => {
               <div className="w-full">
                 <label
                   htmlFor="gender"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-500 mb-1"
                 >
                   Gender
                 </label>
@@ -168,13 +174,13 @@ const ClinicBookingDoctor = () => {
                   onChange={(e) =>
                     setInput({ ...input, gender: e.target.value })
                   }
-                  className="form-input form-input-green px-3"
+                  className="form-select form-select-green px-3"
                   required
                 >
                   <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
             </div>
@@ -198,8 +204,7 @@ const ClinicBookingDoctor = () => {
             <div className="flex justify-center">
               <button
                 type="submit"
-                className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                style={{ fontSize: "19px" }}
+                className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-base font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
               {buttonLoading ? 
               (<IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />) :

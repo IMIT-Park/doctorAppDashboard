@@ -1,18 +1,17 @@
 import { setPageTitle } from "../../store/themeConfigSlice";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Dropdown from "../../components/Dropdown";
 import IconHorizontalDots from "../../components/Icon/IconHorizontalDots";
 import ReactApexChart from "react-apexcharts";
 import CountUp from "react-countup";
-import IconMenuUsers from "../../components/Icon/Menu/IconMenuUsers";
-import IconMenuDatatables from "../../components/Icon/Menu/IconMenuDatatables";
-import IconMenuInvoice from "../../components/Icon/Menu/IconMenuInvoice";
 import IconInbox from "../../components/Icon/IconInbox";
 import IconTag from "../../components/Icon/IconTag";
 import IconCreditCard from "../../components/Icon/IconCreditCard";
+import NetworkHandler from "../../utils/NetworkHandler";
 
 const Index = () => {
+  const [adminReport, setAdminReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const isDark = useSelector(
@@ -23,6 +22,24 @@ const Index = () => {
   useEffect(() => {
     dispatch(setPageTitle("Dashboard"));
   });
+
+  const fetchData = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/report/getSuperadminreport`
+      );
+      setAdminReport(response?.data?.pageInfo);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const revenueChart = {
     series: [
@@ -299,19 +316,7 @@ const Index = () => {
       <div className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6 text-white">
           {/* Total Transactions */}
-          <div className="panel bg-gradient-to-r from-violet-500 to-violet-400">
-            <div className="flex justify-between">
-              <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                Total Income
-              </div>
-            </div>
-            <div className="flex items-center mt-3">
-              <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                1,25,359
-              </div>
-            </div>
-            {/* <IconMenuInvoice className="absolute top-[50%] translate-y-[-50%] right-5 size-8" /> */}
-          </div>
+
           {/* Total Users */}
           <div className="panel bg-gradient-to-r from-cyan-500 to-cyan-400">
             <div className="flex justify-between">
@@ -321,7 +326,11 @@ const Index = () => {
             </div>
             <div className="flex items-center mt-3">
               <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={67} duration={4}></CountUp>{" "}
+                <CountUp
+                  start={0}
+                  end={adminReport?.totalClinics || 0}
+                  duration={4}
+                ></CountUp>{" "}
               </div>
             </div>
             {/* <IconMenuUsers className="absolute top-[50%] translate-y-[-50%] right-5 size-8" /> */}
@@ -331,12 +340,16 @@ const Index = () => {
           <div className="panel bg-gradient-to-r from-blue-500 to-blue-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                New Clinics
+                Total Doctor
               </div>
             </div>
             <div className="flex items-center mt-3">
               <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={34} duration={4}></CountUp>
+                <CountUp
+                  start={0}
+                  end={adminReport?.totalDoctor || 0}
+                  duration={4}
+                ></CountUp>
               </div>
             </div>
             {/* <IconMenuDatatables className="absolute top-[50%] translate-y-[-50%] right-5 size-8" /> */}
@@ -346,12 +359,16 @@ const Index = () => {
           <div className="panel bg-gradient-to-r from-fuchsia-500 to-fuchsia-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                Clinics without Doctor Subscriptions
+                Total Month Subscription
               </div>
             </div>
             <div className="flex items-center mt-3">
               <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={49} duration={4}></CountUp>
+                <CountUp
+                  start={0}
+                  end={adminReport?.totalMonthSubscription || 0}
+                  duration={4}
+                ></CountUp>
               </div>
             </div>
             {/* <IconMenuUsers className="absolute top-[50%] translate-y-[-50%] right-5 size-8" /> */}
@@ -365,7 +382,11 @@ const Index = () => {
             </div>
             <div className="flex items-center mt-3">
               <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={49} duration={4}></CountUp>
+                <CountUp
+                  start={0}
+                  end={adminReport?.totalSubscription || 0}
+                  duration={4}
+                ></CountUp>
               </div>
             </div>
             {/* <IconMenuUsers className="absolute top-[50%] translate-y-[-50%] right-5 size-8" /> */}
@@ -374,26 +395,16 @@ const Index = () => {
           <div className="panel bg-gradient-to-r from-fuchsia-500 to-fuchsia-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                New Subscriptions
+                Total Unsubscription
               </div>
             </div>
             <div className="flex items-center mt-3">
               <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={49} duration={4}></CountUp>
-              </div>
-            </div>
-            {/* <IconMenuUsers className="absolute top-[50%] translate-y-[-50%] right-5 size-8" /> */}
-          </div>
-
-          <div className="panel bg-gradient-to-r from-fuchsia-500 to-fuchsia-400">
-            <div className="flex justify-between">
-              <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                Unsubscription
-              </div>
-            </div>
-            <div className="flex items-center mt-3">
-              <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={49} duration={4}></CountUp>
+                <CountUp
+                  start={0}
+                  end={adminReport?.totalUnsubscription || 0}
+                  duration={4}
+                ></CountUp>
               </div>
             </div>
             {/* <IconMenuUsers className="absolute top-[50%] translate-y-[-50%] right-5 size-8" /> */}

@@ -39,7 +39,7 @@ const OwnerChat = lazy(() => import("../panels/owner/chats/Index"));
 
 // <--------------> clinic panel imports starts here<-------------->
 const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
-const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/index"));
+const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/Index"));
 const ClinicLeaves = lazy(() => import("../panels/clinic/leaves/Index"));
 const ClinicProfile = lazy(() =>
   import("../panels/clinic/profile/ClinicProfile")

@@ -95,6 +95,7 @@ const Requests = () => {
           text: "Request has been accepted.",
           icon: "success",
           customClass: "sweet-alerts",
+          confirmButtonColor: "#006241",
         });
       }
     } catch (error) {
@@ -119,6 +120,7 @@ const Requests = () => {
           text: "Request has been rejected.",
           icon: "success",
           customClass: "sweet-alerts",
+          confirmButtonColor: "#006241",
         });
       }
     } catch (error) {

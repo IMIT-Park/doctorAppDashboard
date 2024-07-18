@@ -13,6 +13,7 @@ import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import { UserContext } from "../../../contexts/UseContext";
 import ModalRequests from "./ModalRequests";
 import noProfile from "/assets/images/empty-user.png";
+import IconSend from "../../../components/Icon/IconSend";
 
 const Requests = () => {
   const dispatch = useDispatch();
@@ -74,6 +75,8 @@ const Requests = () => {
     fetchData();
   }, [page, pageSize]);
 
+  console.log(allRequests);
+
   return (
     <div>
       <ScrollToTop />
@@ -91,6 +94,7 @@ const Requests = () => {
           <div className="ml-auto flex text-gray-500 font-semibold dark:text-white-dark gap-y-4 mb-3">
             <button type="button" className="btn btn-green" onClick={openModal}>
               Send Request
+              <IconSend className="ml-2 w-4 h-4" />
             </button>
           </div>
         </div>
@@ -150,6 +154,24 @@ const Requests = () => {
                   accessor: "address",
                   title: "Address",
                   render: (row) => row?.Doctor?.address || "",
+                },
+                {
+                  accessor: "status",
+                  render: (row) => (
+                    <span
+                      key={row?.doctor_clinic_id}
+                      className={`badge whitespace-nowrap ${
+                        row?.status === "accepted"
+                          ? "bg-success"
+                          : row?.status === "cancelled"
+                          ? "bg-danger"
+                          : "bg-secondary"
+                      }`}
+                    >
+                      {row?.status}
+                    </span>
+                  ),
+                  cellsClassName: "capitalize",
                 },
               ]}
               totalRecords={totalRequests}

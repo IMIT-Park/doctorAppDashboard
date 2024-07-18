@@ -38,6 +38,7 @@ const useBlockUnblock = (fetchDataCallback) => {
       confirmButtonText: action === "activate" ? "Unblock" : "Block",
       padding: "2em",
       customClass: "sweet-alerts",
+      confirmButtonColor: "#006241",
     }).then((result) => {
       if (result.value) {
         handleBlockUnblock(id, action);
@@ -48,6 +49,7 @@ const useBlockUnblock = (fetchDataCallback) => {
           }.`,
           icon: "success",
           customClass: "sweet-alerts",
+          confirmButtonColor: "#006241",
         });
       }
     });

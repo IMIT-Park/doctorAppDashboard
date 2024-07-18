@@ -1,16 +1,15 @@
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 
-const AcceptRejectModal = ({
+const RemoveDoctor = ({
   show,
-  isReject,
   title = "Are you sure?",
-  text = `Do you want to ${isReject ? "Reject" : "Accept"} this request?`,
+  text = `Do you want to Remove this doctor?`,
   icon = "warning",
-  confirmButtonText = `${isReject ? "Reject" : "Accept"}`,
+  confirmButtonText = `Remove`,
   onConfirm,
   onClose,
-  confirmButtonColor= "#006241",
+  confirmButtonColor = "#006241",
 }) => {
   useEffect(() => {
     if (show) {
@@ -18,11 +17,11 @@ const AcceptRejectModal = ({
         icon,
         title,
         text,
+        confirmButtonColor,
         showCancelButton: true,
         confirmButtonText,
         padding: "2em",
         customClass: "sweet-alerts",
-        confirmButtonColor
       }).then((result) => {
         if (result.value && onConfirm) {
           onConfirm();
@@ -36,4 +35,4 @@ const AcceptRejectModal = ({
   return null;
 };
 
-export default AcceptRejectModal;
+export default RemoveDoctor;

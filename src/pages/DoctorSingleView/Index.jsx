@@ -22,6 +22,8 @@ import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
 import CustomButton from "../../components/CustomButton";
 import noProfile from "/assets/images/empty-user.png";
+import RemoveDoctor from "./components/RemoveDoctor";
+import Swal from "sweetalert2";
 
 const SinglePage = () => {
   const { doctorId, clinicId } = useParams();
@@ -65,6 +67,7 @@ const SinglePage = () => {
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
   const [clinicsLoading, setClinicsLoading] = useState(false);
   const [doctorClinics, setDoctorClinics] = useState([]);
+  const [removeModal, setRemoveModal] = useState(false);
 
   const togglePara = (value) => {
     setActive((oldValue) => (oldValue === value ? null : value));
@@ -380,6 +383,38 @@ const SinglePage = () => {
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchDoctorData);
 
+  // dr remove actions
+  const openRemoveModal = () => {
+    setRemoveModal(true);
+  };
+  const closeRemoveModal = () => {
+    setRemoveModal(false);
+  };
+
+  const removeDoctor = async () => {
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/clinic/removeDR/${clinicId}`,
+        { doctor_id: doctorId }
+      );
+      if (response.status === 201) {
+        Swal.fire({
+          title: "Removed!",
+          text: "Doctor has been removed.",
+          icon: "success",
+          customClass: "sweet-alerts",
+          confirmButtonColor: "#006241",
+        });
+        closeRemoveModal();
+        setTimeout(() => {
+          navigate(-1);
+        }, 3000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -411,6 +446,18 @@ const SinglePage = () => {
         ) : (
           <>
             <div className="flex flex-col items-start gap-4">
+              {!isSuperAdmin && (
+                <button
+                  type="button"
+                  className="absolute top-2 right-2 btn btn-danger btn-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openRemoveModal();
+                  }}
+                >
+                  Remove
+                </button>
+              )}
               <div className="relative">
                 <img
                   src={
@@ -499,54 +546,60 @@ const SinglePage = () => {
             </div>
             {/* clinics list starts here */}
 
-            <h5 className="mt-14 mb-2 text-xl font-semibold text-dark dark:text-white-dark">
-              Clinics :
-            </h5>
-            {clinicsLoading ? (
-              <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
-            ) : (
+            {selectedClinicId && (
               <>
-                {doctorClinics && doctorClinics?.length > 0 ? (
-                  <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
-                    {doctorClinics?.map((clinic) => (
-                      <div
-                        key={clinic?.clinic_id}
-                        className={`Sm:min-w-[413px] border bg-[#F6F6F6] dark:bg-slate-900 ${
-                          selectedClinicId === clinic?.clinic_id
-                            ? "border-[#006241]"
-                            : "border-slate-200 dark:border-slate-800"
-                        } rounded flex gap-3 items-center p-1 cursor-pointer`}
-                        onClick={() => handleClinicSelect(clinic)}
-                      >
-                        <img
-                          src={imageBaseUrl + clinic?.banner_img_url}
-                          alt="Clinic"
-                          className="w-[85px] h-[62px] rounded-md object-cover"
-                        />
-                        <div>
-                          <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-300 capitalize">
-                            {clinic?.name || ""}
-                          </h4>
-                          <p className="text-sm font-normal text-slate-500 capitalize">
-                            {clinic?.place || ""}
-                          </p>
-                        </div>
-                        <div
-                          className={`ml-auto mr-2 w-4 h-4 rounded-full border ${
-                            selectedClinicId === clinic?.clinic_id
-                              ? "border-[#006241] bg-slate-400"
-                              : "border-slate-200 dark:border-slate-800"
-                          } p-[1px] bg-slate-200 dark:bg-slate-800`}
-                        >
-                          {selectedClinicId === clinic?.clinic_id && (
-                            <div className="bg-[#006241] w-full h-full rounded-full" />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <h5 className="mt-14 mb-2 text-xl font-semibold text-dark dark:text-white-dark">
+                  Clinics :
+                </h5>
+                {clinicsLoading ? (
+                  <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
                 ) : (
-                  <div className="text-xs text-gray-600">No clinics Found</div>
+                  <>
+                    {doctorClinics && doctorClinics?.length > 0 ? (
+                      <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+                        {doctorClinics?.map((clinic) => (
+                          <div
+                            key={clinic?.clinic_id}
+                            className={`Sm:min-w-[413px] border bg-[#F6F6F6] dark:bg-slate-900 ${
+                              selectedClinicId === clinic?.clinic_id
+                                ? "border-[#006241]"
+                                : "border-slate-200 dark:border-slate-800"
+                            } rounded flex gap-3 items-center p-1 cursor-pointer`}
+                            onClick={() => handleClinicSelect(clinic)}
+                          >
+                            <img
+                              src={imageBaseUrl + clinic?.banner_img_url}
+                              alt="Clinic"
+                              className="w-[85px] h-[62px] rounded-md object-cover"
+                            />
+                            <div>
+                              <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-300 capitalize">
+                                {clinic?.name || ""}
+                              </h4>
+                              <p className="text-sm font-normal text-slate-500 capitalize">
+                                {clinic?.place || ""}
+                              </p>
+                            </div>
+                            <div
+                              className={`ml-auto mr-2 w-4 h-4 rounded-full border ${
+                                selectedClinicId === clinic?.clinic_id
+                                  ? "border-[#006241] bg-slate-400"
+                                  : "border-slate-200 dark:border-slate-800"
+                              } p-[1px] bg-slate-200 dark:bg-slate-800`}
+                            >
+                              {selectedClinicId === clinic?.clinic_id && (
+                                <div className="bg-[#006241] w-full h-full rounded-full" />
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-gray-600">
+                        No clinics Found
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -794,6 +847,13 @@ const SinglePage = () => {
         fetchLeaveData={getDoctorLeaves}
         selectedTimeSlots={selectedTimeSlots}
         setSelectedTimeSlots={setSelectedTimeSlots}
+      />
+
+      {/* dr remove modal */}
+      <RemoveDoctor
+        show={removeModal}
+        onClose={closeRemoveModal}
+        onConfirm={removeDoctor}
       />
     </div>
   );

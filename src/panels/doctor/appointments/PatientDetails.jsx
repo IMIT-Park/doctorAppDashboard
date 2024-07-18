@@ -26,13 +26,15 @@ const PatientDetails = () => {
   const isSuperAdmin = userDetails?.role_id === 1;
   const navigate = useNavigate();
 
-  const [input, setInput] = useState({
+  const initialInputState = {
     symptoms: "",
     diagnosis: "",
     prescription: "",
     medicalTests: "",
     notes: "",
-  });
+  };
+
+  const [input, setInput] = useState(initialInputState);
 
   const fetchPatientDetails = async () => {
     setLoading(true);
@@ -53,6 +55,26 @@ const PatientDetails = () => {
   useEffect(() => {
     fetchPatientDetails();
   }, [bookingId]);
+
+  useEffect(() => {
+    const medicalReportData = sessionStorage.getItem("medicalReport");
+    const medicalReport = medicalReportData ? JSON.parse(medicalReportData) : null;
+    const currentDate = formatDate(new Date());
+
+    if (
+      medicalReport &&
+      medicalReport.currentDate === currentDate &&
+      medicalReport.patientId === patientId
+    ) {
+      setInput({
+        symptoms: medicalReport.symptoms || "",
+        diagnosis: medicalReport.diagnosis || "",
+        prescription: medicalReport.prescription || "",
+        medicalTests: medicalReport.medicalTests || "",
+        notes: medicalReport.notes || "",
+      });
+    }
+  }, [patientId]);
 
   // Function to calculate age
   const calculateAge = (dateOfBirth) => {
@@ -107,6 +129,14 @@ const PatientDetails = () => {
       );
       if (response.status === 201) {
         showMessage("Report added successfully.");
+        sessionStorage.setItem(
+          "medicalReport",
+          JSON.stringify({
+            ...updatedInput,
+            currentDate: formatDate(new Date()),
+            patientId: patientId,
+          })
+        );
         fetchPatientDetails();
         setButtonLoading(false);
       } else {

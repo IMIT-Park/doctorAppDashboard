@@ -115,6 +115,7 @@ const Header = () => {
 
   const handleLogout = () => {
     sessionStorage.clear();
+    localStorage.clear();
     setUserDetails(null);
     navigate("/");
   };

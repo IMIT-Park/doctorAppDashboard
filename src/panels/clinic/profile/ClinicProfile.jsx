@@ -23,6 +23,7 @@ import Dropdown from "../../../components/Dropdown";
 import IconHorizontalDots from "../../../components/Icon/IconHorizontalDots";
 import IconSearch from "../../../components/Icon/IconSearch";
 import IconCopy from "../../../components/Icon/IconCopy";
+import RescheduleModal from "./RescheduleModal";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -61,14 +62,14 @@ const ClinicProfile = () => {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
-  const [totalAppointments, setTotalAppointments] = useState("");
+  const [totalAppointments, setTotalAppointments] = useState(0);
   const [appointments, setAppointments] = useState([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [appointmentsLoading, setAppointmentsLoading] = useState(false);
-  const [noAppoinments, setNoAppoinments] = useState(false);
+  const [addRescheduleModal, setAddRescheduleModal] = useState(false);
 
   useEffect(() => {
     setPage(1);
@@ -219,8 +220,6 @@ const ClinicProfile = () => {
     setSelectedDoctorId(selectedDoctorId);
   };
 
-  console.log(selectedDoctorId);
-
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
   };
@@ -246,7 +245,6 @@ const ClinicProfile = () => {
         setAppointmentsLoading(false);
         setTotalAppointments(0);
         setAppointments([]);
-       
       } else {
         throw new Error("Failed to fetch appointments");
       }
@@ -262,6 +260,14 @@ const ClinicProfile = () => {
   useEffect(() => {
     fetchAppointments();
   }, [selectedDoctorId, selectedDate]);
+
+  const openAddRescheduleModal = () => {
+    setAddRescheduleModal(true);
+  };
+
+  const closeAddRescheduleModal = () => {
+    setAddRescheduleModal(false);
+  };
 
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
@@ -479,7 +485,7 @@ const ClinicProfile = () => {
               <Tab.Panels>
                 <Tab.Panel>
                   {appointmentsLoading ? (
-                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0 mt-4"/>
+                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0 mt-4" />
                   ) : (
                     <div className="datatables mt-8">
                       <DataTable
@@ -517,7 +523,12 @@ const ClinicProfile = () => {
                                 >
                                   <ul className="text-black dark:text-white-dark">
                                     <li>
-                                      <button type="button">Reschedule</button>
+                                      <button
+                                        type="button"
+                                        onClick={openAddRescheduleModal}
+                                      >
+                                        Reschedule
+                                      </button>
                                     </li>
                                     <li>
                                       <button type="button">Cancel</button>
@@ -558,6 +569,14 @@ const ClinicProfile = () => {
         handleSubmit={updateClinic}
         buttonLoading={buttonLoading}
         isEdit={true}
+      />
+      <RescheduleModal
+        addRescheduleModal={addRescheduleModal}
+        setAddRescheduleModal={setAddRescheduleModal}
+        closeAddRescheduleModal={closeAddRescheduleModal}
+        // buttonLoading={buttonLoading}
+        // allDoctorNames={allDoctorNames}
+        // fetchLeaveData={fetchLeaveData}
       />
     </div>
   );

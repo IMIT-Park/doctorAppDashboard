@@ -5,6 +5,8 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
 import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
+import NetworkHandler from "../../../utils/NetworkHandler";
+
 
 const AddDoctor = ({
   open,
@@ -21,6 +23,25 @@ const AddDoctor = ({
   showComfirmPassword,
   setShowComfirmPassword,
 }) => {
+  const [specializations, setSpecializations] = useState([]);
+
+  const fetchSpecializations = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest("/v1/doctor/specializations");
+      setSpecializations(response?.data?.specializations);
+    } catch (error) {
+      console.error("Error fetching specializations:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSpecializations();
+  }, []);
+
+  const handleSpecializationChange = (e) => {
+    setInput({ ...input, specialization: e.target.value });
+  };
+
   const handleEmailChange = (e) => {
     const email = e.target.value;
     setInput({ ...input, email, user_name: email });
@@ -54,6 +75,9 @@ const AddDoctor = ({
   const handleFeesChange = (e) => {
     setInput({ ...input, fees: e.target.value.replace(/\D/g, "") });
   };
+
+  console.log(input);
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -223,38 +247,32 @@ const AddDoctor = ({
                     </div>
 
                     <div className="mb-5">
-  {/* <label htmlFor="fees">Fees</label> */}
-  <input
-    id="fees"
-    type="tel"
-    placeholder="Enter Fees"
-    className="form-input form-input-green h-10" // Adjust the height here (h-12 sets it to 3rem/48px)
-    value={input?.fees}
-      onChange={handleFeesChange}
-
-    
-  />
-</div>
+                      {/* <label htmlFor="fees">Fees</label> */}
+                      <input
+                        id="fees"
+                        type="tel"
+                        placeholder="Enter Fees"
+                        className="form-input form-input-green h-10"
+                        value={input?.fees}
+                        onChange={handleFeesChange}
+                      />
+                    </div>
 
                     <div className="mb-5">
-  <select
-    id="specialization"
-    className="form-select form-select-green text-gray-500 h-10"
-    value={input?.specialization}
-    onChange={(e) =>
-      setInput({ ...input, specialization: e.target.value })
-    }
-  >
-    <option value="">Select Specialization</option>
-    <option value="Dermatopathology">Dermatopathology</option>
-    <option value="Allergy">Allergy</option>
-    <option value="Allergy & Immunology">Allergy & Immunology</option>
-    <option value="Immunology">Immunology</option>
-    <option value="Anesthesiology">Anesthesiology</option>
-    <option value="Critical Care Anesthesiology">Critical Care Anesthesiology</option>
-    <option value="Pain Management">Pain Management</option>
-  </select>
-</div>
+                      <select
+                        id="specialization"
+                        className="form-select form-select-green text-gray-500 h-10"
+                        value={input?.specialization}
+                        onChange={handleSpecializationChange}
+                      >
+                        <option value="">Select Specialization</option>
+                        {specializations?.map((spec) => (
+                          <option key={spec?.id} value={spec.name}>
+                            {spec?.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
                     <div className="mb-5">
                       {/* <label htmlFor="address">Address</label> */}

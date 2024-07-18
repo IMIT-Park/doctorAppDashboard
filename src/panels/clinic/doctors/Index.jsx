@@ -53,6 +53,10 @@ const ClinicDoctor = () => {
     email: "",
     user_name: "",
     phone: "",
+    gender: "",
+    qualification: "",
+    fees: "",
+    specialization: " ",
     address: "",
     password: "",
     confirmPassword: "",
@@ -76,15 +80,20 @@ const ClinicDoctor = () => {
     setInput({
       ...input,
       name: "",
-      email: "",
-      user_name: "",
-      password: "",
-      confirmPassword: "",
-      phone: "",
-      address: "",
+    email: "",
+    user_name: "",
+    phone: "",
+    gender: "",
+    qualification: "",
+    fees: "",
+    specialization: " ",
+    address: "",
+    password: "",
+    confirmPassword: "",
     });
     setErrors(null);
   };
+
 
   // fetch Doctors function
   const fetchData = async () => {

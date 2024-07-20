@@ -5,7 +5,8 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { showMessage } from "../../../utils/showMessage";
 import { formatTime } from "../../../utils/formatTime";
-import { formatDate } from "../../../utils/formatDate";
+import { formatDate, reverseformatDate } from "../../../utils/formatDate";
+import Swal from "sweetalert2";
 
 const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
   const [leaveType, setLeaveType] = useState("Full Day");
@@ -17,16 +18,6 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const days = [
-    { name: "Sunday", id: "0" },
-    { name: "Monday", id: "1" },
-    { name: "Tuesday", id: "2" },
-    { name: "Wednesday", id: "3" },
-    { name: "Thursday", id: "4" },
-    { name: "Friday", id: "5" },
-    { name: "Saturday", id: "6" },
-  ];
 
   // Function to reset the form
   const resetForm = () => {
@@ -85,11 +76,6 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
     }
   };
 
-  const getDayName = (dayId) => {
-    const day = days.find((d) => d.id === String(dayId));
-    return day ? day.name : "";
-  };
-
   const handleTimeSlotChange = (e) => {
     const { value, checked } = e.target;
     const slotId = parseInt(value, 10);
@@ -108,7 +94,7 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
       let leaveData;
 
       if (leaveType === "By Shift" && selectedTimeSlots.length === 0) {
-        showMessage("No time slots selected for leave", "error");
+        showMessage("No time slots selected for leave", "warning");
         setButtonLoading(false);
         return;
       }
@@ -125,7 +111,7 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
       }
 
       if (leaveType === "Multiple" && (!startDate || !endDate)) {
-        showMessage("Please select a date range", "error");
+        showMessage("Please select a date range", "warning");
         setButtonLoading(false);
         return;
       }
@@ -168,7 +154,13 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
     } catch (error) {
       console.error("Error creating leave slots:", error);
       if (error.response && error.response.status === 404) {
-        showMessage("Leave already taken on the date", "error");
+        Swal.fire({
+          icon: "error",
+          title: "Cannot add leave!",
+          text: `${error?.response?.data?.error}`,
+          padding: "2em",
+          customClass: "sweet-alerts",
+        });
       } else {
         showMessage("An error occurred while creating leave slots", "error");
       }
@@ -176,6 +168,8 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
       setButtonLoading(false);
     }
   };
+
+  const currentDate = reverseformatDate(new Date());
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -277,6 +271,7 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                             className="form-input form-input-green"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
+                            min={currentDate}
                             disabled={loading}
                           />
                         </div>
@@ -316,6 +311,7 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                               className="form-input"
                               value={startDate || ""}
                               onChange={(e) => setStartDate(e.target.value)}
+                              min={currentDate}
                             />
                           </div>
                           <div className="w-full">
@@ -326,6 +322,7 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                               className="form-input"
                               value={endDate || ""}
                               onChange={(e) => setEndDate(e.target.value)}
+                              min={currentDate}
                             />
                           </div>
                         </div>
@@ -342,6 +339,7 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                             className="form-input"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
+                            min={currentDate}
                             disabled={loading}
                           />
                           {loading ? (
@@ -362,11 +360,11 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                               <label className="block mb-2">
                                 Select Time Slots:
                               </label>
-                              <div className="flex flex-wrap mt-2">
+                              <div className="flex flex-wrap my-2 gap-3">
                                 {timeSlots?.map((slot) => (
                                   <div
                                     key={slot.DoctorTimeSlot_id}
-                                    className="flex items-center mb-2"
+                                    className="flex items-center border dark:border-slate-600 pr-2 py-2 rounded"
                                   >
                                     <input
                                       type="checkbox"
@@ -377,7 +375,7 @@ const AddLeave = ({ open, closeModal, clinicId, doctorId, fetchLeaveData }) => {
                                     />
                                     <label
                                       htmlFor={`slot-${slot?.DoctorTimeSlot_id}`}
-                                      className="badge badge-outline-dark text-gray-500 p-2 text-lg"
+                                      className="-mb-0.5"
                                     >
                                       {formatTime(slot.startTime)} -{" "}
                                       {formatTime(slot.endTime)}

@@ -1,34 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import "flatpickr/dist/flatpickr.css";
 import IconX from "../../../components/Icon/IconX";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { formatTime } from "../../../utils/formatTime";
-import { formatDate } from "../../../utils/formatDate";
+import { formatDate, reverseformatDate } from "../../../utils/formatDate";
 import { showMessage } from "../../../utils/showMessage";
 import IconLoader from "../../../components/Icon/IconLoader";
+import Swal from "sweetalert2";
 
-const AddLeave = ({
-  addLeaveModal,
-  closeAddLeaveModal,
-  allDoctorNames,
-  fetchLeaveData,
-}) => {
+const AddLeave = ({ addLeaveModal, closeAddLeaveModal, fetchLeaveData }) => {
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const clinicId = userData?.UserClinic?.[0]?.clinic_id || 0;
 
   const [leaveType, setLeaveType] = useState("Full Day");
-  const days = [
-    { name: "Sunday", id: "0" },
-    { name: "Monday", id: "1" },
-    { name: "Tuesday", id: "2" },
-    { name: "Wednesday", id: "3" },
-    { name: "Thursday", id: "4" },
-    { name: "Friday", id: "5" },
-    { name: "Saturday", id: "6" },
-  ];
   const [selectedDate, setSelectedDate] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -38,6 +24,29 @@ const AddLeave = ({
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [doctorsLoading, setDoctorsLoading] = useState(false);
+  const [allDoctors, setAllDoctors] = useState([]);
+
+  const fetchDoctorData = async () => {
+    setDoctorsLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/doctor/getDoctorbyId/${clinicId}`
+      );
+      setAllDoctors(response?.data?.doctors || []);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setDoctorsLoading(false);
+    }
+  };
+
+  // fetching Doctors
+  useEffect(() => {
+    if (addLeaveModal) {
+      fetchDoctorData();
+    }
+  }, [addLeaveModal]);
 
   const resetForm = () => {
     setLeaveType("Full Day");
@@ -92,11 +101,6 @@ const AddLeave = ({
     } finally {
       setLoading(false);
     }
-  };
-
-  const getDayName = (dayId) => {
-    const day = days.find((d) => d.id === String(dayId));
-    return day ? day.name : "";
   };
 
   const handleTimeSlotChange = (e) => {
@@ -188,7 +192,13 @@ const AddLeave = ({
     } catch (error) {
       console.error("Error creating leave slots:", error);
       if (error.response && error.response.status === 404) {
-        showMessage("Leave already taken on the date", "error");
+        Swal.fire({
+          icon: "error",
+          title: "Cannot add leave!",
+          text: `${error?.response?.data?.error}`,
+          padding: "2em",
+          customClass: "sweet-alerts",
+        });
       } else {
         showMessage("An error occurred while creating leave slots", "error");
       }
@@ -196,6 +206,8 @@ const AddLeave = ({
       setButtonLoading(false);
     }
   };
+
+  const currentDate = reverseformatDate(new Date());
 
   return (
     <Transition appear show={addLeaveModal} as={Fragment}>
@@ -259,14 +271,20 @@ const AddLeave = ({
                           onChange={handleDoctorChange}
                         >
                           <option value="">Choose Doctor</option>
-                          {allDoctorNames.map((doctor) => (
-                            <option
-                              key={doctor.doctor_id}
-                              value={doctor.doctor_id}
-                            >
-                              {doctor.name}
-                            </option>
-                          ))}
+                          {doctorsLoading ? (
+                            <option value="">loading...</option>
+                          ) : (
+                            <>
+                              {allDoctors.map((doctor) => (
+                                <option
+                                  key={doctor.doctor_id}
+                                  value={doctor.doctor_id}
+                                >
+                                  {doctor.name}
+                                </option>
+                              ))}
+                            </>
+                          )}
                         </select>
                       </div>
 
@@ -327,6 +345,7 @@ const AddLeave = ({
                             className="form-input form-input-green"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
+                            min={currentDate}
                           />
                         </div>
                         <div className="w-full mt-2">
@@ -365,6 +384,7 @@ const AddLeave = ({
                               className="form-input form-input-green"
                               value={startDate || ""}
                               onChange={(e) => setStartDate(e.target.value)}
+                              min={currentDate}
                             />
                           </div>
                           <div className="w-full">
@@ -375,6 +395,7 @@ const AddLeave = ({
                               className="form-input form-input-green"
                               value={endDate || ""}
                               onChange={(e) => setEndDate(e.target.value)}
+                              min={currentDate}
                             />
                           </div>
                         </div>
@@ -391,6 +412,7 @@ const AddLeave = ({
                             className="form-input form-input-green"
                             value={selectedDate || ""}
                             onChange={handleDateChange}
+                            min={currentDate}
                           />
                           {errorMessage && (
                             <div className="text-red-500 mt-2">
@@ -400,14 +422,14 @@ const AddLeave = ({
                         </div>
 
                         <div className="w-full">
-                          {timeSlots.length > 0 && (
+                          {timeSlots?.length > 0 && (
                             <div className="w-full">
                               <label>Select Time Slots:</label>
-                              <div className="flex flex-wrap mt-2">
+                              <div className="flex flex-wrap my-2 gap-3">
                                 {timeSlots?.map((slot) => (
                                   <div
                                     key={slot.DoctorTimeSlot_id}
-                                    className="flex items-center mb-2"
+                                    className="flex items-center border dark:border-slate-600 pr-2 py-2 rounded"
                                   >
                                     <input
                                       type="checkbox"
@@ -418,11 +440,10 @@ const AddLeave = ({
                                     />
                                     <label
                                       htmlFor={`slot-${slot.DoctorTimeSlot_id}`}
-                                      className="badge badge-outline-dark text-gray-500 p-2 text-lg"
+                                      className="-mb-0.5"
                                     >
-                                      {getDayName(slot.day_id)}:{" "}
-                                      {formatTime(slot.startTime)} -{" "}
-                                      {formatTime(slot.endTime)}
+                                      {formatTime(slot?.startTime)} -{" "}
+                                      {formatTime(slot?.endTime)}
                                     </label>
                                   </div>
                                 ))}

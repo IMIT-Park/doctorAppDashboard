@@ -7,7 +7,6 @@ import IconCloseEye from "../../../components/Icon/IconCloseEye";
 import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
 import NetworkHandler from "../../../utils/NetworkHandler";
 
-
 const AddDoctor = ({
   open,
   closeModal,
@@ -27,7 +26,9 @@ const AddDoctor = ({
 
   const fetchSpecializations = async () => {
     try {
-      const response = await NetworkHandler.makeGetRequest("/v1/doctor/specializations");
+      const response = await NetworkHandler.makeGetRequest(
+        "/v1/doctor/specializations"
+      );
       setSpecializations(response?.data?.specializations);
     } catch (error) {
       console.error("Error fetching specializations:", error);
@@ -75,8 +76,6 @@ const AddDoctor = ({
   const handleFeesChange = (e) => {
     setInput({ ...input, fees: e.target.value.replace(/\D/g, "") });
   };
-
-  console.log(input);
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -198,37 +197,40 @@ const AddDoctor = ({
                           <input
                             type="radio"
                             name="gender"
+                            className="form-radio peer text-[#006241]"
                             value="Male"
                             checked={input?.gender === "Male"}
                             onChange={(e) =>
                               setInput({ ...input, gender: e.target.value })
                             }
                           />
-                          <span className="ml-2 text-gray-500">Male</span>
+                          <span className="text-gray-500">Male</span>
                         </label>
                         <label className="flex items-center">
                           <input
                             type="radio"
                             name="gender"
+                            className="form-radio peer text-[#006241]"
                             value="Female"
                             checked={input?.gender === "Female"}
                             onChange={(e) =>
                               setInput({ ...input, gender: e.target.value })
                             }
                           />
-                          <span className="ml-2 text-gray-500">Female</span>
+                          <span className=" text-gray-500">Female</span>
                         </label>
                         <label className="flex items-center">
                           <input
                             type="radio"
                             name="gender"
+                            className="form-radio peer text-[#006241]"
                             value="Other"
                             checked={input?.gender === "Other"}
                             onChange={(e) =>
                               setInput({ ...input, gender: e.target.value })
                             }
                           />
-                          <span className="ml-2 text-gray-500">Other</span>
+                          <span className=" text-gray-500">Other</span>
                         </label>
                       </div>
                     </div>

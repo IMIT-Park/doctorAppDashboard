@@ -85,7 +85,7 @@ const DoctorTimeSlotEdit = ({
                       {!isEdit && (
                         <select
                           id="ctnSelect1"
-                          className="form-select form-select-green text-white-dark"
+                          className="form-select form-select-green "
                           required
                           value={selectedDay}
                           onChange={(e) => setSelectedDay(e.target.value)}
@@ -109,7 +109,7 @@ const DoctorTimeSlotEdit = ({
                         <label className="text-white-dark">Start:</label>
                         <input
                           type="time"
-                          className="form-input"
+                          className="form-input form-select-green"
                           value={timesInput?.startTime}
                           onChange={(e) =>
                             setTimesInput({
@@ -124,7 +124,7 @@ const DoctorTimeSlotEdit = ({
                         <label className="text-white-dark">End:</label>
                         <input
                           type="time"
-                          className="form-input"
+                          className="form-input form-select-green"
                           value={timesInput?.endTime}
                           onChange={(e) =>
                             setTimesInput({
@@ -143,7 +143,7 @@ const DoctorTimeSlotEdit = ({
                         </label>
                         <input
                           type="tel"
-                          className="form-input w-full"
+                          className="form-input form-select-green w-full"
                           value={timesInput?.noOfConsultationsPerDay}
                           onChange={handleNoOfConsultationChange}
                           required
@@ -155,7 +155,7 @@ const DoctorTimeSlotEdit = ({
                         </label>
                         <input
                           type="tel"
-                          className="form-input w-full"
+                          className="form-input form-select-green w-full"
                           value={timesInput?.time_slot}
                           onChange={handleTimeOfConsultationChange}
                           required

@@ -22,6 +22,7 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomButton from "../../../components/CustomButton";
 import noProfile from "/assets/images/empty-user.png";
+import Swal from "sweetalert2";
 
 const Profile = () => {
   const { userDetails } = useContext(UserContext);
@@ -343,8 +344,17 @@ const Profile = () => {
         closeAddTimeSlotModal();
       }
     } catch (error) {
-      showMessage("An error occurred. Please try again.", "error");
-      setButtonLoading(false);
+      if (error?.response && error?.response?.status === 401) {
+        Swal.fire({
+          icon: "error",
+          title: "Cannot add timeslot!",
+          text: `${error?.response?.data?.error}`,
+          padding: "2em",
+          customClass: "sweet-alerts",
+        });
+      } else {
+        showMessage("An error occurred. Please try again.", "error");
+      }
     } finally {
       setButtonLoading(false);
     }

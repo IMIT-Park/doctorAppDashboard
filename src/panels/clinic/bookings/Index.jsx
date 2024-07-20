@@ -110,7 +110,7 @@ const ClinicBookingDoctor = () => {
                 <button
                   type="button"
                   className="btn btn-green w-full text-base"
-                  onClick={() => navigate("/clinic/bookings/PatientDetails")}
+                  onClick={() => navigate("/clinic/bookings/patient-details")}
                 >
                   New User
                 </button>

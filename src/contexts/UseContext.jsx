@@ -7,20 +7,22 @@ const UserProvider = ({ children }) => {
 
   const [bookingDetails, setBookingDetails] = useState(() => {
     const savedBookingDetails = sessionStorage.getItem("bookingDetails");
-    return savedBookingDetails ? JSON.parse(savedBookingDetails) : {
-      doctor_id: null,
-      clinic_id: null,
-      patient_id: null,
-      schedule_date: "",
-      schedule_time: "",
-      type: "walk in",
-      DoctorTimeSlot_id: null,
-    };
+    return savedBookingDetails
+      ? JSON.parse(savedBookingDetails)
+      : {
+          doctor_id: null,
+          clinic_id: null,
+          patient_id: null,
+          schedule_date: "",
+          schedule_time: "",
+          DoctorTimeSlot_id: null,
+          type: "walkin",
+        };
   });
 
   useEffect(() => {
     sessionStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
-  },[bookingDetails]);
+  }, [bookingDetails]);
 
   useEffect(() => {
     const userData = sessionStorage.getItem("userData");
@@ -30,7 +32,9 @@ const UserProvider = ({ children }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ userDetails, setUserDetails, bookingDetails, setBookingDetails }}>
+    <UserContext.Provider
+      value={{ userDetails, setUserDetails, bookingDetails, setBookingDetails }}
+    >
       {children}
     </UserContext.Provider>
   );

@@ -375,7 +375,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
   .form-input-green,
   .form-textarea-green,
   .form-select-green {
-    @apply  bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-[#006241] focus:ring-transparent  dark:bg-[#121e32] dark:text-white-dark dark:focus:border-[#006241];
+    @apply bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-[#006241] focus:ring-transparent  dark:bg-[#121e32] dark:text-white-dark dark:focus:border-[#006241];
   }
 
   input[type="number"]::-webkit-inner-spin-button,
@@ -742,4 +742,12 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
 /* Hightlight JS */
 pre.hljs {
   @apply p-6 rounded-md overflow-x-auto !bg-[#191e3a];
+}
+
+
+
+/* flatpickr style */
+.flatpickr-day.selected {
+  background: #006241 !important;
+  border-color: #006241 !important;
 }

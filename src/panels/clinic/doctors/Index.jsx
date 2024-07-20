@@ -47,7 +47,6 @@ const ClinicDoctor = () => {
   const [removeModal, setRemoveModal] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
 
-
   const [input, setInput] = useState({
     name: "",
     email: "",
@@ -80,20 +79,19 @@ const ClinicDoctor = () => {
     setInput({
       ...input,
       name: "",
-    email: "",
-    user_name: "",
-    phone: "",
-    gender: "",
-    qualification: "",
-    fees: "",
-    specialization: " ",
-    address: "",
-    password: "",
-    confirmPassword: "",
+      email: "",
+      user_name: "",
+      phone: "",
+      gender: "",
+      qualification: "",
+      fees: "",
+      specialization: " ",
+      address: "",
+      password: "",
+      confirmPassword: "",
     });
     setErrors(null);
   };
-
 
   // fetch Doctors function
   const fetchData = async () => {
@@ -125,112 +123,111 @@ const ClinicDoctor = () => {
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchData);
 
-    const validate = () => {
-      const newErrors = {};
-      if (input.password !== input.confirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
-        showMessage("Passwords do not match", "warning");
-      }
-      if (input.phone.length !== 10) {
-        newErrors.phone = "Phone number must be exactly 10 digits";
-        showMessage("Phone number must be exactly 10 digits", "warning");
-      }
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
-    };
-
-
-    const saveDoctorPerson = async () => {
-      if (
-        !input.name ||
-        !input.email ||
-        !input.phone ||
-        !input.dateOfBirth ||
-        !input.gender ||
-        !input.qualification ||
-        !input.specialization ||
-        !input.fees ||
-        !input.address ||
-        !input.password ||
-        !input.confirmPassword
-      ) {
-        showMessage("Please fill in all required fields", "warning");
-        return;
-      }
-      
-      if (validate()) {
-        setButtonLoading(true);
-    
-        const updatedData = {
-          ...input,
-          phone: `+91${input.phone}`,
-          user_name: input.email,
-          clinic_id: clinicId 
-        };
-    
-        try {
-          const response = await NetworkHandler.makePostRequest(
-            "v1/doctor/ClinicCreateDoctor",
-            updatedData
-          );
-    
-          setAddDoctorModal(false);
-    
-          if (response.status === 201) {
-            showMessage("Doctor has been added successfully.");
-            closeAddDoctorModal();
-            fetchData();
-          } else {
-            showMessage("Failed to add Doctor. Please try again.", "error");
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 403) {
-            showMessage(
-              error.response.data.error === "User Already Exists"
-                ? "Username Already Exists"
-                : "Email already exists.",
-              "error"
-            );
-          } else {
-            showMessage("Failed to add Doctor. Please try again.", "error");
-          }
-        } finally {
-          setButtonLoading(false);
-        }
-      }
-    };
-    
-// dr remove actions
-const openRemoveModal = (doctorId) => {
-  setSelectedDoctorId(doctorId);
-  setRemoveModal(true);
-};
-const closeRemoveModal = () => {
-  setSelectedDoctorId("");
-  setRemoveModal(false);
-};
-
-const removeDoctor = async () => {
-  try {
-    const response = await NetworkHandler.makePostRequest(
-      `/v1/clinic/removeDR/${clinicId}`,
-      { doctor_id: selectedDoctorId }
-    );
-    if (response.status === 201) {
-      fetchData();
-      Swal.fire({
-        title: "Removed!",
-        text: "Doctor has been removed.",
-        icon: "success",
-        customClass: "sweet-alerts",
-        confirmButtonColor: "#006241",
-      });
-      closeRemoveModal();
+  const validate = () => {
+    const newErrors = {};
+    if (input.password !== input.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      showMessage("Passwords do not match", "warning");
     }
-  } catch (error) {
-    console.log(error);
-  }
-};
+    if (input.phone.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+      showMessage("Phone number must be exactly 10 digits", "warning");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const saveDoctorPerson = async () => {
+    if (
+      !input.name ||
+      !input.email ||
+      !input.phone ||
+      !input.dateOfBirth ||
+      !input.gender ||
+      !input.qualification ||
+      !input.specialization ||
+      !input.fees ||
+      !input.address ||
+      !input.password ||
+      !input.confirmPassword
+    ) {
+      showMessage("Please fill in all required fields", "warning");
+      return;
+    }
+
+    if (validate()) {
+      setButtonLoading(true);
+
+      const updatedData = {
+        ...input,
+        phone: `+91${input.phone}`,
+        user_name: input.email,
+        clinic_id: clinicId,
+      };
+
+      try {
+        const response = await NetworkHandler.makePostRequest(
+          "v1/doctor/ClinicCreateDoctor",
+          updatedData
+        );
+
+        setAddDoctorModal(false);
+
+        if (response.status === 201) {
+          showMessage("Doctor has been added successfully.");
+          closeAddDoctorModal();
+          fetchData();
+        } else {
+          showMessage("Failed to add Doctor. Please try again.", "error");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          showMessage(
+            error.response.data.error === "User Already Exists"
+              ? "Username Already Exists"
+              : "Email already exists.",
+            "error"
+          );
+        } else {
+          showMessage("Failed to add Doctor. Please try again.", "error");
+        }
+      } finally {
+        setButtonLoading(false);
+      }
+    }
+  };
+
+  // dr remove actions
+  const openRemoveModal = (doctorId) => {
+    setSelectedDoctorId(doctorId);
+    setRemoveModal(true);
+  };
+  const closeRemoveModal = () => {
+    setSelectedDoctorId("");
+    setRemoveModal(false);
+  };
+
+  const removeDoctor = async () => {
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/clinic/removeDR/${clinicId}`,
+        { doctor_id: selectedDoctorId }
+      );
+      if (response.status === 201) {
+        fetchData();
+        Swal.fire({
+          title: "Removed!",
+          text: "Doctor has been removed.",
+          icon: "success",
+          customClass: "sweet-alerts",
+          confirmButtonColor: "#006241",
+        });
+        closeRemoveModal();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div>
@@ -273,8 +270,6 @@ const removeDoctor = async () => {
             className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
             onClick={openAddDoctorModal}
           >
-    
-
             <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
             Add Doctor
           </button>
@@ -358,31 +353,31 @@ const removeDoctor = async () => {
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex items-center gap-5">
-                    <CustomSwitch
-                      checked={rowData?.status}
-                      onChange={() =>
-                        showDoctorAlert(
-                          rowData?.user_id,
-                          rowData?.status ? "block" : "activate",
-                          "doctor"
-                        )
-                      }
-                      tooltipText={rowData?.status ? "Block" : "Unblock"}
-                      uniqueId={`doctor${rowData?.doctor_id}`}
-                      size="normal"
-                    />
+                      <CustomSwitch
+                        checked={rowData?.status}
+                        onChange={() =>
+                          showDoctorAlert(
+                            rowData?.user_id,
+                            rowData?.status ? "block" : "activate",
+                            "doctor"
+                          )
+                        }
+                        tooltipText={rowData?.status ? "Block" : "Unblock"}
+                        uniqueId={`doctor${rowData?.doctor_id}`}
+                        size="normal"
+                      />
 
-                    <button
-                      type="button"
-                      className="btn btn-danger btn-sm h-fit"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openRemoveModal(rowData?.doctor_id);
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm h-fit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openRemoveModal(rowData?.doctor_id);
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   ),
                 },
               ]}
@@ -416,8 +411,8 @@ const removeDoctor = async () => {
         errors={errors}
         setErrors={setErrors}
       />
-       {/* dr remove modal */}
-       <RemoveDoctor
+      {/* dr remove modal */}
+      <RemoveDoctor
         show={removeModal}
         onClose={closeRemoveModal}
         onConfirm={removeDoctor}

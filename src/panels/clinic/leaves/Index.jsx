@@ -4,7 +4,6 @@ import { setPageTitle } from "../../../store/themeConfigSlice";
 import IconLoader from "../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
-import { useNavigate } from "react-router-dom";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import IconMenuScrumboard from "../../../components/Icon/Menu/IconMenuScrumboard";
 import AddLeave from "./AddLeaveModal";
@@ -17,23 +16,17 @@ import DeleteLeave from "../../../pages/DoctorSingleView/components/DeleteLeave"
 const ClinicDoctorLeave = () => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(setPageTitle("Doctors"));
-  });
-  const [page, setPage] = useState(1);
-  const PAGE_SIZES = [10, 20, 30, 50, 100];
-  const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-  const [search, setSearch] = useState("");
-  const [totalLeaves, setTotalLeaves] = useState(0);
-  const [allLeaves, setAllLeaves] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [buttonLoading, setButtonLoading] = useState(false);
-  const [addLeaveModal, setAddLeaveModal] = useState(false);
-  const [allDoctorNames, setAllDoctorNames] = useState([]);
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
-  const [active, setActive] = useState("");
+  const clinicId = userData?.UserClinic[0]?.clinic_id;
 
+  useEffect(() => {
+    dispatch(setPageTitle("Leaves"));
+  });
+  const [allLeaves, setAllLeaves] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [addLeaveModal, setAddLeaveModal] = useState(false);
+  const [active, setActive] = useState("");
   const [deleteLeaveModal, setDeleteLeaveModal] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
@@ -41,15 +34,6 @@ const ClinicDoctorLeave = () => {
   const togglePara = (value) => {
     setActive((oldValue) => (oldValue === value ? "" : value));
   };
-
-  useEffect(() => {
-    setPage(1);
-  }, [pageSize]);
-
-  useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-  }, [page, pageSize]);
 
   const openAddLeaveModal = () => {
     setAddLeaveModal(true);
@@ -61,7 +45,6 @@ const ClinicDoctorLeave = () => {
 
   // Get Leave by Clinic
   const fetchLeaveData = async () => {
-    const clinicId = userData?.UserClinic[0]?.clinic_id;
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/leave/getleave/${clinicId}`
@@ -81,40 +64,6 @@ const ClinicDoctorLeave = () => {
   // fetching Leave
   useEffect(() => {
     fetchLeaveData();
-  }, [page, pageSize]);
-
-  const fetchDoctorData = async () => {
-    const clinicId = userData?.UserClinic[0]?.clinic_id;
-    let allDoctors = [];
-    let page = 1;
-    let hasMorePages = true;
-
-    try {
-      while (hasMorePages) {
-        const response = await NetworkHandler.makeGetRequest(
-          `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
-        );
-
-        const doctorData = response.data?.alldoctors;
-        allDoctors = allDoctors.concat(doctorData);
-
-        hasMorePages = doctorData.length === pageSize;
-        page += 1;
-      }
-
-      setAllDoctorNames(allDoctors);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // fetching Doctors
-  useEffect(() => {
-    fetchDoctorData();
   }, []);
 
   const openDeleteLeaveModal = (leave, leaveDate) => {
@@ -258,8 +207,6 @@ const ClinicDoctorLeave = () => {
         addLeaveModal={addLeaveModal}
         setAddLeaveModal={setAddLeaveModal}
         closeAddLeaveModal={closeAddLeaveModal}
-        buttonLoading={buttonLoading}
-        allDoctorNames={allDoctorNames}
         fetchLeaveData={fetchLeaveData}
       />
 

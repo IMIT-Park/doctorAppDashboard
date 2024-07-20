@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import ScrollToTop from "../../../components/ScrollToTop";
@@ -8,10 +8,13 @@ import { showMessage } from "../../../utils/showMessage";
 import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
 import IconLoader from "../../../components/Icon/IconLoader";
 import IconCaretDown from "../../../components/Icon/IconCaretDown";
+import { UserContext } from "../../../contexts/UseContext";
 
 const ClinicBookingDoctor = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { bookingDetails, setBookingDetails } = useContext(UserContext);
 
   useEffect(() => {
     dispatch(setPageTitle("ownerDoctor"));
@@ -50,16 +53,11 @@ const ClinicBookingDoctor = () => {
       Particulars: "",
     });
   };
-  
+
   const addPatients = async (e) => {
     e.preventDefault();
 
-    if (
-      !input.name ||
-      !input.phone ||
-      !input.dateOfBirth ||
-      !input.gender
-    ) {
+    if (!input.name || !input.phone || !input.dateOfBirth || !input.gender) {
       showMessage("Please fill in all required fields", "error");
       return;
     }
@@ -83,14 +81,16 @@ const ClinicBookingDoctor = () => {
           "/v1/patient/createpatient",
           preparedInput
         );
-        console.log(response);
-        if(response.status === 201){
-          showMessage("Registration successful", "success");
+        if (response.status === 201) {
+          setBookingDetails({
+            ...bookingDetails,
+            patient_id: response?.data?.Patient?.patient_id || null,
+            type: "walkin",
+          });
           resetForm();
-          navigate("/clinic/bookings/SelectorDoctor");
-        }
-        else{
-          showMessage("Registration Failed", "error");
+          navigate("/clinic/bookings/select-doctor");
+        } else {
+          showMessage("adding patient failed", "error");
         }
       } catch (error) {
         console.error(error?.response?.data?.error);
@@ -104,7 +104,7 @@ const ClinicBookingDoctor = () => {
     setInput({ ...input, phone: value });
     if (value.length === 10) {
       setErrors((prevErrors) => ({ ...prevErrors, phone: "" }));
-    } 
+    }
   };
 
   return (
@@ -204,14 +204,15 @@ const ClinicBookingDoctor = () => {
             <div className="flex justify-center">
               <button
                 type="submit"
-                className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-base font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-base font-medium rounded-md"
               >
-              {buttonLoading ? 
-              (<IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />) :
-              ("Next")}
+                {buttonLoading ? (
+                  <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />
+                ) : (
+                  "Next"
+                )}
               </button>
             </div>
-
           </form>
         </div>
       </div>

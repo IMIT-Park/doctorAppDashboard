@@ -273,21 +273,21 @@ const routes = [
 
   //ClinicPatientDetails
   {
-    path: "/clinic/bookings/PatientDetails",
+    path: "/clinic/bookings/patient-details",
     element: <ClinicPatientDetails />,
     layout: "default",
   },
 
   //ClinicSelectDoctor
   {
-    path: "/clinic/bookings/SelectorDoctor",
+    path: "/clinic/bookings/select-doctor",
     element: <ClinicSelectDoctor />,
     layout: "default",
   },
 
   //ClinicSelectDateAndTime
   {
-    path: "/clinic/bookings/SelectDateAndTime",
+    path: "/clinic/bookings/select-time",
     element: <ClinicSelectDateAndTime />,
     layout: "default",
   },

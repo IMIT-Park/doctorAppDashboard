@@ -3,8 +3,6 @@ import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
 import CountUp from "react-countup";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../../components/Icon/IconLoader";
 import ScrollToTop from "../../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
@@ -78,13 +76,11 @@ const Owners = () => {
         <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              Owners
+              Owners by Sales Person
             </h5>
-            <Tippy content="Total Owners">
-              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalOwners} duration={3}></CountUp>
-              </span>
-            </Tippy>
+            <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
+              <CountUp start={0} end={totalOwners} duration={3}></CountUp>
+            </span>
           </div>
         </div>
         {loading ? (

@@ -13,6 +13,9 @@ import NetworkHandler from "../../utils/NetworkHandler";
 const Index = () => {
   const [adminReport, setAdminReport] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [currentMonth , setCurrentMonth] = useState("");
+  const [currentMonthBookings, setCurrentMonthBookings] = useState(0);
+
   const dispatch = useDispatch();
   const isDark = useSelector(
     (state) =>
@@ -28,7 +31,7 @@ const Index = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/report/getSuperadminreport`
       );
-      setAdminReport(response?.data?.pageInfo);
+      setAdminReport(response?.data?.results);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -41,21 +44,34 @@ const Index = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const date = new Date();
+    const month = date.toLocaleString('default', { month: 'long' });
+    setCurrentMonth(month);
+  }, []);
+
+  useEffect(() => {
+    if (adminReport) {
+      const currentMonthReport = adminReport.totalBooking.find(
+        (item) => item.month === currentMonth
+      );
+      if (currentMonthReport) {
+        setCurrentMonthBookings(currentMonthReport.totalBookings);
+      }
+    }
+  }, [adminReport, currentMonth]);
+
+  
+  const report = adminReport?.totalBooking;
+  const totalBookingsData = report?.map((item) => item?.totalBookings);
+  const totalBookingsLabels = report?.map((item) => item?.month);
+
+
   const revenueChart = {
     series: [
       {
-        name: "Income",
-        data: [
-          16800, 16800, 15500, 17800, 15500, 17000, 19000, 16000, 15000, 17000,
-          14000, 17000,
-        ],
-      },
-      {
-        name: "Expenses",
-        data: [
-          16500, 17500, 16200, 17300, 16000, 19500, 16000, 17000, 16000, 19000,
-          18000, 19000,
-        ],
+        name: "Booking",
+        data: totalBookingsData,
       },
     ],
     options: {
@@ -106,20 +122,7 @@ const Index = () => {
           },
         ],
       },
-      labels: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      labels: totalBookingsLabels,
       xaxis: {
         axisBorder: {
           show: false,
@@ -143,7 +146,7 @@ const Index = () => {
         tickAmount: 7,
         labels: {
           formatter: (value) => {
-            return value / 1000 + "K";
+            return value;
           },
           offsetX: -10,
           offsetY: 0,
@@ -209,98 +212,9 @@ const Index = () => {
     },
   };
 
-  //Sales By Category
-  const salesByCategory = {
-    series: [985, 737, 270],
-    options: {
-      chart: {
-        type: "donut",
-        height: 460,
-        fontFamily: "Nunito, sans-serif",
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        show: true,
-        width: 25,
-        colors: isDark ? "#0e1726" : "#fff",
-      },
-      colors: isDark
-        ? ["#5c1ac3", "#e2a03f", "#e7515a", "#e2a03f"]
-        : ["#e2a03f", "#5c1ac3", "#e7515a"],
-      legend: {
-        position: "bottom",
-        horizontalAlign: "center",
-        fontSize: "14px",
-        markers: {
-          width: 10,
-          height: 10,
-          offsetX: -2,
-        },
-        height: 50,
-        offsetY: 20,
-      },
-      plotOptions: {
-        pie: {
-          donut: {
-            size: "65%",
-            background: "transparent",
-            labels: {
-              show: true,
-              name: {
-                show: true,
-                fontSize: "29px",
-                offsetY: -10,
-              },
-              value: {
-                show: true,
-                fontSize: "26px",
-                color: isDark ? "#bfc9d4" : undefined,
-                offsetY: 16,
-                formatter: (val) => {
-                  return val;
-                },
-              },
-              total: {
-                show: true,
-                label: "Total",
-                color: "#888ea8",
-                fontSize: "29px",
-                formatter: (w) => {
-                  return w.globals.seriesTotals.reduce(function (a, b) {
-                    return a + b;
-                  }, 0);
-                },
-              },
-            },
-          },
-        },
-      },
-      labels: ["Apparel", "Sports", "Others"],
-      states: {
-        hover: {
-          filter: {
-            type: "none",
-            value: 0.15,
-          },
-        },
-        active: {
-          filter: {
-            type: "none",
-            value: 0.15,
-          },
-        },
-      },
-    },
-  };
-
   return (
     <div>
-      <ul className="flex justify-between space-x-2 rtl:space-x-reverse">
-        <li className="ltr:before:mr-2 rtl:before:ml-2">
-          {/* <span>Dashboard</span> */}
-        </li>
+      {/* <ul className="flex justify-between space-x-2 rtl:space-x-reverse">
         <div className="flex items-center gap-2">
           <button type="button" className="btn btn-green">
             Year
@@ -312,12 +226,9 @@ const Index = () => {
             Week
           </button>
         </div>
-      </ul>
+      </ul> */}
       <div className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6 text-white">
-          {/* Total Transactions */}
-
-          {/* Total Users */}
           <div className="panel bg-gradient-to-r from-cyan-500 to-cyan-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
@@ -359,7 +270,7 @@ const Index = () => {
           <div className="panel bg-gradient-to-r from-fuchsia-500 to-fuchsia-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                Total Month Subscription
+                Subscription in Month
               </div>
             </div>
             <div className="flex items-center mt-3">
@@ -407,162 +318,34 @@ const Index = () => {
                 ></CountUp>
               </div>
             </div>
-            {/* <IconMenuUsers className="absolute top-[50%] translate-y-[-50%] right-5 size-8" /> */}
           </div>
         </div>
 
         <div className="pt-5">
-          <div className="grid xl:grid-cols-3 gap-6 mb-6 w-100">
-            <div className="panel h-full xl:col-span-2 min-w-0">
-              <div className="flex items-center justify-between dark:text-white-light mb-5">
-                <h5 className="font-semibold text-lg">Revenue</h5>
-                <div className="dropdown">
-                  <Dropdown
-                    offset={[0, 1]}
-                    placement="bottom-end"
-                    button={
-                      <IconHorizontalDots className="text-black/70 dark:text-white/70 hover:!text-green-800" />
-                    }
-                  >
-                    <ul>
-                      <li>
-                        <button type="button" className="hover:!text-green-800">
-                          Weekly
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" className="hover:!text-green-800">
-                          Monthly
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" className="hover:!text-green-800">
-                          Yearly
-                        </button>
-                      </li>
-                    </ul>
-                  </Dropdown>
-                </div>
-              </div>
-              <p className="text-lg dark:text-white-light/90">
-                Total Profit <span className="text-primary ml-2">$10,840</span>
-              </p>
-              <div className="relative">
-                <div className="bg-white dark:bg-black rounded-lg overflow-hidden">
-                  {loading ? (
-                    <div className="min-h-[325px] grid place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] ">
-                      <span className="animate-spin border-2 border-black dark:border-white !border-l-transparent  rounded-full w-5 h-5 inline-flex"></span>
-                    </div>
-                  ) : (
-                    <ReactApexChart
-                      series={revenueChart.series}
-                      options={revenueChart.options}
-                      type="area"
-                      height={325}
-                    />
-                  )}
-                </div>
+          <div className="panel h-full xl:col-span-2 min-w-0">
+            <div className="flex items-center justify-between dark:text-white-light mb-5">
+              <h5 className="font-semibold text-lg">Bookings</h5>
+            </div>
+            <p className="text-lg dark:text-white-light/90">
+              Total Bookings in this month
+              <span className="text-primary ml-2">{currentMonthBookings}</span>
+            </p>
+            <div className="relative">
+              <div className="bg-white dark:bg-black rounded-lg overflow-hidden">
+                {loading ? (
+                  <div className="min-h-[325px] grid place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] ">
+                    <span className="animate-spin border-2 border-black dark:border-white !border-l-transparent  rounded-full w-5 h-5 inline-flex"></span>
+                  </div>
+                ) : (
+                  <ReactApexChart
+                    series={revenueChart?.series}
+                    options={revenueChart.options}
+                    type="area"
+                    height={325}
+                  />
+                )}
               </div>
             </div>
-
-            <div className="panel h-full">
-              <div className="flex items-center justify-between dark:text-white-light mb-5">
-                <h5 className="font-semibold text-lg">Summary</h5>
-                <div className="dropdown">
-                  <Dropdown
-                    placement={"bottom-end"}
-                    button={
-                      <IconHorizontalDots className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
-                    }
-                  >
-                    <ul>
-                      <li>
-                        <button type="button">View Report</button>
-                      </li>
-                      <li>
-                        <button type="button">Edit Report</button>
-                      </li>
-                      <li>
-                        <button type="button">Mark as Done</button>
-                      </li>
-                    </ul>
-                  </Dropdown>
-                </div>
-              </div>
-              <div className="space-y-9">
-                <div className="flex items-center">
-                  <div className="w-9 h-9 ltr:mr-3 rtl:ml-3">
-                    <div className="bg-secondary-light dark:bg-secondary text-secondary dark:text-secondary-light  rounded-full w-9 h-9 grid place-content-center">
-                      <IconInbox />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex font-semibold text-white-dark mb-2">
-                      <h6>Income</h6>
-                      <p className="ltr:ml-auto rtl:mr-auto">$92,600</p>
-                    </div>
-                    <div className="rounded-full h-2 bg-dark-light dark:bg-[#1b2e4b] shadow">
-                      <div className="bg-gradient-to-r from-[#7579ff] to-[#b224ef] w-11/12 h-full rounded-full"></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-9 h-9 ltr:mr-3 rtl:ml-3">
-                    <div className="bg-success-light dark:bg-success text-success dark:text-success-light rounded-full w-9 h-9 grid place-content-center">
-                      <IconTag />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex font-semibold text-white-dark mb-2">
-                      <h6>Profit</h6>
-                      <p className="ltr:ml-auto rtl:mr-auto">$37,515</p>
-                    </div>
-                    <div className="w-full rounded-full h-2 bg-dark-light dark:bg-[#1b2e4b] shadow">
-                      <div
-                        className="bg-gradient-to-r from-[#3cba92] to-[#0ba360] w-full h-full rounded-full"
-                        style={{ width: "65%" }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-9 h-9 ltr:mr-3 rtl:ml-3">
-                    <div className="bg-warning-light dark:bg-warning text-warning dark:text-warning-light rounded-full w-9 h-9 grid place-content-center">
-                      <IconCreditCard />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex font-semibold text-white-dark mb-2">
-                      <h6>Expenses</h6>
-                      <p className="ltr:ml-auto rtl:mr-auto">$55,085</p>
-                    </div>
-                    <div className="w-full rounded-full h-2 bg-dark-light dark:bg-[#1b2e4b] shadow">
-                      <div
-                        className="bg-gradient-to-r from-[#f09819] to-[#ff5858] w-full h-full rounded-full"
-                        style={{ width: "80%" }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* <div className="panel h-full">
-                            <div className="flex items-center mb-5">
-                                <h5 className="font-semibold text-lg dark:text-white-light">Sales By Category</h5>
-                            </div>
-                            <div>
-                                <div className="bg-white dark:bg-black rounded-lg overflow-hidden">
-                                    {loading ? (
-                                        <div className="min-h-[325px] grid place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] ">
-                                            <span className="animate-spin border-2 border-black dark:border-white !border-l-transparent  rounded-full w-5 h-5 inline-flex"></span>
-                                        </div>
-                                    ) : (
-                                        <ReactApexChart series={salesByCategory.series} options={salesByCategory.options} type="donut" height={460} />
-                                    )}
-                                </div>
-                            </div>
-                        </div> */}
           </div>
         </div>
       </div>

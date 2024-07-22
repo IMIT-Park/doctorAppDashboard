@@ -110,7 +110,7 @@ const Booking = () => {
               columns={[
                 {
                   accessor: "",
-                  title: "ID",
+                  title: "No",
                   render: (rowData, index) => (
                     <span>{(page - 1) * pageSize + index + 1}</span>
                   ),

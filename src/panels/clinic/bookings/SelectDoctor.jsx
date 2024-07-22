@@ -17,7 +17,8 @@ const SelectDoctor = () => {
 
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
-  const clinicId = userData?.UserClinic[0]?.clinic_id;
+  const clinicId =
+    bookingDetails?.clinic_id || userData?.UserClinic[0]?.clinic_id;
 
   useEffect(() => {
     dispatch(setPageTitle("Booking"));

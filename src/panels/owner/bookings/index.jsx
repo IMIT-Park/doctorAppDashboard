@@ -20,10 +20,11 @@ const Booking = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { userDetails } = useContext(UserContext);
+  const { userDetails, bookingDetails, setBookingDetails } =
+    useContext(UserContext);
   const ownerId = userDetails?.UserOwner?.[0]?.owner_id || 0;
   useEffect(() => {
-    dispatch(setPageTitle("Booking"));
+    dispatch(setPageTitle("Add Booking"));
   });
 
   const [page, setPage] = useState(1);
@@ -70,6 +71,15 @@ const Booking = () => {
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchData);
 
+  const handleAddBooking = (clinicId) => {
+    setBookingDetails({
+      ...bookingDetails,
+      clinic_id: clinicId,
+      type: "walkin",
+    });
+    navigate("/clinic/bookings");
+  };
+
   return (
     <div>
       <ScrollToTop />
@@ -102,11 +112,6 @@ const Booking = () => {
               className="whitespace-nowrap table-hover"
               records={allClinics}
               idAccessor="clinic_id"
-              onRowClick={(row) =>
-                navigate(`/clinics/${row?.clinic_id}`, {
-                  state: { previousUrl: location?.pathname },
-                })
-              }
               columns={[
                 {
                   accessor: "",
@@ -119,14 +124,11 @@ const Booking = () => {
                 { accessor: "User.email", title: "Email" },
 
                 { accessor: "phone", title: "Phone" },
-                { accessor: "address", title: "Address" },
-                { accessor: "place", title: "Place" },
-
                 {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <div className="flex gap-4 items-center w-max mx-auto">
+                    <div className="flex gap-6 items-center w-max mx-auto">
                       <CustomSwitch
                         checked={rowData?.User?.status}
                         onChange={() =>
@@ -142,17 +144,12 @@ const Booking = () => {
                         uniqueId={`clinic${rowData?.clinic_id}`}
                         size="normal"
                       />
-                    </div>
-                  ),
-                },
-                {
-                  accessor: "Booking",
-                  render: (rowData) => (
-                    <div>
+
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
+                          handleAddBooking(rowData?.clinic_id);
                         }}
                         className="btn btn-green btn-sm py-1"
                       >

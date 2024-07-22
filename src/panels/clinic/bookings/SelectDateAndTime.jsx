@@ -20,9 +20,11 @@ const Patients = () => {
   const location = useLocation();
   const userDetails = sessionStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
-  const clinicId = userData?.UserClinic[0]?.clinic_id;
 
   const { bookingDetails, setBookingDetails } = useContext(UserContext);
+
+  const clinicId =
+    bookingDetails?.clinic_id || userData?.UserClinic[0]?.clinic_id;
 
   useEffect(() => {
     dispatch(setPageTitle("Booking"));
@@ -39,7 +41,6 @@ const Patients = () => {
     "Doctor is not available on this date."
   );
   const [bookingLoading, setBookingLoading] = useState(false);
-
 
   // fetch timeslots function
   const fetchTimeSlots = async (date) => {

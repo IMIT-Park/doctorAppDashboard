@@ -14,6 +14,7 @@ const DefaultLayout = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userDetails } = useContext(UserContext);
+  const accessToken = sessionStorage.getItem("accessToken");
 
   const [showLoader, setShowLoader] = useState(true);
   const [showTopButton, setShowTopButton] = useState(false);
@@ -49,6 +50,16 @@ const DefaultLayout = ({ children }) => {
       window.removeEventListener("onscroll", onScrollHandler);
     };
   }, []);
+
+  useEffect(() => {
+    if (!accessToken) {
+      navigate("/"); 
+    }
+  }, [accessToken, navigate]);
+
+  if (!accessToken) {
+    return null;
+  }
 
   return (
     <App>

@@ -8,6 +8,7 @@ import bookingDirection from "/assets/images/booking-direction.png";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../../contexts/UseContext";
+import IconCaretDown from "../../../components/Icon/IconCaretDown";
 
 const ClinicBookingDoctor = () => {
   const dispatch = useDispatch();
@@ -16,15 +17,20 @@ const ClinicBookingDoctor = () => {
     dispatch(setPageTitle("ownerDoctor"));
   }, [dispatch]);
 
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
+  const clinicId = userData?.UserClinic[0]?.clinic_id;
+
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [patients, setPatients] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const {setPatientDetails} = useContext(UserContext);
+  const { setPatientDetails, bookingDetails, setBookingDetails } =
+    useContext(UserContext);
 
-  //Search Patients fetch 
+  //Search Patients fetch
   const fetchPatients = async () => {
     if (!search) {
       setPatients([]);
@@ -58,26 +64,40 @@ const ClinicBookingDoctor = () => {
 
   const handleSuggestionClick = (patient) => {
     setPatientDetails(patient);
-    sessionStorage.setItem("patientDetails",JSON.stringify(patient));
-    navigate("/clinic/bookings/patient-details")
+    sessionStorage.setItem("patientDetails", JSON.stringify(patient));
+    navigate("/clinic/bookings/patient-details");
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     setPatientDetails(null);
-    sessionStorage.setItem("patientDetails",null);
-  },[])
+    sessionStorage.setItem("patientDetails", null);
+  }, []);
+
+  const handleNewUserClick = () => {
+    navigate("/clinic/bookings/patient-details");
+  };
 
   return (
     <div>
       <ScrollToTop />
-      <div className="flex items-start gap-2 flex-wrap mb-1">
-        <label
-          className="bg-white dark:bg-slate-900 text-[#006241] py-2 px-4 rounded"
-          style={{ boxShadow: "0 0 4px 2px #00000026" }}
+      {bookingDetails?.clinic_id ? (
+        <button
+          onClick={() => navigate(-1)}
+          type="button"
+          className="btn btn-green btn-sm -mt-4 mb-2"
         >
-          Direct Booking
-        </label>
-      </div>
+          <IconCaretDown className="w-4 h-4 rotate-90" />
+        </button>
+      ) : (
+        <div className="flex items-start gap-2 flex-wrap mb-1">
+          <label
+            className="bg-white dark:bg-slate-900 text-[#006241] py-2 px-4 rounded"
+            style={{ boxShadow: "0 0 4px 2px #00000026" }}
+          >
+            Direct Booking
+          </label>
+        </div>
+      )}
 
       <div className="panel">
         <div className="flex justify-center items-center">
@@ -124,10 +144,11 @@ const ClinicBookingDoctor = () => {
                       <li className="px-4 py-2 text-red-500 text-center">
                         {error}
                       </li>
-                    ) : patients?.length > 0 && (
+                    ) : (
+                      patients?.length > 0 &&
                       patients?.map((patient) => (
                         <li
-                          key={patient.patient_id} 
+                          key={patient.patient_id}
                           className="px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer"
                           onMouseDown={() => handleSuggestionClick(patient)}
                         >
@@ -149,7 +170,7 @@ const ClinicBookingDoctor = () => {
                 <button
                   type="button"
                   className="btn btn-green w-full text-base"
-                  onClick={() => navigate("/clinic/bookings/patient-details")}
+                  onClick={handleNewUserClick}
                 >
                   New User
                 </button>

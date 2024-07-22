@@ -35,6 +35,8 @@ const AdminSupportUser = lazy(() =>
 const OwnerIndex = lazy(() => import("../panels/owner/Index"));
 const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
 const OwnerChat = lazy(() => import("../panels/owner/chats/Index"));
+const OwnerBooking = lazy(() => import("../panels/owner/bookings/index"));
+
 // <--------------> owner panel imports ends here <-------------->
 
 // <--------------> clinic panel imports starts here<-------------->
@@ -224,6 +226,13 @@ const routes = [
     element: <OwnerChat />,
     layout: "default",
   },
+  // owner add booking
+  {
+    path: "/owner/add-booking",
+    element: <OwnerBooking />,
+    layout: "default",
+  },
+  
 
   // <--------------> owner panel ends here <-------------->
 

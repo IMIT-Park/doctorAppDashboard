@@ -120,6 +120,18 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
+                  <NavLink to="/owner/add-booking" className="group">
+                    <div className="flex items-center">
+                      <IconMenuTodo
+                        className={`group-hover:!text-[#006241] shrink-0`}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Booking"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
                   <NavLink to="/owner/chat" className="group">
                     <div className="flex items-center">
                       <IconMenuChat

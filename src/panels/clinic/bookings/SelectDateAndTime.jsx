@@ -40,12 +40,13 @@ const Patients = () => {
   );
   const [bookingLoading, setBookingLoading] = useState(false);
 
+
   // fetch timeslots function
   const fetchTimeSlots = async (date) => {
     setTimeslotsLoading(true);
     try {
       const response = await NetworkHandler.makePostRequest(
-        `/v1/booking/getdoctordate/${26}`,
+        `/v1/booking/getdoctordate/${bookingDetails?.doctor_id}`,
         {
           date: date,
           clinic_id: clinicId,
@@ -98,7 +99,7 @@ const Patients = () => {
     setConsultationLoading(true);
     try {
       const response = await NetworkHandler.makePostRequest(
-        `/v1/booking/getconsulation/${26}`,
+        `/v1/booking/getconsulation/${bookingDetails?.doctor_id}`,
         {
           DoctorTimeSlot_id: selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id,
           date: date,

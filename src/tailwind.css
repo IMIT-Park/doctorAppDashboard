@@ -334,9 +334,15 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     @apply border-dark text-dark shadow-none hover:bg-dark hover:text-white;
   }
 
-  .btn-gradient {
+  /* .btn-gradient {
     @apply bg-gradient-to-r from-[#EF1262] to-[#4361EE] hover:to-[#EF1262] hover:from-[#4361EE] text-white;
-  }
+  } */
+
+  .btn-gradient {
+    @apply bg-gradient-to-r from-[#006241] to-[#00A65A] hover:to-[#006241] hover:from-[#00A65A] text-white;
+}
+
+
 
   /* Badge */
   .badge {

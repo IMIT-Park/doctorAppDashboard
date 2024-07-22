@@ -51,6 +51,11 @@ const CancelReschedule = ({
 
   const CancelAllAppoinments = async (event) => {
     event.preventDefault();
+
+    if (!selectedDate) {
+        showMessage("Please select a doctor and date.", "warning");
+        return;
+    }
     setLoading(true);
 
     try {

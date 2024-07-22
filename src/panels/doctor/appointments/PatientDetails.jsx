@@ -58,7 +58,9 @@ const PatientDetails = () => {
 
   useEffect(() => {
     const medicalReportData = sessionStorage.getItem("medicalReport");
-    const medicalReport = medicalReportData ? JSON.parse(medicalReportData) : null;
+    const medicalReport = medicalReportData
+      ? JSON.parse(medicalReportData)
+      : null;
     const currentDate = formatDate(new Date());
 
     if (
@@ -211,102 +213,75 @@ const PatientDetails = () => {
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
-              <div className="w-full">
-                <label htmlFor="first-name">Name</label>
-                <input
-                  id="first-name"
-                  type="text"
-                  value={viewPatientDetails?.name}
-                  placeholder="loremipsum234@gmail.com"
-                  className="form-input form-input-green"
-                  readOnly
-                />
+            <div className="grid grid-cols-1 md:flex justify-between gap-4 mb-5">
+              <div className="flex flex-col items-start w-full">
+                <div className="text-base font-medium text-gray-500 mb-1">Name </div>
+                <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                  {viewPatientDetails?.name || ""}
+                </div>
               </div>
-              <div className="w-full">
-                <label htmlFor="email">Age</label>
-                <input
-                  id="age"
-                  type="number"
-                  placeholder="Age"
-                  value={
-                    viewPatientDetails
-                      ? calculateAge(viewPatientDetails?.dateOfBirth)
-                      : ""
-                  }
-                  className="form-input form-input-green"
-                  autoComplete="off"
-                  readOnly
-                />
+
+              <div className="flex flex-col items-start w-full">
+                <div className="text-base font-medium text-gray-500 mb-1">Age</div>
+                <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                  {viewPatientDetails
+                    ? calculateAge(viewPatientDetails?.dateOfBirth)
+                    : ""}
+                </div>
               </div>
-              <div className="w-full">
-                <label htmlFor="email">Date of Birth</label>
-                <input
-                  id="dob"
-                  type="email"
-                  placeholder="Date of Birth"
-                  value={
-                    viewPatientDetails
-                      ? formatDate(new Date(viewPatientDetails?.dateOfBirth))
-                      : ""
-                  }
-                  className="form-input form-input-green"
-                  autoComplete="off"
-                  readOnly
-                />
+
+              <div className="flex flex-col items-start w-full">
+                <div className="text-base font-medium text-gray-500 mb-1">
+                  Date of Birth
+                </div>
+                <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                  {viewPatientDetails
+                    ? formatDate(new Date(viewPatientDetails?.dateOfBirth))
+                    : ""}
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:flex justify-between gap-5 mb-5">
-              <div className="w-full">
-                <label htmlFor="first-name">Gender</label>
-                <input
-                  id="gender"
-                  type="text"
-                  value={viewPatientDetails?.gender}
-                  className="form-input form-input-green"
-                  readOnly
-                />
+            <div className="grid grid-cols-1 md:flex justify-between gap-5 mb-5">
+              <div className="flex flex-col items-start w-full">
+                <div className="text-base font-medium text-gray-500 mb-1">
+                  Gender
+                </div>
+                <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                  {viewPatientDetails?.gender}
+                </div>
               </div>
-              <div className="w-full">
-                <label htmlFor="email">Phone Number</label>
-                <input
-                  id="phone-number"
-                  type="text"
-                  // placeholder="loremipsum234@gmail.com"
-                  value={viewPatientDetails?.phone}
-                  className="form-input form-input-green"
-                  autoComplete="off"
-                />
+
+              <div className="flex flex-col items-start w-full">
+                <div className="text-base font-medium text-gray-500 mb-1">
+                  Phone Number
+                </div>
+                <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                  {viewPatientDetails?.phone}
+                </div>
               </div>
-              <div className="w-full">
-                <label htmlFor="email">Token ID</label>
-                <input
-                  id="token-id"
-                  type="text"
-                  placeholder="asdvwveabe01"
-                  value={patientData?.token}
-                  className="form-input form-input-green"
-                  autoComplete="off"
-                />
+
+              <div className="flex flex-col items-start w-full">
+                <div className="text-base font-medium text-gray-500 mb-1">
+                  Token ID
+                </div>
+                <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                  {patientData?.token}
+                </div>
+                <label htmlFor="email"></label>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
-              <div className="w-1/3">
-                <label htmlFor="first-name">Time</label>
-                <input
-                  id="time"
-                  type="text"
-                  value={
-                    patientData ? formatTime(patientData?.schedule_time) : ""
-                  }
-                  placeholder="loremipsum234@gmail.com"
-                  className="form-input form-input-green"
-                  readOnly
-                />
+              <div className="w-full md:w-[calc(33.3333%-19px)] flex flex-col items-start">
+                <div className="text-base font-medium text-gray-500 mb-1">Time</div>
+                <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                  {patientData ? formatTime(patientData?.schedule_time) : ""}
+                </div>
+                <label htmlFor="email"></label>
               </div>
             </div>
+
           </>
         )}
         <Tab.Group>
@@ -375,6 +350,7 @@ const PatientDetails = () => {
                           required
                         />
                       </div>
+
                       <div className="w-full">
                         <label htmlFor="email">Medical Test</label>
                         <input
@@ -408,6 +384,7 @@ const PatientDetails = () => {
                           rows={10}
                         />
                       </div>
+
                       <div className="w-full">
                         <label htmlFor="email">Notes</label>
                         <textarea
@@ -424,6 +401,7 @@ const PatientDetails = () => {
                           rows={10}
                         />
                       </div>
+                      
                     </div>
                     <div className="flex justify-end   text-gray-500 font-bold dark:text-white-dark">
                       <CustomButton type="submit" disabled={buttonLoading}>

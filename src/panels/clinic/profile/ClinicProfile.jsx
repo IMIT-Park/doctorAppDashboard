@@ -499,21 +499,21 @@ const ClinicProfile = () => {
                     type="button"
                     className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
                   >
-                    Reschedule Todays Bookings
+                    Reschedule Todays Appoinments
                   </button>
                   <button
                     type="button"
                     className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
                     onClick={() => openCancelAllAppoimentsModal(selectedDoctorId)}
                   >
-                    Cancel all Bookings
+                    Cancel all Appoinments
                   </button>
                 </div>
               </Tab.List>
               <Tab.Panels>
                 <Tab.Panel>
                   {appointmentsLoading ? (
-                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0 mt-4" />
+                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7  h-7 align-middle shrink-0 mt-4" />
                   ) : (
                     <div className="datatables mt-8">
                       <DataTable
@@ -525,26 +525,27 @@ const ClinicProfile = () => {
                         }
                         mih={180}
                         highlightOnHover
-                        className="whitespace-nowrap table-hover flex"
+                        className="whitespace-nowrap table-hover flex justify-evenly"
                         records={appointments}
                         idAccessor="booking_id"
                         columns={[
                           {
                             accessor: "No",
-                            title: "No",
+                            title: "No", textAlignment: "center",
                             render: (row, rowIndex) => rowIndex + 1,
                           },
-                          { accessor: "Patient.name", title: "Name" },
-                          { accessor: "Patient.gender", title: "Gender" },
-                          { accessor: "schedule_time", title: "Time" },
+                          { accessor: "Patient.name", title: "Name" , textAlignment: "center",},
+                          { accessor: "Patient.gender", title: "Gender", textAlignment: "center", },
+                          { accessor: "schedule_time", title: "Time", textAlignment: "center", },
                           {
                             accessor: "actions",
                             title: "Actions",
+                            textAlignment: "center",
                             render: (row) => (
-                              <div className="dropdown">
+                              <div className="dropdown grid place-items-center">
                                 <Dropdown
-                                  placement="top-end"
-                                  btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full flex justify-center items-center"
+                                  placement="middle"
+                                  btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
                                   button={
                                     <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
                                   }

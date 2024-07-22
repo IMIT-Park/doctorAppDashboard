@@ -1,6 +1,6 @@
 import React from "react";
 
-const PhoneNumberInput = ({ value, onChange, error, maxLength }) => {
+const PhoneNumberInput = ({ value, onChange, error, maxLength,disabled }) => {
   const handlePhoneChange = (e) => {
     const { value } = e.target;
     const numericValue = value.replace(/\D/g, "");
@@ -20,6 +20,7 @@ const PhoneNumberInput = ({ value, onChange, error, maxLength }) => {
           value={value}
           onChange={handlePhoneChange}
           maxLength={maxLength}
+          disabled={disabled}
         />
       </div>
       {error && (

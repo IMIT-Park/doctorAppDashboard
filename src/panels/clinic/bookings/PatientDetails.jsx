@@ -9,16 +9,34 @@ import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberIn
 import IconLoader from "../../../components/Icon/IconLoader";
 import IconCaretDown from "../../../components/Icon/IconCaretDown";
 import { UserContext } from "../../../contexts/UseContext";
+import { reverseformatDate } from "../../../utils/formatDate";
 
 const ClinicBookingDoctor = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { bookingDetails, setBookingDetails } = useContext(UserContext);
+  const { bookingDetails, setBookingDetails, patientDetails } =
+    useContext(UserContext);
 
   useEffect(() => {
     dispatch(setPageTitle("ownerDoctor"));
   }, [dispatch]);
+
+  console.log(patientDetails);
+
+  useEffect(() => {
+    if (patientDetails) {
+      const phoneWithoutCountryCode = patientDetails.phone.replace(/^\+91/, "");
+      setInput({
+        phone: phoneWithoutCountryCode || "",
+        name: patientDetails.name || "",
+        gender: patientDetails.gender || "",
+        dateOfBirth: reverseformatDate(patientDetails?.dateOfBirth) || "",
+        Remarks: patientDetails.Remarks || "",
+        Particulars: patientDetails.Particulars || "",
+      });
+    }
+  }, [patientDetails]);
 
   const [errors, setErrors] = useState({});
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -54,6 +72,7 @@ const ClinicBookingDoctor = () => {
     });
   };
 
+  // Post Method
   const addPatients = async (e) => {
     e.preventDefault();
 
@@ -100,6 +119,16 @@ const ClinicBookingDoctor = () => {
     }
   };
 
+  const handleNext = () => {
+    if (patientDetails) {
+      setBookingDetails({
+        ...bookingDetails,
+        patient_id: patientDetails?.patient_id || null,
+      });
+      navigate("/clinic/bookings/select-doctor");
+    }
+  };
+
   const handlePhoneChange = (value) => {
     setInput({ ...input, phone: value });
     if (value.length === 10) {
@@ -130,6 +159,7 @@ const ClinicBookingDoctor = () => {
               onChange={(e) => setInput({ ...input, name: e.target.value })}
               className="form-input form-input-green mb-4 px-3"
               required
+              disabled={!!patientDetails}
             />
 
             <PhoneNumberInput
@@ -137,6 +167,7 @@ const ClinicBookingDoctor = () => {
               onChange={handlePhoneChange}
               error={errors?.phone}
               maxLength="10"
+              disabled={!!patientDetails}
             />
 
             <div className="flex flex-col md:flex-row md:space-x-4 mb-4 mt-4">
@@ -157,6 +188,7 @@ const ClinicBookingDoctor = () => {
                   }
                   className="form-input form-input-green px-3"
                   required
+                  disabled={!!patientDetails}
                 />
               </div>
 
@@ -176,6 +208,7 @@ const ClinicBookingDoctor = () => {
                   }
                   className="form-select form-select-green px-3"
                   required
+                  disabled={!!patientDetails}
                 >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
@@ -190,6 +223,7 @@ const ClinicBookingDoctor = () => {
               value={input?.Remarks}
               onChange={(e) => setInput({ ...input, Remarks: e.target.value })}
               className="form-input form-input-green mb-4 px-3 h-20"
+              disabled={!!patientDetails}
             ></textarea>
 
             <textarea
@@ -199,19 +233,30 @@ const ClinicBookingDoctor = () => {
                 setInput({ ...input, Particulars: e.target.value })
               }
               className="form-input form-input-green mb-4 px-3 h-20"
+              disabled={!!patientDetails}
             ></textarea>
 
             <div className="flex justify-center">
-              <button
-                type="submit"
-                className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-base font-medium rounded-md"
-              >
-                {buttonLoading ? (
-                  <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />
-                ) : (
-                  "Next"
-                )}
-              </button>
+              {patientDetails ? (
+                <button
+                  type="button"
+                  className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-base font-medium rounded-md"
+                  onClick={handleNext}
+                >
+                    Next
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-base font-medium rounded-md"
+                >
+                  {buttonLoading ? (
+                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />
+                  ) : (
+                    "Next"
+                  )}
+                </button>
+              )}
             </div>
           </form>
         </div>

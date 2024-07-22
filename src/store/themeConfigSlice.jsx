@@ -97,7 +97,7 @@ const themeConfigSlice = createSlice({
     },
 
     setPageTitle(state, { payload }) {
-      document.title = `${payload} | ProHealth`;
+      document.title = `${payload} | My Doctors Time`;
     },
   },
 });

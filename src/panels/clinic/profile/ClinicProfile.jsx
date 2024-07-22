@@ -24,6 +24,7 @@ import IconHorizontalDots from "../../../components/Icon/IconHorizontalDots";
 import IconSearch from "../../../components/Icon/IconSearch";
 import IconCopy from "../../../components/Icon/IconCopy";
 import RescheduleModal from "./RescheduleModal";
+import CancelReschedule from "./CancelReschedule";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -70,6 +71,8 @@ const ClinicProfile = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [appointmentsLoading, setAppointmentsLoading] = useState(false);
   const [addRescheduleModal, setAddRescheduleModal] = useState(false);
+  const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
+  const [cancelAllAppoinments,setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
 
   useEffect(() => {
@@ -272,6 +275,27 @@ const ClinicProfile = () => {
     setAddRescheduleModal(false);
   };
 
+  const openCancelRescheduleModal = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    console.log(bookingId);
+    setCancelRescheduleModal(true);
+  };
+
+  const closeCancelRescheduleModal = () => {
+    setCancelRescheduleModal(false);
+  };
+
+  const openCancelAllAppoimentsModal = (selectedDoctorId) => {
+    setSelectedDoctorId(selectedDoctorId);
+    console.log(selectedDoctorId);
+    setCancelAllAppoinments(true);
+  };
+
+  const closeCancelAllAppoimentsModal = () => {
+    setCancelAllAppoinments(false);
+  };
+
+  setCancelAllAppoinments
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchProfileData);
@@ -480,6 +504,7 @@ const ClinicProfile = () => {
                   <button
                     type="button"
                     className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+                    onClick={() => openCancelAllAppoimentsModal(selectedDoctorId)}
                   >
                     Cancel all Bookings
                   </button>
@@ -536,7 +561,16 @@ const ClinicProfile = () => {
                                       </button>
                                     </li>
                                     <li>
-                                      <button type="button">Cancel</button>
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          openCancelRescheduleModal(
+                                            row.booking_id
+                                          )
+                                        }
+                                      >
+                                        Cancel
+                                      </button>
                                     </li>
                                   </ul>
                                 </Dropdown>
@@ -575,14 +609,30 @@ const ClinicProfile = () => {
         buttonLoading={buttonLoading}
         isEdit={true}
       />
+
       <RescheduleModal
         addRescheduleModal={addRescheduleModal}
-        setAddRescheduleModal={setAddRescheduleModal}
         closeAddRescheduleModal={closeAddRescheduleModal}
         bookingId={selectedBookingId}
-        // buttonLoading={buttonLoading}
-        // allDoctorNames={allDoctorNames}
-        // fetchLeaveData={fetchLeaveData}
+        fetchAppointments={fetchAppointments}
+      />
+
+      <CancelReschedule
+        cancelRescheduleModal={cancelRescheduleModal}
+        setCancelRescheduleModal={setCancelRescheduleModal}
+        closeCancelRescheduleModal={closeCancelRescheduleModal}
+        bookingId={selectedBookingId}
+        fetchAppointments={fetchAppointments}
+      />
+
+      <CancelReschedule
+        cancelRescheduleModal={cancelAllAppoinments}
+        closeCancelRescheduleModal={closeCancelAllAppoimentsModal}
+        selectedDoctorId={selectedDoctorId}
+        fetchAppointments={fetchAppointments}
+        cancelAll={true}
+        clinicId={clinicId}
+        selectedDate={selectedDate}
       />
     </div>
   );

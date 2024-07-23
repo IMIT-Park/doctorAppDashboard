@@ -36,6 +36,9 @@ const OwnerIndex = lazy(() => import("../panels/owner/Index"));
 const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
 const OwnerChat = lazy(() => import("../panels/owner/chats/Index"));
 const OwnerBooking = lazy(() => import("../panels/owner/bookings/index"));
+const OwnerProfile = lazy(() =>
+  import("../panels/owner/profile/OwnerProfile")
+);
 
 // <--------------> owner panel imports ends here <-------------->
 
@@ -233,6 +236,12 @@ const routes = [
     layout: "default",
   },
   
+  // ownerprofile
+  {
+    path: "/owner/profile",
+    element: <OwnerProfile />,
+    layout: "default",
+  },
 
   // <--------------> owner panel ends here <-------------->
 

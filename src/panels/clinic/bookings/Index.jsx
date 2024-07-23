@@ -80,7 +80,7 @@ const ClinicBookingDoctor = () => {
   return (
     <div>
       <ScrollToTop />
-      {bookingDetails?.clinic_id ? (
+      {bookingDetails?.whoIsBooking === "owner" ? (
         <button
           onClick={() => navigate(-1)}
           type="button"

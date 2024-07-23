@@ -76,6 +76,7 @@ const Booking = () => {
       ...bookingDetails,
       clinic_id: clinicId,
       type: "walkin",
+      whoIsBooking: "owner",
     });
     navigate("/clinic/bookings");
   };

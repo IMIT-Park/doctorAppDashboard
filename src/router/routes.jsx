@@ -183,7 +183,7 @@ const routes = [
 
   // sales-team  -> owners
   {
-    path: "/admin/sales/:salesId",
+    path: "/admin/sales/owners",
     element: <AdminSalesOwners />,
     layout: "default",
   },
@@ -232,7 +232,6 @@ const routes = [
     element: <OwnerBooking />,
     layout: "default",
   },
-  
 
   // <--------------> owner panel ends here <-------------->
 

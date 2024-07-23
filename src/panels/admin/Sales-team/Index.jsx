@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -19,10 +19,13 @@ import { showMessage } from "../../../utils/showMessage";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import CustomButton from "../../../components/CustomButton";
+import { UserContext } from "../../../contexts/UseContext";
 
 const Sales = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { ids, setIds } = useContext(UserContext);
 
   useEffect(() => {
     dispatch(setPageTitle("Sales Teams"));
@@ -249,6 +252,11 @@ const Sales = () => {
   const { showAlert: showSalesAlert, loading: blockUnblockSalesLoading } =
     useBlockUnblock(fetchData);
 
+  const handleRowClick = (salespersonId) => {
+    setIds({ ...ids, salespersonId: salespersonId });
+    navigate(`/admin/sales/owners`);
+  };
+
   return (
     <div>
       <ScrollToTop />
@@ -287,9 +295,7 @@ const Sales = () => {
               className="whitespace-nowrap table-hover"
               records={allSalesPerson}
               idAccessor="salesperson_id"
-              onRowClick={(row) =>
-                navigate(`/admin/sales/${row.salesperson_id}`)
-              }
+              onRowClick={(row) => handleRowClick(row?.salesperson_id)}
               columns={[
                 {
                   accessor: "salesperson_id",

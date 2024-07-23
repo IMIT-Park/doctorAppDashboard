@@ -24,7 +24,7 @@ const ClinicDoctor = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const userDetails = sessionStorage.getItem("userData");
+  const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const clinicId = userData?.UserClinic[0]?.clinic_id;
 

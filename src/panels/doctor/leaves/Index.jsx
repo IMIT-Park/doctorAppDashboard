@@ -125,7 +125,6 @@ const DoctorLeaves = () => {
     setSelectedLeave(null);
   };
 
-  console.log(selectedLeave);
 
   return (
     <div>

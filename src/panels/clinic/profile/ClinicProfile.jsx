@@ -30,7 +30,7 @@ const ClinicProfile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const userDetails = sessionStorage.getItem("userData");
+  const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const clinicId = userData?.UserClinic?.[0]?.clinic_id || 0;
   const ownerId = userDetails?.UserClinic?.[0]?.owner_id;

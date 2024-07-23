@@ -57,7 +57,7 @@ const PatientDetails = () => {
   }, [bookingId]);
 
   useEffect(() => {
-    const medicalReportData = sessionStorage.getItem("medicalReport");
+    const medicalReportData = localStorage.getItem("medicalReport");
     const medicalReport = medicalReportData
       ? JSON.parse(medicalReportData)
       : null;
@@ -134,7 +134,7 @@ const PatientDetails = () => {
       );
       if (response.status === 201) {
         showMessage("Report added successfully.");
-        sessionStorage.setItem(
+        localStorage.setItem(
           "medicalReport",
           JSON.stringify({
             ...updatedInput,

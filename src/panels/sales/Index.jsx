@@ -23,7 +23,7 @@ import NetworkHandler, {
 import { showMessage } from "../../utils/showMessage";
 
 const Users = () => {
-  const userDetails = sessionStorage.getItem("userData");
+  const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const salespersonId = userData?.UserSalesperson?.[0]?.salesperson_id || 0;
 

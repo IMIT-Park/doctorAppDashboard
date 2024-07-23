@@ -5,6 +5,18 @@ const UserContext = createContext(null);
 const UserProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState(null);
 
+  const [ids, setIds] = useState(() => {
+    const savedBookingDetails = localStorage.getItem("ids");
+    return savedBookingDetails
+      ? JSON.parse(savedBookingDetails)
+      : {
+          ownerId: null,
+          clinicId: null,
+          doctorId: null,
+          salespersonId: null,
+        };
+  });
+
   const [bookingDetails, setBookingDetails] = useState(() => {
     const savedBookingDetails = localStorage.getItem("bookingDetails");
     return savedBookingDetails
@@ -17,20 +29,24 @@ const UserProvider = ({ children }) => {
           schedule_time: "",
           DoctorTimeSlot_id: null,
           type: "walkin",
-          whoIsBooking:"",
+          whoIsBooking: "",
         };
   });
 
   const [patientDetails, setPatientDetails] = useState(null);
 
   useEffect(() => {
+    localStorage.setItem("ids", JSON.stringify(ids));
+  }, [ids]);
+
+  useEffect(() => {
     localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
   }, [bookingDetails]);
 
   useEffect(() => {
-   const patientData = localStorage.getItem("patientDetails");
-   const convertedpatientData = JSON.parse(patientData);
-   setPatientDetails(convertedpatientData);
+    const patientData = localStorage.getItem("patientDetails");
+    const convertedpatientData = JSON.parse(patientData);
+    setPatientDetails(convertedpatientData);
   }, []);
 
   useEffect(() => {
@@ -42,7 +58,16 @@ const UserProvider = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ userDetails, setUserDetails, bookingDetails, setBookingDetails, patientDetails, setPatientDetails }}
+      value={{
+        ids,
+        setIds,
+        userDetails,
+        setUserDetails,
+        bookingDetails,
+        setBookingDetails,
+        patientDetails,
+        setPatientDetails,
+      }}
     >
       {children}
     </UserContext.Provider>

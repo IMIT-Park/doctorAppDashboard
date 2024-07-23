@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -11,11 +11,14 @@ import NetworkHandler from "../../../../utils/NetworkHandler";
 import IconCaretDown from "../../../../components/Icon/IconCaretDown";
 import useBlockUnblock from "../../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../../components/CustomSwitch";
+import { UserContext } from "../../../../contexts/UseContext";
 
 const Owners = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { salesId } = useParams();
+  const { ids } = useContext(UserContext);
+
+  const salesId = ids?.salespersonId;
 
   useEffect(() => {
     dispatch(setPageTitle("Owners"));

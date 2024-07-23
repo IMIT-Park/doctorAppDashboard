@@ -1,42 +1,75 @@
 import { setPageTitle } from "../../store/themeConfigSlice";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Dropdown from "../../components/Dropdown";
-import IconHorizontalDots from "../../components/Icon/IconHorizontalDots";
 import ReactApexChart from "react-apexcharts";
 import CountUp from "react-countup";
 import IconMenuUsers from "../../components/Icon/Menu/IconMenuUsers";
+import IconMenuTodo from "../../components/Icon/Menu/IconMenuTodo";
 import IconMenuDatatables from "../../components/Icon/Menu/IconMenuDatatables";
-import IconMenuInvoice from "../../components/Icon/Menu/IconMenuInvoice";
-import IconLoader from "../../components/Icon/IconLoader";
+import NetworkHandler from "../../utils/NetworkHandler";
 
 const Index = () => {
   const [loading, setLoading] = useState(false);
+  const [ownerReport, setOwnerReport] = useState(null);
+  const [currentMonth, setCurrentMonth] = useState("");
+  const [currentMonthBookings, setCurrentMonthBookings] = useState(0);
+
   const dispatch = useDispatch();
   const isDark = useSelector(
     (state) =>
       state.themeConfig.theme === "dark" || state.themeConfig.isDarkMode
   );
 
+  const fetchData = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/report/getOwnerReport/1`
+      );
+      setOwnerReport(response?.data?.results);
+      console.log(response);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   useEffect(() => {
     dispatch(setPageTitle("Dashboard"));
   });
 
+  useEffect(() => {
+    const date = new Date();
+    const month = date.toLocaleString("default", { month: "long" });
+    setCurrentMonth(month);
+  }, []);
+
+  useEffect(() => {
+    if (ownerReport) {
+      const currentMonthReport = ownerReport.totalBooking.find(
+        (item) => item.month === currentMonth
+      );
+      if (currentMonthReport) {
+        setCurrentMonthBookings(currentMonthReport.totalBookings);
+      }
+    }
+  }, [ownerReport, currentMonth]);
+
+  const report = ownerReport?.totalBooking;
+  const totalBookingsData = report?.map((item) => item?.totalBookings);
+  const totalBookingsLabels = report?.map((item) => item?.month);
+
   const revenueChart = {
     series: [
       {
-        name: "Income",
-        data: [
-          16800, 16800, 15500, 17800, 15500, 17000, 19000, 16000, 15000, 17000,
-          14000, 17000,
-        ],
-      },
-      {
-        name: "Expenses",
-        data: [
-          16500, 17500, 16200, 17300, 16000, 19500, 16000, 17000, 16000, 19000,
-          18000, 19000,
-        ],
+        name: "Booking",
+        data: totalBookingsData,
       },
     ],
     options: {
@@ -87,20 +120,7 @@ const Index = () => {
           },
         ],
       },
-      labels: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      labels: totalBookingsLabels,
       xaxis: {
         axisBorder: {
           show: false,
@@ -124,7 +144,7 @@ const Index = () => {
         tickAmount: 7,
         labels: {
           formatter: (value) => {
-            return value / 1000 + "K";
+            return value;
           },
           offsetX: -10,
           offsetY: 0,
@@ -430,42 +450,54 @@ const Index = () => {
           <div className="panel bg-gradient-to-r from-cyan-500 to-cyan-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                Clinics
+                Total Clinics
               </div>
             </div>
             <div className="flex items-center mt-3">
               <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={67} duration={4}></CountUp>{" "}
+                <CountUp
+                  start={0}
+                  end={ownerReport?.totalClinics || 0}
+                  duration={4}
+                ></CountUp>{" "}
               </div>
             </div>
-            <IconMenuUsers className="absolute top-[50%] translate-y-[-50%] right-5 size-8" />
+            <IconMenuTodo className="absolute top-[50%] translate-y-[-50%] right-5 size-8" />
           </div>
 
           {/* Total Transactions */}
           <div className="panel bg-gradient-to-r from-violet-500 to-violet-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                Transactions
+                Total Doctors
               </div>
             </div>
             <div className="flex items-center mt-3">
               <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={74} duration={4}></CountUp>
+                <CountUp
+                  start={0}
+                  end={ownerReport?.totalDoctor || 0}
+                  duration={4}
+                ></CountUp>
               </div>
             </div>
-            <IconMenuInvoice className="absolute top-[50%] translate-y-[-50%] right-5 size-8" />
+            <IconMenuUsers className="absolute top-[50%] translate-y-[-50%] right-5 size-8" />
           </div>
 
           {/*  Total Banners */}
           <div className="panel bg-gradient-to-r from-blue-500 to-blue-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                Banners
+                Total Subscription
               </div>
             </div>
             <div className="flex items-center mt-3">
               <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={34} duration={4}></CountUp>
+                <CountUp
+                  start={0}
+                  end={ownerReport?.totalSubscription || 0}
+                  duration={4}
+                ></CountUp>
               </div>
             </div>
             <IconMenuDatatables className="absolute top-[50%] translate-y-[-50%] right-5 size-8" />
@@ -475,86 +507,51 @@ const Index = () => {
           <div className="panel bg-gradient-to-r from-fuchsia-500 to-fuchsia-400">
             <div className="flex justify-between">
               <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">
-                Bounce Rate
+                Total Unsubscription
               </div>
             </div>
             <div className="flex items-center mt-3">
               <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                <CountUp start={0} end={49} duration={4}></CountUp>%
+                <CountUp
+                  start={0}
+                  end={ownerReport?.totalUnsubscription || 0}
+                  duration={4}
+                ></CountUp>
               </div>
             </div>
-            <IconMenuUsers className="absolute top-[50%] translate-y-[-50%] right-5 size-8" />
+            <IconMenuDatatables className="absolute top-[50%] translate-y-[-50%] right-5 size-8" />
           </div>
         </div>
 
         <div className="pt-5">
-          <div className="grid xl:grid-cols-3 gap-6 mb-6 w-100">
-            <div className="panel h-full xl:col-span-2 min-w-0">
-              <div className="flex items-center justify-between dark:text-white-light mb-5">
-                <h5 className="font-semibold text-lg">Revenue</h5>
-                <div className="dropdown">
-                  <Dropdown
-                    offset={[0, 1]}
-                    placement="bottom-end"
-                    button={
-                      <IconHorizontalDots className="text-black/70 dark:text-white/70 hover:!text-primary" />
-                    }
-                  >
-                    <ul>
-                      <li>
-                        <button type="button">Weekly</button>
-                      </li>
-                      <li>
-                        <button type="button">Monthly</button>
-                      </li>
-                      <li>
-                        <button type="button">Yearly</button>
-                      </li>
-                    </ul>
-                  </Dropdown>
+          <div className="panel h-full xl:col-span-2 min-w-0">
+            <div className="grid xl:grid-cols-2 gap-6 mb-6 w-100">
+              <div className="panel h-full xl:col-span-2 min-w-0">
+                <div className="flex items-center justify-between dark:text-white-light mb-5">
+                  <h5 className="font-semibold text-lg">Bookings</h5>
+                  {/*  */}
                 </div>
-              </div>
-              <p className="text-lg dark:text-white-light/90">
-                Total Profit <span className="text-primary ml-2">$10,840</span>
-              </p>
-              <div className="relative">
-                <div className="bg-white dark:bg-black rounded-lg overflow-hidden">
-                  {loading ? (
-                    <div className="min-h-[325px] grid place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] ">
-                      <span className="animate-spin border-2 border-black dark:border-white !border-l-transparent  rounded-full w-5 h-5 inline-flex"></span>
-                    </div>
-                  ) : (
-                    <ReactApexChart
-                      series={revenueChart.series}
-                      options={revenueChart.options}
-                      type="area"
-                      height={325}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="panel h-full">
-              <div className="flex items-center mb-5">
-                <h5 className="font-semibold text-lg dark:text-white-light">
-                  Sales By Category
-                </h5>
-              </div>
-              <div>
-                <div className="bg-white dark:bg-black rounded-lg overflow-hidden">
-                  {loading ? (
-                    <div className="min-h-[325px] grid place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] ">
-                      <span className="animate-spin border-2 border-black dark:border-white !border-l-transparent  rounded-full w-5 h-5 inline-flex"></span>
-                    </div>
-                  ) : (
-                    <ReactApexChart
-                      series={salesByCategory.series}
-                      options={salesByCategory.options}
-                      type="donut"
-                      height={460}
-                    />
-                  )}
+                <p className="text-lg dark:text-white-light/90">
+                  Total Bookings in this month{" "}
+                  <span className="text-primary ml-2">
+                    {currentMonthBookings}
+                  </span>
+                </p>
+                <div className="relative">
+                  <div className="bg-white dark:bg-black rounded-lg overflow-hidden">
+                    {loading ? (
+                      <div className="min-h-[325px] grid place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] ">
+                        <span className="animate-spin border-2 border-black dark:border-white !border-l-transparent  rounded-full w-5 h-5 inline-flex"></span>
+                      </div>
+                    ) : (
+                      <ReactApexChart
+                        series={revenueChart.series}
+                        options={revenueChart.options}
+                        type="area"
+                        height={325}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

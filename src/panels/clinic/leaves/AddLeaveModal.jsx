@@ -10,7 +10,7 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import Swal from "sweetalert2";
 
 const AddLeave = ({ addLeaveModal, closeAddLeaveModal, fetchLeaveData }) => {
-  const userDetails = sessionStorage.getItem("userData");
+  const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const clinicId = userData?.UserClinic?.[0]?.clinic_id || 0;
 

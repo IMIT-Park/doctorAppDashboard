@@ -6,7 +6,7 @@ const UserProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState(null);
 
   const [bookingDetails, setBookingDetails] = useState(() => {
-    const savedBookingDetails = sessionStorage.getItem("bookingDetails");
+    const savedBookingDetails = localStorage.getItem("bookingDetails");
     return savedBookingDetails
       ? JSON.parse(savedBookingDetails)
       : {
@@ -24,17 +24,17 @@ const UserProvider = ({ children }) => {
   const [patientDetails, setPatientDetails] = useState(null);
 
   useEffect(() => {
-    sessionStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
+    localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
   }, [bookingDetails]);
 
   useEffect(() => {
-   const patientData = sessionStorage.getItem("patientDetails");
+   const patientData = localStorage.getItem("patientDetails");
    const convertedpatientData = JSON.parse(patientData);
    setPatientDetails(convertedpatientData);
   }, []);
 
   useEffect(() => {
-    const userData = sessionStorage.getItem("userData");
+    const userData = localStorage.getItem("userData");
     if (userData) {
       setUserDetails(JSON.parse(userData));
     }

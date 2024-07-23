@@ -140,8 +140,9 @@ const Patients = () => {
     setBookingLoading(true);
 
     try {
+      const { whoIsBooking, ...restBookingDetails } = bookingDetails;
       const bookingData = {
-        ...bookingDetails,
+        ...restBookingDetails,
         schedule_date: reverseformatDate(selectedDate) || "",
         schedule_time: selectedConsultation?.slot || "",
         DoctorTimeSlot_id:
@@ -161,9 +162,14 @@ const Patients = () => {
           text: "Booking Added Successfully",
           padding: "2em",
           customClass: "sweet-alerts",
+          confirmButtonColor: "#006241",
         });
         setTimeout(() => {
-          navigate("/clinic/bookings");
+          navigate(
+            bookingDetails?.whoIsBooking === "owner"
+              ? "/owner/add-booking"
+              : "/clinic/bookings"
+          );
         }, 3000);
         setBookingDetails({
           doctor_id: null,
@@ -173,6 +179,7 @@ const Patients = () => {
           schedule_time: "",
           DoctorTimeSlot_id: null,
           type: "walkin",
+          whoIsBooking: "",
         });
       }
     } catch (error) {

@@ -17,6 +17,7 @@ const UserProvider = ({ children }) => {
           schedule_time: "",
           DoctorTimeSlot_id: null,
           type: "walkin",
+          whoIsBooking:"",
         };
   });
 

@@ -22,8 +22,6 @@ const ClinicBookingDoctor = () => {
     dispatch(setPageTitle("ownerDoctor"));
   }, [dispatch]);
 
-  console.log(patientDetails);
-
   useEffect(() => {
     if (patientDetails) {
       const phoneWithoutCountryCode = patientDetails.phone.replace(/^\+91/, "");

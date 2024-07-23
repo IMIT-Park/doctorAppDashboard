@@ -17,11 +17,10 @@ const AddDoctor = ({
   errors,
   setErrors,
   buttonLoading,
-  showPassword,
-  setShowPassword,
-  showComfirmPassword,
-  setShowComfirmPassword,
+
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showComfirmPassword, setShowComfirmPassword] = useState(false);
   const [specializations, setSpecializations] = useState([]);
 
   const fetchSpecializations = async () => {
@@ -107,7 +106,7 @@ const AddDoctor = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
+              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-xl text-black dark:text-white-dark">
                 <button
                   type="button"
                   onClick={closeModal}
@@ -116,7 +115,7 @@ const AddDoctor = ({
                   <IconX />
                 </button>
                 <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                  {isEditMode ? "Edit Sales Person" : "Add Sales Person"}
+                  {isEditMode ? "Edit Doctor" : "Add Doctor"}
                 </div>
                 <div className="p-5">
                   <form>

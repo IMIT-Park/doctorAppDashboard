@@ -24,6 +24,8 @@ import useFetchData from "../../customHooks/useFetchData";
 import CustomSwitch from "../../components/CustomSwitch";
 import { UserContext } from "../../contexts/UseContext";
 import emptyUser from "/assets/images/empty-user.png";
+import IconUserPlus from "../../components/Icon/IconUserPlus";
+import AddDoctor from "../../panels/clinic/doctors/AddDoctor";
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -75,6 +77,9 @@ const ClinicSingleView = () => {
     password: "",
     confirmPassword: "",
   });
+
+  const [addDoctorModal, setAddDoctorModal] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     setPage(1);
@@ -192,6 +197,105 @@ const ClinicSingleView = () => {
     }
   };
 
+
+  const openAddDoctorModal = () => {
+    setAddDoctorModal(true);
+  };
+
+  const closeAddDoctorModal = () => {
+    setAddDoctorModal(false);
+    setInput({
+      ...input,
+      name: "",
+      email: "",
+      user_name: "",
+      phone: "",
+      gender: "",
+      qualification: "",
+      fees: "",
+      specialization: " ",
+      address: "",
+      password: "",
+      confirmPassword: "",
+    });
+    setErrors(null);
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (input.password !== input.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      showMessage("Passwords do not match", "warning");
+    }
+    if (input.phone.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+      showMessage("Phone number must be exactly 10 digits", "warning");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const saveDoctorPerson = async () => {
+    if (
+      !input.name ||
+      !input.email ||
+      !input.phone ||
+      !input.dateOfBirth ||
+      !input.gender ||
+      !input.qualification ||
+      !input.specialization ||
+      !input.fees ||
+      !input.address ||
+      !input.password ||
+      !input.confirmPassword
+    ) {
+      showMessage("Please fill in all required fields", "warning");
+      return;
+    }
+
+    if (validate()) {
+      setButtonLoading(true);
+
+      const updatedData = {
+        ...input,
+        phone: `+91${input.phone}`,
+        user_name: input.email,
+        clinic_id: clinicId,
+      };
+
+      try {
+        const response = await NetworkHandler.makePostRequest(
+          "v1/doctor/ClinicCreateDoctor",
+          updatedData
+        );
+
+        setAddDoctorModal(false);
+
+        if (response.status === 201) {
+          showMessage("Doctor has been added successfully.");
+          closeAddDoctorModal();
+          fetchDoctorData();
+        } else {
+          showMessage("Failed to add Doctor. Please try again.", "error");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          showMessage(
+            error.response.data.error === "User Already Exists"
+              ? "Username Already Exists"
+              : "Email already exists.",
+            "error"
+          );
+        } else {
+          showMessage("Failed to add Doctor. Please try again.", "error");
+        }
+      } finally {
+        setButtonLoading(false);
+      }
+    }
+  };
+
+
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchClinicData);
@@ -290,15 +394,22 @@ const ClinicSingleView = () => {
                       </div>
 
                       <div className="flex flex-col md:flex-row items-start gap-5">
-                        <div className="flex flex-col items-start w-full">
-                          <div className="text-base font-medium text-gray-500">
-                            Username:
+                        {!isSuperAdmin && (
+                          <div className="flex flex-col items-start w-full">
+                            <div className="text-base font-medium text-gray-500">
+                              Username:
+                            </div>
+                            <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                              {clinicDetails?.User?.user_name || ""}
+                            </div>
                           </div>
-                          <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                            {clinicDetails?.User?.user_name || ""}
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-start w-full">
+                        )}
+
+                        <div
+                          className={`flex flex-col items-start w-full ${
+                            isSuperAdmin && "md:w-[calc(50%-15px)]"
+                          }`}
+                        >
                           <div className="text-base font-medium text-gray-500">
                             Phone:
                           </div>
@@ -335,6 +446,14 @@ const ClinicSingleView = () => {
               <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
             </span>
           </div>
+          <button
+            type="button"
+            className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+            onClick={openAddDoctorModal}
+          >
+            <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
+            Add Doctor
+          </button>
         </div>
         {doctorLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -455,6 +574,17 @@ const ClinicSingleView = () => {
         handleSubmit={updateClinic}
         buttonLoading={buttonLoading}
         isEdit={true}
+      />
+       <AddDoctor
+        open={addDoctorModal}
+        closeModal={closeAddDoctorModal}
+        input={input}
+        setInput={setInput}
+        formSubmit={saveDoctorPerson}
+        buttonLoading={buttonLoading}
+        setButtonLoading={setButtonLoading}      
+        errors={errors}
+        setErrors={setErrors}
       />
     </div>
   );

@@ -41,8 +41,7 @@ const ClinicDoctor = () => {
   const [loading, setLoading] = useState(false);
   const [addDoctorModal, setAddDoctorModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showComfirmPassword, setShowComfirmPassword] = useState(false);
+
   const [errors, setErrors] = useState({});
   const [removeModal, setRemoveModal] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
@@ -403,11 +402,7 @@ const ClinicDoctor = () => {
         setInput={setInput}
         formSubmit={saveDoctorPerson}
         buttonLoading={buttonLoading}
-        setButtonLoading={setButtonLoading}
-        showPassword={showPassword}
-        setShowPassword={setShowPassword}
-        showComfirmPassword={showComfirmPassword}
-        setShowComfirmPassword={setShowComfirmPassword}
+        setButtonLoading={setButtonLoading}      
         errors={errors}
         setErrors={setErrors}
       />

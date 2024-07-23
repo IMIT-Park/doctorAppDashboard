@@ -16,6 +16,8 @@ import { handleGetLocation } from "../../../utils/getLocation";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import SubscriptionDetailsModal from "../../../components/SubscriptionDetailsModal/SubscriptionDetailsModal";
+import IconSearch from "../../../components/Icon/IconSearch";
+import { UserContext } from "../../../contexts/UseContext";
 
 const OwnerSingleView = () => {
   const dispatch = useDispatch();
@@ -37,6 +39,10 @@ const OwnerSingleView = () => {
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [subscriptionAddModal, setsubscriptionAddModal] = useState(false);
   const [currentClinicId, setCurrentClinicId] = useState("");
+  const [search, setSearch] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [error, setError] = useState("");
+  const [clinics, setClinics] = useState([]);
 
   useEffect(() => {
     setPage(1);
@@ -81,9 +87,42 @@ const OwnerSingleView = () => {
     }
   };
 
+  // Get Search Clinics
+  const fetchSearchClinics = async () => {
+    if (!search) {
+      setClinics([]);
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/clinic/getclinicdata/${ownerId}?pageSize=${pageSize}&page=${page}`,
+        { keyword: search }
+      );
+      if(response.status === 200){
+        setAllClinics(response?.data?.clinics);
+      } else{
+        setClinics([]);
+        setError("No data found for the search query.");
+      }
+    } catch (error) {
+      console.error("Error fetching Clinics:", error);
+      setError("No Clinics found.");
+      setAllClinics([]);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchOwnerInfo();
   }, []);
+
+  useEffect(() => {
+    fetchSearchClinics();
+  },[search]);
 
   useEffect(() => {
     fetchData();
@@ -104,6 +143,8 @@ const OwnerSingleView = () => {
     setsubscriptionAddModal(false);
     setSelectedPlan(null);
   };
+
+  console.log(allClinics);
 
   return (
     <div>
@@ -186,6 +227,60 @@ const OwnerSingleView = () => {
               </span>
             </Tippy>
           </div>
+          <div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                fetchSearchClinics();
+              }}
+              className="mx-auto w-full mb-2"
+            >
+              <div className="relative">
+                <input
+                  type="text"
+                  value={search}
+                  placeholder="Search Clinic..."
+                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => {
+                    setShowSuggestions(true);
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => setShowSuggestions(false), 2000);
+                  }}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-green absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                >
+                  <IconSearch className="mx-auto" />
+                </button>
+                {/* {showSuggestions && clinics.length > 0 && (
+                  <ul className="z-10 absolute top-11 bg-white dark:bg-slate-900 border border-gray-300 dark:border-gray-800 rounded-md w-full p-2 max-h-60 overflow-y-auto">
+                    {error && search ? (
+                      <li className="px-4 py-2 text-red-500 text-center">
+                      {error}
+                    </li>
+                    ) : (
+                      clinics?.length > 0 && 
+                      clinics?.map((clinic) => (
+                        <li
+                        key={clinic?.clinic_id}
+                        className="px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer"
+                        onMouseDown={() => handleSuggestionClick(clinic)}
+                        >
+                          {clinic?.name}{" "}
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                )} */}
+              </div>
+            </form>
+          </div>
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -202,7 +297,7 @@ const OwnerSingleView = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allClinics}
-              idAccessor="User.user_id"
+              idAccessor="clinic_id"
               onRowClick={(row) =>
                 navigate(`/clinics/${row?.clinic_id}`, {
                   state: { previousUrl: location?.pathname },

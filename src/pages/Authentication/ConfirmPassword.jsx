@@ -103,7 +103,7 @@ const LoginBoxed = () => {
         },
         body: JSON.stringify({
           newpassword: data.newPassword,
-          token: token,
+          token: tokenFromUrl,
         }),
       });
       console.log(response);

@@ -17,7 +17,7 @@ const ClinicBookingDoctor = () => {
     dispatch(setPageTitle("ownerDoctor"));
   }, [dispatch]);
 
-  const userDetails = sessionStorage.getItem("userData");
+  const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const clinicId = userData?.UserClinic[0]?.clinic_id;
 
@@ -64,13 +64,13 @@ const ClinicBookingDoctor = () => {
 
   const handleSuggestionClick = (patient) => {
     setPatientDetails(patient);
-    sessionStorage.setItem("patientDetails", JSON.stringify(patient));
+    localStorage.setItem("patientDetails", JSON.stringify(patient));
     navigate("/clinic/bookings/patient-details");
   };
 
   useEffect(() => {
     setPatientDetails(null);
-    sessionStorage.setItem("patientDetails", null);
+    localStorage.setItem("patientDetails", null);
   }, []);
 
   const handleNewUserClick = () => {

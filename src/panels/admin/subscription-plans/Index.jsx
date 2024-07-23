@@ -22,7 +22,6 @@ const SubscriptionPlans = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/plans/getallplans`
       );
-      console.log(response);
       setAllPlans(response?.data?.Plans?.rows || []);
     } catch {
       setLoading(false);

@@ -9,7 +9,7 @@ import { showMessage } from "../../../utils/showMessage";
 import IconX from "../../../components/Icon/IconX";
 
 const Chat = () => {
-  const userDetails = sessionStorage.getItem("userData");
+  const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const ownerId = userData?.UserOwner?.[0]?.owner_id || 0;
   const ownerRoleId = userData?.role_id || 0;

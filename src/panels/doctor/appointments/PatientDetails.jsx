@@ -57,7 +57,7 @@ const PatientDetails = () => {
   }, [bookingId]);
 
   useEffect(() => {
-    const medicalReportData = sessionStorage.getItem("medicalReport");
+    const medicalReportData = localStorage.getItem("medicalReport");
     const medicalReport = medicalReportData
       ? JSON.parse(medicalReportData)
       : null;
@@ -82,19 +82,22 @@ const PatientDetails = () => {
   const calculateAge = (dateOfBirth) => {
     const dob = new Date(dateOfBirth);
     const currentDate = new Date();
-
-    let age = currentDate.getFullYear() - dob.getFullYear();
-    const monthDiff = currentDate.getMonth() - dob.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && currentDate.getDate() < dob.getDate())
-    ) {
-      age--;
+    let years = currentDate.getFullYear() - dob.getFullYear();
+    let months = currentDate.getMonth() - dob.getMonth();
+  
+    if (months < 0 || (months === 0 && currentDate.getDate() < dob.getDate())) {
+      years--;
+      months = 12 + months;
     }
-    return age;
+  
+    if (months === 12) {
+      years++;
+      months = 0;
+    }
+    return months > 0 ? `${years} years ${months} months` : `${years} years`;
   };
 
+  
   // const handleInputChange = (e) => {
   //   const { id, value } = e.target;
   //   setInput((prevInput) => ({
@@ -131,7 +134,7 @@ const PatientDetails = () => {
       );
       if (response.status === 201) {
         showMessage("Report added successfully.");
-        sessionStorage.setItem(
+        localStorage.setItem(
           "medicalReport",
           JSON.stringify({
             ...updatedInput,
@@ -180,6 +183,7 @@ const PatientDetails = () => {
     }
   };
 
+
   return (
     <div>
       <ScrollToTop />
@@ -224,9 +228,7 @@ const PatientDetails = () => {
               <div className="flex flex-col items-start w-full">
                 <div className="text-base font-medium text-gray-500 mb-1">Age</div>
                 <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                  {viewPatientDetails
-                    ? calculateAge(viewPatientDetails?.dateOfBirth)
-                    : ""}
+                {viewPatientDetails ? calculateAge(viewPatientDetails?.dateOfBirth) : ""}
                 </div>
               </div>
 

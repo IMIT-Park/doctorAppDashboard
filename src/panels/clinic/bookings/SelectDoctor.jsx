@@ -15,7 +15,7 @@ const SelectDoctor = () => {
   const navigate = useNavigate();
   const { bookingDetails, setBookingDetails } = useContext(UserContext);
 
-  const userDetails = sessionStorage.getItem("userData");
+  const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const clinicId =
     bookingDetails?.clinic_id || userData?.UserClinic[0]?.clinic_id;

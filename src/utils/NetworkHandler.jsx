@@ -15,8 +15,8 @@ export const websiteUrl = "https://mydoctorstime.gitdr.com/";
 
 // Helper function to get stored token details
 function getStoredTokenDetails() {
-  const accessToken = sessionStorage.getItem("accessToken");
-  const refreshToken = sessionStorage.getItem("refreshToken");
+  const accessToken = localStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
   if (!accessToken || !refreshToken) return null;
   return { accessToken, refreshToken };
 }
@@ -60,7 +60,7 @@ class NetworkHandler {
               RefreshToken: refreshToken,
             });
             const { accessToken } = response.data;
-            sessionStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("accessToken", accessToken);
 
             const config = error.config;
             config.headers.Authorization = `Bearer ${accessToken}`;
@@ -82,8 +82,8 @@ class NetworkHandler {
   }
 
   storeAccessTokenInfo(accessToken, refreshToken) {
-    sessionStorage.setItem("accessToken", accessToken);
-    sessionStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
   }
 
   makeGetRequest(url, headers) {

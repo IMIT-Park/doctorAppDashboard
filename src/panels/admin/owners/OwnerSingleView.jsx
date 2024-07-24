@@ -17,7 +17,6 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import SubscriptionDetailsModal from "../../../components/SubscriptionDetailsModal/SubscriptionDetailsModal";
 import IconSearch from "../../../components/Icon/IconSearch";
-import { UserContext } from "../../../contexts/UseContext";
 
 const OwnerSingleView = () => {
   const dispatch = useDispatch();
@@ -40,7 +39,7 @@ const OwnerSingleView = () => {
   const [subscriptionAddModal, setsubscriptionAddModal] = useState(false);
   const [currentClinicId, setCurrentClinicId] = useState("");
   const [search, setSearch] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  // const [showSuggestions, setShowSuggestions] = useState(false);
   const [error, setError] = useState("");
   const [clinics, setClinics] = useState([]);
 
@@ -62,6 +61,7 @@ const OwnerSingleView = () => {
       );
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
+      setClinics(response.data?.Clinic?.rows);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -89,8 +89,9 @@ const OwnerSingleView = () => {
 
   // Get Search Clinics
   const fetchSearchClinics = async () => {
+    const updatedKeyword = isNaN(search) ? search : `+91${search}`
     if (!search) {
-      setClinics([]);
+      setClinics(allClinics); 
       return;
     }
     setLoading(true);
@@ -98,19 +99,24 @@ const OwnerSingleView = () => {
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/clinic/getclinicdata/${ownerId}?pageSize=${pageSize}&page=${page}`,
-        { keyword: search }
+        { keyword: updatedKeyword }
       );
-      if(response.status === 200){
-        setAllClinics(response?.data?.clinics);
-      } else{
-        setClinics([]);
-        setError("No data found for the search query.");
+      if (response.status === 200) {
+        const searchClinics = response?.data?.clinics || [];
+        if (searchClinics.length > 0) {
+          setClinics(searchClinics); 
+        } else {
+          setError("No data found for the search query.");
+          setClinics([]); 
+        }
+      } else {
+        setError("No Clinics found.");
+        setClinics([]); 
       }
     } catch (error) {
       console.error("Error fetching Clinics:", error);
-      setError("No Clinics found.");
-      setAllClinics([]);
-      setLoading(false);
+      setError("Error fetching Clinics.");
+      setClinics([]); 
     } finally {
       setLoading(false);
     }
@@ -121,8 +127,12 @@ const OwnerSingleView = () => {
   }, []);
 
   useEffect(() => {
-    fetchSearchClinics();
-  },[search]);
+    if (search.trim()) {
+      fetchSearchClinics();
+    } else {
+      fetchData();
+    }
+  }, [search]);
 
   useEffect(() => {
     fetchData();
@@ -243,14 +253,14 @@ const OwnerSingleView = () => {
                   className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
                   onChange={(e) => {
                     setSearch(e.target.value);
-                    setShowSuggestions(true);
+                    // setShowSuggestions(true);
                   }}
-                  onFocus={() => {
-                    setShowSuggestions(true);
-                  }}
-                  onBlur={() => {
-                    setTimeout(() => setShowSuggestions(false), 2000);
-                  }}
+                  // onFocus={() => {
+                  //   setShowSuggestions(true);
+                  // }}
+                  // onBlur={() => {
+                  //   setTimeout(() => setShowSuggestions(false), 2000);
+                  // }}
                 />
                 <button
                   type="submit"
@@ -296,7 +306,7 @@ const OwnerSingleView = () => {
               mih={180}
               highlightOnHover
               className="whitespace-nowrap table-hover"
-              records={allClinics}
+              records={clinics}
               idAccessor="clinic_id"
               onRowClick={(row) =>
                 navigate(`/clinics/${row?.clinic_id}`, {

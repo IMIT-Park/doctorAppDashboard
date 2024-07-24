@@ -14,6 +14,10 @@ const Index = () => {
   const [currentMonth, setCurrentMonth] = useState("");
   const [currentMonthBookings, setCurrentMonthBookings] = useState(0);
 
+  const userDetails = sessionStorage.getItem("userData");
+  const userData = JSON.parse(userDetails);
+  const ownerId = userData?.UserOwner?.[0]?.owner_id || 0;
+
   const dispatch = useDispatch();
   const isDark = useSelector(
     (state) =>
@@ -23,7 +27,7 @@ const Index = () => {
   const fetchData = async () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/report/getOwnerReport/1`
+        `/v1/report/getOwnerReport/${ownerId}`
       );
       setOwnerReport(response?.data?.results);
       console.log(response);

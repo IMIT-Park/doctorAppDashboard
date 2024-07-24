@@ -12,7 +12,9 @@ import { useNavigate } from "react-router-dom";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
+import IconSearch from "../../../components/Icon/IconSearch";
 import {formatDate} from "../../../utils/formatDate"
+
 
 const Owners = () => {
   const dispatch = useDispatch();
@@ -28,6 +30,7 @@ const Owners = () => {
   const [totalOwners, setTotalOwners] = useState(0);
   const [allOwners, setAllOwners] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     setPage(1);
@@ -40,7 +43,7 @@ const Owners = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getallowner?page=${page}&pageSize=${pageSize}`
       );
-      setTotalOwners(response?.data?.Owner?.count);
+      setTotalOwners(response?.data?.Owner?.count || []);
       setAllOwners(response?.data?.Owner?.rows);
     } catch (error) {
       console.log(error);
@@ -52,6 +55,33 @@ const Owners = () => {
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
+
+  
+  const ownerSearch = async () => {
+    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/owner/getownersearch?pageSize=1${pageSize}&page=${page}`,
+        { keyword: updatedKeyword }
+      );
+      setAllOwners(response?.data?.owners || []);
+    } catch (error) {
+      setAllOwners([]);
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (search.trim()) {
+      ownerSearch();
+    } else {
+      fetchData();
+    }
+  }, [search]);
+
 
   const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =
     useBlockUnblock(fetchData);
@@ -67,7 +97,33 @@ const Owners = () => {
               <CountUp start={0} end={totalOwners} duration={3} />
             </span>
           </Tippy>
+          <div className="ml-auto">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                ownerSearch();
+              }}
+              className="mx-auto w-full mb-2"
+            >
+              <div className="relative">
+                <input
+                  type="text"
+                  value={search}
+                  placeholder="Search Owners..."
+                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-green absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                >
+                  <IconSearch className="mx-auto" />
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
+
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (

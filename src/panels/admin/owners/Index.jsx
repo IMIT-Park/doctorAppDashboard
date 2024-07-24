@@ -25,7 +25,7 @@ const Owners = () => {
   }, [dispatch]);
 
   const [page, setPage] = useState(1);
-  const PAGE_SIZES = [10, 20, 30, 50, 100];
+  const PAGE_SIZES = [3, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [totalOwners, setTotalOwners] = useState(0);
   const [allOwners, setAllOwners] = useState([]);
@@ -34,7 +34,12 @@ const Owners = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [pageSize]);
+  }, [pageSize,search]);
+
+  useEffect(() => {
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize;
+  }, [page, pageSize]);
 
   // Fetch data function
   const fetchData = async () => {
@@ -61,9 +66,12 @@ const Owners = () => {
     const updatedKeyword = isNaN(search) ? search : `+91${search}`;
     try {
       const response = await NetworkHandler.makePostRequest(
-        `/v1/owner/getownersearch?pageSize=1${pageSize}&page=${page}`,
+        `/v1/owner/getownersearch?pageSize=${pageSize}&page=${page}`,
         { keyword: updatedKeyword }
       );
+      console.log(response?.data?.owners);
+      console.log(response?.data);
+      setTotalOwners(response?.data?.pagination?.total || 0);
       setAllOwners(response?.data?.owners || []);
     } catch (error) {
       setAllOwners([]);
@@ -80,7 +88,7 @@ const Owners = () => {
     } else {
       fetchData();
     }
-  }, [search]);
+  }, [search, page, pageSize]);
 
 
   const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =

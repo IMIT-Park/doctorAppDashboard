@@ -13,8 +13,7 @@ import NetworkHandler from "../../../utils/NetworkHandler";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import IconSearch from "../../../components/Icon/IconSearch";
-import {formatDate} from "../../../utils/formatDate"
-
+import { formatDate } from "../../../utils/formatDate";
 
 const Owners = () => {
   const dispatch = useDispatch();
@@ -25,21 +24,17 @@ const Owners = () => {
   }, [dispatch]);
 
   const [page, setPage] = useState(1);
-  const PAGE_SIZES = [3, 20, 30, 50, 100];
+  const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [totalOwners, setTotalOwners] = useState(0);
+  const [totalOwnersCount, setTotalOwnersCount] = useState(0);
   const [allOwners, setAllOwners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     setPage(1);
-  }, [pageSize,search]);
-
-  useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-  }, [page, pageSize]);
+  }, [pageSize, search]);
 
   // Fetch data function
   const fetchData = async () => {
@@ -48,7 +43,8 @@ const Owners = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getallowner?page=${page}&pageSize=${pageSize}`
       );
-      setTotalOwners(response?.data?.Owner?.count || []);
+      setTotalOwnersCount(response?.data?.Owner?.count || 0);
+      setTotalOwners(response?.data?.Owner?.count || 0);
       setAllOwners(response?.data?.Owner?.rows);
     } catch (error) {
       console.log(error);
@@ -57,11 +53,6 @@ const Owners = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
-
-  
   const ownerSearch = async () => {
     const updatedKeyword = isNaN(search) ? search : `+91${search}`;
     try {
@@ -69,8 +60,6 @@ const Owners = () => {
         `/v1/owner/getownersearch?pageSize=${pageSize}&page=${page}`,
         { keyword: updatedKeyword }
       );
-      console.log(response?.data?.owners);
-      console.log(response?.data);
       setTotalOwners(response?.data?.pagination?.total || 0);
       setAllOwners(response?.data?.owners || []);
     } catch (error) {
@@ -90,7 +79,6 @@ const Owners = () => {
     }
   }, [search, page, pageSize]);
 
-
   const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =
     useBlockUnblock(fetchData);
 
@@ -99,10 +87,12 @@ const Owners = () => {
       <ScrollToTop />
       <div className="panel">
         <div className="flex items-center gap-1 mb-3">
-          <h5 className="font-semibold text-lg dark:text-white-light">Owners</h5>
+          <h5 className="font-semibold text-lg dark:text-white-light">
+            Owners
+          </h5>
           <Tippy content="Total Owners">
             <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-              <CountUp start={0} end={totalOwners} duration={3} />
+              <CountUp start={0} end={totalOwnersCount} duration={3} />
             </span>
           </Tippy>
           <div className="ml-auto">
@@ -167,7 +157,8 @@ const Owners = () => {
                   accessor: "created_at",
                   title: "Account Creation Date",
                   textAlignment: "center",
-                  render: (row) => row?.created_at && formatDate(row?.created_at),
+                  render: (row) =>
+                    row?.created_at && formatDate(row?.created_at),
                 },
                 {
                   accessor: "salesperson_name",

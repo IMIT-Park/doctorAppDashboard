@@ -1,11 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import IconLockDots from "../../../components/Icon/IconLockDots";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
 import { UserContext } from "../../../contexts/UseContext";
 
-
 const OwnerProfile = () => {
-
   const { userDetails } = useContext(UserContext);
 
   const createUserData = (userDetails) => {
@@ -108,62 +106,49 @@ const OwnerProfile = () => {
     }
   };
 
-  console.log(userData)
   return (
     <div>
-      <div className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black">
-      <div className="flex flex-col items-start">
-          
-
-            <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
-                          <div className=" w-full flex items-start justify-between gap-2 mt-2 ">
-                          {userData?.additionalDetails?.name}
-
-                          </div>
-                        </div>
-
-          </div>
-        <div className="space-y-4">
-          <div className="flex flex-col items-start">
-            <div className="text-base font-medium text-gray-500">Address:</div>
-            <div className="border dark:border-slate-800 dark:text-slat-00 rounded w-full text-base p-2 min-h-20">
-            {userData?.additionalDetails?.address}
+      <div className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-8 mb-5 bg-white dark:bg-black">
+        <div className="flex flex-col items-start">
+          <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
+            <div className="w-full flex items-start justify-between gap-2 mt-2">
+              {userData?.additionalDetails?.name}
             </div>
           </div>
+        </div>
+        <div className="space-y-4">
           <div className="flex flex-col md:flex-row items-start gap-5">
             <div className="flex flex-col items-start w-full">
-              <div className="text-base font-medium text-gray-500 ">Place:</div>
-              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-              {userData?.additionalDetails?.place}
+              <div className="text-base font-medium text-gray-500">Address:</div>
+              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2 min-h-20">
+                {userData?.additionalDetails?.address}
               </div>
             </div>
             <div className="flex flex-col items-start w-full">
               <div className="text-base font-medium text-gray-500">Email:</div>
               <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-              {userData?.email}
-               
+                {userData?.email}
               </div>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-start gap-5">
+          
             <div className="flex flex-col items-start w-full">
-              <div className="text-base font-medium text-gray-500 ">
-                Username:
-              </div>
+              <div className="text-base font-medium text-gray-500">Username:</div>
               <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-              {userData?.user_name}
+                {userData?.user_name}
               </div>
             </div>
             <div className="flex flex-col items-start w-full">
               <div className="text-base font-medium text-gray-500">Phone:</div>
               <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-              {userData?.additionalDetails?.phone}
+                {userData?.additionalDetails?.phone}
               </div>
             </div>
           </div>
+         
         </div>
       </div>
-    
     </div>
   );
 };

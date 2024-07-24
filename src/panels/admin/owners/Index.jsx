@@ -61,7 +61,7 @@ const Owners = () => {
     const updatedKeyword = isNaN(search) ? search : `+91${search}`;
     try {
       const response = await NetworkHandler.makePostRequest(
-        `/v1/owner/getownersearch?pageSize=1${pageSize}&page=${page}`,
+        `/v1/owner/getownersearch?pageSize=${pageSize}&page=${page}`,
         { keyword: updatedKeyword }
       );
       setAllOwners(response?.data?.owners || []);

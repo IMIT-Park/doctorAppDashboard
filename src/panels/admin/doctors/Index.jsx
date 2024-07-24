@@ -63,6 +63,31 @@ const Doctors = () => {
     fetchData();
   }, [page, pageSize]);
 
+  const doctorSearch = async () => {
+    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/getalldoctordata?pageSize=${pageSize}&page=${page}`,
+        { keyword: updatedKeyword }
+      );
+      setAllDoctors(response?.data?.doctors || []);
+    } catch (error) {
+      setAllDoctors([]);
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (search.trim()) {
+      doctorSearch();
+    } else {
+      fetchData();
+    }
+  }, [search]);
+
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchData);
@@ -166,7 +191,11 @@ const Doctors = () => {
                 { accessor: "qualification", title: "Qualification" },
                 { accessor: "specialization", title: "Specialization" },
                 { accessor: "address", title: "Address" },
-                { accessor: "fees", title: "Fees",render: (row) => `₹${row?.fees}`, },
+                {
+                  accessor: "fees",
+                  title: "Fees",
+                  render: (row) => `₹${row?.fees}`,
+                },
                 {
                   accessor: "visibility",
                   title: "Visibility",

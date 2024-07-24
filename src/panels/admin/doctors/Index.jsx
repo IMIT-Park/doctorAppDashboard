@@ -183,11 +183,11 @@ const Doctors = () => {
                   title: "Gender",
                   cellsStyle: { textTransform: "capitalize" },
                 },
-                {
-                  accessor: "dateOfBirth",
-                  title: "Date of Birth",
-                  render: (row) => formatDate(row?.dateOfBirth),
-                },
+                // {
+                //   accessor: "dateOfBirth",
+                //   title: "Date of Birth",
+                //   render: (row) => formatDate(row?.dateOfBirth),
+                // },
                 { accessor: "qualification", title: "Qualification" },
                 { accessor: "specialization", title: "Specialization" },
                 { accessor: "address", title: "Address" },
@@ -201,25 +201,38 @@ const Doctors = () => {
                   title: "Visibility",
                   render: (row) => (row.visibility ? "Visible" : "Hidden"),
                 },
+                // {
+                //   accessor: "Actions",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <CustomSwitch
+                //       checked={rowData?.status}
+                //       onChange={() =>
+                //         showDoctorAlert(
+                //           rowData?.user_id,
+                //           rowData?.status ? "block" : "activate",
+                //           "doctor"
+                //         )
+                //       }
+                //       tooltipText={rowData?.status ? "Block" : "Unblock"}
+                //       uniqueId={`clinic${rowData?.clinic_id}`}
+                //       size="normal"
+                //     />
+                //   ),
+                // },
+
                 {
-                  accessor: "Actions",
+                  accessor: "Status",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <CustomSwitch
-                      checked={rowData?.status}
-                      onChange={() =>
-                        showDoctorAlert(
-                          rowData?.user_id,
-                          rowData?.status ? "block" : "activate",
-                          "doctor"
-                        )
-                      }
-                      tooltipText={rowData?.status ? "Block" : "Unblock"}
-                      uniqueId={`clinic${rowData?.clinic_id}`}
-                      size="normal"
-                    />
+                    <div className="flex justify-center items-center">
+                      <span className={`text-sm font-medium ${rowData?.status ? "text-green-500" : "text-red-500"}`}>
+                        {rowData?.status ? "Active" : "Blocked"}
+                      </span>
+                    </div>
                   ),
-                },
+                }
+                
               ]}
               totalRecords={totalDoctors}
               recordsPerPage={pageSize}

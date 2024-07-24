@@ -241,43 +241,58 @@ const Clinics = () => {
                     </div>
                   ),
                 },
+                // {
+                //   accessor: "googleLocation",
+                //   title: "Location",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <button
+                //       type="button"
+                //       onClick={(e) => {
+                //         e.stopPropagation();
+                //         handleGetLocation(rowData.googleLocation);
+                //       }}
+                //       className="btn btn-success btn-sm py-1"
+                //     >
+                //       <IconMenuContacts className="mr-1 w-4" />
+                //       View Location
+                //     </button>
+                //   ),
+                // },
+                // {
+                //   accessor: "Actions",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <CustomSwitch
+                //       checked={rowData?.User?.status}
+                //       onChange={() =>
+                //         showClinicAlert(
+                //           rowData?.user_id,
+                //           rowData?.User?.status ? "block" : "activate",
+                //           "clinic"
+                //         )
+                //       }
+                //       tooltipText={rowData?.User?.status ? "Block" : "Unblock"}
+                //       uniqueId={`clinic${rowData?.clinic_id}`}
+                //       size="normal"
+                //     />
+                //   ),
+                // },
+
                 {
-                  accessor: "googleLocation",
-                  title: "Location",
+                  accessor: "Status",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleGetLocation(rowData.googleLocation);
-                      }}
-                      className="btn btn-success btn-sm py-1"
-                    >
-                      <IconMenuContacts className="mr-1 w-4" />
-                      View Location
-                    </button>
+                    <div className="flex justify-center items-center">
+                      <span className={`text-sm font-medium ${rowData?.User?.status ? "text-green-500" : "text-red-500"}`}>
+                        {rowData?.User?.status ? "Active" : "Blocked"}
+                      </span>
+                    </div>
                   ),
-                },
-                {
-                  accessor: "Actions",
-                  textAlignment: "center",
-                  render: (rowData) => (
-                    <CustomSwitch
-                      checked={rowData?.User?.status}
-                      onChange={() =>
-                        showClinicAlert(
-                          rowData?.user_id,
-                          rowData?.User?.status ? "block" : "activate",
-                          "clinic"
-                        )
-                      }
-                      tooltipText={rowData?.User?.status ? "Block" : "Unblock"}
-                      uniqueId={`clinic${rowData?.clinic_id}`}
-                      size="normal"
-                    />
-                  ),
-                },
+                }
+                
+                
+                
               ]}
               totalRecords={totalClinics}
               recordsPerPage={pageSize}

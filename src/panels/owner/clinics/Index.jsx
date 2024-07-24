@@ -434,8 +434,28 @@ const Clinics = () => {
                 //   ),
                 // },
 
+                // Column configuration for the status
                 {
-                  accessor: "Actions",
+                  accessor: "status",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`ml-2 ${
+                          rowData?.User?.status
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {rowData?.User?.status ? "Active" : "Blocked"}
+                      </span>
+                    </div>
+                  ),
+                },
+
+                // Column configuration for the actions
+                {
+                  accessor: "actions",
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex gap-4 items-center w-max mx-auto">
@@ -450,17 +470,6 @@ const Clinics = () => {
                           <IconEdit className="w-4.5 h-4.5" />
                         </button>
                       </Tippy>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`ml-2 ${
-                            rowData?.User?.status
-                              ? "text-green-500"
-                              : "text-red-500"
-                          }`}
-                        >
-                          {rowData?.User?.status ? "Active" : "Blocked"}
-                        </span>
-                      </div>
                     </div>
                   ),
                 },

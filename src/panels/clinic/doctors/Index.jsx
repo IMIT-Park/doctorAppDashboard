@@ -384,7 +384,7 @@ const ClinicDoctor = () => {
                   accessor: "status",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <div className="flex items-center gap-5">
+                    <div className="flex items-center justify-center">
                       <span
                         className={`ml-2 ${
                           rowData?.status ? "text-green-500" : "text-red-500"
@@ -392,6 +392,14 @@ const ClinicDoctor = () => {
                       >
                         {rowData?.status ? "Active" : "Blocked"}
                       </span>
+                    </div>
+                  ),
+                },
+                {
+                  accessor: "actions",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="flex items-center justify-center">
                       <button
                         type="button"
                         className="btn btn-danger btn-sm h-fit"
@@ -405,6 +413,7 @@ const ClinicDoctor = () => {
                     </div>
                   ),
                 },
+                
               ]}
               totalRecords={totalDoctors}
               recordsPerPage={pageSize}

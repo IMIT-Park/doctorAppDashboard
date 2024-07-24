@@ -321,11 +321,11 @@ const ClinicDoctor = () => {
                 { accessor: "email", title: "Email" },
                 { accessor: "phone", title: "Phone" },
                 { accessor: "gender", title: "Gender" },
-                {
-                  accessor: "dateOfBirth",
-                  title: "Date of Birth",
-                  render: (row) => formatDate(row?.dateOfBirth),
-                },
+                // {
+                //   accessor: "dateOfBirth",
+                //   title: "Date of Birth",
+                //   render: (row) => formatDate(row?.dateOfBirth),
+                // },
                 {
                   accessor: "qualification",
                   title: "Qualification",
@@ -347,25 +347,51 @@ const ClinicDoctor = () => {
                   title: "Visibility",
                   render: (row) => (row.visibility ? "Visible" : "Hidden"),
                 },
+                // {
+                //   accessor: "status",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <div className="flex items-center gap-5">
+                //       <CustomSwitch
+                //         checked={rowData?.status}
+                //         onChange={() =>
+                //           showDoctorAlert(
+                //             rowData?.user_id,
+                //             rowData?.status ? "block" : "activate",
+                //             "doctor"
+                //           )
+                //         }
+                //         tooltipText={rowData?.status ? "Block" : "Unblock"}
+                //         uniqueId={`doctor${rowData?.doctor_id}`}
+                //         size="normal"
+                //       />
+
+                //       <button
+                //         type="button"
+                //         className="btn btn-danger btn-sm h-fit"
+                //         onClick={(e) => {
+                //           e.stopPropagation();
+                //           openRemoveModal(rowData?.doctor_id);
+                //         }}
+                //       >
+                //         Remove
+                //       </button>
+                //     </div>
+                //   ),
+                // },
+
                 {
                   accessor: "status",
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex items-center gap-5">
-                      <CustomSwitch
-                        checked={rowData?.status}
-                        onChange={() =>
-                          showDoctorAlert(
-                            rowData?.user_id,
-                            rowData?.status ? "block" : "activate",
-                            "doctor"
-                          )
-                        }
-                        tooltipText={rowData?.status ? "Block" : "Unblock"}
-                        uniqueId={`doctor${rowData?.doctor_id}`}
-                        size="normal"
-                      />
-
+                      <span
+                        className={`ml-2 ${
+                          rowData?.status ? "text-green-500" : "text-red-500"
+                        }`}
+                      >
+                        {rowData?.status ? "Active" : "Blocked"}
+                      </span>
                       <button
                         type="button"
                         className="btn btn-danger btn-sm h-fit"
@@ -402,7 +428,7 @@ const ClinicDoctor = () => {
         setInput={setInput}
         formSubmit={saveDoctorPerson}
         buttonLoading={buttonLoading}
-        setButtonLoading={setButtonLoading}      
+        setButtonLoading={setButtonLoading}
         errors={errors}
         setErrors={setErrors}
       />

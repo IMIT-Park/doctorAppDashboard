@@ -111,8 +111,18 @@ const OwnerProfile = () => {
   console.log(userData)
   return (
     <div>
-      <div className="p-4 bg-white shadow-md rounded-lg pb-8">
-        <h2 className="text-xl font-semibold mb-4">Sajna</h2>
+      <div className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black">
+      <div className="flex flex-col items-start">
+          
+
+            <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
+                          <div className=" w-full flex items-start justify-between gap-2 mt-2 ">
+                          {userData?.additionalDetails?.name}
+
+                          </div>
+                        </div>
+
+          </div>
         <div className="space-y-4">
           <div className="flex flex-col items-start">
             <div className="text-base font-medium text-gray-500">Address:</div>
@@ -153,88 +163,7 @@ const OwnerProfile = () => {
           </div>
         </div>
       </div>
-      <div className="pt-8 lg:col-span-2 xl:col-span-3 max-w-[70rem]">
-        <form
-          className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4 mb-5 bg-white dark:bg-black"
-          onSubmit={handleChangePassword}
-        >
-          <h6 className="text-lg font-bold mb-5">Change Password</h6>
-          <div className="flex flex-col sm:flex-row">
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label htmlFor="Password">Current Password</label>
-                <div
-                  className={`relative text-white-dark ${
-                    isIncorrect && "has-error"
-                  }`}
-                >
-                  <input
-                    id="oldpassword"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Current Password"
-                    className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
-                    value={data.oldpassword}
-                    onChange={(e) =>
-                      setData({ ...data, oldpassword: e.target.value })
-                    }
-                    onKeyDown={handleCurrentPasswordKeyDown}
-                  />
-                  <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                    <IconLockDots fill={true} />
-                  </span>
-                  <span
-                    title={showPassword ? "hide password" : "show password"}
-                    className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <IconEye /> : <IconCloseEye />}
-                  </span>
-                </div>
-                {isIncorrect && (
-                  <div className="text-danger mt-0.5 ml-1">
-                    Current Password is incorrect !
-                  </div>
-                )}
-              </div>
-              <div>
-                <label htmlFor="Password">New Password</label>
-                <div className="relative text-white-dark">
-                  <input
-                    id="newpassword"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="New Password"
-                    className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
-                    value={data.newpassword}
-                    onChange={(e) =>
-                      setData({ ...data, newpassword: e.target.value })
-                    }
-                    onKeyDown={handleNewPasswordKeyDown}
-                  />
-                  <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                    <IconLockDots fill={true} />
-                  </span>
-                  <span
-                    title={showPassword ? "hide password" : "show password"}
-                    className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <IconEye /> : <IconCloseEye />}
-                  </span>
-                </div>
-              </div>
-              <div className="sm:col-span-2 mt-3 ml-auto">
-                <button type="submit" className="btn btn-green">
-                  {loading ? (
-                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle shrink-0" />
-                  ) : (
-                    "Change"
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
+    
     </div>
   );
 };

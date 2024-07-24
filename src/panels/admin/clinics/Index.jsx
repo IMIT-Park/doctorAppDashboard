@@ -53,8 +53,8 @@ const Clinics = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getall?pageSize=${pageSize}&page=${page}`
       );
-      setTotalClinics(response.data?.Clinic?.count);
-      setAllClinics(response.data?.Clinic?.rows);
+      setTotalClinics(response?.data?.Clinic?.count);
+      setAllClinics(response?.data?.Clinic?.rows);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -68,6 +68,32 @@ const Clinics = () => {
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
+
+  const clinicSearch = async () => {
+    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/clinic/getallclinicdata?pageSize=1${pageSize}&page=${page}`,
+        { keyword: updatedKeyword }
+      );
+
+      setAllClinics(response?.data?.clinics || []);
+    } catch (error) {
+      setAllClinics([]);
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (search.trim()) {
+      clinicSearch();
+    } else {
+      fetchData();
+    }
+  }, [search]);
 
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
@@ -100,7 +126,10 @@ const Clinics = () => {
           </div>
           <div>
             <form
-              onSubmit={(e) => handleSubmit(e)}
+              onSubmit={(e) => {
+                e.preventDefault();
+                clinicSearch();
+              }}
               className="mx-auto w-full mb-2"
             >
               <div className="relative">

@@ -17,7 +17,6 @@ const AddDoctor = ({
   errors,
   setErrors,
   buttonLoading,
-
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showComfirmPassword, setShowComfirmPassword] = useState(false);

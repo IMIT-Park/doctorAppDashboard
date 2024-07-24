@@ -125,27 +125,51 @@ const Booking = () => {
                 { accessor: "User.email", title: "Email" },
 
                 { accessor: "phone", title: "Phone" },
+                // {
+                //   accessor: "Actions",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <div className="flex gap-6 items-center w-max mx-auto">
+                //       <CustomSwitch
+                //         checked={rowData?.User?.status}
+                //         onChange={() =>
+                //           showClinicAlert(
+                //             rowData?.user_id,
+                //             rowData?.User?.status ? "block" : "activate",
+                //             "clinic"
+                //           )
+                //         }
+                //         tooltipText={
+                //           rowData?.User?.status ? "Block" : "Unblock"
+                //         }
+                //         uniqueId={`clinic${rowData?.clinic_id}`}
+                //         size="normal"
+                //       />
+
+                //       <button
+                //         type="button"
+                //         onClick={(e) => {
+                //           e.stopPropagation();
+                //           handleAddBooking(rowData?.clinic_id);
+                //         }}
+                //         className="btn btn-green btn-sm py-1"
+                //       >
+                //         <IconPlus className="ltr:mr-2 rtl:ml-2" />
+                //         Add Booking
+                //       </button>
+                //     </div>
+                //   ),
+                // },
+
                 {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex gap-6 items-center w-max mx-auto">
-                      <CustomSwitch
-                        checked={rowData?.User?.status}
-                        onChange={() =>
-                          showClinicAlert(
-                            rowData?.user_id,
-                            rowData?.User?.status ? "block" : "activate",
-                            "clinic"
-                          )
-                        }
-                        tooltipText={
-                          rowData?.User?.status ? "Block" : "Unblock"
-                        }
-                        uniqueId={`clinic${rowData?.clinic_id}`}
-                        size="normal"
-                      />
-
+                      <span className={`ml-2 ${rowData?.User?.status ? "text-green-500" : "text-red-500"}`}>
+                        {rowData?.User?.status ? "Active" : "Blocked"}
+                      </span>
+                      
                       <button
                         type="button"
                         onClick={(e) => {
@@ -159,7 +183,9 @@ const Booking = () => {
                       </button>
                     </div>
                   ),
-                },
+                }
+
+                
               ]}
               totalRecords={totalClinics}
               recordsPerPage={pageSize}

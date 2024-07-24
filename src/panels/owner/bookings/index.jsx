@@ -162,14 +162,22 @@ const Booking = () => {
                 // },
 
                 {
-                  accessor: "Actions",
+                  accessor: "status",
+                  textAlignment: "center", 
+                  render: (rowData) => (
+                    <div className="flex justify-center items-center gap-2">
+                      <span className={`${rowData?.User?.status ? "text-green-500" : "text-red-500"}`}>
+                        {rowData?.User?.status ? "Active" : "Blocked"}
+                      </span>
+                    </div>
+                  ),
+                },
+                
+                {
+                  accessor: "actions",
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex gap-6 items-center w-max mx-auto">
-                      <span className={`ml-2 ${rowData?.User?.status ? "text-green-500" : "text-red-500"}`}>
-                        {rowData?.User?.status ? "Active" : "Blocked"}
-                      </span>
-                      
                       <button
                         type="button"
                         onClick={(e) => {
@@ -183,7 +191,8 @@ const Booking = () => {
                       </button>
                     </div>
                   ),
-                }
+                },
+                
 
                 
               ]}

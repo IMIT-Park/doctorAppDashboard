@@ -17,6 +17,7 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import SubscriptionDetailsModal from "../../../components/SubscriptionDetailsModal/SubscriptionDetailsModal";
 import { UserContext } from "../../../contexts/UseContext";
+import * as XLSX from "xlsx";
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -109,6 +110,35 @@ const Clinics = () => {
     setSelectedPlan(null);
   };
 
+  const exportToExcel = () => {
+    const filteredClinics = allClinics.map((clinic, index) => ({
+      No: index + 1,
+      Name: clinic.name,
+      Email: clinic.email,
+      Phone: clinic.phone,
+      Place: clinic.place,
+      Address: clinic.address,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(filteredClinics);
+    const columnWidths = [
+      { wpx: 50 },
+      { wpx: 200 },
+      { wpx: 250 },
+      { wpx: 120 },
+      { wpx: 150 },
+      { wpx: 300 },
+    ];
+    worksheet["!cols"] = columnWidths;
+
+    const rowHeights = filteredClinics.map(() => ({ hpx: 20 }));
+    rowHeights.unshift({ hpx: 20 });
+    worksheet["!rows"] = rowHeights;
+    
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
+    XLSX.writeFile(workbook, "ClinicsData.xlsx");
+  };
+
   return (
     <div>
       <ScrollToTop />
@@ -148,6 +178,16 @@ const Clinics = () => {
                 </button>
               </div>
             </form>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={exportToExcel}
+            >
+              Export to Excel
+            </button>
           </div>
         </div>
         {loading ? (

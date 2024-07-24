@@ -14,6 +14,7 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import IconSearch from "../../../components/Icon/IconSearch";
 import { formatDate } from "../../../utils/formatDate";
+import * as XLSX from "xlsx";
 
 const Owners = () => {
   const dispatch = useDispatch();
@@ -82,19 +83,49 @@ const Owners = () => {
   const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =
     useBlockUnblock(fetchData);
 
+  // Export to Excel function
+  const exportToExcel = () => {
+    const filteredOwners = allOwners.map((owner, index) => ({
+      No: index + 1,
+      Name: owner.name,
+      Email: owner.email,
+      Phone: owner.phone,
+      Address: owner.address,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(filteredOwners);
+    const columnWidths = [
+      { wpx: 50 },
+      { wpx: 200 },
+      { wpx: 250 },
+      { wpx: 120 },
+      { wpx: 300 },
+    ];
+    worksheet["!cols"] = columnWidths;
+
+    const rowHeights = filteredOwners.map(() => ({ hpx: 20 }));
+    rowHeights.unshift({ hpx: 20 });
+    worksheet["!rows"] = rowHeights;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
+    XLSX.writeFile(workbook, "ClinicsData.xlsx");
+  };
+
   return (
     <div>
       <ScrollToTop />
       <div className="panel">
-        <div className="flex items-center gap-1 mb-3">
-          <h5 className="font-semibold text-lg dark:text-white-light">
-            Owners
-          </h5>
-          <Tippy content="Total Owners">
-            <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-              <CountUp start={0} end={totalOwnersCount} duration={3} />
-            </span>
-          </Tippy>
+        <div className="flex items-center flex-wrap gap-3 justify-between mb-5">
+          <div className="flex items-center gap-1">
+            <h5 className="font-semibold text-lg dark:text-white-light">
+              Owners
+            </h5>
+            <Tippy content="Total Owners">
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
+                <CountUp start={0} end={totalOwnersCount} duration={3} />
+              </span>
+            </Tippy>
+          </div>
           <div className="ml-auto">
             <form
               onSubmit={(e) => {
@@ -119,6 +150,16 @@ const Owners = () => {
                 </button>
               </div>
             </form>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={exportToExcel}
+            >
+              Export to Excel
+            </button>
           </div>
         </div>
 

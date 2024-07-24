@@ -148,7 +148,7 @@ const Clinics = () => {
   };
 
   const openEditModal = (clinic) => {
-    const phoneWithoutCountryCode = clinic.phone.replace(/^\+91/, '');
+    const phoneWithoutCountryCode = clinic.phone.replace(/^\+91/, "");
     setInput({
       name: clinic.name,
       email: clinic.User.email,
@@ -377,26 +377,62 @@ const Clinics = () => {
                     </div>
                   ),
                 },
-                {
-                  accessor: "googleLocation",
-                  title: "Location",
-                  textAlignment: "center",
-                  render: (rowData) => (
-                    <div className="grid place-items-center">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleGetLocation(rowData.googleLocation);
-                        }}
-                        className="btn btn-success btn-sm py-1"
-                      >
-                        <IconMenuContacts className="mr-1 w-4" />
-                        View Location
-                      </button>
-                    </div>
-                  ),
-                },
+                // {
+                //   accessor: "googleLocation",
+                //   title: "Location",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <div className="grid place-items-center">
+                //       <button
+                //         type="button"
+                //         onClick={(e) => {
+                //           e.stopPropagation();
+                //           handleGetLocation(rowData.googleLocation);
+                //         }}
+                //         className="btn btn-success btn-sm py-1"
+                //       >
+                //         <IconMenuContacts className="mr-1 w-4" />
+                //         View Location
+                //       </button>
+                //     </div>
+                //   ),
+                // },
+
+                // {
+                //   accessor: "Actions",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <div className="flex gap-4 items-center w-max mx-auto">
+                //       <Tippy content="Edit">
+                //         <button
+                //           className="flex hover:text-info"
+                //           onClick={(e) => {
+                //             e.stopPropagation();
+                //             openEditModal(rowData);
+                //           }}
+                //         >
+                //           <IconEdit className="w-4.5 h-4.5" />
+                //         </button>
+                //       </Tippy>
+                //       <CustomSwitch
+                //         checked={rowData?.User?.status}
+                //         onChange={() =>
+                //           showClinicAlert(
+                //             rowData?.user_id,
+                //             rowData?.User?.status ? "block" : "activate",
+                //             "clinic"
+                //           )
+                //         }
+                //         tooltipText={
+                //           rowData?.User?.status ? "Block" : "Unblock"
+                //         }
+                //         uniqueId={`clinic${rowData?.clinic_id}`}
+                //         size="normal"
+                //       />
+
+                //     </div>
+                //   ),
+                // },
 
                 {
                   accessor: "Actions",
@@ -414,21 +450,17 @@ const Clinics = () => {
                           <IconEdit className="w-4.5 h-4.5" />
                         </button>
                       </Tippy>
-                      <CustomSwitch
-                        checked={rowData?.User?.status}
-                        onChange={() =>
-                          showClinicAlert(
-                            rowData?.user_id,
-                            rowData?.User?.status ? "block" : "activate",
-                            "clinic"
-                          )
-                        }
-                        tooltipText={
-                          rowData?.User?.status ? "Block" : "Unblock"
-                        }
-                        uniqueId={`clinic${rowData?.clinic_id}`}
-                        size="normal"
-                      />
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`ml-2 ${
+                            rowData?.User?.status
+                              ? "text-green-500"
+                              : "text-red-500"
+                          }`}
+                        >
+                          {rowData?.User?.status ? "Active" : "Blocked"}
+                        </span>
+                      </div>
                     </div>
                   ),
                 },

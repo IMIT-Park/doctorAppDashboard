@@ -32,7 +32,7 @@ const CustomSwitch = ({
             isLarge
               ? "before:w-4 before:h-4 peer-checked:before:left-7"
               : "before:w-[14px] before:h-[14px] peer-checked:before:left-7"
-          } before:rounded-full peer-checked:bg-primary before:transition-all before:duration-300`}
+          } before:rounded-full peer-checked:bg-[#006241] before:transition-all before:duration-300`}
         ></span>
       </label>
     </Tippy>

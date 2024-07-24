@@ -18,7 +18,7 @@ const Patients = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const userDetails = sessionStorage.getItem("userData");
+  const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
 
   const { bookingDetails, setBookingDetails } = useContext(UserContext);

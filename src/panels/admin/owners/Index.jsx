@@ -13,6 +13,8 @@ import NetworkHandler from "../../../utils/NetworkHandler";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import IconSearch from "../../../components/Icon/IconSearch";
+import {formatDate} from "../../../utils/formatDate"
+
 
 const Owners = () => {
   const dispatch = useDispatch();
@@ -20,7 +22,8 @@ const Owners = () => {
 
   useEffect(() => {
     dispatch(setPageTitle("Owners"));
-  });
+  }, [dispatch]);
+
   const [page, setPage] = useState(1);
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
@@ -33,12 +36,7 @@ const Owners = () => {
     setPage(1);
   }, [pageSize]);
 
-  useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-  }, [page, pageSize]);
-
-  // fetch function
+  // Fetch data function
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -47,20 +45,18 @@ const Owners = () => {
       );
       setTotalOwners(response?.data?.Owner?.count || []);
       setAllOwners(response?.data?.Owner?.rows);
-      setLoading(false);
     } catch (error) {
       console.log(error);
-      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
 
-  // fetching Mds
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
 
+  
   const ownerSearch = async () => {
     const updatedKeyword = isNaN(search) ? search : `+91${search}`;
     try {
@@ -86,7 +82,7 @@ const Owners = () => {
     }
   }, [search]);
 
-  // block and unblock handler
+
   const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =
     useBlockUnblock(fetchData);
 
@@ -94,13 +90,11 @@ const Owners = () => {
     <div>
       <ScrollToTop />
       <div className="panel">
-        <div className="flex items-center gap-1 mb-3 w-full">
-          <h5 className="font-semibold text-lg dark:text-white-light">
-            Owners
-          </h5>
+        <div className="flex items-center gap-1 mb-3">
+          <h5 className="font-semibold text-lg dark:text-white-light">Owners</h5>
           <Tippy content="Total Owners">
             <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-              <CountUp start={0} end={totalOwners} duration={3}></CountUp>
+              <CountUp start={0} end={totalOwners} duration={3} />
             </span>
           </Tippy>
           <div className="ml-auto">
@@ -162,6 +156,20 @@ const Owners = () => {
                 { accessor: "phone" },
                 { accessor: "address", title: "Address" },
                 {
+                  accessor: "created_at",
+                  title: "Account Creation Date",
+                  textAlignment: "center",
+                  render: (row) => row?.created_at && formatDate(row?.created_at),
+                },
+                {
+                  accessor: "salesperson_name",
+                  title: "Entered By",
+                  render: (row) =>
+                    row.salesperson_id
+                      ? row.salesperson?.name || "Salesperson"
+                      : "Application",
+                },
+                {
                   accessor: "Actions",
                   textAlignment: "center",
                   render: (rowData) => (
@@ -193,7 +201,7 @@ const Owners = () => {
               onRecordsPerPageChange={setPageSize}
               minHeight={200}
               paginationText={({ from, to, totalRecords }) =>
-                `Showing  ${from} to ${to} of ${totalRecords} entries`
+                `Showing ${from} to ${to} of ${totalRecords} entries`
               }
             />
           </div>

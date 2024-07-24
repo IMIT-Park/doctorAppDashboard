@@ -42,6 +42,10 @@ const LoginBoxed = () => {
 
   const { userDetails, setUserDetails } = useContext(UserContext);
 
+  const accessToken = localStorage.getItem("accessToken");
+
+  
+
   // warning alert closer
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -108,9 +112,9 @@ const LoginBoxed = () => {
         const { accessToken, refreshToken, user } = data;
 
         // Store data in sessionStorage
-        sessionStorage.setItem("accessToken", accessToken);
-        sessionStorage.setItem("refreshToken", refreshToken);
-        sessionStorage.setItem("userData", JSON.stringify(user));
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("userData", JSON.stringify(user));
 
         // Update the user details in context
         setUserDetails(user);
@@ -170,6 +174,8 @@ const LoginBoxed = () => {
       handleLogin(e);
     }
   };
+
+
 
   return (
     <div>

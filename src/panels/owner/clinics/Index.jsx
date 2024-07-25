@@ -98,8 +98,9 @@ const Clinics = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getallclinics/${ownerId}?page=${page}&pagesize=${pageSize}`
       );
+      console.log(response.data);
       setTotalClinics(response.data?.Clinic?.count);
-      setAllClinics(response.data?.Clinic?.rows);
+      setAllClinics(response.data?.Clinic);
       setLoading(false);
       console.log(response.data?.Clinic?.rows);
     } catch (error) {
@@ -301,6 +302,7 @@ const Clinics = () => {
     setsubscriptionAddModal(true);
   };
 
+  console.log(allClinics);
   return (
     <div>
       <ScrollToTop />
@@ -338,9 +340,9 @@ const Clinics = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allClinics}
-              idAccessor="clinic_id"
+              idAccessor="clinic.clinic_id"
               onRowClick={(row) =>
-                navigate(`/clinics/${row?.clinic_id}`, {
+                navigate(`/clinics/${row?.clinic?.clinic_id}`, {
                   state: { previousUrl: location?.pathname },
                 })
               }
@@ -352,14 +354,16 @@ const Clinics = () => {
                     <span>{(page - 1) * pageSize + index + 1}</span>
                   ),
                 },
-                { accessor: "name", title: "Name" },
-                { accessor: "User.email", title: "Email" },
-                { accessor: "User.user_name", title: "Username" },
-                { accessor: "phone", title: "Phone" },
-                { accessor: "address", title: "Address" },
-                { accessor: "place", title: "Place" },
+                { accessor: "clinic.name", title: "Name" },
+                { accessor: "clinic.User.email", title: "Email" },
+                { accessor: "clinic.User.user_name", title: "Username" },
+                { accessor: "clinic.phone", title: "Phone" },
+                { accessor: "clinic.address", title: "Address" },
+                { accessor: "clinic.place", title: "Place" },
+                { accessor: "doctor_count", title: "Doctor Count" },
+
                 {
-                  accessor: "clinic_id",
+                  accessor: "clinic.clinic_id",
                   title: "Plan Details",
                   textAlignment: "center",
                   render: (rowData) => (
@@ -436,7 +440,8 @@ const Clinics = () => {
 
                 // Column configuration for the status
                 {
-                  accessor: "status",
+                  accessor: "clinic.User.status",
+                  title: "status", 
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex items-center gap-2">

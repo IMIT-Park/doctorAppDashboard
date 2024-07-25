@@ -79,7 +79,12 @@ const ClinicSingleView = () => {
   });
 
   const [addDoctorModal, setAddDoctorModal] = useState(false);
+  const [totalDoctors, setTotalDoctors] = useState(0);
+  const[totalDoctorsCount,setTotalDoctorsCount] = useState(0)
+  const [allDoctors, setAllDoctors] = useState([]);
   const [errors, setErrors] = useState({});
+  const [search, setSearch] = useState("");
+  const [doctorLoading, setdoctorLoading] = useState(true);
 
   useEffect(() => {
     setPage(1);
@@ -99,17 +104,40 @@ const ClinicSingleView = () => {
   const clinicDetails = clinicData?.Clinic;
 
   // fetch doctors data function
-  const {
-    data: doctorData,
-    loading: doctorLoading,
-    refetch: fetchDoctorData,
-  } = useFetchData(
-    `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`,
-    {},
-    [clinicId, page, pageSize]
-  );
-  const totalDoctors = doctorData?.count || 0;
-  const allDoctors = doctorData?.alldoctors || [];
+  // const {
+  //   data: doctorData,
+  //   loading: doctorLoading,
+  //   refetch: fetchDoctorData,
+  // } = useFetchData(
+  //   `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`,
+  //   {},
+  //   [clinicId, page, pageSize]
+  // );
+  // const totalDoctors = doctorData?.count || 0;
+  // const allDoctors = doctorData?.alldoctors || [];
+
+  const fetchDoctorData = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
+      );
+      console.log(response);
+      setTotalDoctors(response?.data?.pageInfo?.totalPages);
+      setTotalDoctorsCount(response?.data?.pageInfo?.totalPages)
+      setAllDoctors(response?.data?.alldoctors);
+      setdoctorLoading(false);
+    } catch (error) {
+      console.log(error);
+      setdoctorLoading(false);
+    } finally {
+      setdoctorLoading(false);
+    }
+  };
+
+useEffect(() => {
+  fetchDoctorData();
+}, [page, pageSize]);
+
 
   // doctor image picker
   const handleFileChange = (e) => {
@@ -196,7 +224,6 @@ const ClinicSingleView = () => {
       setButtonLoading(false);
     }
   };
-
 
   const openAddDoctorModal = () => {
     setAddDoctorModal(true);
@@ -295,6 +322,30 @@ const ClinicSingleView = () => {
     }
   };
 
+  const doctorSearch = async () => {
+    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/getalldoctordata?pageSize=${pageSize}&page=${page}`,
+        { keyword: updatedKeyword }
+      );
+      setAllDoctors(response?.data?.doctors || []);
+    } catch (error) {
+      setAllDoctors([]);
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (search.trim()) {
+      doctorSearch();
+    } else {
+      fetchDoctorData();
+    }
+  }, [search]);
 
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
@@ -442,18 +493,24 @@ const ClinicSingleView = () => {
             <h5 className="font-semibold text-lg dark:text-white-light">
               Doctors
             </h5>
+            <Tippy content="Total Doctors">
             <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-              <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
+              <CountUp start={0} end={totalDoctorsCount} duration={3}></CountUp>
             </span>
+            </Tippy>
           </div>
-          <button
-            type="button"
-            className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
-            onClick={openAddDoctorModal}
-          >
-            <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-            Add Doctor
-          </button>
+
+          {!isSuperAdmin ? (
+            <button
+              type="button"
+              className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+              onClick={openAddDoctorModal}
+            >
+              <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
+              Add Doctor
+            </button>
+          ) : null}
+
         </div>
         {doctorLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -575,14 +632,14 @@ const ClinicSingleView = () => {
         buttonLoading={buttonLoading}
         isEdit={true}
       />
-       <AddDoctor
+      <AddDoctor
         open={addDoctorModal}
         closeModal={closeAddDoctorModal}
         input={input}
         setInput={setInput}
         formSubmit={saveDoctorPerson}
         buttonLoading={buttonLoading}
-        setButtonLoading={setButtonLoading}      
+        setButtonLoading={setButtonLoading}
         errors={errors}
         setErrors={setErrors}
       />

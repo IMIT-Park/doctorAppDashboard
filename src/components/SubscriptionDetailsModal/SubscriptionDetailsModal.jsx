@@ -16,6 +16,7 @@ const SubscriptionDetailsModal = ({ open, closeModal, clinicId }) => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/subscription/getsubscription/${clinicId}`
       );
+      console.log(response);
       if (response?.status === 201) {
         setSubscriptionData(response?.data?.Subscriptions);
       } else {

@@ -17,6 +17,7 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import SubscriptionDetailsModal from "../../../components/SubscriptionDetailsModal/SubscriptionDetailsModal";
 import IconSearch from "../../../components/Icon/IconSearch";
+import * as XLSX from "xlsx";
 
 const OwnerSingleView = () => {
   const dispatch = useDispatch();
@@ -29,9 +30,10 @@ const OwnerSingleView = () => {
   }, []);
 
   const [page, setPage] = useState(1);
-  const PAGE_SIZES = [10, 20, 30, 50, 100];
+  const PAGE_SIZES = [5, 10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [totalClinics, setTotalClinics] = useState(0);
+  const [totalClinicsCount, setTotalClinicsCount] = useState(0);
   const [allClinics, setAllClinics] = useState([]);
   const [loading, setLoading] = useState(false);
   const [ownerInfo, setOwnerInfo] = useState({});
@@ -41,7 +43,6 @@ const OwnerSingleView = () => {
   const [search, setSearch] = useState("");
   // const [showSuggestions, setShowSuggestions] = useState(false);
   const [error, setError] = useState("");
-  const [clinics, setClinics] = useState([]);
 
   useEffect(() => {
     setPage(1);
@@ -59,10 +60,10 @@ const OwnerSingleView = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getallclinics/${ownerId}?page=${page}&pageSize=${pageSize}`
       );
-        console.log(response.data);
-      setTotalClinics(response.data?.Clinic?.count);
-      setAllClinics(response.data?.Clinic?.rows);
-      setClinics(response.data?.Clinic);
+      console.log(response);
+      setTotalClinicsCount(response.data?.pageInfo?.total);
+      setTotalClinics(response.data?.pageInfo?.total);
+      setAllClinics(response.data?.Clinic);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -78,7 +79,7 @@ const OwnerSingleView = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getowner/${ownerId}`
       );
-     
+
       setOwnerInfo(response?.data?.Owner);
       setDetailsLoading(false);
     } catch (error) {
@@ -89,44 +90,30 @@ const OwnerSingleView = () => {
     }
   };
 
-  // Get Search Clinics
+  useEffect(() => {
+    fetchOwnerInfo();
+  }, []);
+
+  
+  // Search Clinic
   const fetchSearchClinics = async () => {
-    const updatedKeyword = isNaN(search) ? search : `+91${search}`
-    if (!search) {
-      setClinics(allClinics); 
-      return;
-    }
-    setLoading(true);
-    setError("");
+    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/clinic/getclinicdata/${ownerId}?pageSize=${pageSize}&page=${page}`,
         { keyword: updatedKeyword }
       );
-      if (response.status === 200) {
-        const searchClinics = response?.data?.clinics || [];
-        if (searchClinics.length > 0) {
-          setClinics(searchClinics); 
-        } else {
-          setError("No data found for the search query.");
-          setClinics([]); 
-        }
-      } else {
-        setError("No Clinics found.");
-        setClinics([]); 
-      }
+
+      setTotalClinics(response?.data?.pagination?.total || 0);
+      setAllClinics(response?.data?.clinics || []);
     } catch (error) {
-      console.error("Error fetching Clinics:", error);
-      setError("Error fetching Clinics.");
-      setClinics([]); 
+      setAllClinics([]);
+      console.log(error);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchOwnerInfo();
-  }, []);
 
   useEffect(() => {
     if (search.trim()) {
@@ -134,11 +121,7 @@ const OwnerSingleView = () => {
     } else {
       fetchData();
     }
-  }, [search]);
-
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
+  }, [search, page, pageSize]);
 
   // block and unblock handler
   const { showAlert: showOwnerAlert, loading: blockUnblockOwnerLoading } =
@@ -152,11 +135,38 @@ const OwnerSingleView = () => {
   };
 
   const closeSubscriptionModal = () => {
-    setsubscriptionAddModal(false);
-    setSelectedPlan(null);
+    setsubscriptionAddModal(false);   
   };
 
-  console.log(allClinics);
+  // Export to Excel function
+  const exportToExcel = () => {
+    const filteredClinics = allClinics.map((clinic, index) => ({
+      No: index + 1,
+      Name: clinic.clinic.name,
+      Email: clinic.clinic.email,
+      Phone: clinic.clinic.phone,
+      Address: clinic.clinic.address,
+      Place: clinic.clinic.place,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(filteredClinics);
+    const columnWidths = [
+      { wpx: 50 },
+      { wpx: 200 },
+      { wpx: 250 },
+      { wpx: 120 },
+      { wpx: 300 },
+      { wpx: 250 },
+    ];
+    worksheet["!cols"] = columnWidths;
+
+    const rowHeights = filteredClinics.map(() => ({ hpx: 20 }));
+    rowHeights.unshift({ hpx: 20 });
+    worksheet["!rows"] = rowHeights;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
+    XLSX.writeFile(workbook, "ClinicsData.xlsx");
+  };
 
   return (
     <div>
@@ -235,7 +245,11 @@ const OwnerSingleView = () => {
             </h5>
             <Tippy content="Total Clinics">
               <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalClinics} duration={3}></CountUp>
+                <CountUp
+                  start={0}
+                  end={totalClinicsCount}
+                  duration={3}
+                ></CountUp>
               </span>
             </Tippy>
           </div>
@@ -293,7 +307,18 @@ const OwnerSingleView = () => {
               </div>
             </form>
           </div>
+
+          <div>
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={exportToExcel}
+            >
+              Export to Excel
+            </button>
+          </div>
         </div>
+
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
@@ -308,10 +333,10 @@ const OwnerSingleView = () => {
               mih={180}
               highlightOnHover
               className="whitespace-nowrap table-hover"
-              records={clinics}
+              records={allClinics}
               idAccessor="clinic_id"
               onRowClick={(row) =>
-                navigate(`/clinics/${row?.clinic_id}`, {
+                navigate(`/clinics/${row?.clinic?.clinic_id}`, {
                   state: { previousUrl: location?.pathname },
                 })
               }
@@ -346,41 +371,58 @@ const OwnerSingleView = () => {
                     </div>
                   ),
                 },
+                // {
+                //   accessor: "googleLocation",
+                //   title: "Location",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <button
+                //       type="button"
+                //       onClick={(e) => {
+                //         e.stopPropagation();
+                //         handleGetLocation(rowData.googleLocation);
+                //       }}
+                //       className="btn btn-success btn-sm py-1"
+                //     >
+                //       <IconMenuContacts className="mr-1 w-4" />
+                //       View Location
+                //     </button>
+                //   ),
+                // },
+                // {
+                //   accessor: "Actions",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <CustomSwitch
+                //       checked={rowData?.User?.status}
+                //       onChange={() =>
+                //         showClinicAlert(
+                //           rowData?.user_id,
+                //           rowData?.User?.status ? "block" : "activate",
+                //           "clinic"
+                //         )
+                //       }
+                //       tooltipText={rowData?.User?.status ? "Block" : "Unblock"}
+                //       uniqueId={`clinic${rowData?.clinic_id}`}
+                //       size="normal"
+                //     />
+                //   ),
+                // },
                 {
-                  accessor: "googleLocation",
-                  title: "Location",
+                  accessor: "Status",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleGetLocation(rowData.googleLocation);
-                      }}
-                      className="btn btn-success btn-sm py-1"
-                    >
-                      <IconMenuContacts className="mr-1 w-4" />
-                      View Location
-                    </button>
-                  ),
-                },
-                {
-                  accessor: "Actions",
-                  textAlignment: "center",
-                  render: (rowData) => (
-                    <CustomSwitch
-                      checked={rowData?.User?.status}
-                      onChange={() =>
-                        showClinicAlert(
-                          rowData?.user_id,
-                          rowData?.User?.status ? "block" : "activate",
-                          "clinic"
-                        )
-                      }
-                      tooltipText={rowData?.User?.status ? "Block" : "Unblock"}
-                      uniqueId={`clinic${rowData?.clinic_id}`}
-                      size="normal"
-                    />
+                    <div className="flex justify-center items-center">
+                      <span
+                        className={`text-sm font-medium ${
+                          rowData?.clinic?.User?.status
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {rowData?.clinic?.User?.status ? "Active" : "Blocked"}
+                      </span>
+                    </div>
                   ),
                 },
               ]}

@@ -59,9 +59,10 @@ const OwnerSingleView = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getallclinics/${ownerId}?page=${page}&pageSize=${pageSize}`
       );
+        console.log(response.data);
       setTotalClinics(response.data?.Clinic?.count);
       setAllClinics(response.data?.Clinic?.rows);
-      setClinics(response.data?.Clinic?.rows);
+      setClinics(response.data?.Clinic);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -77,7 +78,8 @@ const OwnerSingleView = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getowner/${ownerId}`
       );
-      setOwnerInfo(response.data?.Owner);
+     
+      setOwnerInfo(response?.data?.Owner);
       setDetailsLoading(false);
     } catch (error) {
       console.log(error);
@@ -319,12 +321,12 @@ const OwnerSingleView = () => {
                   title: "No.",
                   render: (row, rowIndex) => rowIndex + 1,
                 },
-                { accessor: "name", title: "Name" },
-                { accessor: "phone", title: "Phone" },
-                { accessor: "address", title: "Address" },
-                { accessor: "User.email", title: "Email" },
+                { accessor: "clinic.name", title: "Name" },
+                { accessor: "clinic.phone", title: "Phone" },
+                { accessor: "clinic.address", title: "Address" },
+                { accessor: "clinic.email", title: "Email" },
 
-                { accessor: "place", title: "Place" },
+                { accessor: "clinic.place", title: "Place" },
                 {
                   accessor: "clinic_id",
                   title: "Plan Details",

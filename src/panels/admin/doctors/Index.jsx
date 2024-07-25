@@ -15,6 +15,8 @@ import { formatDate } from "../../../utils/formatDate";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import noProfile from "/assets/images/empty-user.png";
+import * as XLSX from "xlsx";
+
 
 const Doctors = () => {
   const dispatch = useDispatch();
@@ -92,6 +94,42 @@ const Doctors = () => {
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchData);
 
+    const exportToExcel = () => {
+      const filteredDoctors = allDoctors.map((doctor, index) => ({
+        No: index + 1,
+        Name: doctor.name,
+        Email: doctor.email,
+        Phone: doctor.phone,
+        Gender: doctor.gender,
+        Address: doctor.address,
+        Qualification: doctor.qualification,
+        Specialization: doctor.specialization,
+        Fees: doctor.fees,
+        
+      }));
+      const worksheet = XLSX.utils.json_to_sheet(filteredDoctors);
+      const columnWidths = [
+        { wpx: 50 },
+        { wpx: 200 },
+        { wpx: 250 },
+        { wpx: 120 },
+        { wpx: 150 },
+        { wpx: 300 },
+        { wpx: 150 },
+        { wpx: 300 },
+        { wpx: 150 },
+      ];
+      worksheet["!cols"] = columnWidths;
+  
+      const rowHeights = filteredDoctors.map(() => ({ hpx: 20 }));
+      rowHeights.unshift({ hpx: 20 });
+      worksheet["!rows"] = rowHeights;
+      
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Doctors");
+      XLSX.writeFile(workbook, "DoctorData.xlsx");
+    };
+
   return (
     <div>
       <ScrollToTop />
@@ -130,6 +168,17 @@ const Doctors = () => {
               </div>
             </form>
           </div>
+
+          <div>
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={exportToExcel}
+            >
+              Export to Excel
+            </button>
+          </div>
+
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />

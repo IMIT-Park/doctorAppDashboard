@@ -50,8 +50,9 @@ const Booking = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getallclinics/${ownerId}?page=${page}&pagesize=${pageSize}`
       );
+      console.log(response.data);
       setTotalClinics(response.data?.Clinic?.count);
-      setAllClinics(response.data?.Clinic?.rows);
+      setAllClinics(response.data?.Clinic);
       setLoading(false);
       console.log(response.data?.Clinic?.rows);
     } catch (error) {
@@ -80,7 +81,7 @@ const Booking = () => {
     });
     navigate("/clinic/bookings");
   };
-
+console.log(allClinics);
   return (
     <div>
       <ScrollToTop />
@@ -121,10 +122,12 @@ const Booking = () => {
                     <span>{(page - 1) * pageSize + index + 1}</span>
                   ),
                 },
-                { accessor: "name", title: "Name" },
-                { accessor: "User.email", title: "Email" },
+                { accessor: "clinic.name", title: "Name" },
+                { accessor: "clinic.User.email", title: "Email" },
 
-                { accessor: "phone", title: "Phone" },
+                { accessor: "clinic.phone", title: "Phone" },
+                { accessor: "doctor_count", title: "Doctor Count" },
+
                 // {
                 //   accessor: "Actions",
                 //   textAlignment: "center",
@@ -162,7 +165,8 @@ const Booking = () => {
                 // },
 
                 {
-                  accessor: "status",
+                  accessor: "clinic.User.status",
+                  title: "status", 
                   textAlignment: "center", 
                   render: (rowData) => (
                     <div className="flex justify-center items-center gap-2">
@@ -189,11 +193,24 @@ const Booking = () => {
                         <IconPlus className="ltr:mr-2 rtl:ml-2" />
                         Add Booking
                       </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Add your view booking handler here
+                          navigate(`/clinic/bookings/${rowData?.clinic_id}`);
+                        }}
+                        className="btn btn-green btn-sm py-1"
+
+                      >
+                        View Booking
+                      </button>
                     </div>
                   ),
-                },
+                }
                 
-
+                
+                
                 
               ]}
               totalRecords={totalClinics}

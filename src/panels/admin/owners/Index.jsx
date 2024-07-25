@@ -44,9 +44,10 @@ const Owners = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getallowner?page=${page}&pageSize=${pageSize}`
       );
-      setTotalOwnersCount(response?.data?.Owner?.count || 0);
-      setTotalOwners(response?.data?.Owner?.count || 0);
-      setAllOwners(response?.data?.Owner?.rows);
+
+      setTotalOwnersCount(response?.data?.pageInfo?.total || 0);
+      setTotalOwners(response?.data?.pageInfo?.total || 0);
+      setAllOwners(response?.data?.Owners || 0);
     } catch (error) {
       console.log(error);
     } finally {
@@ -111,6 +112,9 @@ const Owners = () => {
     XLSX.writeFile(workbook, "ClinicsData.xlsx");
   };
 
+
+  console.log(allOwners);
+
   return (
     <div>
       <ScrollToTop />
@@ -126,7 +130,7 @@ const Owners = () => {
               </span>
             </Tippy>
           </div>
-          <div className="ml-auto">
+          <div>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -178,8 +182,8 @@ const Owners = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allOwners}
-              onRowClick={(row) => navigate(`/admin/owners/${row?.owner_id}`)}
-              idAccessor="owner_id"
+              onRowClick={(row) => navigate(`/admin/owners/${row?.Owner.owner_id}`)}
+              idAccessor="Owner.owner_id"
               columns={[
                 {
                   accessor: "owner_id",
@@ -187,48 +191,65 @@ const Owners = () => {
                   render: (row, rowIndex) => rowIndex + 1,
                 },
                 {
-                  accessor: "name",
+                  accessor: "Owner.name",
                   title: "Name",
                   cellsClassName: "capitalize",
                 },
-                { accessor: "email" },
-                { accessor: "phone" },
-                { accessor: "address", title: "Address" },
+                { accessor: "Owner.email", title: "Email" },
+                { accessor: "Owner.phone", title: "Phone" },
+                { accessor: "Owner.address", title: "Address" },
                 {
-                  accessor: "created_at",
+                  accessor: "Owner.created_at",
                   title: "Account Creation Date",
                   textAlignment: "center",
                   render: (row) =>
-                    row?.created_at && formatDate(row?.created_at),
+                    row?.Owner?.created_at && formatDate(row?.Owner?.created_at),
                 },
                 {
                   accessor: "salesperson_name",
                   title: "Entered By",
                   render: (row) =>
-                    row.salesperson_id
-                      ? row.salesperson?.name || "Salesperson"
+                    row?.Owner?.salesperson_id
+                      ? row?.Owner?.salesperson?.name || "Salesperson"
                       : "Application",
                 },
+                // {
+                //   accessor: "Actions",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <div className="grid place-items-center">
+                //       <CustomSwitch
+                //         checked={rowData?.User?.status}
+                //         onChange={() =>
+                //           showOwnerAlert(
+                //             rowData?.user_id,
+                //             rowData?.User?.status ? "block" : "activate",
+                //             "owner"
+                //           )
+                //         }
+                //         tooltipText={
+                //           rowData?.User?.status ? "Block" : "Unblock"
+                //         }
+                //         uniqueId={`owner${rowData?.owner_id}`}
+                //         size="normal"
+                //       />
+                //     </div>
+                //   ),
+                // },
                 {
-                  accessor: "Actions",
+                  accessor: "Status",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <div className="grid place-items-center">
-                      <CustomSwitch
-                        checked={rowData?.User?.status}
-                        onChange={() =>
-                          showOwnerAlert(
-                            rowData?.user_id,
-                            rowData?.User?.status ? "block" : "activate",
-                            "owner"
-                          )
-                        }
-                        tooltipText={
-                          rowData?.User?.status ? "Block" : "Unblock"
-                        }
-                        uniqueId={`owner${rowData?.owner_id}`}
-                        size="normal"
-                      />
+                    <div className="flex justify-center items-center">
+                      <span
+                        className={`text-sm font-medium ${
+                          rowData?.Owner?.User?.status
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {rowData?.Owner?.User?.status ? "Active" : "Blocked"}
+                      </span>
                     </div>
                   ),
                 },

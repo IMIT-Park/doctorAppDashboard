@@ -93,6 +93,10 @@ const SupportUserComplaints = lazy(() =>
   import("../panels/supportUser/complaints/Index")
 );
 
+const SupportUserDoctors = lazy(() =>
+  import("../panels/supportUser/doctors/Index")
+);
+
 // <--------------> supportUser panel imports ends here <-------------->
 
 // <--------------> clinic single-view imports starts here <-------------->
@@ -378,6 +382,13 @@ const routes = [
   {
     path: "/supportuser/chats",
     element: <SupportUserChats />,
+    layout: "default",
+  },
+
+  //doctors
+  {
+    path: "/supportuser/doctors",
+    element: <SupportUserDoctors />,
     layout: "default",
   },
   // <--------------> support-user sales panel ends here <-------------->

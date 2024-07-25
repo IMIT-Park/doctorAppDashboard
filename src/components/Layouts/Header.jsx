@@ -117,6 +117,8 @@ const Header = () => {
     sessionStorage.clear();
     localStorage.clear();
     setUserDetails(null);
+    setIds(null);
+    setBookingDetails(null);
     navigate("/");
   };
 

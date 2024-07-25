@@ -51,8 +51,9 @@ const Booking = () => {
         `/v1/clinic/getallclinics/${ownerId}?page=${page}&pagesize=${pageSize}`
       );
       console.log(response.data);
-      setTotalClinics(response.data?.Clinic?.count);
+      setTotalClinics(response.data?.pageInfo.total);
       setAllClinics(response.data?.Clinic);
+
       setLoading(false);
       console.log(response.data?.Clinic?.rows);
     } catch (error) {
@@ -81,7 +82,7 @@ const Booking = () => {
     });
     navigate("/clinic/bookings");
   };
-console.log(allClinics);
+  console.log(allClinics);
   return (
     <div>
       <ScrollToTop />
@@ -113,7 +114,7 @@ console.log(allClinics);
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allClinics}
-              idAccessor="clinic_id"
+              idAccessor="clinic.clinic_id"
               columns={[
                 {
                   accessor: "",
@@ -126,7 +127,7 @@ console.log(allClinics);
                 { accessor: "clinic.User.email", title: "Email" },
 
                 { accessor: "clinic.phone", title: "Phone" },
-                { accessor: "doctor_count", title: "Doctor Count" },
+                { accessor: "doctor_count", title: "Total Doctors" },
 
                 // {
                 //   accessor: "Actions",
@@ -166,17 +167,23 @@ console.log(allClinics);
 
                 {
                   accessor: "clinic.User.status",
-                  title: "status", 
-                  textAlignment: "center", 
+                  title: "status",
+                  textAlignment: "center",
                   render: (rowData) => (
-                    <div className="flex justify-center items-center gap-2">
-                      <span className={`${rowData?.User?.status ? "text-green-500" : "text-red-500"}`}>
-                        {rowData?.User?.status ? "Active" : "Blocked"}
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`ml-2 ${
+                          rowData?.clinic?.User?.status
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {rowData?.clinic?.User?.status ? "Active" : "Blocked"}
                       </span>
                     </div>
                   ),
                 },
-                
+
                 {
                   accessor: "actions",
                   textAlignment: "center",
@@ -186,7 +193,7 @@ console.log(allClinics);
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleAddBooking(rowData?.clinic_id);
+                          handleAddBooking(rowData?.clinic?.clinic_id);
                         }}
                         className="btn btn-green btn-sm py-1"
                       >
@@ -198,20 +205,16 @@ console.log(allClinics);
                         onClick={(e) => {
                           e.stopPropagation();
                           // Add your view booking handler here
-                          navigate(`/clinic/bookings/${rowData?.clinic_id}`);
+                          navigate(`/owner/bookings/${rowData?.clinic?.clinic_id}`);
                         }}
-                        className="btn btn-green btn-sm py-1"
-
+                        className="btn btn-green btn-sm py-1.5 px-3.5"
                       >
+
                         View Booking
                       </button>
                     </div>
                   ),
-                }
-                
-                
-                
-                
+                },
               ]}
               totalRecords={totalClinics}
               recordsPerPage={pageSize}

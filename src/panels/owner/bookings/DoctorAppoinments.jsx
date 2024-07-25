@@ -23,8 +23,8 @@ import Dropdown from "../../../components/Dropdown";
 import IconHorizontalDots from "../../../components/Icon/IconHorizontalDots";
 import IconSearch from "../../../components/Icon/IconSearch";
 import IconCopy from "../../../components/Icon/IconCopy";
-import RescheduleModal from "./RescheduleModal";
-import CancelReschedule from "./CancelReschedule";
+// import RescheduleModal from "./RescheduleModal";
+// import CancelReschedule from "./CancelReschedule";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -302,7 +302,7 @@ const ClinicProfile = () => {
 
   return (
     <div>
-      <div className="flex justify-end items-center">
+      {/* <div className="flex justify-end items-center">
         <ScrollToTop />
         <div className="flex items-center">
           {!loading && (
@@ -321,109 +321,13 @@ const ClinicProfile = () => {
             />
           )}
         </div>
-      </div>
+      </div> */}
 
       <div className="panel mb-1">
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
         ) : (
           <>
-            {profileData ? (
-              <>
-                <div className="relative flex flex-col xl:flex-row gap-3 xl:gap-3">
-                  <div className="w-full xl:w-1/2 overflow-hidden flex flex-col items-center sm:mb-1 xl:mb-0">
-                    <div className="w-full aspect-video xl:h-80 ">
-                      <img
-                        src={imageBaseUrl + profileData?.banner_img_url}
-                        className="w-full h-full object-cover"
-                        alt="Banner"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="w-full xl:w-1/2">
-                    <div className="rounded-lg h-full mt-2 xl:-mt-3 flex flex-col justify-between">
-                      <div className="">
-                        <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
-                          <div className=" w-full flex items-start justify-between gap-2 mt-2 ">
-                            {profileData?.name || ""}
-                            <button
-                              className="flex text-slate-500 hover:text-info"
-                              onClick={() => openEditModal(profileData)}
-                            >
-                              <IconEdit className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-4">
-                          <div className="flex flex-col items-start">
-                            <div className="text-base font-medium text-gray-500">
-                              Address:
-                            </div>
-                            <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2 min-h-20">
-                              {profileData?.address || ""}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col md:flex-row items-start gap-5">
-                            <div className="flex flex-col items-start w-full">
-                              <div className="text-base font-medium text-gray-500 ">
-                                Place:
-                              </div>
-                              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                                {profileData?.place || ""}
-                              </div>
-                            </div>
-                            <div className="flex flex-col items-start w-full">
-                              <div className="text-base font-medium text-gray-500">
-                                Email:
-                              </div>
-                              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                                {profileData?.User?.email || ""}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col md:flex-row items-start gap-5">
-                            <div className="flex flex-col items-start w-full">
-                              <div className="text-base font-medium text-gray-500">
-                                Username:
-                              </div>
-                              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                                {profileData?.User?.user_name || ""}
-                              </div>
-                            </div>
-                            <div className="flex flex-col items-start w-full">
-                              <div className="text-base font-medium text-gray-500">
-                                Phone:
-                              </div>
-                              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                                {profileData?.phone || ""}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <QRCodeComponent
-                    qrUrl={qrUrl}
-                    locationDetails={profileData?.googleLocation}
-                    clinicId={clinicId}
-                    ownerId={ownerId}
-                    fetchClinicData={fetchProfileData}
-                  />
-                </div>
-              </>
-            ) : (
-              <div className="h-52 grid place-items-center text-gray-500">
-                No Data Found
-              </div>
-            )}
-
-            <div className="border-t border-gray-300 dark:border-gray-800 flex-grow ml-2 mt-10"></div>
             <h5 className="mt-8 mb-10 text-xl font-semibold text-dark dark:text-slate-400">
               Select a Doctor to View Appointments
             </h5>
@@ -611,7 +515,7 @@ const ClinicProfile = () => {
         isEdit={true}
       />
 
-      <RescheduleModal
+      {/* <RescheduleModal
         addRescheduleModal={addRescheduleModal}
         closeAddRescheduleModal={closeAddRescheduleModal}
         bookingId={selectedBookingId}
@@ -634,7 +538,7 @@ const ClinicProfile = () => {
         cancelAll={true}
         clinicId={clinicId}
         selectedDate={selectedDate}
-      />
+      /> */}
     </div>
   );
 };

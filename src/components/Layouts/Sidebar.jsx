@@ -335,6 +335,18 @@ const Sidebar = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
+                  <NavLink to="/supportuser/doctors" className="group">
+                    <div className="flex items-center">
+                      <IconMenuDashboard
+                        className={`group-hover:!text-[#006241] shrink-0 `}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Doctors"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
                   <NavLink to="/supportuser/chats" className="group">
                     <div className="flex items-center">
                       <IconMenuChat

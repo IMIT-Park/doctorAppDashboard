@@ -41,9 +41,11 @@ const Patients = () => {
     "Doctor is not available on this date."
   );
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [consultationWarning, setConsultationWarning] = useState("");
 
   // fetch timeslots function
   const fetchTimeSlots = async (date) => {
+    setConsultationWarning("");
     setTimeslotsLoading(true);
     try {
       const response = await NetworkHandler.makePostRequest(
@@ -107,7 +109,15 @@ const Patients = () => {
           clinic_id: clinicId,
         }
       );
-      setConsultations(response?.data?.consultationSlots);
+      if (response?.data?.noOfConsultationsPerDay?.length > 0) {
+        setConsultationWarning(
+          "No available consultations for this day. Please select another day."
+        );
+      } else {
+        setConsultations(response?.data?.consultationSlots);
+        setConsultationWarning("");
+      }
+      console.log(response?.data);
     } catch (error) {
       setConsultations([]);
       console.error(error?.response?.data?.error);
@@ -183,6 +193,16 @@ const Patients = () => {
         });
       }
     } catch (error) {
+      if(error?.response?.status === 403){
+        Swal.fire({
+          icon: "error",
+          title: "Todays Booking Slots Filled!",
+          text: "Todays Booking Slots Filled. Kindly Select Another date to book.",
+          padding: "2em",
+          customClass: "sweet-alerts",
+          confirmButtonColor: "#006241"
+        })
+      }
       console.error(error?.response?.data?.error);
     } finally {
       setBookingLoading(false);
@@ -260,36 +280,38 @@ const Patients = () => {
                       <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
                     ) : (
                       <>
-                        {consultations && consultations?.length > 0 && (
-                          <div className="flex flex-col items-start my-6">
-                            <div className="w-full pb-4">
-                              <div className="border border-blue-300 dark:border-blue-900 rounded py-1 px-6 text-center text-[#006241] mb-6 font-semibold text-lg w-fit">
-                                Select Time
-                              </div>
-                              <div className="flex flex-wrap text-base gap-2 md:gap-2">
-                                {consultations?.map((time, index) => (
-                                  <div
-                                    key={index}
-                                    className={`border w-[85px] flex justify-center rounded py-[6px] border-slate-300 dark:border-slate-700 cursor-pointer font-semibold text-sm ${
-                                      selectedConsultation?.slot === time?.slot
-                                        ? "bg-green-800 text-white"
-                                        : ""
-                                    } ${
-                                      !time?.Available
-                                        ? "cursor-not-allowed text-slate-300 dark:text-slate-800 border-slate-200 dark:border-slate-800"
-                                        : ""
-                                    }`}
-                                    onClick={() => {
-                                      if (time?.Available) {
-                                        handleSelectConsultation(time);
-                                      }
-                                    }}
-                                  >
-                                    {formatTime(time?.slot)}
-                                  </div>
-                                ))}
-                              </div>
+                        {consultations && consultations?.length > 0 ? (
+                          <>
+                            <div className="border border-blue-300 dark:border-blue-900 rounded py-1 px-6 text-center text-[#006241] mb-6 font-semibold text-lg w-fit">
+                              Select Time
                             </div>
+                            <div className="flex flex-wrap text-base gap-2 md:gap-2">
+                              {consultations?.map((time, index) => (
+                                <div
+                                  key={index}
+                                  className={`border w-[85px] flex justify-center rounded py-[6px] border-slate-300 dark:border-slate-700 cursor-pointer font-semibold text-sm ${
+                                    selectedConsultation?.slot === time?.slot
+                                      ? "bg-green-800 text-white"
+                                      : ""
+                                  } ${
+                                    !time?.Available
+                                      ? "cursor-not-allowed text-slate-300 dark:text-slate-800 border-slate-200 dark:border-slate-800"
+                                      : ""
+                                  }`}
+                                  onClick={() => {
+                                    if (time?.Available) {
+                                      handleSelectConsultation(time);
+                                    }
+                                  }}
+                                >
+                                  {formatTime(time?.slot)}
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex justify-center items-center text-center w-full h-full min-h-24 text-base text-gray-500">
+                            {consultationWarning}
                           </div>
                         )}
                       </>

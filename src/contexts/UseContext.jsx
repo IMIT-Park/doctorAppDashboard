@@ -56,6 +56,8 @@ const UserProvider = ({ children }) => {
     }
   }, []);
 
+  console.log(bookingDetails);
+
   return (
     <UserContext.Provider
       value={{

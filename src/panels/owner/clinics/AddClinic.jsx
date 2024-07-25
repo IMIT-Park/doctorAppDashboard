@@ -169,6 +169,19 @@ const AddClinic = ({
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                       <div className="">
+                        <label htmlFor="type">Category</label>
+                        <input
+                          id="type"
+                          type="text"
+                          placeholder="Category"
+                          className="form-input form-input-green"
+                          value={data.type}
+                          onChange={(e) =>
+                            setData({ ...data, type: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="">
                         <label htmlFor="place">Place</label>
                         <input
                           id="place"

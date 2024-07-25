@@ -24,6 +24,7 @@ import ModalSubscription from "./ModalSubscription";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomSwitch from "../../../components/CustomSwitch";
 import CustomButton from "../../../components/CustomButton";
+import IconSearch from "../../../components/Icon/IconSearch";
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -33,17 +34,16 @@ const Clinics = () => {
   const { userDetails } = useContext(UserContext);
   const ownerId = userDetails?.UserOwner?.[0]?.owner_id || 0;
 
-  // console.log(userDetails);
-
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
   });
 
   const [page, setPage] = useState(1);
-  const PAGE_SIZES = [10, 20, 30, 50, 100];
+  const PAGE_SIZES = [5, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [allClinics, setAllClinics] = useState([]);
   const [totalClinics, setTotalClinics] = useState(0);
+  const [totalClinicsCount, setTotalClinicsCount] = useState(0);
   const [subscriptionAddModal, setsubscriptionAddModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -62,17 +62,14 @@ const Clinics = () => {
     picture: null,
     defaultPicture: null,
     googleLocation: null,
+    type: "",
   });
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     setPage(1);
-  }, [pageSize]);
-
-  useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-  }, [page, pageSize]);
+  }, [pageSize, search]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -96,13 +93,12 @@ const Clinics = () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/clinic/getallclinics/${ownerId}?page=${page}&pagesize=${pageSize}`
+        `/v1/clinic/getallclinics/${ownerId}?page=${page}&pageSize=${pageSize}`
       );
-      console.log(response.data);
-      setTotalClinics(response.data?.Clinic?.count);
+      setTotalClinics(response.data?.pageInfo?.total || 0);
+      setTotalClinicsCount(response.data?.pageInfo?.total || 0);
       setAllClinics(response.data?.Clinic);
       setLoading(false);
-      console.log(response.data?.Clinic?.rows);
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -110,11 +106,6 @@ const Clinics = () => {
       setLoading(false);
     }
   };
-
-  // fetching Mds
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
 
   // handle add modal
   const openAddModal = () => {
@@ -145,23 +136,25 @@ const Clinics = () => {
       picture: null,
       defaultPicture: null,
       googleLocation: null,
+      type: "",
     });
   };
 
   const openEditModal = (clinic) => {
-    const phoneWithoutCountryCode = clinic.phone.replace(/^\+91/, "");
+    const phoneWithoutCountryCode = clinic?.phone?.replace(/^\+91/, "");
     setInput({
-      name: clinic.name,
-      email: clinic.User.email,
-      username: clinic.User.user_name,
+      name: clinic?.name,
+      email: clinic?.User?.email,
+      username: clinic?.User?.user_name,
       phone: phoneWithoutCountryCode,
-      address: clinic.address,
-      place: clinic.place,
+      address: clinic?.address,
+      place: clinic?.place,
       picture: null,
       googleLocation: convertLocationDetail(clinic?.googleLocation),
       defaultPicture: imageBaseUrl + clinic?.banner_img_url || null,
+      type: clinic?.type || "",
     });
-    setCurrentClinicId(clinic.clinic_id);
+    setCurrentClinicId(clinic?.clinic_id);
     setEditModal(true);
   };
 
@@ -176,6 +169,7 @@ const Clinics = () => {
       place: "",
       picture: null,
       googleLocation: {},
+      type: "",
     });
     setCurrentClinicId(null);
   };
@@ -190,7 +184,8 @@ const Clinics = () => {
       !input.place ||
       !input.password ||
       !input.picture ||
-      !input.confirmPassword
+      !input.confirmPassword ||
+      !input.type
     ) {
       showMessage("Please fill in all required fields", "warning");
       return true;
@@ -214,6 +209,7 @@ const Clinics = () => {
     formData.append("phone", `+91${input.phone}`);
     formData.append("address", input.address);
     formData.append("place", input.place);
+    formData.append("type", input.type);
 
     formData.append("googleLocation", JSON.stringify(input.googleLocation));
     if (input.picture) {
@@ -251,7 +247,13 @@ const Clinics = () => {
   };
 
   const updateClinic = async () => {
-    if (!input.name || !input.phone || !input.address || !input.place) {
+    if (
+      !input.name ||
+      !input.phone ||
+      !input.address ||
+      !input.place ||
+      !input.type
+    ) {
       showMessage("Please fill in all required fields", "warning");
       return true;
     }
@@ -268,6 +270,7 @@ const Clinics = () => {
     formData.append("phone", `+91${input.phone}`);
     formData.append("address", input.address);
     formData.append("place", input.place);
+    formData.append("type", input.type);
     formData.append("googleLocation", JSON.stringify(input.googleLocation));
     if (input.picture) {
       formData.append("image_url[]", input.picture);
@@ -302,7 +305,32 @@ const Clinics = () => {
     setsubscriptionAddModal(true);
   };
 
-  console.log(allClinics);
+  // Search Clinic
+  const fetchSearchClinics = async () => {
+    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/clinic/getclinicdata/${ownerId}?pageSize=${pageSize}&page=${page}`,
+        { keyword: updatedKeyword }
+      );
+      setTotalClinics(response?.data?.pagination?.total || 0);
+      setAllClinics(response?.data?.clinics || []);
+    } catch (error) {
+      setAllClinics([]);
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (search.trim()) {
+      fetchSearchClinics();
+    } else {
+      fetchData();
+    }
+  }, [search, page, pageSize]);
+
   return (
     <div>
       <ScrollToTop />
@@ -314,9 +342,34 @@ const Clinics = () => {
             </h5>
             <Tippy content="Total Clinics">
               <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalClinics} duration={3}></CountUp>
+                <CountUp start={0} end={totalClinicsCount} duration={3}></CountUp>
               </span>
             </Tippy>
+          </div>
+          <div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                ownerSearch();
+              }}
+              className="mx-auto w-full mb-2"
+            >
+              <div className="relative">
+                <input
+                  type="text"
+                  value={search}
+                  placeholder="Search Clinics..."
+                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-green absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                >
+                  <IconSearch className="mx-auto" />
+                </button>
+              </div>
+            </form>
           </div>
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
             <CustomButton onClick={() => openAddModal()}>
@@ -359,8 +412,13 @@ const Clinics = () => {
                 { accessor: "clinic.User.user_name", title: "Username" },
                 { accessor: "clinic.phone", title: "Phone" },
                 { accessor: "clinic.address", title: "Address" },
+                { accessor: "clinic.type", title: "Category" },
                 { accessor: "clinic.place", title: "Place" },
-                { accessor: "doctor_count", title: "Doctor Count" },
+                {
+                  accessor: "doctor_count",
+                  title: "Total Doctors",
+                  textAlignment: "center",
+                },
 
                 {
                   accessor: "clinic.clinic_id",
@@ -372,7 +430,7 @@ const Clinics = () => {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleSubButtonClick(rowData);
+                          handleSubButtonClick(rowData?.clinic);
                         }}
                         className="btn btn-green btn-sm py-1"
                       >
@@ -441,13 +499,13 @@ const Clinics = () => {
                 // Column configuration for the status
                 {
                   accessor: "clinic.User.status",
-                  title: "status", 
+                  title: "status",
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex items-center gap-2">
                       <span
                         className={`ml-2 ${
-                          rowData?.User?.status
+                          rowData?.clinic?.User?.status
                             ? "text-green-500"
                             : "text-red-500"
                         }`}
@@ -469,7 +527,7 @@ const Clinics = () => {
                           className="flex hover:text-info"
                           onClick={(e) => {
                             e.stopPropagation();
-                            openEditModal(rowData);
+                            openEditModal(rowData?.clinic);
                           }}
                         >
                           <IconEdit className="w-4.5 h-4.5" />

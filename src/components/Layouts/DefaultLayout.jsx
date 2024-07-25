@@ -7,14 +7,14 @@ import Setting from "./Setting";
 import Sidebar from "./Sidebar";
 import Portals from "../../components/Portals";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../contexts/UseContext";
 
 const DefaultLayout = ({ children }) => {
   const themeConfig = useSelector((state) => state.themeConfig);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userDetails } = useContext(UserContext);
   const accessToken = localStorage.getItem("accessToken");
+  const userData = localStorage.getItem("userData");
+  const userDetails = JSON.parse(userData);
 
   const [showLoader, setShowLoader] = useState(true);
   const [showTopButton, setShowTopButton] = useState(false);
@@ -52,8 +52,8 @@ const DefaultLayout = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (!accessToken) {
-      navigate("/"); 
+    if (!accessToken && !userDetails) {
+      navigate("/");
     }
   }, [accessToken, navigate]);
 

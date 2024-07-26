@@ -26,6 +26,10 @@ import { UserContext } from "../../contexts/UseContext";
 import emptyUser from "/assets/images/empty-user.png";
 import IconUserPlus from "../../components/Icon/IconUserPlus";
 import AddDoctor from "../../panels/clinic/doctors/AddDoctor";
+import Tippy from "@tippyjs/react";
+import IconSearch from "../../components/Icon/IconSearch";
+import * as XLSX from "xlsx";
+
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -44,7 +48,7 @@ const ClinicSingleView = () => {
     dispatch(setPageTitle("Doctors"));
   });
   const [page, setPage] = useState(1);
-  const PAGE_SIZES = [10, 20, 30, 50, 100];
+  const PAGE_SIZES = [5,10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [editModal, setEditModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -79,7 +83,12 @@ const ClinicSingleView = () => {
   });
 
   const [addDoctorModal, setAddDoctorModal] = useState(false);
+  const [totalDoctors, setTotalDoctors] = useState(0);
+  const[totalDoctorsCount,setTotalDoctorsCount] = useState(0)
+  const [allDoctors, setAllDoctors] = useState([]);
   const [errors, setErrors] = useState({});
+  const [search, setSearch] = useState("");
+  const [doctorLoading, setdoctorLoading] = useState(true);
 
   useEffect(() => {
     setPage(1);
@@ -99,17 +108,40 @@ const ClinicSingleView = () => {
   const clinicDetails = clinicData?.Clinic;
 
   // fetch doctors data function
-  const {
-    data: doctorData,
-    loading: doctorLoading,
-    refetch: fetchDoctorData,
-  } = useFetchData(
-    `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`,
-    {},
-    [clinicId, page, pageSize]
-  );
-  const totalDoctors = doctorData?.count || 0;
-  const allDoctors = doctorData?.alldoctors || [];
+  // const {
+  //   data: doctorData,
+  //   loading: doctorLoading,
+  //   refetch: fetchDoctorData,
+  // } = useFetchData(
+  //   `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`,
+  //   {},
+  //   [clinicId, page, pageSize]
+  // );
+  // const totalDoctors = doctorData?.count || 0;
+  // const allDoctors = doctorData?.alldoctors || [];
+
+  const fetchDoctorData = async () => {
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
+      );
+      console.log(response);
+      setTotalDoctors(response?.data?.count);
+      setTotalDoctorsCount(response?.data?.count)
+      setAllDoctors(response?.data?.alldoctors);
+      setdoctorLoading(false);
+    } catch (error) {
+      console.log(error);
+      setdoctorLoading(false);
+    } finally {
+      setdoctorLoading(false);
+    }
+  };
+
+useEffect(() => {
+  fetchDoctorData();
+}, [page, pageSize]);
+
 
   // doctor image picker
   const handleFileChange = (e) => {
@@ -196,7 +228,6 @@ const ClinicSingleView = () => {
       setButtonLoading(false);
     }
   };
-
 
   const openAddDoctorModal = () => {
     setAddDoctorModal(true);
@@ -293,6 +324,69 @@ const ClinicSingleView = () => {
         setButtonLoading(false);
       }
     }
+  };
+
+  const doctorSearch = async () => {
+    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/getalldoctordata?pageSize=${pageSize}&page=${page}`,
+        { keyword: updatedKeyword }
+      );
+      setAllDoctors(response?.data?.doctors || []);
+    } catch (error) {
+      setAllDoctors([]);
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (search.trim()) {
+      doctorSearch();
+    } else {
+      fetchDoctorData();
+    }
+  }, [search]);
+
+  // Export to Excel function
+  const exportToExcel = () => {
+    const filteredDoctors = allDoctors.map((doctor, index) => ({
+      No: index + 1,
+      Name: doctor.name,
+      Email: doctor.email,
+      Phone: doctor.phone,
+      Address: doctor.address,
+      Gender: doctor.gender,
+      Qualification: doctor.qualification,
+      Specialization: doctor.specialization,
+      Fees: doctor.fees,
+
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(filteredDoctors);
+    const columnWidths = [
+      { wpx: 50 },
+      { wpx: 200 },
+      { wpx: 250 },
+      { wpx: 120 },
+      { wpx: 300 },
+      { wpx: 100 },
+      { wpx: 150 },
+      { wpx: 200 },
+      { wpx: 100 },
+
+    ];
+    worksheet["!cols"] = columnWidths;
+
+    const rowHeights = filteredDoctors.map(() => ({ hpx: 20 }));
+    rowHeights.unshift({ hpx: 20 });
+    worksheet["!rows"] = rowHeights;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
+    XLSX.writeFile(workbook, "DoctorData.xlsx");
   };
 
 
@@ -442,18 +536,59 @@ const ClinicSingleView = () => {
             <h5 className="font-semibold text-lg dark:text-white-light">
               Doctors
             </h5>
+            <Tippy content="Total Doctors">
             <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-              <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
+              <CountUp start={0} end={totalDoctorsCount} duration={3}></CountUp>
             </span>
+            </Tippy>
           </div>
-          <button
-            type="button"
-            className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
-            onClick={openAddDoctorModal}
-          >
-            <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-            Add Doctor
-          </button>
+          <div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                ownerSearch();
+              }}
+              className="mx-auto w-full mb-2"
+            >
+              <div className="relative">
+                <input
+                  type="text"
+                  value={search}
+                  placeholder="Search Owners..."
+                  className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-green absolute ltr:right-1 rtl:left-1 inset-y-0 m-auto rounded-full w-9 h-9 p-0 flex items-center justify-center"
+                >
+                  <IconSearch className="mx-auto" />
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={exportToExcel}
+            >
+              Export to Excel
+            </button>
+          </div>
+
+          {!isSuperAdmin ? (
+            <button
+              type="button"
+              className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+              onClick={openAddDoctorModal}
+            >
+              <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
+              Add Doctor
+            </button>
+          ) : null}
+
         </div>
         {doctorLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -528,25 +663,44 @@ const ClinicSingleView = () => {
                   render: (row) => (row.visibility ? "Visible" : "Hidden"),
                 },
 
+                // {
+                //   accessor: "Actions",
+                //   textAlignment: "center",
+                //   render: (rowData) => (
+                //     <CustomSwitch
+                //       checked={rowData?.status}
+                //       onChange={() =>
+                //         showDoctorAlert(
+                //           rowData?.user_id,
+                //           rowData.status ? "block" : "activate",
+                //           "doctor"
+                //         )
+                //       }
+                //       tooltipText={rowData?.status ? "Block" : "Unblock"}
+                //       uniqueId={`doctor${rowData?.doctor_id}`}
+                //       size="normal"
+                //     />
+                //   ),
+                // },
+
                 {
-                  accessor: "Actions",
+                  accessor: "Status",
                   textAlignment: "center",
                   render: (rowData) => (
-                    <CustomSwitch
-                      checked={rowData?.status}
-                      onChange={() =>
-                        showDoctorAlert(
-                          rowData?.user_id,
-                          rowData.status ? "block" : "activate",
-                          "doctor"
-                        )
-                      }
-                      tooltipText={rowData?.status ? "Block" : "Unblock"}
-                      uniqueId={`doctor${rowData?.doctor_id}`}
-                      size="normal"
-                    />
+                    <div className="flex justify-center items-center">
+                      <span
+                        className={`text-sm font-medium ${
+                          rowData?.status
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {rowData?.status ? "Active" : "Blocked"}
+                      </span>
+                    </div>
                   ),
                 },
+
               ]}
               totalRecords={totalDoctors}
               recordsPerPage={pageSize}
@@ -575,14 +729,14 @@ const ClinicSingleView = () => {
         buttonLoading={buttonLoading}
         isEdit={true}
       />
-       <AddDoctor
+      <AddDoctor
         open={addDoctorModal}
         closeModal={closeAddDoctorModal}
         input={input}
         setInput={setInput}
         formSubmit={saveDoctorPerson}
         buttonLoading={buttonLoading}
-        setButtonLoading={setButtonLoading}      
+        setButtonLoading={setButtonLoading}
         errors={errors}
         setErrors={setErrors}
       />

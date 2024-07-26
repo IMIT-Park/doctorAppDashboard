@@ -20,6 +20,7 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import CustomButton from "../../../components/CustomButton";
 import { UserContext } from "../../../contexts/UseContext";
+import * as XLSX from "xlsx";
 
 const Sales = () => {
   const dispatch = useDispatch();
@@ -39,6 +40,7 @@ const Sales = () => {
   const [editSalesPersonModal, setEditSalesPersonModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [totalSaleperson, setTotalSalesPerson] = useState(0);
+  const [totalSalespersonsCount, setTotalSalespersonsCount] = useState(0);
   const [allSalesPerson, setAllSalesPerson] = useState([]);
   const [loading, setLoading] = useState(true);
   const [input, setInput] = useState({
@@ -90,7 +92,9 @@ const Sales = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/salesperson/getallsalespersons?page=${page}&pageSize=${pageSize}`
       );
-      setTotalSalesPerson(response.data?.Salesperson?.count);
+      console.log(response);
+      setTotalSalesPerson(response.data?.pageInfo?.total);
+      setTotalSalespersonsCount(response.data?.pageInfo?.total);
       setAllSalesPerson(response.data?.Salesperson?.rows);
       setLoading(false);
     } catch (error) {
@@ -257,6 +261,36 @@ const Sales = () => {
     navigate(`/admin/sales/owners`);
   };
 
+  // Export to Excel function
+  const exportToExcel = () => {
+    const filteredSales = allSalesPerson.map((sales, index) => ({
+      No: index + 1,
+      Name: sales.name,
+      Email: sales.email,
+      Phone: sales.phone,
+      Address: sales.address,
+      UserName: sales.User.user_name,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(filteredSales);
+    const columnWidths = [
+      { wpx: 50 },
+      { wpx: 200 },
+      { wpx: 250 },
+      { wpx: 120 },
+      { wpx: 300 },
+      { wpx: 300 },
+    ];
+    worksheet["!cols"] = columnWidths;
+
+    const rowHeights = filteredSales.map(() => ({ hpx: 20 }));
+    rowHeights.unshift({ hpx: 20 });
+    worksheet["!rows"] = rowHeights;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
+    XLSX.writeFile(workbook, "SalesPersonData.xlsx");
+  };
+
   return (
     <div>
       <ScrollToTop />
@@ -268,15 +302,26 @@ const Sales = () => {
             </h5>
             <Tippy content="Total Sales Team">
               <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalSaleperson} duration={3} />
+                <CountUp start={0} end={totalSalespersonsCount} duration={3} />
               </span>
             </Tippy>
           </div>
+
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
             <CustomButton onClick={openAddSalesPersonModal}>
               <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
               Add Sales Person
             </CustomButton>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={exportToExcel}
+            >
+              Export to Excel
+            </button>
           </div>
         </div>
         <div className="datatables">

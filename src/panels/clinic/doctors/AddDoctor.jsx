@@ -261,11 +261,11 @@ const AddDoctor = ({
                     <div className="mb-5">
                       <select
                         id="specialization"
-                        className="form-select form-select-green text-gray-500 h-10"
+                        className={`form-select form-select-green h-10 ${!input?.specialization && "text-gray-500"}`}
                         value={input?.specialization}
                         onChange={handleSpecializationChange}
                       >
-                        <option value="">Select Specialization</option>
+                        <option value="" className="text-gray-500">Select Specialization</option>
                         {specializations?.map((spec) => (
                           <option key={spec?.id} value={spec.name}>
                             {spec?.name}

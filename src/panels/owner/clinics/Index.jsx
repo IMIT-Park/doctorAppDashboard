@@ -39,7 +39,7 @@ const Clinics = () => {
   });
 
   const [page, setPage] = useState(1);
-  const PAGE_SIZES = [5, 20, 30, 50, 100];
+  const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [allClinics, setAllClinics] = useState([]);
   const [totalClinics, setTotalClinics] = useState(0);
@@ -141,7 +141,10 @@ const Clinics = () => {
   };
 
   const openEditModal = (clinic) => {
+    console.log(clinic);
     const phoneWithoutCountryCode = clinic?.phone?.replace(/^\+91/, "");
+    const isGoogleLocationValid =
+      clinic?.googleLocation && clinic.googleLocation !== `"{}"`;
     setInput({
       name: clinic?.name,
       email: clinic?.User?.email,
@@ -150,7 +153,9 @@ const Clinics = () => {
       address: clinic?.address,
       place: clinic?.place,
       picture: null,
-      googleLocation: convertLocationDetail(clinic?.googleLocation),
+      googleLocation: isGoogleLocationValid
+        ? convertLocationDetail(clinic?.googleLocation)
+        : null,
       defaultPicture: imageBaseUrl + clinic?.banner_img_url || null,
       type: clinic?.type || "",
     });
@@ -342,7 +347,11 @@ const Clinics = () => {
             </h5>
             <Tippy content="Total Clinics">
               <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalClinicsCount} duration={3}></CountUp>
+                <CountUp
+                  start={0}
+                  end={totalClinicsCount}
+                  duration={3}
+                ></CountUp>
               </span>
             </Tippy>
           </div>

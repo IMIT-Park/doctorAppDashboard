@@ -39,6 +39,7 @@ const Sales = () => {
   const [editSalesPersonModal, setEditSalesPersonModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [totalSaleperson, setTotalSalesPerson] = useState(0);
+  const [totalSalespersonsCount, setTotalSalespersonsCount] = useState(0);
   const [allSalesPerson, setAllSalesPerson] = useState([]);
   const [loading, setLoading] = useState(true);
   const [input, setInput] = useState({
@@ -90,7 +91,9 @@ const Sales = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/salesperson/getallsalespersons?page=${page}&pageSize=${pageSize}`
       );
-      setTotalSalesPerson(response.data?.Salesperson?.count);
+      console.log(response);
+      setTotalSalesPerson(response.data?.pageInfo?.total);
+      setTotalSalespersonsCount(response.data?.pageInfo?.total);
       setAllSalesPerson(response.data?.Salesperson?.rows);
       setLoading(false);
     } catch (error) {
@@ -268,10 +271,12 @@ const Sales = () => {
             </h5>
             <Tippy content="Total Sales Team">
               <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalSaleperson} duration={3} />
+                <CountUp start={0} end={totalSalespersonsCount} duration={3} />
               </span>
             </Tippy>
           </div>
+
+          
           <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
             <CustomButton onClick={openAddSalesPersonModal}>
               <IconUserPlus className="ltr:mr-2 rtl:ml-2" />

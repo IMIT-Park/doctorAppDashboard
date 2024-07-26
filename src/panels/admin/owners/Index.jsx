@@ -44,7 +44,6 @@ const Owners = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getallowner?page=${page}&pageSize=${pageSize}`
       );
-
       setTotalOwnersCount(response?.data?.pageInfo?.total || 0);
       setTotalOwners(response?.data?.pageInfo?.total || 0);
       setAllOwners(response?.data?.Owners || 0);
@@ -112,8 +111,6 @@ const Owners = () => {
     XLSX.writeFile(workbook, "ClinicsData.xlsx");
   };
 
-
-  console.log(allOwners);
 
   return (
     <div>
@@ -198,6 +195,7 @@ const Owners = () => {
                 { accessor: "Owner.email", title: "Email" },
                 { accessor: "Owner.phone", title: "Phone" },
                 { accessor: "Owner.address", title: "Address" },
+                { accessor: "Clinic_count", title: "Total clinics" },
                 {
                   accessor: "Owner.created_at",
                   title: "Account Creation Date",

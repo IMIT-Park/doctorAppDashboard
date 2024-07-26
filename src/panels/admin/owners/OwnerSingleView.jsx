@@ -60,7 +60,6 @@ const OwnerSingleView = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getallclinics/${ownerId}?page=${page}&pageSize=${pageSize}`
       );
-      console.log(response);
       setTotalClinicsCount(response.data?.pageInfo?.total);
       setTotalClinics(response.data?.pageInfo?.total);
       setAllClinics(response.data?.Clinic);
@@ -334,7 +333,7 @@ const OwnerSingleView = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allClinics}
-              idAccessor="clinic_id"
+              idAccessor="clinic.clinic_id"
               onRowClick={(row) =>
                 navigate(`/clinics/${row?.clinic?.clinic_id}`, {
                   state: { previousUrl: location?.pathname },
@@ -352,6 +351,8 @@ const OwnerSingleView = () => {
                 { accessor: "clinic.email", title: "Email" },
 
                 { accessor: "clinic.place", title: "Place" },
+                { accessor: "doctor_count", title: "Total Doctors"},
+
                 {
                   accessor: "clinic_id",
                   title: "Plan Details",

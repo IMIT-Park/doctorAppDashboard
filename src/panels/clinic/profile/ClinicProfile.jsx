@@ -58,6 +58,7 @@ const ClinicProfile = () => {
     picture: null,
     defaultPicture: null,
     googleLocation: {},
+    type: "",
   });
 
   const [doctors, setDoctors] = useState([]);
@@ -72,7 +73,7 @@ const ClinicProfile = () => {
   const [appointmentsLoading, setAppointmentsLoading] = useState(false);
   const [addRescheduleModal, setAddRescheduleModal] = useState(false);
   const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
-  const [cancelAllAppoinments,setCancelAllAppoinments] = useState(false);
+  const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
 
   useEffect(() => {
@@ -102,6 +103,8 @@ const ClinicProfile = () => {
 
   const openEditModal = (clinic) => {
     const phoneWithoutCountryCode = clinic.phone.replace(/^\+91/, "");
+    const isGoogleLocationValid =
+      clinic?.googleLocation && clinic.googleLocation !== `"{}"`;
     setInput({
       name: clinic.name,
       email: clinic.User.email,
@@ -110,8 +113,11 @@ const ClinicProfile = () => {
       address: clinic.address,
       place: clinic.place,
       picture: null,
-      googleLocation: convertLocationDetail(clinic.googleLocation),
+      googleLocation: isGoogleLocationValid
+        ? convertLocationDetail(clinic?.googleLocation)
+        : null,
       defaultPicture: imageBaseUrl + clinic?.banner_img_url || null,
+      type: clinic?.type || "",
     });
     setCurrentClinicId(clinic.clinic_id);
     setEditModal(true);
@@ -133,7 +139,13 @@ const ClinicProfile = () => {
   };
 
   const updateClinic = async () => {
-    if (!input.name || !input.phone || !input.address || !input.place) {
+    if (
+      !input.name ||
+      !input.phone ||
+      !input.address ||
+      !input.place ||
+      !input.type
+    ) {
       showMessage("Please fill in all required fields", "warning");
       return true;
     }
@@ -152,6 +164,7 @@ const ClinicProfile = () => {
     formData.append("phone", `+91${input.phone}`);
     formData.append("address", input.address);
     formData.append("place", input.place);
+    formData.append("type", input.type);
     formData.append("googleLocation", JSON.stringify(input.googleLocation));
     if (input.picture) {
       formData.append("image_url[]", input.picture);
@@ -295,7 +308,7 @@ const ClinicProfile = () => {
     setCancelAllAppoinments(false);
   };
 
-  setCancelAllAppoinments
+  setCancelAllAppoinments;
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchProfileData);
@@ -387,10 +400,10 @@ const ClinicProfile = () => {
                           <div className="flex flex-col md:flex-row items-start gap-5">
                             <div className="flex flex-col items-start w-full">
                               <div className="text-base font-medium text-gray-500">
-                                Username:
+                                Cateogry:
                               </div>
                               <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                                {profileData?.User?.user_name || ""}
+                                {profileData?.type || ""}
                               </div>
                             </div>
                             <div className="flex flex-col items-start w-full">
@@ -504,7 +517,9 @@ const ClinicProfile = () => {
                   <button
                     type="button"
                     className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
-                    onClick={() => openCancelAllAppoimentsModal(selectedDoctorId)}
+                    onClick={() =>
+                      openCancelAllAppoimentsModal(selectedDoctorId)
+                    }
                   >
                     Cancel all Appoinments
                   </button>
@@ -531,12 +546,25 @@ const ClinicProfile = () => {
                         columns={[
                           {
                             accessor: "No",
-                            title: "No", textAlignment: "center",
+                            title: "No",
+                            textAlignment: "center",
                             render: (row, rowIndex) => rowIndex + 1,
                           },
-                          { accessor: "Patient.name", title: "Name" , textAlignment: "center",},
-                          { accessor: "Patient.gender", title: "Gender", textAlignment: "center", },
-                          { accessor: "schedule_time", title: "Time", textAlignment: "center", },
+                          {
+                            accessor: "Patient.name",
+                            title: "Name",
+                            textAlignment: "center",
+                          },
+                          {
+                            accessor: "Patient.gender",
+                            title: "Gender",
+                            textAlignment: "center",
+                          },
+                          {
+                            accessor: "schedule_time",
+                            title: "Time",
+                            textAlignment: "center",
+                          },
                           {
                             accessor: "actions",
                             title: "Actions",

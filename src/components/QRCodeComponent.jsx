@@ -107,7 +107,7 @@ const QRCodeComponent = ({
       <ModalSubscription
         open={subscriptionModal}
         closeModal={closeSubscriptionModal}
-        clinicId={clinicId}
+        clinicId={subscriptionModal && clinicId}
         ownerId={ownerId}
         buttonLoading={buttonLoading}
         setButtonLoading={setButtonLoading}

@@ -111,7 +111,6 @@ const Owners = () => {
     XLSX.writeFile(workbook, "ClinicsData.xlsx");
   };
 
-
   return (
     <div>
       <ScrollToTop />

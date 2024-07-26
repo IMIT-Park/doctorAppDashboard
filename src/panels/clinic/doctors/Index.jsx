@@ -36,12 +36,12 @@ const ClinicDoctor = () => {
   const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [search, setSearch] = useState("");
+  const [totalDoctorsCount, setTotalDoctorsCount] = useState(0);
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [addDoctorModal, setAddDoctorModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-
   const [errors, setErrors] = useState({});
   const [removeModal, setRemoveModal] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
@@ -54,7 +54,7 @@ const ClinicDoctor = () => {
     gender: "",
     qualification: "",
     fees: "",
-    specialization: " ",
+    specialization: "",
     address: "",
     password: "",
     confirmPassword: "",
@@ -62,12 +62,7 @@ const ClinicDoctor = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [pageSize]);
-
-  useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-  }, [page, pageSize]);
+  }, [pageSize, search]);
 
   const openAddDoctorModal = () => {
     setAddDoctorModal(true);
@@ -100,23 +95,20 @@ const ClinicDoctor = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
       );
-      setTotalDoctors(response.data?.count);
+      setTotalDoctorsCount(response.data?.count || 0);
+      setTotalDoctors(response.data?.count || 0);
       setAllDoctors(response.data?.alldoctors || []);
       setLoading(false);
     } catch (error) {
       setAllDoctors([]);
       setTotalDoctors(0);
+      setTotalDoctorsCount(0);
       console.log(error);
       setLoading(false);
     } finally {
       setLoading(false);
     }
   };
-
-  // fetching Doctors
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
 
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
@@ -228,7 +220,33 @@ const ClinicDoctor = () => {
     }
   };
 
-  return (
+  const doctorSearch = async () => {
+    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/doctor/getdoctordata/${clinicId}?pageSize=${pageSize}&page=${page}`,
+        { keyword: updatedKeyword }
+      );
+      setTotalDoctors(response?.data?.pagination?.total || 0);
+      setAllDoctors(response?.data?.doctors || []);
+    } catch (error) {
+      setAllDoctors([]);
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (search.trim()) {
+      doctorSearch();
+    } else {
+      fetchData();
+    }
+  }, [search, page, pageSize]);
+
+  http: return (
     <div>
       <ScrollToTop />
       <div className="panel">
@@ -413,7 +431,6 @@ const ClinicDoctor = () => {
                     </div>
                   ),
                 },
-                
               ]}
               totalRecords={totalDoctors}
               recordsPerPage={pageSize}

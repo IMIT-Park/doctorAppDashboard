@@ -256,7 +256,7 @@ const ClinicDoctor = () => {
               Doctors
             </h5>
             <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-              <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
+              <CountUp start={0} end={totalDoctorsCount} duration={3}></CountUp>
             </span>
           </div>
 

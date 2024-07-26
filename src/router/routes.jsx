@@ -36,9 +36,7 @@ const OwnerIndex = lazy(() => import("../panels/owner/Index"));
 const OwnerClinics = lazy(() => import("../panels/owner/clinics/Index"));
 const OwnerChat = lazy(() => import("../panels/owner/chats/Index"));
 const OwnerBooking = lazy(() => import("../panels/owner/bookings/index"));
-const OwnerProfile = lazy(() =>
-  import("../panels/owner/profile/OwnerProfile")
-);
+const OwnerProfile = lazy(() => import("../panels/owner/profile/OwnerProfile"));
 const OwnerDoctorAppointments = lazy(() =>
   import("../panels/owner/bookings/DoctorAppoinments")
 );
@@ -48,6 +46,7 @@ const OwnerDoctorAppointments = lazy(() =>
 const ClinicIndex = lazy(() => import("../panels/clinic/Index"));
 const ClinicDoctors = lazy(() => import("../panels/clinic/doctors/Index"));
 const ClinicLeaves = lazy(() => import("../panels/clinic/leaves/Index"));
+const ClinicTimings = lazy(() => import("../panels/clinic/timings/Index"));
 const ClinicProfile = lazy(() =>
   import("../panels/clinic/profile/ClinicProfile")
 );
@@ -241,7 +240,7 @@ const routes = [
     element: <OwnerBooking />,
     layout: "default",
   },
-  
+
   // ownerprofile
   {
     path: "/owner/profile",
@@ -249,12 +248,12 @@ const routes = [
     layout: "default",
   },
 
- // OwnerDoctorAppointments
- {
-  path: "/owner/bookings/:clinicId",
-  element: <OwnerDoctorAppointments />,
-  layout: "default",
-},
+  // OwnerDoctorAppointments
+  {
+    path: "/owner/bookings/:clinicId",
+    element: <OwnerDoctorAppointments />,
+    layout: "default",
+  },
   // <--------------> owner panel ends here <-------------->
 
   // <--------------> clinic panel starts here <-------------->
@@ -273,13 +272,20 @@ const routes = [
     layout: "default",
   },
 
-  // clinicDoctors
+  // clinic leaves
   {
     path: "/clinic/leaves",
     element: <ClinicLeaves />,
     layout: "default",
   },
 
+  // clinic leaves
+  {
+    path: "/clinic/timing",
+    element: <ClinicTimings />,
+    layout: "default",
+  },
+  
   // clinicBookings
   {
     path: "/clinic/bookings",

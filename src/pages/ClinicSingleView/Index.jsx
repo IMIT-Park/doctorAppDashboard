@@ -30,7 +30,6 @@ import Tippy from "@tippyjs/react";
 import IconSearch from "../../components/Icon/IconSearch";
 import * as XLSX from "xlsx";
 
-
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -48,7 +47,7 @@ const ClinicSingleView = () => {
     dispatch(setPageTitle("Doctors"));
   });
   const [page, setPage] = useState(1);
-  const PAGE_SIZES = [5,10, 20, 30, 50, 100];
+  const PAGE_SIZES = [10, 20, 30, 50, 100];
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [editModal, setEditModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -64,6 +63,7 @@ const ClinicSingleView = () => {
     picture: null,
     defaultPicture: null,
     googleLocation: {},
+    type: "",
   });
   const [input, setInput] = useState({
     name: "",
@@ -84,7 +84,7 @@ const ClinicSingleView = () => {
 
   const [addDoctorModal, setAddDoctorModal] = useState(false);
   const [totalDoctors, setTotalDoctors] = useState(0);
-  const[totalDoctorsCount,setTotalDoctorsCount] = useState(0)
+  const [totalDoctorsCount, setTotalDoctorsCount] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
   const [errors, setErrors] = useState({});
   const [search, setSearch] = useState("");
@@ -92,7 +92,7 @@ const ClinicSingleView = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [pageSize]);
+  }, [pageSize, search]);
 
   useEffect(() => {
     const from = (page - 1) * pageSize;
@@ -107,27 +107,13 @@ const ClinicSingleView = () => {
   } = useFetchData(`/v1/clinic/getbyId/${clinicId}`, {}, [clinicId]);
   const clinicDetails = clinicData?.Clinic;
 
-  // fetch doctors data function
-  // const {
-  //   data: doctorData,
-  //   loading: doctorLoading,
-  //   refetch: fetchDoctorData,
-  // } = useFetchData(
-  //   `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`,
-  //   {},
-  //   [clinicId, page, pageSize]
-  // );
-  // const totalDoctors = doctorData?.count || 0;
-  // const allDoctors = doctorData?.alldoctors || [];
-
   const fetchDoctorData = async () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/doctor/getalldr/${clinicId}?pageSize=${pageSize}&page=${page}`
       );
-      console.log(response);
       setTotalDoctors(response?.data?.count);
-      setTotalDoctorsCount(response?.data?.count)
+      setTotalDoctorsCount(response?.data?.count);
       setAllDoctors(response?.data?.alldoctors);
       setdoctorLoading(false);
     } catch (error) {
@@ -138,10 +124,9 @@ const ClinicSingleView = () => {
     }
   };
 
-useEffect(() => {
-  fetchDoctorData();
-}, [page, pageSize]);
-
+  useEffect(() => {
+    fetchDoctorData();
+  }, [page, pageSize]);
 
   // doctor image picker
   const handleFileChange = (e) => {
@@ -157,16 +142,21 @@ useEffect(() => {
   // edit modal handler
   const openEditModal = () => {
     const phoneWithoutCountryCode = clinicDetails.phone.replace(/^\+91/, "");
+    const isGoogleLocationValid =
+      clinicDetails?.googleLocation && clinicDetails.googleLocation !== `"{}"`;
     setClinicInput({
-      name: clinicDetails.name,
-      email: clinicDetails.User.email,
-      username: clinicDetails.User.user_name,
+      name: clinicDetails?.name,
+      email: clinicDetails?.User?.email,
+      username: clinicDetails?.User?.user_name,
       phone: phoneWithoutCountryCode,
-      address: clinicDetails.address,
-      place: clinicDetails.place,
+      address: clinicDetails?.address,
+      place: clinicDetails?.place,
       picture: null,
-      googleLocation: convertLocationDetail(clinicDetails?.googleLocation),
+      googleLocation: isGoogleLocationValid
+        ? convertLocationDetail(clinicDetails?.googleLocation)
+        : null,
       defaultPicture: imageBaseUrl + clinicDetails?.banner_img_url || null,
+      type: clinicDetails?.type || "",
     });
     setEditModal(true);
   };
@@ -181,7 +171,8 @@ useEffect(() => {
       !clinicInput.name ||
       !clinicInput.phone ||
       !clinicInput.address ||
-      !clinicInput.place
+      !clinicInput.place ||
+      !clinicInput.type
     ) {
       showMessage("Please fill in all required fields", "warning");
       return true;
@@ -201,6 +192,8 @@ useEffect(() => {
     formData.append("phone", `+91${clinicInput.phone}`);
     formData.append("address", clinicInput.address);
     formData.append("place", clinicInput.place);
+    formData.append("type", clinicInput.type);
+
     formData.append(
       "googleLocation",
       JSON.stringify(clinicInput.googleLocation)
@@ -334,6 +327,7 @@ useEffect(() => {
         { keyword: updatedKeyword }
       );
       setAllDoctors(response?.data?.doctors || []);
+      setTotalDoctors(response?.data?.pagination?.total || 0);
     } catch (error) {
       setAllDoctors([]);
       console.log(error);
@@ -363,7 +357,6 @@ useEffect(() => {
       Qualification: doctor.qualification,
       Specialization: doctor.specialization,
       Fees: doctor.fees,
-
     }));
     const worksheet = XLSX.utils.json_to_sheet(filteredDoctors);
     const columnWidths = [
@@ -376,7 +369,6 @@ useEffect(() => {
       { wpx: 150 },
       { wpx: 200 },
       { wpx: 100 },
-
     ];
     worksheet["!cols"] = columnWidths;
 
@@ -388,7 +380,6 @@ useEffect(() => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
     XLSX.writeFile(workbook, "DoctorData.xlsx");
   };
-
 
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
@@ -488,22 +479,15 @@ useEffect(() => {
                       </div>
 
                       <div className="flex flex-col md:flex-row items-start gap-5">
-                        {!isSuperAdmin && (
-                          <div className="flex flex-col items-start w-full">
-                            <div className="text-base font-medium text-gray-500">
-                              Username:
-                            </div>
-                            <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                              {clinicDetails?.User?.user_name || ""}
-                            </div>
+                        <div className="flex flex-col items-start w-full">
+                          <div className="text-base font-medium text-gray-500">
+                            Cateogry:
                           </div>
-                        )}
-
-                        <div
-                          className={`flex flex-col items-start w-full ${
-                            isSuperAdmin && "md:w-[calc(50%-15px)]"
-                          }`}
-                        >
+                          <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
+                            {clinicDetails?.type || ""}
+                          </div>
+                        </div>
+                        <div className={`flex flex-col items-start w-full`}>
                           <div className="text-base font-medium text-gray-500">
                             Phone:
                           </div>
@@ -531,22 +515,26 @@ useEffect(() => {
       </div>
 
       <div className="panel">
-        <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
+        <div className="flex items-center flex-wrap gap-2 justify-between mb-5">
           <div className="flex items-center gap-1">
             <h5 className="font-semibold text-lg dark:text-white-light">
               Doctors
             </h5>
             <Tippy content="Total Doctors">
-            <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-              <CountUp start={0} end={totalDoctorsCount} duration={3}></CountUp>
-            </span>
+              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
+                <CountUp
+                  start={0}
+                  end={totalDoctorsCount}
+                  duration={3}
+                ></CountUp>
+              </span>
             </Tippy>
           </div>
           <div>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                ownerSearch();
+                doctorSearch();
               }}
               className="mx-auto w-full mb-2"
             >
@@ -554,7 +542,7 @@ useEffect(() => {
                 <input
                   type="text"
                   value={search}
-                  placeholder="Search Owners..."
+                  placeholder="Search Doctors..."
                   className="form-input form-input-green shadow-[0_0_4px_2px_rgb(31_45_61_/_10%)] bg-white rounded-full h-11 placeholder:tracking-wider ltr:pr-11 rtl:pl-11"
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -568,7 +556,7 @@ useEffect(() => {
             </form>
           </div>
 
-          <div>
+          <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
             <button
               type="button"
               className="btn btn-green"
@@ -576,19 +564,18 @@ useEffect(() => {
             >
               Export to Excel
             </button>
+
+            {!isSuperAdmin && (
+              <button
+                type="button"
+                className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+                onClick={openAddDoctorModal}
+              >
+                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
+                Add Doctor
+              </button>
+            )}
           </div>
-
-          {!isSuperAdmin ? (
-            <button
-              type="button"
-              className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
-              onClick={openAddDoctorModal}
-            >
-              <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-              Add Doctor
-            </button>
-          ) : null}
-
         </div>
         {doctorLoading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -690,9 +677,7 @@ useEffect(() => {
                     <div className="flex justify-center items-center">
                       <span
                         className={`text-sm font-medium ${
-                          rowData?.status
-                            ? "text-green-500"
-                            : "text-red-500"
+                          rowData?.status ? "text-green-500" : "text-red-500"
                         }`}
                       >
                         {rowData?.status ? "Active" : "Blocked"}
@@ -700,7 +685,6 @@ useEffect(() => {
                     </div>
                   ),
                 },
-
               ]}
               totalRecords={totalDoctors}
               recordsPerPage={pageSize}

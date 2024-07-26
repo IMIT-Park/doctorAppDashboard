@@ -14,6 +14,7 @@ import IconMenuNotes from "../Icon/Menu/IconMenuNotes";
 import IconMenuTables from "../Icon/Menu/IconMenuTables";
 import IconUser from "../Icon/IconUser";
 import IconUserPlus from "../Icon/IconUserPlus";
+import IconClock from "../Icon/IconClock";
 import IconUsersGroup from "../Icon/IconUsersGroup";
 import { UserContext } from "../../contexts/UseContext";
 
@@ -184,7 +185,19 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
-
+                <li className="nav-item">
+                  <NavLink to="/clinic/timing" className="group">
+                    <div className="flex items-center">
+                      <IconClock
+                      fill
+                        className={`group-hover:!text-[#006241] shrink-0 `}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Timing"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
                 <li className="nav-item">
                   <NavLink to="/clinic/doctors" className="group">
                     <div className="flex items-center">

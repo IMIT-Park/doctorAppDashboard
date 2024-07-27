@@ -6,6 +6,7 @@ import CountUp from "react-countup";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import IconLoader from "../../../components/Icon/IconLoader";
+import IconEye from "../../../components/Icon/IconEye";
 import ScrollToTop from "../../../components/ScrollToTop";
 import emptyBox from "/assets/images/empty-box.svg";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -16,6 +17,7 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import noProfile from "/assets/images/empty-user.png";
 import DoctorViewModal from "./DoctorViewModal";
+
 
 const SupportUsers_Doctors = () => {
   const dispatch = useDispatch();
@@ -30,6 +32,7 @@ const SupportUsers_Doctors = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [search, setSearch] = useState("");
   const [totalDoctors, setTotalDoctors] = useState(0);
+  const [totalDoctorsCount, setTotalDoctorsCount] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
@@ -46,12 +49,7 @@ const SupportUsers_Doctors = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [pageSize]);
-
-  useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-  }, [page, pageSize]);
+  }, [pageSize, search]);
 
   // fetch Doctors function
   const fetchData = async () => {
@@ -59,9 +57,9 @@ const SupportUsers_Doctors = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/doctor/getall?pageSize=${pageSize}&page=${page}`
       );
-      setTotalDoctors(response.data?.Doctors?.count);
+      setTotalDoctorsCount(response.data?.Doctors?.count || 0);
+      setTotalDoctors(response.data?.Doctors?.count || 0);
       setAllDoctors(response.data?.Doctors?.rows);
-      console.log(response);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -71,11 +69,6 @@ const SupportUsers_Doctors = () => {
     }
   };
 
-  // fetching Loans
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
-
   const doctorSearch = async () => {
     const updatedKeyword = isNaN(search) ? search : `+91${search}`;
     try {
@@ -84,6 +77,7 @@ const SupportUsers_Doctors = () => {
         { keyword: updatedKeyword }
       );
       setAllDoctors(response?.data?.doctors || []);
+      setTotalDoctors(response?.data?.pagination?.total || 0);
     } catch (error) {
       setAllDoctors([]);
       console.log(error);
@@ -117,7 +111,11 @@ const SupportUsers_Doctors = () => {
             </h5>
             <Tippy content="Total Doctors">
               <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
+                <CountUp
+                  start={0}
+                  end={totalDoctorsCount}
+                  duration={3}
+                ></CountUp>
               </span>
             </Tippy>
           </div>
@@ -160,11 +158,6 @@ const SupportUsers_Doctors = () => {
               className="whitespace-nowrap table-hover"
               records={allDoctors}
               idAccessor="doctor_id"
-              // onRowClick={(row) =>
-              //   navigate(`/doctors/${row?.doctor_id}`, {
-              //     state: { previousUrl: location?.pathname },
-              //   })
-              // }
               columns={[
                 {
                   accessor: "No",
@@ -192,25 +185,8 @@ const SupportUsers_Doctors = () => {
                 { accessor: "email", title: "Email" },
                 { accessor: "phone", title: "Phone" },
                 {
-                  accessor: "gender",
-                  title: "Gender",
-                  cellsStyle: { textTransform: "capitalize" },
-                },
-                // {
-                //   accessor: "dateOfBirth",
-                //   title: "Date of Birth",
-                //   render: (row) => formatDate(row?.dateOfBirth),
-                // },
-                { accessor: "qualification", title: "Qualification" },
-                { accessor: "specialization", title: "Specialization" },
-                { accessor: "address", title: "Address" },
-                {
-                  accessor: "fees",
-                  title: "Fees",
-                  render: (row) => `₹${row?.fees}`,
-                },
-                {
                   accessor: "Verification",
+                  title: "Verification Status",
                   render: (row) => (
                     <span
                       key={row?.doctor_clinic_id}
@@ -230,28 +206,11 @@ const SupportUsers_Doctors = () => {
                     </span>
                   ),
                   cellsClassName: "capitalize",
-                },
-                {
-                  accessor: "View",
                   textAlignment: "center",
-                  render: (rowData) => (
-                    <div className="flex items-center justify-center">
-                      <button
-                        type="button"
-                        className="btn btn-green btn-sm h-fit"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          OpenDoctorModal(rowData);
-                        }}
-                      >
-                        View
-                      </button>
-                    </div>
-                  ),
                 },
 
                 {
-                  accessor: "Status",
+                  accessor: "Active Status",
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex justify-center items-center">
@@ -262,6 +221,28 @@ const SupportUsers_Doctors = () => {
                       >
                         {rowData?.status ? "Active" : "Blocked"}
                       </span>
+                    </div>
+                  ),
+                },
+
+                {
+                  accessor: "View",
+                  title:"Action",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="flex items-center justify-center">
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm h-fit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          OpenDoctorModal(rowData);
+                        }}
+                      >
+                    <IconEye className="ltr:mr-2 rtl:ml-2" />
+
+                        View Full Detials
+                      </button>
                     </div>
                   ),
                 },

@@ -153,7 +153,7 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                                   Fees:
                                 </div>
                                 <div className="text-md p-1 text-gray-600 dark:text-gray-300">
-                                  {SingleDoctor.fees}
+                                  ₹{SingleDoctor.fees}
                                 </div>
                               </div>
                             </div>
@@ -200,7 +200,7 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                               <div className="text-md p-1 font-bold text-black dark:text-gray-400">
                                 Address:
                               </div>
-                              <div className="text-md p-1 text-gray-600 dark:text-gray-300 ">
+                              <div className="text-md p-1 text-gray-600 dark:text-gray-300 min-h-14">
                                 {SingleDoctor.address}
                               </div>
                             </div>

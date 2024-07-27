@@ -14,7 +14,7 @@ const Index = () => {
   const [currentMonth, setCurrentMonth] = useState("");
   const [currentMonthBookings, setCurrentMonthBookings] = useState(0);
 
-  const userDetails = sessionStorage.getItem("userData");
+  const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const ownerId = userData?.UserOwner?.[0]?.owner_id || 0;
 
@@ -30,7 +30,6 @@ const Index = () => {
         `/v1/report/getOwnerReport/${ownerId}`
       );
       setOwnerReport(response?.data?.results);
-      console.log(response);
       setLoading(false);
     } catch (error) {
       console.log(error);

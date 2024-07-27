@@ -7,16 +7,23 @@ import IconLoader from "../../../components/Icon/IconLoader";
 import NetworkHandler, { imageBaseUrl } from "../../../utils/NetworkHandler";
 import noProfile from "/assets/images/empty-user.png";
 import Swal from "sweetalert2";
+import ConfirmationModal from "./ConfirmationModal";
 
 const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
   const { doctorId } = useParams();
   const [rejectButtonLoading, setRejectButtonLoading] = useState(false);
   const [verifyButtonLoading, setVerifyButtonLoading] = useState(false);
   const [doctorsLoading, setDoctorsLoading] = useState(false);
+  const [actionStatus, setActionStatus] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  const handleAction = (status) => {
+    setActionStatus(status);
+    setShowConfirmation(true);
+  };
 
   const updateDoctorStatus = async (status) => {
-    const doctorId = SingleDoctor?.doctor_id;
-    if (!doctorId) {
+    if (!SingleDoctor?.doctor_id) {
       console.error("Doctor ID is undefined");
       return;
     }
@@ -25,14 +32,13 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
     if (status === 1) setVerifyButtonLoading(true);
 
     try {
-      const response = await NetworkHandler.makePutRequest(
-        `/v1/supportuser/verifyDoctor/${doctorId}`,
+      await NetworkHandler.makePutRequest(
+        `/v1/supportuser/verifyDoctor/${SingleDoctor.doctor_id}`,
         { status }
       );
       Swal.fire({
-        icon: status === 0 ? "warning" : "success",
+        icon: status === 0 ? "success" : "success",
         title: `Doctor ${status === 0 ? "rejected" : "verified"} successfully!`,
-        text: ``,
         padding: "2em",
         customClass: "sweet-alerts",
       });
@@ -51,7 +57,23 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
       CloseDoctorModal();
     }
   };
-  
+
+  const confirmAction = () => {
+    updateDoctorStatus(actionStatus);
+    setShowConfirmation(false);
+  };
+
+  const cancelAction = () => {
+    setShowConfirmation(false);
+  };
+
+  ConfirmationModal({
+    show: showConfirmation,
+    status: actionStatus,
+    onConfirm: confirmAction,
+    onClose: cancelAction,
+  });
+
   return (
     <Transition appear show={openModal} as={Fragment}>
       <Dialog
@@ -119,18 +141,18 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                             </div>
                             <div className="mt-2 flex flex-col md:flex-row gap-2">
                               <div className="w-full md:w-4/5 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
-                                <div className="text-md p-1 font-bold text-black dark:text-green-600">
+                                <div className="text-md p-1 font-bold text-black dark:text-gray-400">
                                   Email:
                                 </div>
-                                <div className="text-md p-1 text-gray-600 dark:text-white">
+                                <div className="text-md p-1 text-gray-600 dark:text-gray-300">
                                   {SingleDoctor.email}
                                 </div>
                               </div>
                               <div className="w-full md:w-1/2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
-                                <div className="text-md p-1 font-bold text-black dark:text-green-600">
+                                <div className="text-md p-1 font-bold text-black dark:text-gray-400">
                                   Fees:
                                 </div>
-                                <div className="text-md p-1 text-gray-600 dark:text-white">
+                                <div className="text-md p-1 text-gray-600 dark:text-gray-300">
                                   {SingleDoctor.fees}
                                 </div>
                               </div>
@@ -138,18 +160,18 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
 
                             <div className="mt-2 flex flex-col md:flex-row gap-2">
                               <div className="w-full md:w-1/2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
-                                <div className="text-md p-1 font-bold text-black dark:text-green-600">
+                                <div className="text-md p-1 font-bold text-black dark:text-gray-400">
                                   Phone:
                                 </div>
-                                <div className="text-md p-1 text-gray-600 dark:text-white">
+                                <div className="text-md p-1 text-gray-600 dark:text-gray-300">
                                   {SingleDoctor.phone}
                                 </div>
                               </div>
                               <div className="w-full md:w-1/2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
-                                <div className="text-md p-1 font-bold text-black dark:text-green-600">
+                                <div className="text-md p-1 font-bold text-black dark:text-gray-400">
                                   Gender:
                                 </div>
-                                <div className="text-md p-1 text-gray-600 dark:text-white">
+                                <div className="text-md p-1 text-gray-600 dark:text-gray-300">
                                   {SingleDoctor.gender}
                                 </div>
                               </div>
@@ -157,28 +179,28 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
 
                             <div className="mt-2 flex flex-col md:flex-row gap-2">
                               <div className="w-full md:w-1/2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
-                                <div className="text-md p-1 font-bold text-black dark:text-green-600">
+                                <div className="text-md p-1 font-bold text-black dark:text-gray-400">
                                   Qualification:
                                 </div>
-                                <div className="text-md p-1 text-gray-600 dark:text-white">
+                                <div className="text-md p-1 text-gray-600 dark:text-gray-300">
                                   {SingleDoctor.qualification}
                                 </div>
                               </div>
                               <div className="w-full md:w-4/5 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
-                                <div className="text-md p-1 font-bold text-black dark:text-green-600">
+                                <div className="text-md p-1 font-bold text-black dark:text-gray-400">
                                   Specialization:
                                 </div>
-                                <div className="text-md p-1 text-gray-600 dark:text-white">
+                                <div className="text-md p-1 text-gray-600 dark:text-gray-300">
                                   {SingleDoctor.specialization}
                                 </div>
                               </div>
                             </div>
 
                             <div className="mt-2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
-                              <div className="text-md p-1 font-bold text-black dark:text-green-600">
+                              <div className="text-md p-1 font-bold text-black dark:text-gray-400">
                                 Address:
                               </div>
-                              <div className="text-md p-1 text-gray-600 dark:text-white ">
+                              <div className="text-md p-1 text-gray-600 dark:text-gray-300 ">
                                 {SingleDoctor.address}
                               </div>
                             </div>
@@ -191,11 +213,11 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                       </div>
                     </div>
                   </div>
-                  <div className=" mt-8 flex flex-row gap-3">
+                  <div className="mt-8 flex flex-row gap-3">
                     <button
                       type="button"
                       className="btn btn-danger gap-2 w-1/2"
-                      onClick={() => updateDoctorStatus(0)}
+                      onClick={() => handleAction(0)}
                     >
                       {rejectButtonLoading ? (
                         <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />
@@ -206,7 +228,7 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                     <button
                       type="button"
                       className="btn btn-success gap-2 w-1/2"
-                      onClick={() => updateDoctorStatus(1)}
+                      onClick={() => handleAction(1)}
                     >
                       {verifyButtonLoading ? (
                         <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />

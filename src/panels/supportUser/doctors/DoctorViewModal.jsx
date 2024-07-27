@@ -14,17 +14,13 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
   const [verifyButtonLoading, setVerifyButtonLoading] = useState(false);
   const [doctorsLoading, setDoctorsLoading] = useState(false);
 
-  console.log(SingleDoctor);
-
   const updateDoctorStatus = async (status) => {
     const doctorId = SingleDoctor?.doctor_id;
-    console.log("Doctor ID:", doctorId); 
     if (!doctorId) {
       console.error("Doctor ID is undefined");
       return;
     }
 
-    // Set loading state based on action
     if (status === 0) setRejectButtonLoading(true);
     if (status === 1) setVerifyButtonLoading(true);
 
@@ -33,7 +29,6 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
         `/v1/supportuser/verifyDoctor/${doctorId}`,
         { status }
       );
-      console.log(`Doctor ${status === 0 ? "rejected" : "verified"}:`, response.data);
       Swal.fire({
         icon: status === 0 ? "warning" : "success",
         title: `Doctor ${status === 0 ? "rejected" : "verified"} successfully!`,
@@ -51,7 +46,6 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
         customClass: "sweet-alerts",
       });
     } finally {
-      // Reset loading states and close modal
       if (status === 0) setRejectButtonLoading(false);
       if (status === 1) setVerifyButtonLoading(false);
       CloseDoctorModal();
@@ -132,7 +126,7 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                                   {SingleDoctor.email}
                                 </div>
                               </div>
-                              <div className="w-full md:w-1/2 flex flex-row justify-center dark:bg-slate-800">
+                              <div className="w-full md:w-1/2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
                                 <div className="text-md p-1 font-bold text-black dark:text-green-600">
                                   Fees:
                                 </div>
@@ -143,7 +137,7 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                             </div>
 
                             <div className="mt-2 flex flex-col md:flex-row gap-2">
-                              <div className="w-full md:w-1/2 flex flex-row justify-center dark:bg-slate-800">
+                              <div className="w-full md:w-1/2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
                                 <div className="text-md p-1 font-bold text-black dark:text-green-600">
                                   Phone:
                                 </div>
@@ -151,7 +145,7 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                                   {SingleDoctor.phone}
                                 </div>
                               </div>
-                              <div className="w-full md:w-1/2 flex flex-row justify-center dark:bg-slate-800">
+                              <div className="w-full md:w-1/2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
                                 <div className="text-md p-1 font-bold text-black dark:text-green-600">
                                   Gender:
                                 </div>
@@ -162,7 +156,7 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                             </div>
 
                             <div className="mt-2 flex flex-col md:flex-row gap-2">
-                              <div className="w-full md:w-1/2 flex flex-row justify-center dark:bg-slate-800">
+                              <div className="w-full md:w-1/2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
                                 <div className="text-md p-1 font-bold text-black dark:text-green-600">
                                   Qualification:
                                 </div>
@@ -170,7 +164,7 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                                   {SingleDoctor.qualification}
                                 </div>
                               </div>
-                              <div className="w-full md:w-4/5 flex flex-row justify-center dark:bg-slate-800">
+                              <div className="w-full md:w-4/5 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
                                 <div className="text-md p-1 font-bold text-black dark:text-green-600">
                                   Specialization:
                                 </div>
@@ -180,7 +174,7 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                               </div>
                             </div>
 
-                            <div className="mt-2 flex flex-row justify-center dark:bg-slate-800">
+                            <div className="mt-2 flex flex-row justify-center bg-gray-100 dark:bg-slate-800">
                               <div className="text-md p-1 font-bold text-black dark:text-green-600">
                                 Address:
                               </div>
@@ -202,7 +196,6 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                       type="button"
                       className="btn btn-danger gap-2 w-1/2"
                       onClick={() => updateDoctorStatus(0)}
-                      disabled={rejectButtonLoading || verifyButtonLoading}
                     >
                       {rejectButtonLoading ? (
                         <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />
@@ -214,7 +207,6 @@ const DoctorViewModal = ({ openModal, CloseDoctorModal, SingleDoctor }) => {
                       type="button"
                       className="btn btn-success gap-2 w-1/2"
                       onClick={() => updateDoctorStatus(1)}
-                      disabled={rejectButtonLoading || verifyButtonLoading}
                     >
                       {verifyButtonLoading ? (
                         <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle ltr:ml-3 rtl:mr-3 shrink-0" />

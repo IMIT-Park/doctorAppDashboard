@@ -8,11 +8,19 @@ import AnimateHeight from "react-animate-height";
 import { showMessage } from "../../../utils/showMessage";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { formatTime } from "../../../utils/formatTime";
+import IconLoader from "../../../components/Icon/IconLoader";
+import { useDispatch } from "react-redux";
+import { setPageTitle } from "../../../store/themeConfigSlice";
 
 const Timings = () => {
+  const dispatch = useDispatch();
   const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
   const clinicId = userData?.UserClinic?.[0]?.clinic_id || 0;
+
+  useEffect(() => {
+    dispatch(setPageTitle("Timing"));
+  }, [dispatch]);
 
   const [addTimingModal, setAddTimingModal] = useState(false);
   const [editTimingModal, setEditTimingModal] = useState(false);
@@ -223,77 +231,94 @@ const Timings = () => {
             Add Timing
           </CustomButton>
         </div>
-        <div className="space-y-2 font-semibold">
-          {Object.keys(groupedTimings).map((dayId) => {
-            const day = days?.find((d) => d?.id == dayId);
-            const dayTimings = groupedTimings[dayId];
+        {loading ? (
+          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+        ) : (
+          <>
+            {clinicTimings && clinicTimings.length > 0 ? (
+              <div className="space-y-2 font-semibold">
+                {Object.keys(groupedTimings).map((dayId) => {
+                  const day = days?.find((d) => d?.id == dayId);
+                  const dayTimings = groupedTimings[dayId];
 
-            // Filter out timings that don't have a start and end time
-            const validTimings = dayTimings.filter(
-              (timing) => timing?.start && timing?.end
-            );
+                  // Filter out timings that don't have a start and end time
+                  const validTimings = dayTimings.filter(
+                    (timing) => timing?.start && timing?.end
+                  );
 
-            // Skip rendering the day if no valid timings
-            if (validTimings.length === 0) {
-              return null;
-            }
+                  // Skip rendering the day if no valid timings
+                  if (validTimings.length === 0) {
+                    return null;
+                  }
 
-            return (
-              <div
-                key={dayId}
-                className="border border-[#d3d3d3] rounded dark:border-[#1b2e4b]"
-              >
-                <button
-                  type="button"
-                  className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
-                    active == dayId
-                      ? "!text-[#006241] dark:!text-[#4ec37bfb]"
-                      : ""
-                  }`}
-                  onClick={() => togglePara(dayId)}
-                >
-                  {day ? day?.name : "Unknown Day"}
-                  <div
-                    className={`ltr:ml-auto rtl:mr-auto ${
-                      active == dayId ? "rotate-180" : ""
-                    }`}
-                  >
-                    <IconCaretDown />
-                  </div>
-                </button>
-                <div>
-                  <AnimateHeight
-                    duration={300}
-                    height={active == dayId ? "auto" : 0}
-                  >
-                    <div className="w-full flex items-start flex-wrap gap-5 p-4">
-                      {validTimings?.map((timing, index) => (
+                  return (
+                    <div
+                      key={dayId}
+                      className="border border-[#d3d3d3] rounded dark:border-[#1b2e4b]"
+                    >
+                      <button
+                        type="button"
+                        className={`p-4 w-full flex items-center text-white-dark dark:bg-[#1b2e4b] ${
+                          active == dayId
+                            ? "!text-[#006241] dark:!text-[#4ec37bfb]"
+                            : ""
+                        }`}
+                        onClick={() => togglePara(dayId)}
+                      >
+                        {day ? day?.name : "Unknown Day"}
                         <div
-                          key={index}
-                          className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-700 pt-4 px-3 pb-2 rounded"
+                          className={`ltr:ml-auto rtl:mr-auto ${
+                            active == dayId ? "rotate-180" : ""
+                          }`}
                         >
-                          <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
-                            {timing?.start ? formatTime(timing.start) : ""} -{" "}
-                            {timing?.end ? formatTime(timing.end) : ""}
-                          </span>
-                          <button
-                            type="button"
-                            className="btn btn-primary btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
-                            onClick={() =>
-                              openEditTimingModal({ ...timing, dayId: dayId })
-                            }
-                          >
-                            Edit
-                          </button>
+                          <IconCaretDown />
                         </div>
-                      ))}
+                      </button>
+                      <div>
+                        <AnimateHeight
+                          duration={300}
+                          height={active == dayId ? "auto" : 0}
+                        >
+                          <div className="w-full flex items-start flex-wrap gap-5 p-4">
+                            {validTimings?.map((timing, index) => (
+                              <div
+                                key={index}
+                                className="flex flex-col items-center gap-2 border border-slate-300 dark:border-slate-700 pt-4 px-3 pb-2 rounded"
+                              >
+                                <span className="text-[#006241] font-bold border border-[#006241] px-4 py-1 rounded">
+                                  {timing?.start
+                                    ? formatTime(timing.start)
+                                    : ""}{" "}
+                                  - {timing?.end ? formatTime(timing.end) : ""}
+                                </span>
+                                <button
+                                  type="button"
+                                  className="btn btn-primary btn-sm rounded-sm py-1 min-w-20 sm:min-w-24"
+                                  onClick={() =>
+                                    openEditTimingModal({
+                                      ...timing,
+                                      dayId: dayId,
+                                    })
+                                  }
+                                >
+                                  Edit
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </AnimateHeight>
+                      </div>
                     </div>
-                  </AnimateHeight>
-                </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
+            ) : (
+              <div className="w-full h-28 grid place-items-center">
+                No Timings Found
+              </div>
+            )}
+          </>
+        )}
       </div>
       {/* add timing modal */}
       <AddTiming

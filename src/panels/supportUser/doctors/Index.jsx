@@ -36,13 +36,13 @@ const SupportUsers_Doctors = () => {
   const [singleDoctor, setSingleDoctor] = useState(null);
 
   const OpenDoctorModal = (rowData) => {
-    setSingleDoctor(rowData)
+    setSingleDoctor(rowData);
     setOpenModal(true);
-  }
+  };
 
   const CloseDoctorModal = () => {
     setOpenModal(false);
-  }
+  };
 
   useEffect(() => {
     setPage(1);
@@ -61,7 +61,7 @@ const SupportUsers_Doctors = () => {
       );
       setTotalDoctors(response.data?.Doctors?.count);
       setAllDoctors(response.data?.Doctors?.rows);
-      // console.log(response.data?.Doctors);
+      console.log(response);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -99,7 +99,7 @@ const SupportUsers_Doctors = () => {
     } else {
       fetchData();
     }
-  }, [search]);
+  }, [search, page, pageSize]);
 
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
@@ -214,15 +214,19 @@ const SupportUsers_Doctors = () => {
                   render: (row) => (
                     <span
                       key={row?.doctor_clinic_id}
-                      className={`badge whitespace-nowrap ${
+                      className={`badge whitespace-nowrap capitalize ${
                         row?.verification_status === "verified"
                           ? "bg-success"
-                          : row?.status === "rejected"
+                          : row?.verification_status === "rejected"
                           ? "bg-danger"
-                          : "bg-secondary"
+                          : row?.verification_status === "under_verification"
+                          ? "bg-secondary"
+                          : row?.verification_status === "draft"
+                          ? "bg-secondary"
+                          : ""
                       }`}
                     >
-                      {row?.verification_status}
+                      {row?.verification_status.replace("_", " ")}
                     </span>
                   ),
                   cellsClassName: "capitalize",
@@ -236,8 +240,8 @@ const SupportUsers_Doctors = () => {
                         type="button"
                         className="btn btn-green btn-sm h-fit"
                         onClick={(e) => {
-                            e.stopPropagation();
-                            OpenDoctorModal(rowData);
+                          e.stopPropagation();
+                          OpenDoctorModal(rowData);
                         }}
                       >
                         View
@@ -277,10 +281,10 @@ const SupportUsers_Doctors = () => {
         )}
       </div>
       <DoctorViewModal
-      openModal={openModal}
-      setOpenModal={setOpenModal}
-      CloseDoctorModal={CloseDoctorModal}
-      SingleDoctor={singleDoctor}
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+        CloseDoctorModal={CloseDoctorModal}
+        SingleDoctor={singleDoctor}
       />
     </div>
   );

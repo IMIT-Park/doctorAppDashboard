@@ -17,7 +17,7 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import noProfile from "/assets/images/empty-user.png";
 import DoctorViewModal from "./DoctorViewModal";
 
-const Doctors = () => {
+const SupportUsers_Doctors = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,7 +33,6 @@ const Doctors = () => {
   const [allDoctors, setAllDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
-  const [closeModal, setCloseModal] = useState(false);
   const [singleDoctor, setSingleDoctor] = useState(null);
 
   const OpenDoctorModal = (rowData) => {
@@ -62,7 +61,7 @@ const Doctors = () => {
       );
       setTotalDoctors(response.data?.Doctors?.count);
       setAllDoctors(response.data?.Doctors?.rows);
-      console.log(response.data?.Doctors);
+      // console.log(response.data?.Doctors);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -161,11 +160,11 @@ const Doctors = () => {
               className="whitespace-nowrap table-hover"
               records={allDoctors}
               idAccessor="doctor_id"
-              onRowClick={(row) =>
-                navigate(`/doctors/${row?.doctor_id}`, {
-                  state: { previousUrl: location?.pathname },
-                })
-              }
+              // onRowClick={(row) =>
+              //   navigate(`/doctors/${row?.doctor_id}`, {
+              //     state: { previousUrl: location?.pathname },
+              //   })
+              // }
               columns={[
                 {
                   accessor: "No",
@@ -211,9 +210,22 @@ const Doctors = () => {
                   render: (row) => `₹${row?.fees}`,
                 },
                 {
-                  accessor: "visibility",
-                  title: "Visibility",
-                  render: (row) => (row.visibility ? "Visible" : "Hidden"),
+                  accessor: "Verification",
+                  render: (row) => (
+                    <span
+                      key={row?.doctor_clinic_id}
+                      className={`badge whitespace-nowrap ${
+                        row?.verification_status === "verified"
+                          ? "bg-success"
+                          : row?.status === "rejected"
+                          ? "bg-danger"
+                          : "bg-secondary"
+                      }`}
+                    >
+                      {row?.verification_status}
+                    </span>
+                  ),
+                  cellsClassName: "capitalize",
                 },
                 {
                   accessor: "View",
@@ -268,9 +280,10 @@ const Doctors = () => {
       openModal={openModal}
       setOpenModal={setOpenModal}
       CloseDoctorModal={CloseDoctorModal}
-      SingleDoctor={singleDoctor}/>
+      SingleDoctor={singleDoctor}
+      />
     </div>
   );
 };
 
-export default Doctors;
+export default SupportUsers_Doctors;

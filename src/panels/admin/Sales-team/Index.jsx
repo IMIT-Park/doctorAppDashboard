@@ -307,14 +307,12 @@ const Sales = () => {
             </Tippy>
           </div>
 
-          <div className="flex items-center text-gray-500 font-semibold dark:text-white-dark gap-y-4">
+          <div className="flex items-center ml-auto text-gray-500 font-semibold  dark:text-white-dark gap-2">
             <CustomButton onClick={openAddSalesPersonModal}>
               <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
               Add Sales Person
             </CustomButton>
-          </div>
-
-          <div>
+         
             <button
               type="button"
               className="btn btn-green"

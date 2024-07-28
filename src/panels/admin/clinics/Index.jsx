@@ -32,6 +32,7 @@ const Clinics = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [search, setSearch] = useState("");
   const [totalClinics, setTotalClinics] = useState(0);
+  const [totalClinicsCount, setTotalClinicsCount] = useState(0);
   const [allClinics, setAllClinics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentClinicId, setCurrentClinicId] = useState("");
@@ -41,12 +42,12 @@ const Clinics = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [pageSize]);
+  }, [pageSize, search]);
 
-  useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-  }, [page, pageSize]);
+  // useEffect(() => {
+  //   const from = (page - 1) * pageSize;
+  //   const to = from + pageSize;
+  // }, [page, pageSize]);
 
   // fetch Clininc function
   const fetchData = async () => {
@@ -54,7 +55,9 @@ const Clinics = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getall?pageSize=${pageSize}&page=${page}`
       );
+      console.log(response);
       setTotalClinics(response?.data?.Clinic?.count);
+      setTotalClinicsCount(response?.data?.Clinic?.count);
       setAllClinics(response?.data?.Clinic?.rows);
       setLoading(false);
     } catch (error) {
@@ -65,11 +68,6 @@ const Clinics = () => {
     }
   };
 
-  // fetching Loans
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
-
   const clinicSearch = async () => {
     const updatedKeyword = isNaN(search) ? search : `+91${search}`;
     try {
@@ -78,7 +76,8 @@ const Clinics = () => {
         { keyword: updatedKeyword }
       );
 
-      setAllClinics(response?.data?.clinics || []);
+      setTotalClinics(response?.data?.pagination?.total || 0);
+      setAllClinics(response?.data?.clinics || 0);
     } catch (error) {
       setAllClinics([]);
       console.log(error);
@@ -94,7 +93,7 @@ const Clinics = () => {
     } else {
       fetchData();
     }
-  }, [search]);
+  }, [search, page, pageSize]);
 
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
@@ -133,7 +132,7 @@ const Clinics = () => {
     const rowHeights = filteredClinics.map(() => ({ hpx: 20 }));
     rowHeights.unshift({ hpx: 20 });
     worksheet["!rows"] = rowHeights;
-    
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
     XLSX.writeFile(workbook, "ClinicsData.xlsx");
@@ -150,7 +149,11 @@ const Clinics = () => {
             </h5>
             <Tippy content="Total Clinics">
               <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalClinics} duration={3}></CountUp>
+                <CountUp
+                  start={0}
+                  end={totalClinicsCount}
+                  duration={3}
+                ></CountUp>
               </span>
             </Tippy>
           </div>
@@ -284,15 +287,18 @@ const Clinics = () => {
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex justify-center items-center">
-                      <span className={`text-sm font-medium ${rowData?.User?.status ? "text-green-500" : "text-red-500"}`}>
+                      <span
+                        className={`text-sm font-medium ${
+                          rowData?.User?.status
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
                         {rowData?.User?.status ? "Active" : "Blocked"}
                       </span>
                     </div>
                   ),
-                }
-                
-                
-                
+                },
               ]}
               totalRecords={totalClinics}
               recordsPerPage={pageSize}

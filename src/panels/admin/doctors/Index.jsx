@@ -17,7 +17,6 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import noProfile from "/assets/images/empty-user.png";
 import * as XLSX from "xlsx";
 
-
 const Doctors = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -31,17 +30,18 @@ const Doctors = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [search, setSearch] = useState("");
   const [totalDoctors, setTotalDoctors] = useState(0);
+  const [totalDoctorsCount, setTotalDoctorCount] = useState(0);
   const [allDoctors, setAllDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setPage(1);
-  }, [pageSize]);
+  }, [pageSize, search]);
 
-  useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-  }, [page, pageSize]);
+  // useEffect(() => {
+  //   const from = (page - 1) * pageSize;
+  //   const to = from + pageSize;
+  // }, [page, pageSize]);
 
   // fetch Doctors function
   const fetchData = async () => {
@@ -49,6 +49,7 @@ const Doctors = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/doctor/getall?pageSize=${pageSize}&page=${page}`
       );
+      setTotalDoctorCount(response.data?.Doctors?.count);
       setTotalDoctors(response.data?.Doctors?.count);
       setAllDoctors(response.data?.Doctors?.rows);
       setLoading(false);
@@ -60,11 +61,6 @@ const Doctors = () => {
     }
   };
 
-  // fetching Loans
-  useEffect(() => {
-    fetchData();
-  }, [page, pageSize]);
-
   const doctorSearch = async () => {
     const updatedKeyword = isNaN(search) ? search : `+91${search}`;
     try {
@@ -72,7 +68,9 @@ const Doctors = () => {
         `/v1/doctor/getalldoctordata?pageSize=${pageSize}&page=${page}`,
         { keyword: updatedKeyword }
       );
-      setAllDoctors(response?.data?.doctors || []);
+
+      setTotalDoctors(response?.data?.pagination?.total || 0);
+      setAllDoctors(response?.data?.doctors || 0);
     } catch (error) {
       setAllDoctors([]);
       console.log(error);
@@ -88,47 +86,46 @@ const Doctors = () => {
     } else {
       fetchData();
     }
-  }, [search]);
+  }, [search, page, pageSize]);
 
   // block and unblock handler
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchData);
 
-    const exportToExcel = () => {
-      const filteredDoctors = allDoctors.map((doctor, index) => ({
-        No: index + 1,
-        Name: doctor.name,
-        Email: doctor.email,
-        Phone: doctor.phone,
-        Gender: doctor.gender,
-        Address: doctor.address,
-        Qualification: doctor.qualification,
-        Specialization: doctor.specialization,
-        Fees: doctor.fees,
-        
-      }));
-      const worksheet = XLSX.utils.json_to_sheet(filteredDoctors);
-      const columnWidths = [
-        { wpx: 50 },
-        { wpx: 200 },
-        { wpx: 250 },
-        { wpx: 120 },
-        { wpx: 150 },
-        { wpx: 300 },
-        { wpx: 150 },
-        { wpx: 300 },
-        { wpx: 150 },
-      ];
-      worksheet["!cols"] = columnWidths;
-  
-      const rowHeights = filteredDoctors.map(() => ({ hpx: 20 }));
-      rowHeights.unshift({ hpx: 20 });
-      worksheet["!rows"] = rowHeights;
-      
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Doctors");
-      XLSX.writeFile(workbook, "DoctorData.xlsx");
-    };
+  const exportToExcel = () => {
+    const filteredDoctors = allDoctors.map((doctor, index) => ({
+      No: index + 1,
+      Name: doctor.name,
+      Email: doctor.email,
+      Phone: doctor.phone,
+      Gender: doctor.gender,
+      Address: doctor.address,
+      Qualification: doctor.qualification,
+      Specialization: doctor.specialization,
+      Fees: doctor.fees,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(filteredDoctors);
+    const columnWidths = [
+      { wpx: 50 },
+      { wpx: 200 },
+      { wpx: 250 },
+      { wpx: 120 },
+      { wpx: 150 },
+      { wpx: 300 },
+      { wpx: 150 },
+      { wpx: 300 },
+      { wpx: 150 },
+    ];
+    worksheet["!cols"] = columnWidths;
+
+    const rowHeights = filteredDoctors.map(() => ({ hpx: 20 }));
+    rowHeights.unshift({ hpx: 20 });
+    worksheet["!rows"] = rowHeights;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Doctors");
+    XLSX.writeFile(workbook, "DoctorData.xlsx");
+  };
 
   return (
     <div>
@@ -142,7 +139,11 @@ const Doctors = () => {
             </h5>
             <Tippy content="Total Doctors">
               <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp start={0} end={totalDoctors} duration={3}></CountUp>
+                <CountUp
+                  start={0}
+                  end={totalDoctorsCount}
+                  duration={3}
+                ></CountUp>
               </span>
             </Tippy>
           </div>
@@ -178,7 +179,6 @@ const Doctors = () => {
               Export to Excel
             </button>
           </div>
-
         </div>
         {loading ? (
           <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
@@ -275,13 +275,16 @@ const Doctors = () => {
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex justify-center items-center">
-                      <span className={`text-sm font-medium ${rowData?.status ? "text-green-500" : "text-red-500"}`}>
+                      <span
+                        className={`text-sm font-medium ${
+                          rowData?.status ? "text-green-500" : "text-red-500"
+                        }`}
+                      >
                         {rowData?.status ? "Active" : "Blocked"}
                       </span>
                     </div>
                   ),
-                }
-                
+                },
               ]}
               totalRecords={totalDoctors}
               recordsPerPage={pageSize}

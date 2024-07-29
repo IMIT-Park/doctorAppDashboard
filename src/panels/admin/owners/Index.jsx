@@ -42,8 +42,9 @@ const Owners = () => {
     setLoading(true);
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/owner/getallowner?page=${page}&pageSize=${pageSize}`
+        `/v1/owner/getallowner?pageSize=${pageSize}&page=${page}`
       );
+      console.log(response);
       setTotalOwnersCount(response?.data?.pageInfo?.total || 0);
       setTotalOwners(response?.data?.pageInfo?.total || 0);
       setAllOwners(response?.data?.Owners || 0);
@@ -61,6 +62,7 @@ const Owners = () => {
         `/v1/owner/getownersearch?pageSize=${pageSize}&page=${page}`,
         { keyword: updatedKeyword }
       );
+
       setTotalOwners(response?.data?.pagination?.total || 0);
       setAllOwners(response?.data?.owners || []);
     } catch (error) {
@@ -87,10 +89,10 @@ const Owners = () => {
   const exportToExcel = () => {
     const filteredOwners = allOwners.map((owner, index) => ({
       No: index + 1,
-      Name: owner.name,
-      Email: owner.email,
-      Phone: owner.phone,
-      Address: owner.address,
+      Name: owner.Owner.name,
+      Email: owner.Owner.email,
+      Phone: owner.Owner.phone,
+      Address: owner.Owner.address,
     }));
     const worksheet = XLSX.utils.json_to_sheet(filteredOwners);
     const columnWidths = [
@@ -108,7 +110,7 @@ const Owners = () => {
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
-    XLSX.writeFile(workbook, "ClinicsData.xlsx");
+    XLSX.writeFile(workbook, "OwnerData.xlsx");
   };
 
   return (
@@ -178,7 +180,9 @@ const Owners = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allOwners}
-              onRowClick={(row) => navigate(`/admin/owners/${row?.Owner.owner_id}`)}
+              onRowClick={(row) =>
+                navigate(`/admin/owners/${row?.Owner.owner_id}`)
+              }
               idAccessor="Owner.owner_id"
               columns={[
                 {
@@ -200,7 +204,8 @@ const Owners = () => {
                   title: "Account Creation Date",
                   textAlignment: "center",
                   render: (row) =>
-                    row?.Owner?.created_at && formatDate(row?.Owner?.created_at),
+                    row?.Owner?.created_at &&
+                    formatDate(row?.Owner?.created_at),
                 },
                 {
                   accessor: "salesperson_name",

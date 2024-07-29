@@ -63,7 +63,15 @@ const Doctors = () => {
   };
 
   const doctorSearch = async () => {
-    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    // const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+
+    let updatedKeyword;
+    if(search.startsWith('+9' || '+91')){
+      updatedKeyword = search;
+    } else {
+      updatedKeyword = isNaN(search) ? search : `+91{search}`
+    };
+
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/doctor/getalldoctordata?pageSize=${pageSize}&page=${page}`,

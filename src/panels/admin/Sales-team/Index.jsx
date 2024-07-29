@@ -21,6 +21,7 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import CustomButton from "../../../components/CustomButton";
 import { UserContext } from "../../../contexts/UseContext";
 import * as XLSX from "xlsx";
+import IconFile from "../../../components/Icon/IconFile";
 
 const Sales = () => {
   const dispatch = useDispatch();
@@ -312,12 +313,13 @@ const Sales = () => {
               <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
               Add Sales Person
             </CustomButton>
-         
+
             <button
               type="button"
-              className="btn btn-green"
+              className="btn btn-secondary"
               onClick={exportToExcel}
             >
+              <IconFile className="ltr:mr-2 rtl:ml-2" />
               Export to Excel
             </button>
           </div>

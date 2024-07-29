@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -15,10 +15,13 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import IconSearch from "../../../components/Icon/IconSearch";
 import { formatDate } from "../../../utils/formatDate";
 import * as XLSX from "xlsx";
+import { UserContext } from "../../../contexts/UseContext";
 
 const Owners = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { ids, setIds } = useContext(UserContext);
 
   useEffect(() => {
     dispatch(setPageTitle("Owners"));
@@ -44,7 +47,6 @@ const Owners = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/owner/getallowner?pageSize=${pageSize}&page=${page}`
       );
-      console.log(response);
       setTotalOwnersCount(response?.data?.pageInfo?.total || 0);
       setTotalOwners(response?.data?.pageInfo?.total || 0);
       setAllOwners(response?.data?.Owners || 0);
@@ -111,6 +113,11 @@ const Owners = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
     XLSX.writeFile(workbook, "OwnerData.xlsx");
+  };
+
+  const handleRowClick = (ownerId) => {
+    setIds({ ...ids, ownerId: ownerId });
+    navigate("/admin/owners/single-view");
   };
 
   return (
@@ -180,9 +187,7 @@ const Owners = () => {
               highlightOnHover
               className="whitespace-nowrap table-hover"
               records={allOwners}
-              onRowClick={(row) =>
-                navigate(`/admin/owners/${row?.Owner.owner_id}`)
-              }
+              onRowClick={(row) => handleRowClick(row?.Owner?.owner_id)}
               idAccessor="Owner.owner_id"
               columns={[
                 {
@@ -198,7 +203,7 @@ const Owners = () => {
                 { accessor: "Owner.email", title: "Email" },
                 { accessor: "Owner.phone", title: "Phone" },
                 { accessor: "Owner.address", title: "Address" },
-                { accessor: "Clinic_count", title: "Total clinics" },
+                { accessor: "Clinic_count", title: "Total clinics",textAlignment:"center" },
                 {
                   accessor: "Owner.created_at",
                   title: "Account Creation Date",

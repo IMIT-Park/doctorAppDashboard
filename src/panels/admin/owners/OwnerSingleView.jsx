@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -18,12 +18,15 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import SubscriptionDetailsModal from "../../../components/SubscriptionDetailsModal/SubscriptionDetailsModal";
 import IconSearch from "../../../components/Icon/IconSearch";
 import * as XLSX from "xlsx";
+import { UserContext } from "../../../contexts/UseContext";
 
 const OwnerSingleView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { ownerId } = useParams();
+  const { ids } = useContext(UserContext);
+
+  const ownerId = ids?.ownerId;
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
@@ -93,7 +96,6 @@ const OwnerSingleView = () => {
     fetchOwnerInfo();
   }, []);
 
-  
   // Search Clinic
   const fetchSearchClinics = async () => {
     const updatedKeyword = isNaN(search) ? search : `+91${search}`;
@@ -134,7 +136,7 @@ const OwnerSingleView = () => {
   };
 
   const closeSubscriptionModal = () => {
-    setsubscriptionAddModal(false);   
+    setsubscriptionAddModal(false);
   };
 
   // Export to Excel function
@@ -351,7 +353,7 @@ const OwnerSingleView = () => {
                 { accessor: "clinic.email", title: "Email" },
 
                 { accessor: "clinic.place", title: "Place" },
-                { accessor: "doctor_count", title: "Total Doctors"},
+                { accessor: "doctor_count", title: "Total Doctors" },
 
                 {
                   accessor: "clinic_id",

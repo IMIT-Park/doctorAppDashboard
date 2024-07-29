@@ -50,12 +50,10 @@ const Booking = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getallclinics/${ownerId}?page=${page}&pagesize=${pageSize}`
       );
-      console.log(response.data);
       setTotalClinics(response.data?.pageInfo.total);
       setAllClinics(response.data?.Clinic);
 
       setLoading(false);
-      console.log(response.data?.Clinic?.rows);
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -73,6 +71,7 @@ const Booking = () => {
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchData);
 
+
   const handleAddBooking = (clinicId) => {
     setBookingDetails({
       ...bookingDetails,
@@ -82,7 +81,7 @@ const Booking = () => {
     });
     navigate("/clinic/bookings");
   };
-  console.log(allClinics);
+
   return (
     <div>
       <ScrollToTop />
@@ -205,11 +204,12 @@ const Booking = () => {
                         onClick={(e) => {
                           e.stopPropagation();
                           // Add your view booking handler here
-                          navigate(`/owner/bookings/${rowData?.clinic?.clinic_id}`);
+                          navigate(
+                            `/owner/bookings/${rowData?.clinic?.clinic_id}`
+                          );
                         }}
                         className="btn btn-green btn-sm py-1.5 px-3.5"
                       >
-
                         View Booking
                       </button>
                     </div>

@@ -19,6 +19,7 @@ import SubscriptionDetailsModal from "../../../components/SubscriptionDetailsMod
 import IconSearch from "../../../components/Icon/IconSearch";
 import * as XLSX from "xlsx";
 import { UserContext } from "../../../contexts/UseContext";
+import { formatDate } from "../../../utils/formatDate";
 
 const OwnerSingleView = () => {
   const dispatch = useDispatch();
@@ -98,7 +99,17 @@ const OwnerSingleView = () => {
 
   // Search Clinic
   const fetchSearchClinics = async () => {
-    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    // const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    let updatedKeyword;
+
+    // Check if the search string starts with '+91'
+    if (search.startsWith('+91')) {
+      updatedKeyword = search; // Keep the original search keyword
+    } else {
+      // Add '+91' if the search is a number, otherwise keep it as is
+      updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    }
+  
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/clinic/getclinicdata/${ownerId}?pageSize=${pageSize}&page=${page}`,
@@ -169,6 +180,11 @@ const OwnerSingleView = () => {
     XLSX.writeFile(workbook, "ClinicsData.xlsx");
   };
 
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+  
+
   return (
     <div>
       <ScrollToTop />
@@ -205,29 +221,73 @@ const OwnerSingleView = () => {
             <div className="text-left">
               <div className="mt-5">
                 <div className="flex lg:flex-row md:flex-col sm:flex-col flex-wrap gap-6 mb-2">
-                  <div className="flex flex-col lg:w-7/12 w-full mb-5">
-                    <div className="text-white-dark min-w-96 text-base mb-1">
-                      Address
+                  <div className="w-full flex flex-col md:flex-row gap-3">
+                    <div className="flex flex-col md:w-1/2 mb-2">
+                      <div className="text-white-dark min-w-96 text-base mb-1">
+                        Address
+                      </div>
+                      <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base h-full bg-gray-100">
+                        {ownerInfo?.address}
+                      </div>
                     </div>
-                    <div className="dark:text-slate-300 border dark:border-slate-800 rounded p-2 text-base h-36">
-                      {ownerInfo?.address}
+                    <div className="flex flex-col mb-2 md:w-1/2 gap-1">
+                      <div className="text-white-dark text-base">
+                        City
+                      </div>
+                      <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min:h-10 bg-gray-100">
+                        {ownerInfo?.city || "-----"}
+                      </div>
+                      <div className="text-white-dark text-base">
+                        Country
+                      </div>
+                      <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
+                        {ownerInfo?.country || "-----"}
+                      </div><div className="text-white-dark text-base">
+                        State
+                      </div>
+                      <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
+                        {ownerInfo?.state ? capitalizeFirstLetter(ownerInfo.state) : "-----"}
+                      </div>
                     </div>
                   </div>
-                  <div className="lg:w-4/12 w-full flex flex-col gap-4">
-                    <div className="gap-1 mb-2 w-full">
-                      <div className="text-white-dark text-base mb-1">
-                        Email
+
+                  <div className="w-full flex flex-col md:flex-row gap-3">
+                    <div className="lg:w-1/2 w-full flex flex-col gap-4">
+                      <div className="gap-1 mb-2 w-full">
+                        <div className="text-white-dark text-base mb-1">
+                          Email
+                        </div>
+                        <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                          {ownerInfo?.email}
+                        </div>
                       </div>
-                      <div className="dark:text-slate-300 border dark:border-slate-800 rounded p-2 text-base">
-                        {ownerInfo?.email}
+                      <div className="gap-1 mb-2 w-full">
+                        <div className="text-white-dark text-base mb-1">
+                          Phone Number
+                        </div>
+                        <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                          {ownerInfo?.phone}
+                        </div>
                       </div>
                     </div>
-                    <div className="gap-1 mb-2 w-full">
-                      <div className="text-white-dark text-base mb-1">
-                        Phone Number
+                    <div className="lg:w-1/2 w-full flex flex-col gap-4">
+                      <div className="gap-1 mb-2 w-full">
+                        <div className="text-white-dark text-base mb-1">
+                          Account Creation Date
+                        </div>
+                        <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                          {formatDate(ownerInfo?.created_at)}
+                        </div>
                       </div>
-                      <div className="dark:text-slate-300 border dark:border-slate-800 rounded p-2 text-base">
-                        {ownerInfo?.phone}
+                      <div className="gap-1 mb-2 w-full">
+                        <div className="text-white-dark text-base mb-1">
+                          Entered By
+                        </div>
+                        <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                          {ownerInfo?.salesperson_id
+                            ? "Salesperson"
+                            : "Application"}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -353,7 +413,11 @@ const OwnerSingleView = () => {
                 { accessor: "clinic.email", title: "Email" },
 
                 { accessor: "clinic.place", title: "Place" },
-                { accessor: "doctor_count", title: "Total Doctors" },
+                {
+                  accessor: "doctor_count",
+                  title: "Total Doctors",
+                  textAlignment: "center",
+                },
 
                 {
                   accessor: "clinic_id",

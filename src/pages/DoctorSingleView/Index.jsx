@@ -523,10 +523,10 @@ const SinglePage = () => {
                   </div>
                   <div className="w-full">
                     <div className="text-base text-gray-500">
-                      Profile Visibility
+                      Verification Status
                     </div>
                     <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
-                      {doctorDetails?.visibility ? "Visible" : "Hidden" || ""}
+                      {doctorDetails?.verification_status}
                     </div>
                   </div>
                   <div className="w-full">

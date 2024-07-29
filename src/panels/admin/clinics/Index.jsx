@@ -18,6 +18,7 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import SubscriptionDetailsModal from "../../../components/SubscriptionDetailsModal/SubscriptionDetailsModal";
 import { UserContext } from "../../../contexts/UseContext";
 import * as XLSX from "xlsx";
+import IconFile from "../../../components/Icon/IconFile";
 
 const Clinics = () => {
   const dispatch = useDispatch();
@@ -186,9 +187,10 @@ const Clinics = () => {
           <div>
             <button
               type="button"
-              className="btn btn-green"
+              className="btn btn-secondary"
               onClick={exportToExcel}
             >
+              <IconFile  className="ltr:mr-2 rtl:ml-2"/>
               Export to Excel
             </button>
           </div>

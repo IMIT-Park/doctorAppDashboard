@@ -13,6 +13,7 @@ import NetworkHandler from "../../../utils/NetworkHandler";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import IconSearch from "../../../components/Icon/IconSearch";
+import IconFile from "../../../components/Icon/IconFile";
 import { formatDate } from "../../../utils/formatDate";
 import * as XLSX from "xlsx";
 import { UserContext } from "../../../contexts/UseContext";
@@ -164,9 +165,10 @@ const Owners = () => {
           <div>
             <button
               type="button"
-              className="btn btn-green"
+              className="btn btn-secondary"
               onClick={exportToExcel}
             >
+              <IconFile  className="ltr:mr-2 rtl:ml-2"/>
               Export to Excel
             </button>
           </div>

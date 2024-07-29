@@ -16,6 +16,7 @@ import useBlockUnblock from "../../../utils/useBlockUnblock";
 import CustomSwitch from "../../../components/CustomSwitch";
 import noProfile from "/assets/images/empty-user.png";
 import * as XLSX from "xlsx";
+import IconFile from "../../../components/Icon/IconFile";
 
 const Doctors = () => {
   const dispatch = useDispatch();
@@ -173,9 +174,11 @@ const Doctors = () => {
           <div>
             <button
               type="button"
-              className="btn btn-green"
+              className="btn btn-secondary"
               onClick={exportToExcel}
             >
+              <IconFile  className="ltr:mr-2 rtl:ml-2"/>
+
               Export to Excel
             </button>
           </div>

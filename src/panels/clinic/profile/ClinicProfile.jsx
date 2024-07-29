@@ -403,7 +403,7 @@ const ClinicProfile = () => {
                                 Cateogry:
                               </div>
                               <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                                {profileData?.type || ""}
+                                {profileData?.type || "-----"}
                               </div>
                             </div>
                             <div className="flex flex-col items-start w-full">

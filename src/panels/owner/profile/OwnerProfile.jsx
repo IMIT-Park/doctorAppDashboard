@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import IconLockDots from "../../../components/Icon/IconLockDots";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
 import { UserContext } from "../../../contexts/UseContext";
+import { formatDate } from "../../../utils/formatDate";
 
 const OwnerProfile = () => {
   const { userDetails } = useContext(UserContext);
@@ -32,6 +33,8 @@ const OwnerProfile = () => {
     if (userDetails?.UserSupportuser?.length > 0) {
       userData.additionalDetails = userDetails?.UserSupportuser[0];
     }
+
+    console.log(userData);
 
     return userData;
   };
@@ -106,6 +109,10 @@ const OwnerProfile = () => {
     }
   };
 
+  const convertFirstLetterCapital = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
+  }
+
   return (
     <div>
       <div className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-8 mb-5 bg-white dark:bg-black">
@@ -116,37 +123,66 @@ const OwnerProfile = () => {
             </div>
           </div>
         </div>
-        <div className="space-y-4">
-          <div className="flex flex-col md:flex-row items-start gap-5">
-            <div className="flex flex-col items-start w-full">
-              <div className="text-base font-medium text-gray-500">Address:</div>
-              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2 min-h-20">
+        <div className="flex lg:flex-row md:flex-col sm:flex-col flex-wrap gap-6 mb-2">
+          <div className="w-full flex flex-col md:flex-row gap-3">
+            <div className="flex flex-col md:w-1/2 mb-2">
+              <div className="text-white-dark min-w-96 text-base mb-1">
+                Address
+              </div>
+              <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base h-full bg-gray-100">
                 {userData?.additionalDetails?.address}
               </div>
             </div>
-            <div className="flex flex-col items-start w-full">
-              <div className="text-base font-medium text-gray-500">Email:</div>
-              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                {userData?.email}
+            <div className="flex flex-col mb-2 md:w-1/2 gap-1">
+              <div className="text-white-dark text-base">City</div>
+              <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
+                {userData?.additionalDetails?.city  || "-----"} 
+              </div>
+              <div className="text-white-dark text-base">Country</div>
+              <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
+                {userData?.additionalDetails?.country || "-----"}
+              </div>
+              <div className="text-white-dark text-base">State</div>
+              <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
+                {userData?.additionalDetails?.state ? convertFirstLetterCapital(userData?.additionalDetails?.state) : "-----"}
               </div>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-start gap-5">
-          
-            <div className="flex flex-col items-start w-full">
-              <div className="text-base font-medium text-gray-500">Username:</div>
-              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                {userData?.user_name}
+
+          <div className="w-full flex flex-col md:flex-row gap-3">
+            <div className="lg:w-1/2 w-full flex flex-col gap-4">
+              <div className="gap-1 mb-2 w-full">
+                <div className="text-white-dark text-base mb-1">Email</div>
+                <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                  {userData?.email}
+                </div>
+              </div>
+              <div className="gap-1 mb-2 w-full">
+                <div className="text-white-dark text-base mb-1">
+                  Phone Number
+                </div>
+                <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                  {userData?.additionalDetails?.phone}
+                </div>
               </div>
             </div>
-            <div className="flex flex-col items-start w-full">
-              <div className="text-base font-medium text-gray-500">Phone:</div>
-              <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                {userData?.additionalDetails?.phone}
+            <div className="lg:w-1/2 w-full flex flex-col gap-4">
+              <div className="gap-1 mb-2 w-full">
+                <div className="text-white-dark text-base mb-1">
+                  Account Creation Date
+                </div>
+                <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                  {formatDate(userData?.additionalDetails?.created_at)}
+                </div>
+              </div>
+              <div className="gap-1 mb-2 w-full">
+                <div className="text-white-dark text-base mb-1">Entered By</div>
+                <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                  {userData?.additionalDetails?.salesperson_id ? "Salesperson" : "Application"}
+                </div>
               </div>
             </div>
           </div>
-         
         </div>
       </div>
     </div>

@@ -242,16 +242,41 @@ const Doctors = () => {
                 // },
                 { accessor: "qualification", title: "Qualification" },
                 { accessor: "specialization", title: "Specialization" },
-                { accessor: "address", title: "Address" },
+                // { accessor: "address", title: "Address" },
                 {
                   accessor: "fees",
                   title: "Fees",
                   render: (row) => `₹${row?.fees}`,
                 },
+                // {
+                //   accessor: "visibility",
+                //   title: "Visibility",
+                //   render: (row) => (row.visibility ? "Visible" : "Hidden"),
+                // },
+
                 {
-                  accessor: "visibility",
-                  title: "Visibility",
-                  render: (row) => (row.visibility ? "Visible" : "Hidden"),
+                  accessor: "Verification",
+                  title: "Verification Status",
+                  render: (row) => (
+                    <span
+                      key={row?.doctor_id}
+                      className={`badge whitespace-nowrap capitalize ${
+                        row?.verification_status === "verified"
+                          ? "bg-success"
+                          : row?.verification_status === "rejected"
+                          ? "bg-danger"
+                          : row?.verification_status === "under_verification"
+                          ? "bg-secondary"
+                          : row?.verification_status === "draft"
+                          ? "bg-secondary"
+                          : ""
+                      }`}
+                    >
+                      {row?.verification_status.replace("_", " ")}
+                    </span>
+                  ),
+                  cellsClassName: "capitalize",
+                  textAlignment: "center",
                 },
                 // {
                 //   accessor: "Actions",

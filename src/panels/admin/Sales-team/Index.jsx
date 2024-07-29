@@ -319,7 +319,7 @@ const Sales = () => {
               className="btn btn-secondary"
               onClick={exportToExcel}
             >
-              <IconFile className="ltr:mr-2 rtl:ml-2" />
+              <IconFile className="ltr:mr-2 rtl:ml-2 " />
               Export to Excel
             </button>
           </div>

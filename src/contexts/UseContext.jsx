@@ -4,6 +4,9 @@ const UserContext = createContext(null);
 
 const UserProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState(null);
+  const [doctorReportId, setDoctorReportId] = useState(
+    localStorage.getItem("doctorReportId") || null
+  );
 
   const [ids, setIds] = useState(() => {
     const savedBookingDetails = localStorage.getItem("ids");
@@ -37,6 +40,10 @@ const UserProvider = ({ children }) => {
   const [patientDetails, setPatientDetails] = useState(null);
 
   useEffect(() => {
+    localStorage.setItem("doctorReportId",doctorReportId );
+  }, [doctorReportId]);
+
+  useEffect(() => {
     localStorage.setItem("ids", JSON.stringify(ids));
   }, [ids]);
 
@@ -68,6 +75,8 @@ const UserProvider = ({ children }) => {
         setBookingDetails,
         patientDetails,
         setPatientDetails,
+        doctorReportId,
+        setDoctorReportId,
       }}
     >
       {children}

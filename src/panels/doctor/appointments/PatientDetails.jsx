@@ -20,9 +20,12 @@ const PatientDetails = () => {
   const [patientId, setPatientId] = useState("");
   const [medicalRecords, setMedicalRecords] = useState([]);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { userDetails } = useContext(UserContext);
+  const { userDetails, doctorReportId, setDoctorReportId } =
+    useContext(UserContext);
 
-  const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id;
+    console.log(doctorReportId);
+
+  const doctorId = doctorReportId || userDetails?.UserDoctor?.[0]?.doctor_id;
   const isSuperAdmin = userDetails?.role_id === 1;
   const navigate = useNavigate();
 
@@ -84,12 +87,12 @@ const PatientDetails = () => {
     const currentDate = new Date();
     let years = currentDate.getFullYear() - dob.getFullYear();
     let months = currentDate.getMonth() - dob.getMonth();
-  
+
     if (months < 0 || (months === 0 && currentDate.getDate() < dob.getDate())) {
       years--;
       months = 12 + months;
     }
-  
+
     if (months === 12) {
       years++;
       months = 0;
@@ -97,7 +100,6 @@ const PatientDetails = () => {
     return months > 0 ? `${years} years ${months} months` : `${years} years`;
   };
 
-  
   // const handleInputChange = (e) => {
   //   const { id, value } = e.target;
   //   setInput((prevInput) => ({
@@ -183,7 +185,6 @@ const PatientDetails = () => {
     }
   };
 
-
   return (
     <div>
       <ScrollToTop />
@@ -219,16 +220,22 @@ const PatientDetails = () => {
           <>
             <div className="grid grid-cols-1 md:flex justify-between gap-4 mb-5">
               <div className="flex flex-col items-start w-full">
-                <div className="text-base font-medium text-gray-500 mb-1">Name </div>
+                <div className="text-base font-medium text-gray-500 mb-1">
+                  Name{" "}
+                </div>
                 <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
                   {viewPatientDetails?.name || ""}
                 </div>
               </div>
 
               <div className="flex flex-col items-start w-full">
-                <div className="text-base font-medium text-gray-500 mb-1">Age</div>
+                <div className="text-base font-medium text-gray-500 mb-1">
+                  Age
+                </div>
                 <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
-                {viewPatientDetails ? calculateAge(viewPatientDetails?.dateOfBirth) : ""}
+                  {viewPatientDetails
+                    ? calculateAge(viewPatientDetails?.dateOfBirth)
+                    : ""}
                 </div>
               </div>
 
@@ -276,14 +283,15 @@ const PatientDetails = () => {
 
             <div className="grid grid-cols-1 sm:flex justify-between gap-4 mb-5">
               <div className="w-full md:w-[calc(33.3333%-19px)] flex flex-col items-start">
-                <div className="text-base font-medium text-gray-500 mb-1">Time</div>
+                <div className="text-base font-medium text-gray-500 mb-1">
+                  Time
+                </div>
                 <div className="border dark:border-slate-800 dark:text-slate-300 rounded w-full text-base p-2">
                   {patientData ? formatTime(patientData?.schedule_time) : ""}
                 </div>
                 <label htmlFor="email"></label>
               </div>
             </div>
-
           </>
         )}
         <Tab.Group>
@@ -403,7 +411,6 @@ const PatientDetails = () => {
                           rows={10}
                         />
                       </div>
-                      
                     </div>
                     <div className="flex justify-end   text-gray-500 font-bold dark:text-white-dark">
                       <CustomButton type="submit" disabled={buttonLoading}>

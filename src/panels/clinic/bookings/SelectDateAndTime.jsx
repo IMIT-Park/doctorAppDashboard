@@ -117,7 +117,6 @@ const Patients = () => {
         setConsultations(response?.data?.consultationSlots);
         setConsultationWarning("");
       }
-      console.log(response?.data);
     } catch (error) {
       setConsultations([]);
       console.error(error?.response?.data?.error);
@@ -164,7 +163,7 @@ const Patients = () => {
         "/v1/booking/createBooking",
         bookingData
       );
-      console.log(response);
+
       if (response.status === 201) {
         Swal.fire({
           icon: "success",
@@ -190,18 +189,19 @@ const Patients = () => {
           DoctorTimeSlot_id: null,
           type: "walkin",
           whoIsBooking: "",
+          created_by: "",
         });
       }
     } catch (error) {
-      if(error?.response?.status === 403){
+      if (error?.response?.status === 403) {
         Swal.fire({
           icon: "error",
           title: "Todays Booking Slots Filled!",
           text: "Todays Booking Slots Filled. Kindly Select Another date to book.",
           padding: "2em",
           customClass: "sweet-alerts",
-          confirmButtonColor: "#006241"
-        })
+          confirmButtonColor: "#006241",
+        });
       }
       console.error(error?.response?.data?.error);
     } finally {

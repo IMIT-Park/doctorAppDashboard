@@ -62,12 +62,14 @@ const SelectDoctor = () => {
 
     setBookingDetails({
       ...bookingDetails,
+      created_by: userData?.user_name || "",
       doctor_id: selectedDoctor,
       clinic_id: clinicId,
       type: "walkin",
     });
     navigate("/clinic/bookings/select-time");
   };
+
 
   return (
     <div>

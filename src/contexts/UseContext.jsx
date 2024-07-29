@@ -30,6 +30,7 @@ const UserProvider = ({ children }) => {
           DoctorTimeSlot_id: null,
           type: "walkin",
           whoIsBooking: "",
+          created_by: "",
         };
   });
 

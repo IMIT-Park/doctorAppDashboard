@@ -89,10 +89,10 @@ const Owners = () => {
   const exportToExcel = () => {
     const filteredOwners = allOwners.map((owner, index) => ({
       No: index + 1,
-      Name: owner.name,
-      Email: owner.email,
-      Phone: owner.phone,
-      Address: owner.address,
+      Name: owner.Owner.name,
+      Email: owner.Owner.email,
+      Phone: owner.Owner.phone,
+      Address: owner.Owner.address,
     }));
     const worksheet = XLSX.utils.json_to_sheet(filteredOwners);
     const columnWidths = [

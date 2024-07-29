@@ -59,7 +59,12 @@ const Owners = () => {
   };
 
   const ownerSearch = async () => {
-    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    let updatedKeyword;
+    if (search.startsWith("+9" || "+91")) {
+      updatedKeyword = search;
+    } else {
+      updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    }
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/owner/getownersearch?pageSize=${pageSize}&page=${page}`,
@@ -96,6 +101,7 @@ const Owners = () => {
       Email: owner.Owner.email,
       Phone: owner.Owner.phone,
       Address: owner.Owner.address,
+      AccountCreationDate: formatDate(owner.Owner.created_at),
     }));
     const worksheet = XLSX.utils.json_to_sheet(filteredOwners);
     const columnWidths = [
@@ -103,6 +109,7 @@ const Owners = () => {
       { wpx: 200 },
       { wpx: 250 },
       { wpx: 120 },
+      { wpx: 300 },
       { wpx: 300 },
     ];
     worksheet["!cols"] = columnWidths;
@@ -168,7 +175,7 @@ const Owners = () => {
               className="btn btn-secondary"
               onClick={exportToExcel}
             >
-              <IconFile  className="ltr:mr-2 rtl:ml-2"/>
+              <IconFile className="ltr:mr-2 rtl:ml-2" />
               Export to Excel
             </button>
           </div>
@@ -205,7 +212,11 @@ const Owners = () => {
                 { accessor: "Owner.email", title: "Email" },
                 { accessor: "Owner.phone", title: "Phone" },
                 { accessor: "Owner.address", title: "Address" },
-                { accessor: "Clinic_count", title: "Total clinics",textAlignment:"center" },
+                {
+                  accessor: "Clinic_count",
+                  title: "Total clinics",
+                  textAlignment: "center",
+                },
                 {
                   accessor: "Owner.created_at",
                   title: "Account Creation Date",

@@ -157,7 +157,7 @@ const routes = [
 
   // owners -> clinics
   {
-    path: "/admin/owners/:ownerId",
+    path: "/admin/owners/single-view",
     element: <AdminOwnerSingleView />,
     layout: "default",
   },
@@ -285,7 +285,7 @@ const routes = [
     element: <ClinicTimings />,
     layout: "default",
   },
-  
+
   // clinicBookings
   {
     path: "/clinic/bookings",
@@ -406,13 +406,13 @@ const routes = [
   },
   // <--------------> support-user sales panel ends here <-------------->
 
-  // <--------------> doctor single-view starts here <-------------->
+  // <--------------> clinic single-view starts here <-------------->
   {
     path: "/clinics/:clinicId",
     element: <ClinicSingleView />,
     layout: "default",
   },
-  // <--------------> doctor single-view ends here <-------------->
+  // <--------------> clinic single-view ends here <-------------->
 
   // <--------------> doctor single-view starts here <-------------->
   {

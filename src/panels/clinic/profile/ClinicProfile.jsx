@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import IconEdit from "../../../components/Icon/IconEdit";
@@ -25,6 +25,7 @@ import IconSearch from "../../../components/Icon/IconSearch";
 import IconCopy from "../../../components/Icon/IconCopy";
 import RescheduleModal from "./RescheduleModal";
 import CancelReschedule from "./CancelReschedule";
+import { UserContext } from "../../../contexts/UseContext";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -34,6 +35,8 @@ const ClinicProfile = () => {
   const userData = JSON.parse(userDetails);
   const clinicId = userData?.UserClinic?.[0]?.clinic_id || 0;
   const ownerId = userDetails?.UserClinic?.[0]?.owner_id;
+
+  const { doctorReportId, setDoctorReportId } = useContext(UserContext);
 
   const qrUrl = `${websiteUrl}clinic/${clinicId}`;
 
@@ -313,6 +316,11 @@ const ClinicProfile = () => {
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchProfileData);
 
+  const handleRowClick = (bookingId) => {
+    setDoctorReportId(selectedDoctorId);
+    navigate(`/patient-details/${bookingId}`);
+  };
+
   return (
     <div>
       <div className="flex justify-end items-center">
@@ -543,6 +551,7 @@ const ClinicProfile = () => {
                         className="whitespace-nowrap table-hover flex justify-evenly"
                         records={appointments}
                         idAccessor="booking_id"
+                        onRowClick={(row) => handleRowClick(row.booking_id)}
                         columns={[
                           {
                             accessor: "No",
@@ -572,6 +581,7 @@ const ClinicProfile = () => {
                             render: (row) => (
                               <div className="dropdown grid place-items-center">
                                 <Dropdown
+
                                   placement="middle"
                                   btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
                                   button={
@@ -582,9 +592,12 @@ const ClinicProfile = () => {
                                     <li>
                                       <button
                                         type="button"
-                                        onClick={() =>
-                                          openAddRescheduleModal(row.booking_id)
-                                        }
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          openAddRescheduleModal(
+                                            row.booking_id
+                                          );
+                                        }}
                                       >
                                         Reschedule
                                       </button>
@@ -592,11 +605,12 @@ const ClinicProfile = () => {
                                     <li>
                                       <button
                                         type="button"
-                                        onClick={() =>
+                                        onClick={() => {
+                                        
                                           openCancelRescheduleModal(
                                             row.booking_id
-                                          )
-                                        }
+                                          );
+                                        }}
                                       >
                                         Cancel
                                       </button>

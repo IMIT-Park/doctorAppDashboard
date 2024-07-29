@@ -23,6 +23,7 @@ import Dropdown from "../../../components/Dropdown";
 import IconHorizontalDots from "../../../components/Icon/IconHorizontalDots";
 import IconSearch from "../../../components/Icon/IconSearch";
 import IconCopy from "../../../components/Icon/IconCopy";
+import IconCaretDown from "../../../components/Icon/IconCaretDown";
 // import RescheduleModal from "./RescheduleModal";
 // import CancelReschedule from "./CancelReschedule";
 
@@ -72,7 +73,7 @@ const ClinicProfile = () => {
   const [appointmentsLoading, setAppointmentsLoading] = useState(false);
   const [addRescheduleModal, setAddRescheduleModal] = useState(false);
   const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
-  const [cancelAllAppoinments,setCancelAllAppoinments] = useState(false);
+  const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
 
   useEffect(() => {
@@ -295,7 +296,7 @@ const ClinicProfile = () => {
     setCancelAllAppoinments(false);
   };
 
-  setCancelAllAppoinments
+  setCancelAllAppoinments;
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
     useBlockUnblock(fetchProfileData);
@@ -322,6 +323,13 @@ const ClinicProfile = () => {
           )}
         </div>
       </div> */}
+      <button
+        onClick={() => navigate(-1)}
+        type="button"
+        className="btn btn-green btn-sm -mt-4 mb-4"
+      >
+        <IconCaretDown className="w-4 h-4 rotate-90" />
+      </button>
 
       <div className="panel mb-1">
         {loading ? (
@@ -408,7 +416,9 @@ const ClinicProfile = () => {
                   <button
                     type="button"
                     className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
-                    onClick={() => openCancelAllAppoimentsModal(selectedDoctorId)}
+                    onClick={() =>
+                      openCancelAllAppoimentsModal(selectedDoctorId)
+                    }
                   >
                     Cancel all Appoinments
                   </button>
@@ -435,12 +445,25 @@ const ClinicProfile = () => {
                         columns={[
                           {
                             accessor: "No",
-                            title: "No", textAlignment: "center",
+                            title: "No",
+                            textAlignment: "center",
                             render: (row, rowIndex) => rowIndex + 1,
                           },
-                          { accessor: "Patient.name", title: "Name" , textAlignment: "center",},
-                          { accessor: "Patient.gender", title: "Gender", textAlignment: "center", },
-                          { accessor: "schedule_time", title: "Time", textAlignment: "center", },
+                          {
+                            accessor: "Patient.name",
+                            title: "Name",
+                            textAlignment: "center",
+                          },
+                          {
+                            accessor: "Patient.gender",
+                            title: "Gender",
+                            textAlignment: "center",
+                          },
+                          {
+                            accessor: "schedule_time",
+                            title: "Time",
+                            textAlignment: "center",
+                          },
                           {
                             accessor: "actions",
                             title: "Actions",

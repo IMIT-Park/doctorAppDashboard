@@ -41,6 +41,9 @@ const SupportUser = () => {
     address: "",
     email: "",
     user_name: "",
+    chat_access: 0,
+    website_leads_access: 0,
+    doctor_verify_access: 0,
     password: "",
     confirmPassword: "",
   });
@@ -92,6 +95,9 @@ const SupportUser = () => {
       address: "",
       email: "",
       user_name: "",
+      chat_access:0,
+      website_leads_access:0,
+      doctor_verify_access:0,
       password: "",
       confirmPassword: "",
     });
@@ -108,6 +114,10 @@ const SupportUser = () => {
     if (input.phone.length !== 10) {
       newErrors.phone = "Phone number must be exactly 10 digits";
       showMessage("Phone number must be exactly 10 digits", "warning");
+    }
+    if (!input.chat_access === 0 || !input.website_leads_access === 0 || !input.doctor_verify_access === 0) {
+      newErrors.checkboxes = "At least one permission checkbox must be selected";
+      showMessage("At least one permission checkbox must be selected", "warning");
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -178,6 +188,10 @@ const SupportUser = () => {
       name: rowData?.name || "",
       phone: phoneWithoutCountryCode || "",
       address: rowData?.address || "",
+      chat_access: rowData?.chat_access || 0,
+      website_leads_access: rowData?.website_leads_access || 0,
+      doctor_verify_access: rowData?.doctor_verify_access || 0,
+
     });
     setEditModal(true);
   };
@@ -191,6 +205,9 @@ const SupportUser = () => {
       address: "",
       email: "",
       user_name: "",
+      chat_access:"",
+      website_leads_access: "",
+      doctor_verify_access: "",
       password: "",
       confirmPassword: "",
     });

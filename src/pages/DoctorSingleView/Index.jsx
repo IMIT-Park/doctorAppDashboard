@@ -26,12 +26,13 @@ import RemoveDoctor from "./components/RemoveDoctor";
 import Swal from "sweetalert2";
 
 const SinglePage = () => {
-  const { doctorId, clinicId } = useParams();
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { userDetails } = useContext(UserContext);
+  const { userDetails, ids, setIds } = useContext(UserContext);
+
+  const clinicId = ids?.clinicId;
+  const doctorId = ids?.doctorId;
 
   const isSuperAdmin = userDetails?.role_id === 1;
 

@@ -31,7 +31,7 @@ const Clinics = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { userDetails } = useContext(UserContext);
+  const { userDetails, ids, setIds } = useContext(UserContext);
   const ownerId = userDetails?.UserOwner?.[0]?.owner_id || 0;
 
   useEffect(() => {
@@ -336,6 +336,11 @@ const Clinics = () => {
     }
   }, [search, page, pageSize]);
 
+  const handleRowClick = (clinicId) => {
+    setIds({ ...ids, clinicId: clinicId });
+    navigate("/clinics/single-view");
+  };
+
   return (
     <div>
       <ScrollToTop />
@@ -403,11 +408,7 @@ const Clinics = () => {
               className="whitespace-nowrap table-hover"
               records={allClinics}
               idAccessor="clinic.clinic_id"
-              onRowClick={(row) =>
-                navigate(`/clinics/${row?.clinic?.clinic_id}`, {
-                  state: { previousUrl: location?.pathname },
-                })
-              }
+              onRowClick={(row) => handleRowClick(row?.clinic?.clinic_id)}
               columns={[
                 {
                   accessor: "",

@@ -20,6 +20,7 @@ import IconSearch from "../../../components/Icon/IconSearch";
 import * as XLSX from "xlsx";
 import { UserContext } from "../../../contexts/UseContext";
 import { formatDate } from "../../../utils/formatDate";
+import IconFile from "../../../components/Icon/IconFile";
 
 const OwnerSingleView = () => {
   const dispatch = useDispatch();
@@ -99,17 +100,13 @@ const OwnerSingleView = () => {
 
   // Search Clinic
   const fetchSearchClinics = async () => {
-    // const updatedKeyword = isNaN(search) ? search : `+91${search}`;
     let updatedKeyword;
-
-    // Check if the search string starts with '+91'
-    if (search.startsWith('+91')) {
-      updatedKeyword = search; // Keep the original search keyword
+    if (search.startsWith("+9" || "+91")) {
+      updatedKeyword = search;
     } else {
-      // Add '+91' if the search is a number, otherwise keep it as is
       updatedKeyword = isNaN(search) ? search : `+91${search}`;
     }
-  
+    
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/clinic/getclinicdata/${ownerId}?pageSize=${pageSize}&page=${page}`,
@@ -372,9 +369,10 @@ const OwnerSingleView = () => {
           <div>
             <button
               type="button"
-              className="btn btn-green"
+              className="btn btn-secondary"
               onClick={exportToExcel}
             >
+                <IconFile className="ltr:mr-2 rtl:ml-2" />
               Export to Excel
             </button>
           </div>

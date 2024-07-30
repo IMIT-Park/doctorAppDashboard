@@ -34,6 +34,7 @@ import IconPlus from "../../components/Icon/IconPlus";
 import AddTiming from "../../panels/clinic/timings/AddTiming";
 import AnimateHeight from "react-animate-height";
 import { formatTime } from "../../utils/formatTime";
+import IconFile from "../../components/Icon/IconFile";
 
 const ClinicSingleView = () => {
   const dispatch = useDispatch();
@@ -353,7 +354,12 @@ const ClinicSingleView = () => {
   };
 
   const doctorSearch = async () => {
-    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    let updatedKeyword;
+    if (search.startsWith("+9" || "+91")) {
+      updatedKeyword = search;
+    } else {
+      updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    }
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/doctor/getalldoctordata?pageSize=${pageSize}&page=${page}`,
@@ -866,9 +872,10 @@ const ClinicSingleView = () => {
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
             <button
               type="button"
-              className="btn btn-green"
+              className="btn btn-secondary"
               onClick={exportToExcel}
             >
+              <IconFile className="ltr:mr-2 rtl:ml-2" />
               Export to Excel
             </button>
 

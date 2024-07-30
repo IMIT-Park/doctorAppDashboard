@@ -26,6 +26,7 @@ import IconCopy from "../../../components/Icon/IconCopy";
 import RescheduleModal from "./RescheduleModal";
 import CancelReschedule from "./CancelReschedule";
 import { UserContext } from "../../../contexts/UseContext";
+import { formatTime } from "../../../utils/formatTime";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -66,7 +67,6 @@ const ClinicProfile = () => {
 
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [appointments, setAppointments] = useState([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
@@ -78,6 +78,13 @@ const ClinicProfile = () => {
   const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
   const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
+
+  const getCurrentDate = () => {
+    const currentDate = new Date();
+    return currentDate.toISOString().split("T")[0];
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
 
   useEffect(() => {
     setPage(1);
@@ -475,7 +482,7 @@ const ClinicProfile = () => {
                   id="Date"
                   type="date"
                   className="form-input form-input-green w-full md:w-auto min-w-52 pr-2"
-                  value={selectedDate}
+                  value={selectedDate || ""}
                   onChange={handleDateChange}
                   placeholder="Select date"
                 />
@@ -573,6 +580,7 @@ const ClinicProfile = () => {
                             accessor: "schedule_time",
                             title: "Time",
                             textAlignment: "center",
+                            render: (row) => formatTime(row?.schedule_time),
                           },
                           {
                             accessor: "actions",
@@ -581,7 +589,6 @@ const ClinicProfile = () => {
                             render: (row) => (
                               <div className="dropdown grid place-items-center">
                                 <Dropdown
-
                                   placement="middle"
                                   btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
                                   button={
@@ -606,7 +613,6 @@ const ClinicProfile = () => {
                                       <button
                                         type="button"
                                         onClick={() => {
-                                        
                                           openCancelRescheduleModal(
                                             row.booking_id
                                           );

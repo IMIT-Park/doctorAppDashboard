@@ -23,7 +23,7 @@ const PatientDetails = () => {
   const { userDetails, doctorReportId, setDoctorReportId } =
     useContext(UserContext);
 
-    console.log(doctorReportId);
+  console.log(doctorReportId);
 
   const doctorId = doctorReportId || userDetails?.UserDoctor?.[0]?.doctor_id;
   const isSuperAdmin = userDetails?.role_id === 1;
@@ -38,6 +38,7 @@ const PatientDetails = () => {
   };
 
   const [input, setInput] = useState(initialInputState);
+  const [scheduleDate, setScheduleDate] = useState(null);
 
   const fetchPatientDetails = async () => {
     setLoading(true);
@@ -45,7 +46,9 @@ const PatientDetails = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/consultation/takeConsultation/${bookingId}`
       );
+      console.log(response);
       setPatientData(response?.data?.Consultation);
+      setScheduleDate(response?.data?.Consultation?.schedule_date);
       setPatientId(response?.data?.Consultation?.patient_id);
       setViewPatientDetails(response?.data?.Consultation?.Patient);
       setMedicalRecords(response?.data?.medicalrecords);
@@ -111,6 +114,13 @@ const PatientDetails = () => {
   //Add addMedicalReport function
   const addMedicalReport = async (e) => {
     e.preventDefault();
+
+    const currentDate = new Date();
+    if (currentDate !== scheduleDate) {
+      showMessage("Medical reports can be added only for today's bookings..", "warning");
+      return;
+    }
+
     if (
       !input.symptoms ||
       !input.diagnosis ||
@@ -160,6 +170,12 @@ const PatientDetails = () => {
   // console.log(medicalRecords);
 
   const handleComplete = async () => {
+    const currentDate = new Date();
+    if (currentDate !== scheduleDate) {
+      showMessage("Only today's booking can be marked as complete.", "warning");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await NetworkHandler.makePutRequest(
@@ -341,7 +357,7 @@ const PatientDetails = () => {
                             setInput({ ...input, symptoms: e.target.value })
                           }
                           className="form-input form-input-green bg-transparent"
-                          required
+                         
                         />
                       </div>
 
@@ -357,7 +373,7 @@ const PatientDetails = () => {
                           }
                           className="form-input form-input-green bg-transparent"
                           autoComplete="off"
-                          required
+                         
                         />
                       </div>
 
@@ -373,7 +389,7 @@ const PatientDetails = () => {
                           }
                           className="form-input form-input-green bg-transparent"
                           autoComplete="off"
-                          required
+                          
                         />
                       </div>
                     </div>
@@ -390,7 +406,7 @@ const PatientDetails = () => {
                             setInput({ ...input, prescription: e.target.value })
                           }
                           className="form-input form-input-green bg-transparent"
-                          required
+                         
                           rows={10}
                         />
                       </div>
@@ -407,7 +423,7 @@ const PatientDetails = () => {
                           }
                           className="form-input form-input-green bg-transparent"
                           autoComplete="off"
-                          required
+                         
                           rows={10}
                         />
                       </div>

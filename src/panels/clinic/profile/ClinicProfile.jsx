@@ -522,23 +522,25 @@ const ClinicProfile = () => {
                     )}
                   </Tab>
                 </div>
-                <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
-                  <button
-                    type="button"
-                    className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
-                  >
-                    Reschedule Todays Appoinments
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
-                    onClick={() =>
-                      openCancelAllAppoimentsModal(selectedDoctorId)
-                    }
-                  >
-                    Cancel all Appoinments
-                  </button>
-                </div>
+                {totalAppointments > 0 && (
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
+                    <button
+                      type="button"
+                      className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
+                    >
+                      Reschedule Todays Appoinments
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+                      onClick={() =>
+                        openCancelAllAppoimentsModal(selectedDoctorId)
+                      }
+                    >
+                      Cancel all Appoinments
+                    </button>
+                  </div>
+                )}
               </Tab.List>
               <Tab.Panels>
                 <Tab.Panel>
@@ -599,12 +601,9 @@ const ClinicProfile = () => {
                                     <li>
                                       <button
                                         type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          openAddRescheduleModal(
-                                            row.booking_id
-                                          );
-                                        }}
+                                        onClick={() =>
+                                          openAddRescheduleModal(row.booking_id)
+                                        }
                                       >
                                         Reschedule
                                       </button>
@@ -612,11 +611,11 @@ const ClinicProfile = () => {
                                     <li>
                                       <button
                                         type="button"
-                                        onClick={() => {
+                                        onClick={() =>
                                           openCancelRescheduleModal(
                                             row.booking_id
-                                          );
-                                        }}
+                                          )
+                                        }
                                       >
                                         Cancel
                                       </button>

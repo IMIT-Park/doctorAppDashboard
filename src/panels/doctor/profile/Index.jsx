@@ -24,6 +24,7 @@ import CustomButton from "../../../components/CustomButton";
 import noProfile from "/assets/images/empty-user.png";
 import Swal from "sweetalert2";
 
+
 const Profile = () => {
   const { userDetails } = useContext(UserContext);
 
@@ -480,6 +481,8 @@ const Profile = () => {
   const { showAlert: showDoctorAlert, loading: blockUnblockDoctorLoading } =
     useBlockUnblock(fetchDoctorData);
 
+
+
   return (
     <div>
       <ScrollToTop />
@@ -598,6 +601,7 @@ const Profile = () => {
                     <div className="text-base text-gray-500">Date of Birth</div>
                     <div className="text-base dark:text-slate-300 p-2 border dark:border-slate-800 rounded">
                       {formatDate(doctorDetails?.dateOfBirth)}
+
                     </div>
                   </div>
                 </div>

@@ -4,6 +4,7 @@ import IconX from "../../../components/Icon/IconX";
 import IconLoader from "../../../components/Icon/IconLoader";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
+import { reverseformatDate } from "../../../utils/formatDate";
 
 const DoctorDetailsEdit = ({
   open,
@@ -16,6 +17,7 @@ const DoctorDetailsEdit = ({
   setErrors,
 }) => {
   const [specializations, setSpecializations] = useState([]);
+  const currentDate = reverseformatDate(new Date());
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -156,6 +158,7 @@ const DoctorDetailsEdit = ({
                           type="date"
                           className="form-input form-input-green"
                           value={input.dateOfBirth}
+                      max={currentDate} 
                           onChange={(e) =>
                             setInput({ ...input, dateOfBirth: e.target.value })
                           }

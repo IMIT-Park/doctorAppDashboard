@@ -6,6 +6,8 @@ import IconEye from "../../../components/Icon/IconEye";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
 import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
 import NetworkHandler from "../../../utils/NetworkHandler";
+import { reverseformatDate } from "../../../utils/formatDate";
+
 
 const AddDoctor = ({
   open,
@@ -74,6 +76,7 @@ const AddDoctor = ({
   const handleFeesChange = (e) => {
     setInput({ ...input, fees: e.target.value.replace(/\D/g, "") });
   };
+  const currentDate = reverseformatDate(new Date());
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -183,6 +186,7 @@ const AddDoctor = ({
                         type="date"
                         className="form-input form-input-green h-10"
                         value={input?.dateOfBirth}
+                        max={currentDate} 
                         onChange={(e) =>
                           setInput({ ...input, dateOfBirth: e.target.value })
                         }

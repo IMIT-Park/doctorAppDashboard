@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import IconLoader from "../../../components/Icon/IconLoader";
@@ -14,8 +14,10 @@ import CountUp from "react-countup";
 import Dropdown from "../../../components/Dropdown";
 import IconHorizontalDots from "../../../components/Icon/IconHorizontalDots";
 import IconCaretDown from "../../../components/Icon/IconCaretDown";
-// import RescheduleModal from "./RescheduleModal";
-// import CancelReschedule from "./CancelReschedule";
+import CancelReschedule from "../../clinic/profile/CancelReschedule";
+import RescheduleModal from "../../clinic/profile/RescheduleModal";
+import { UserContext } from "../../../contexts/UseContext";
+
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -31,6 +33,7 @@ const ClinicProfile = () => {
   const ownerId = userDetails?.UserClinic?.[0]?.owner_id;
 
   const qrUrl = `${websiteUrl}clinic/${clinicId}`;
+  const { doctorReportId, setDoctorReportId } = useContext(UserContext);
 
   useEffect(() => {
     dispatch(setPageTitle("Profile"));
@@ -42,7 +45,6 @@ const ClinicProfile = () => {
 
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [appointments, setAppointments] = useState([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
@@ -54,6 +56,14 @@ const ClinicProfile = () => {
   const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
   const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
+
+  const getCurrentDate = () => {
+    const currentDate = new Date();
+    return currentDate.toISOString().split("T")[0];
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
+
 
   useEffect(() => {
     setPage(1);
@@ -108,7 +118,7 @@ const ClinicProfile = () => {
           clinic_id: clinicId,
         }
       );
-
+        console.log(response);
       if (response.status === 200) {
         setTotalAppointments(response.data?.Consultations?.count || 0);
         setAppointments(response?.data?.Consultations?.rows || []);
@@ -163,7 +173,12 @@ const ClinicProfile = () => {
   };
 
   setCancelAllAppoinments;
-  // block and unblock handler
+ 
+
+  const handleRowClick = (bookingId) => {
+    setDoctorReportId(selectedDoctorId);
+    navigate(`/patient-details/${bookingId}`);
+  };
 
   return (
     <div>
@@ -284,6 +299,7 @@ const ClinicProfile = () => {
                       className="whitespace-nowrap table-hover flex justify-evenly"
                       records={appointments}
                       idAccessor="booking_id"
+                      onRowClick={(row) => handleRowClick(row.booking_id)}
                       columns={[
                         {
                           accessor: "No",
@@ -316,6 +332,7 @@ const ClinicProfile = () => {
                                 placement="middle"
                                 btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
                                 button={
+                                  
                                   <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
                                 }
                               >
@@ -368,7 +385,7 @@ const ClinicProfile = () => {
         {/* // )} */}
       </div>
 
-      {/* <RescheduleModal
+      <RescheduleModal
         addRescheduleModal={addRescheduleModal}
         closeAddRescheduleModal={closeAddRescheduleModal}
         bookingId={selectedBookingId}
@@ -391,7 +408,7 @@ const ClinicProfile = () => {
         cancelAll={true}
         clinicId={clinicId}
         selectedDate={selectedDate}
-      /> */}
+      />
     </div>
   );
 };

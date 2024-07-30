@@ -46,8 +46,10 @@ const Dropdown = (props, forwardedRef) => {
                 ref={referenceRef}
                 type="button"
                 className={props.btnClassName}
-                onClick={() => setVisibility(!visibility)}
-            >
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setVisibility(!visibility)}}
+                >
                 {props.button}
             </button>
 
@@ -56,7 +58,9 @@ const Dropdown = (props, forwardedRef) => {
                 style={styles.popper}
                 {...attributes.popper}
                 className="z-50"
-                onClick={() => setVisibility(!visibility)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setVisibility(!visibility)}}
                 >
                     {visibility && props.children}
                 </div>

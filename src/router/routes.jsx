@@ -40,6 +40,8 @@ const OwnerProfile = lazy(() => import("../panels/owner/profile/OwnerProfile"));
 const OwnerDoctorAppointments = lazy(() =>
   import("../panels/owner/bookings/DoctorAppoinments")
 );
+const SubscriptionDetails = lazy(() => import("../panels/owner/subscriptiondetails/SubscriptionDetails"));
+
 // <--------------> owner panel imports ends here <-------------->
 
 // <--------------> clinic panel imports starts here<-------------->
@@ -252,6 +254,12 @@ const routes = [
   {
     path: "/owner/bookings/:clinicId",
     element: <OwnerDoctorAppointments />,
+    layout: "default",
+  },
+   // SubscriptionDetails
+   {
+    path: "/owner/subscriptiondetails",
+    element: <SubscriptionDetails />,
     layout: "default",
   },
   // <--------------> owner panel ends here <-------------->

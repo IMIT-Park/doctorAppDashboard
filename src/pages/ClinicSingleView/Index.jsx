@@ -40,9 +40,10 @@ const ClinicSingleView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { clinicId } = useParams();
+  const { userDetails, ids, setIds } = useContext(UserContext);
 
-  const { userDetails } = useContext(UserContext);
+  const clinicId = ids?.clinicId;
+
   const ownerId = userDetails?.UserOwner?.[0]?.owner_id;
 
   const isSuperAdmin = userDetails?.role_id === 1;
@@ -593,6 +594,11 @@ const ClinicSingleView = () => {
 
   const groupedTimings = groupTimingsByDay(clinicTimings);
 
+  const handleRowClick = (doctorId) => {
+    setIds({ ...ids, clinicId: clinicId || null, doctorId: doctorId });
+    navigate("/doctors/single-view");
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -907,11 +913,7 @@ const ClinicSingleView = () => {
               className="whitespace-nowrap table-hover"
               records={allDoctors}
               idAccessor="doctor_id"
-              onRowClick={(row) =>
-                navigate(`/clinics/${clinicId}/${row?.doctor_id}`, {
-                  state: { previousUrl: location?.pathname },
-                })
-              }
+              onRowClick={(row) => handleRowClick(row?.doctor_id)}
               columns={[
                 {
                   accessor: "doctor_id",

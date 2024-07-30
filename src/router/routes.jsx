@@ -408,21 +408,21 @@ const routes = [
 
   // <--------------> clinic single-view starts here <-------------->
   {
-    path: "/clinics/:clinicId",
+    path: "/clinics/single-view",
     element: <ClinicSingleView />,
     layout: "default",
   },
   // <--------------> clinic single-view ends here <-------------->
 
   // <--------------> doctor single-view starts here <-------------->
-  {
-    path: "/clinics/:clinicId/:doctorId",
-    element: <DoctorSingleView />,
-    layout: "default",
-  },
+  // {
+  //   path: "/clinics/:clinicId/:doctorId",
+  //   element: <DoctorSingleView />,
+  //   layout: "default",
+  // },
 
   {
-    path: "/doctors/:doctorId",
+    path: "/doctors/single-view",
     element: <DoctorSingleView />,
     layout: "default",
   },

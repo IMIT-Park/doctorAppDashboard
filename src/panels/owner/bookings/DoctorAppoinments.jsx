@@ -18,7 +18,6 @@ import CancelReschedule from "../../clinic/profile/CancelReschedule";
 import RescheduleModal from "../../clinic/profile/RescheduleModal";
 import { UserContext } from "../../../contexts/UseContext";
 
-
 const ClinicProfile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,9 +27,10 @@ const ClinicProfile = () => {
   const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
 
+
   // const clinicId = userData?.UserClinic?.[0]?.clinic_id || 0;
 
-  const ownerId = userDetails?.UserClinic?.[0]?.owner_id;
+  const isSuperAdmin = userData?.role_id === 1;
 
   const qrUrl = `${websiteUrl}clinic/${clinicId}`;
   const { doctorReportId, setDoctorReportId } = useContext(UserContext);
@@ -63,7 +63,6 @@ const ClinicProfile = () => {
   };
 
   const [selectedDate, setSelectedDate] = useState(getCurrentDate());
-
 
   useEffect(() => {
     setPage(1);
@@ -118,7 +117,7 @@ const ClinicProfile = () => {
           clinic_id: clinicId,
         }
       );
-        console.log(response);
+
       if (response.status === 200) {
         setTotalAppointments(response.data?.Consultations?.count || 0);
         setAppointments(response?.data?.Consultations?.rows || []);
@@ -173,7 +172,6 @@ const ClinicProfile = () => {
   };
 
   setCancelAllAppoinments;
- 
 
   const handleRowClick = (bookingId) => {
     setDoctorReportId(selectedDoctorId);
@@ -265,21 +263,26 @@ const ClinicProfile = () => {
                   )}
                 </Tab>
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
-                <button
-                  type="button"
-                  className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
-                >
-                  Reschedule Todays Appoinments
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
-                  onClick={() => openCancelAllAppoimentsModal(selectedDoctorId)}
-                >
-                  Cancel all Appoinments
-                </button>
-              </div>
+              {totalAppointments > 0 && !isSuperAdmin && (
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
+                  <button
+                    type="button"
+                    className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
+                  >
+                    Reschedule Todays Appoinments
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+                    onClick={() =>
+                      openCancelAllAppoimentsModal(selectedDoctorId)
+                    }
+                  >
+                    Cancel all Appoinments
+                  </button>
+                </div>
+              )}
+
             </Tab.List>
             <Tab.Panels>
               <Tab.Panel>
@@ -322,6 +325,7 @@ const ClinicProfile = () => {
                           title: "Time",
                           textAlignment: "center",
                         },
+
                         {
                           accessor: "actions",
                           title: "Actions",
@@ -332,7 +336,6 @@ const ClinicProfile = () => {
                                 placement="middle"
                                 btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
                                 button={
-                                  
                                   <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
                                 }
                               >

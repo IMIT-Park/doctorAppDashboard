@@ -53,7 +53,7 @@ const SubscriptionDetails = () => {
               <div className="mt-1 bg-white p-4 rounded shadow bg-none">
                 <table className="w-full table-auto">
                   <thead className="bg-transparent">
-                    <tr className='bg-transparent'>
+                  <tr className='!bg-transparent dark:!bg-transparent'>
                       <th className="px-4 py-2 text-left text-[20px] font-semibold">Order ID</th>
                       <th className="px-4 py-2 text-left text-[20px] font-semibold">Bill Date</th>
                       <th className="px-4 py-2 text-left text-[20px] font-semibold">Amount</th>

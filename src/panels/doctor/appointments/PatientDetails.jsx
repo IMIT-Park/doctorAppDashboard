@@ -4,7 +4,7 @@ import CustomButton from "../../../components/CustomButton";
 import { Tab } from "@headlessui/react";
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { formatDate } from "../../../utils/formatDate";
+import { formatDate, reverseformatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
 import { UserContext } from "../../../contexts/UseContext";
 import IconLoader from "../../../components/Icon/IconLoader";
@@ -115,8 +115,8 @@ const PatientDetails = () => {
   const addMedicalReport = async (e) => {
     e.preventDefault();
 
-    const currentDate = new Date();
-    if (currentDate !== scheduleDate) {
+    const currentDate = reverseformatDate(new Date());
+    if (currentDate !== reverseformatDate(scheduleDate)) {
       showMessage("Medical reports can be added only for today's bookings..", "warning");
       return;
     }
@@ -170,8 +170,8 @@ const PatientDetails = () => {
   // console.log(medicalRecords);
 
   const handleComplete = async () => {
-    const currentDate = new Date();
-    if (currentDate !== scheduleDate) {
+    const currentDate = reverseformatDate(new Date());
+    if (currentDate !== reverseformatDate(scheduleDate)){
       showMessage("Only today's booking can be marked as complete.", "warning");
       return;
     }

@@ -413,6 +413,23 @@ const OwnerSingleView = () => {
                   title: "Total Doctors",
                   textAlignment: "center",
                 },
+                {
+                  accessor: "Status",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="flex justify-center items-center">
+                      <span
+                        className={`text-sm font-medium ${
+                          rowData?.clinic?.User?.status
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {rowData?.clinic?.User?.status ? "Active" : "Blocked"}
+                      </span>
+                    </div>
+                  ),
+                },
 
                 {
                   accessor: "clinic_id",
@@ -433,6 +450,29 @@ const OwnerSingleView = () => {
                     </div>
                   ),
                 },
+                {
+                  accessor: "actions",
+                  title: "View Booking",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="grid place-items-center">
+                     <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Add your view booking handler here
+                          navigate(
+                            `/owner/bookings/${rowData?.clinic?.clinic_id}`
+                          );
+                        }}
+                        className="btn btn-green btn-sm py-1.5 px-3.5"
+                      >
+                        View Booking
+                      </button>
+                    </div>
+                  ),
+                },
+
                 // {
                 //   accessor: "googleLocation",
                 //   title: "Location",
@@ -470,23 +510,7 @@ const OwnerSingleView = () => {
                 //     />
                 //   ),
                 // },
-                {
-                  accessor: "Status",
-                  textAlignment: "center",
-                  render: (rowData) => (
-                    <div className="flex justify-center items-center">
-                      <span
-                        className={`text-sm font-medium ${
-                          rowData?.clinic?.User?.status
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        {rowData?.clinic?.User?.status ? "Active" : "Blocked"}
-                      </span>
-                    </div>
-                  ),
-                },
+              
               ]}
               totalRecords={totalClinics}
               recordsPerPage={pageSize}

@@ -326,7 +326,7 @@ const ClinicProfile = () => {
                           textAlignment: "center",
                         },
 
-                        {
+                        !isSuperAdmin && {
                           accessor: "actions",
                           title: "Actions",
                           textAlignment: "center",
@@ -334,7 +334,7 @@ const ClinicProfile = () => {
                             <div className="dropdown grid place-items-center">
                               <Dropdown
                                 placement="middle"
-                                btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
+                                btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full flex justify-center items-center"
                                 button={
                                   <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
                                 }
@@ -354,9 +354,7 @@ const ClinicProfile = () => {
                                     <button
                                       type="button"
                                       onClick={() =>
-                                        openCancelRescheduleModal(
-                                          row.booking_id
-                                        )
+                                        openCancelRescheduleModal(row.booking_id)
                                       }
                                     >
                                       Cancel
@@ -367,7 +365,8 @@ const ClinicProfile = () => {
                             </div>
                           ),
                         },
-                      ]}
+                      ].filter(Boolean)} 
+                    
                       totalRecords={totalAppointments}
                       recordsPerPage={pageSize}
                       page={page}

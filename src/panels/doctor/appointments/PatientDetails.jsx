@@ -223,10 +223,11 @@ const PatientDetails = () => {
             <button className="btn btn-outline-primary mr-3 cursor-default hover:bg-transparent hover:text-primary ">
               {patientData?.type}
             </button>
-
+            {!isSuperAdmin && (
             <CustomButton onClick={handleComplete} disabled={loading}>
               Completed
             </CustomButton>
+            )}
           </div>
         </div>
 
@@ -312,6 +313,7 @@ const PatientDetails = () => {
         )}
         <Tab.Group>
           <Tab.List className="mt-3 flex flex-wrap font-bold">
+            {!isSuperAdmin && (
             <Tab as={Fragment}>
               {({ selected }) => (
                 <button
@@ -325,6 +327,7 @@ const PatientDetails = () => {
                 </button>
               )}
             </Tab>
+            )}
             <Tab as={Fragment}>
               {({ selected }) => (
                 <button
@@ -341,6 +344,7 @@ const PatientDetails = () => {
           </Tab.List>
 
           <Tab.Panels>
+            {!isSuperAdmin && (
             <Tab.Panel>
               <div className="active pt-5">
                 <form onSubmit={addMedicalReport}>
@@ -442,6 +446,7 @@ const PatientDetails = () => {
                 </form>
               </div>
             </Tab.Panel>
+            )}
 
             <Tab.Panel>
               {medicalRecords && medicalRecords?.length > 0 ? (

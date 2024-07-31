@@ -18,6 +18,8 @@ import { showMessage } from "../../../utils/showMessage";
 import CustomSwitch from "../../../components/CustomSwitch";
 import CustomButton from "../../../components/CustomButton";
 import DeleteSupportPerson from "../../../components/CustomDeleteModal";
+import IconEye from "../../../components/Icon/IconEye";
+import ShowSupportUser from "./ShowSupportUser";
 
 const SupportUser = () => {
   const dispatch = useDispatch();
@@ -36,6 +38,8 @@ const SupportUser = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [supportPersonId, setSupportPersonId] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
+  const [viewModal, setViewModal] = useState(false);
+  const [singleDetails, setSingleDetails] = useState({});
   const [input, setInput] = useState({
     name: "",
     phone: "",
@@ -328,6 +332,19 @@ const SupportUser = () => {
   const { showAlert: showSupportAlert, loading: blockUnblockSupportLoading } =
     useBlockUnblock(fetchData);
 
+
+    const openViewModal = (user) => {
+      setSingleDetails(user);
+      setViewModal(true);
+    };
+  
+    const closeViewModal = () => {
+      setViewModal(false);
+    };
+  
+  
+
+
   return (
     <div>
       <ScrollToTop />
@@ -392,7 +409,7 @@ const SupportUser = () => {
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="flex gap-5 items-center w-max mx-auto">
-                      <CustomSwitch
+                      {/* <CustomSwitch
                         checked={rowData?.User?.status}
                         onChange={() =>
                           showSupportAlert(
@@ -406,7 +423,18 @@ const SupportUser = () => {
                         }
                         uniqueId={`support${rowData?.supportuser_id}`}
                         size="normal"
-                      />
+                      /> */}
+                       <Tippy content="View">
+                        <button
+                          className="flex hover:text-primary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openViewModal(rowData);
+                          }}
+                        >
+                          <IconEye />
+                        </button>
+                      </Tippy>
                       <Tippy content="Edit">
                         <button
                           className="flex hover:text-primary"
@@ -448,7 +476,13 @@ const SupportUser = () => {
           </div>
         )}
       </div>
+      <ShowSupportUser
+        open={viewModal}
+        closeModal={closeViewModal}
+        details={singleDetails}
+      />
       {/* add support user modal */}
+     
       <AddSupportUser
         open={addModal}
         closeModal={closeAddModal}

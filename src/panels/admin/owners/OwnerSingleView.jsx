@@ -26,7 +26,7 @@ const OwnerSingleView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { ids } = useContext(UserContext);
+  const { ids, setIds } = useContext(UserContext);
 
   const ownerId = ids?.ownerId;
 
@@ -106,7 +106,7 @@ const OwnerSingleView = () => {
     } else {
       updatedKeyword = isNaN(search) ? search : `+91${search}`;
     }
-    
+
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/clinic/getclinicdata/${ownerId}?pageSize=${pageSize}&page=${page}`,
@@ -180,7 +180,11 @@ const OwnerSingleView = () => {
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
-  
+
+  const handleRowClick = (clinicId) => {
+    setIds({ ...ids, clinicId: clinicId });
+    navigate("/clinics/single-view");
+  };
 
   return (
     <div>
@@ -228,22 +232,19 @@ const OwnerSingleView = () => {
                       </div>
                     </div>
                     <div className="flex flex-col mb-2 md:w-1/2 gap-1">
-                      <div className="text-white-dark text-base">
-                        City
-                      </div>
+                      <div className="text-white-dark text-base">City</div>
                       <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min:h-10 bg-gray-100">
                         {ownerInfo?.city || "-----"}
                       </div>
-                      <div className="text-white-dark text-base">
-                        Country
-                      </div>
+                      <div className="text-white-dark text-base">Country</div>
                       <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
                         {ownerInfo?.country || "-----"}
-                      </div><div className="text-white-dark text-base">
-                        State
                       </div>
+                      <div className="text-white-dark text-base">State</div>
                       <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
-                        {ownerInfo?.state ? capitalizeFirstLetter(ownerInfo.state) : "-----"}
+                        {ownerInfo?.state
+                          ? capitalizeFirstLetter(ownerInfo.state)
+                          : "-----"}
                       </div>
                     </div>
                   </div>
@@ -372,7 +373,7 @@ const OwnerSingleView = () => {
               className="btn btn-secondary"
               onClick={exportToExcel}
             >
-                <IconFile className="ltr:mr-2 rtl:ml-2" />
+              <IconFile className="ltr:mr-2 rtl:ml-2" />
               Export to Excel
             </button>
           </div>
@@ -394,11 +395,7 @@ const OwnerSingleView = () => {
               className="whitespace-nowrap table-hover"
               records={allClinics}
               idAccessor="clinic.clinic_id"
-              onRowClick={(row) =>
-                navigate(`/clinics/${row?.clinic?.clinic_id}`, {
-                  state: { previousUrl: location?.pathname },
-                })
-              }
+              onRowClick={(row) => handleRowClick(row?.clinic?.clinic_id)}
               columns={[
                 {
                   accessor: "User.user_id",

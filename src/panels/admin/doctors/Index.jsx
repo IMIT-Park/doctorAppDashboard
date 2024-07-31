@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setPageTitle } from "../../../store/themeConfigSlice";
 import { DataTable } from "mantine-datatable";
@@ -17,11 +17,14 @@ import CustomSwitch from "../../../components/CustomSwitch";
 import noProfile from "/assets/images/empty-user.png";
 import * as XLSX from "xlsx";
 import IconFile from "../../../components/Icon/IconFile";
+import { UserContext } from "../../../contexts/UseContext";
 
 const Doctors = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { ids, setIds } = useContext(UserContext);
 
   useEffect(() => {
     dispatch(setPageTitle("Doctors"));
@@ -136,6 +139,11 @@ const Doctors = () => {
     XLSX.writeFile(workbook, "DoctorData.xlsx");
   };
 
+  const handleRowClick = (doctorId) => {
+    setIds({ ...ids, clinicId: null, doctorId: doctorId });
+    navigate("/doctors/single-view");
+  };
+
   return (
     <div>
       <ScrollToTop />
@@ -185,8 +193,7 @@ const Doctors = () => {
               className="btn btn-secondary"
               onClick={exportToExcel}
             >
-              <IconFile  className="ltr:mr-2 rtl:ml-2"/>
-
+              <IconFile className="ltr:mr-2 rtl:ml-2" />
               Export to Excel
             </button>
           </div>
@@ -207,11 +214,7 @@ const Doctors = () => {
               className="whitespace-nowrap table-hover"
               records={allDoctors}
               idAccessor="doctor_id"
-              onRowClick={(row) =>
-                navigate(`/doctors/${row?.doctor_id}`, {
-                  state: { previousUrl: location?.pathname },
-                })
-              }
+              onRowClick={(row) => handleRowClick(row?.doctor_id)}
               columns={[
                 {
                   accessor: "No",

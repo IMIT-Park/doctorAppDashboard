@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { DataTable } from "mantine-datatable";
 import CountUp from "react-countup";
@@ -18,11 +18,14 @@ import AddDoctor from "./AddDoctor";
 import { showMessage } from "../../../utils/showMessage";
 import RemoveDoctor from "../../../pages/DoctorSingleView/components/RemoveDoctor";
 import Swal from "sweetalert2";
+import { UserContext } from "../../../contexts/UseContext";
 
 const ClinicDoctor = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+
+  const { ids, setIds } = useContext(UserContext);
 
   const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
@@ -254,7 +257,12 @@ const ClinicDoctor = () => {
     }
   }, [search, page, pageSize]);
 
-  http: return (
+  const handleRowClick = (doctorId) => {
+    setIds({ ...ids, clinicId: clinicId || null, doctorId: doctorId });
+    navigate("/doctors/single-view");
+  };
+
+  return (
     <div>
       <ScrollToTop />
       <div className="panel">
@@ -315,11 +323,7 @@ const ClinicDoctor = () => {
               className="whitespace-nowrap table-hover"
               records={allDoctors}
               idAccessor="doctor_id"
-              onRowClick={(row) =>
-                navigate(`/clinics/${clinicId}/${row?.doctor_id}`, {
-                  state: { previousUrl: location?.pathname },
-                })
-              }
+              onRowClick={(row) => handleRowClick(row?.doctor_id)}
               columns={[
                 {
                   accessor: "No",

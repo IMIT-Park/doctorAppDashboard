@@ -26,6 +26,7 @@ import IconCopy from "../../../components/Icon/IconCopy";
 import RescheduleModal from "./RescheduleModal";
 import CancelReschedule from "./CancelReschedule";
 import { UserContext } from "../../../contexts/UseContext";
+import { formatTime } from "../../../utils/formatTime";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -66,7 +67,6 @@ const ClinicProfile = () => {
 
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
   const [totalAppointments, setTotalAppointments] = useState(0);
   const [appointments, setAppointments] = useState([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
@@ -78,6 +78,13 @@ const ClinicProfile = () => {
   const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
   const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
+
+  const getCurrentDate = () => {
+    const currentDate = new Date();
+    return currentDate.toISOString().split("T")[0];
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
 
   useEffect(() => {
     setPage(1);
@@ -475,7 +482,7 @@ const ClinicProfile = () => {
                   id="Date"
                   type="date"
                   className="form-input form-input-green w-full md:w-auto min-w-52 pr-2"
-                  value={selectedDate}
+                  value={selectedDate || ""}
                   onChange={handleDateChange}
                   placeholder="Select date"
                 />
@@ -515,23 +522,25 @@ const ClinicProfile = () => {
                     )}
                   </Tab>
                 </div>
-                <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
-                  <button
-                    type="button"
-                    className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
-                  >
-                    Reschedule Todays Appoinments
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
-                    onClick={() =>
-                      openCancelAllAppoimentsModal(selectedDoctorId)
-                    }
-                  >
-                    Cancel all Appoinments
-                  </button>
-                </div>
+                {totalAppointments > 0 && (
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
+                    <button
+                      type="button"
+                      className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
+                    >
+                      Reschedule Todays Appoinments
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+                      onClick={() =>
+                        openCancelAllAppoimentsModal(selectedDoctorId)
+                      }
+                    >
+                      Cancel all Appoinments
+                    </button>
+                  </div>
+                )}
               </Tab.List>
               <Tab.Panels>
                 <Tab.Panel>
@@ -573,6 +582,7 @@ const ClinicProfile = () => {
                             accessor: "schedule_time",
                             title: "Time",
                             textAlignment: "center",
+                            render: (row) => formatTime(row?.schedule_time),
                           },
                           {
                             accessor: "actions",
@@ -581,7 +591,6 @@ const ClinicProfile = () => {
                             render: (row) => (
                               <div className="dropdown grid place-items-center">
                                 <Dropdown
-
                                   placement="middle"
                                   btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
                                   button={
@@ -592,12 +601,9 @@ const ClinicProfile = () => {
                                     <li>
                                       <button
                                         type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          openAddRescheduleModal(
-                                            row.booking_id
-                                          );
-                                        }}
+                                        onClick={() =>
+                                          openAddRescheduleModal(row.booking_id)
+                                        }
                                       >
                                         Reschedule
                                       </button>
@@ -605,12 +611,11 @@ const ClinicProfile = () => {
                                     <li>
                                       <button
                                         type="button"
-                                        onClick={() => {
-                                        
+                                        onClick={() =>
                                           openCancelRescheduleModal(
                                             row.booking_id
-                                          );
-                                        }}
+                                          )
+                                        }
                                       >
                                         Cancel
                                       </button>

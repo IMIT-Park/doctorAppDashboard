@@ -47,6 +47,8 @@ const ClinicBookingDoctor = () => {
     Particulars: "",
   });
 
+  const currentDate = reverseformatDate(new Date());
+
   const validate = () => {
     const newErrors = {};
 
@@ -185,6 +187,7 @@ const ClinicBookingDoctor = () => {
                     setInput({ ...input, dateOfBirth: e.target.value })
                   }
                   className="form-input form-input-green px-3"
+                  max={currentDate} 
                   required
                   disabled={!!patientDetails}
                 />
@@ -241,7 +244,7 @@ const ClinicBookingDoctor = () => {
                   className="btn btn-green inline-flex justify-center w-40 px-4 py-2 border border-transparent text-base font-medium rounded-md"
                   onClick={handleNext}
                 >
-                    Next
+                  Next
                 </button>
               ) : (
                 <button

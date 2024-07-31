@@ -51,6 +51,14 @@ const AddSupportUser = ({
     }
   };
 
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setInput((prevInput) => ({
+      ...prevInput,
+      [name]: checked ? 1 : 0,
+    }));
+  };
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog
@@ -165,6 +173,45 @@ const AddSupportUser = ({
                           setInput({ ...input, address: e.target.value })
                         }
                       ></textarea>
+                    </div>
+
+                    <div>
+                      <label>Permissions</label>
+                    </div>
+
+                    <div className="ml-5 mb-5">
+                      <label>
+                        <input
+                          className="form-checkbox border-gray-200 text-green-600 "
+                          type="checkbox"
+                          name="chat_access"
+                          checked={input.chat_access === 1}
+                          onChange={handleCheckboxChange}
+                        />
+                        Chat Access
+                      </label>
+                      <br />
+                      <label>
+                        <input
+                          className="form-checkbox border-gray-200 text-green-600 "
+                          type="checkbox"
+                          name="website_leads_access"
+                          checked={input.website_leads_access === 1}
+                          onChange={handleCheckboxChange}
+                        />
+                        Website Lead Access
+                      </label>
+                      <br />
+                      <label>
+                        <input
+                          className="form-checkbox border-gray-200 text-green-600 "
+                          type="checkbox"
+                          name="doctor_verify_access"
+                          checked={input.doctor_verify_access === 1}
+                          onChange={handleCheckboxChange}
+                        />
+                        Doctor Verify Access
+                      </label>
                     </div>
 
                     {!isEditMode && (

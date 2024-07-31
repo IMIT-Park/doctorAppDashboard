@@ -24,6 +24,7 @@ const Clinics = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { ids, setIds } = useContext(UserContext);
 
   useEffect(() => {
     dispatch(setPageTitle("Clinics"));
@@ -45,18 +46,12 @@ const Clinics = () => {
     setPage(1);
   }, [pageSize, search]);
 
-  // useEffect(() => {
-  //   const from = (page - 1) * pageSize;
-  //   const to = from + pageSize;
-  // }, [page, pageSize]);
-
   // fetch Clininc function
   const fetchData = async () => {
     try {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getall?pageSize=${pageSize}&page=${page}`
       );
-      console.log(response);
       setTotalClinics(response?.data?.Clinic?.count);
       setTotalClinicsCount(response?.data?.Clinic?.count);
       setAllClinics(response?.data?.Clinic?.rows);
@@ -147,6 +142,11 @@ const Clinics = () => {
     XLSX.writeFile(workbook, "ClinicsData.xlsx");
   };
 
+  const handleRowClick = (clinicId) => {
+    setIds({ ...ids, clinicId: clinicId });
+    navigate("/clinics/single-view");
+  };
+
   return (
     <div>
       <ScrollToTop />
@@ -198,7 +198,7 @@ const Clinics = () => {
               className="btn btn-secondary"
               onClick={exportToExcel}
             >
-              <IconFile  className="ltr:mr-2 rtl:ml-2"/>
+              <IconFile className="ltr:mr-2 rtl:ml-2" />
               Export to Excel
             </button>
           </div>
@@ -219,11 +219,7 @@ const Clinics = () => {
               className="whitespace-nowrap table-hover"
               records={allClinics}
               idAccessor="clinic_id"
-              onRowClick={(row) =>
-                navigate(`/clinics/${row?.clinic_id}`, {
-                  state: { previousUrl: location?.pathname },
-                })
-              }
+              onRowClick={(row) => handleRowClick(row?.clinic_id)}
               columns={[
                 {
                   accessor: "No",

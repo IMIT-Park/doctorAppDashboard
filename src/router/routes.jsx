@@ -40,6 +40,8 @@ const OwnerProfile = lazy(() => import("../panels/owner/profile/OwnerProfile"));
 const OwnerDoctorAppointments = lazy(() =>
   import("../panels/owner/bookings/DoctorAppoinments")
 );
+const SubscriptionDetails = lazy(() => import("../panels/owner/subscriptiondetails/SubscriptionDetails"));
+
 // <--------------> owner panel imports ends here <-------------->
 
 // <--------------> clinic panel imports starts here<-------------->
@@ -254,6 +256,12 @@ const routes = [
     element: <OwnerDoctorAppointments />,
     layout: "default",
   },
+   // SubscriptionDetails
+   {
+    path: "/owner/subscriptiondetails",
+    element: <SubscriptionDetails />,
+    layout: "default",
+  },
   // <--------------> owner panel ends here <-------------->
 
   // <--------------> clinic panel starts here <-------------->
@@ -408,21 +416,21 @@ const routes = [
 
   // <--------------> clinic single-view starts here <-------------->
   {
-    path: "/clinics/:clinicId",
+    path: "/clinics/single-view",
     element: <ClinicSingleView />,
     layout: "default",
   },
   // <--------------> clinic single-view ends here <-------------->
 
   // <--------------> doctor single-view starts here <-------------->
-  {
-    path: "/clinics/:clinicId/:doctorId",
-    element: <DoctorSingleView />,
-    layout: "default",
-  },
+  // {
+  //   path: "/clinics/:clinicId/:doctorId",
+  //   element: <DoctorSingleView />,
+  //   layout: "default",
+  // },
 
   {
-    path: "/doctors/:doctorId",
+    path: "/doctors/single-view",
     element: <DoctorSingleView />,
     layout: "default",
   },

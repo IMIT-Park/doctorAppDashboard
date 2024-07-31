@@ -14,6 +14,10 @@ import { UserContext } from "../../../contexts/UseContext";
 import useFetchData from "../../../customHooks/useFetchData";
 import { formatDate } from "../../../utils/formatDate";
 import { formatTime } from "../../../utils/formatTime";
+import Dropdown from "../../../components/Dropdown";
+import IconHorizontalDots from "../../../components/Icon/IconHorizontalDots";
+import RescheduleModal from "../../clinic/profile/RescheduleModal";
+import CancelReschedule from "../../clinic/profile/CancelReschedule";
 
 const Appointments = () => {
   const dispatch = useDispatch();
@@ -32,15 +36,17 @@ const Appointments = () => {
   const { userDetails } = useContext(UserContext);
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [clinicId, setClinicId] = useState(null);
+  const [addRescheduleModal, setAddRescheduleModal] = useState(false);
+  const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
+  const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState("");
 
-  
-    const getCurrentDate = () => {
-      const currentDate = new Date();
-      return currentDate.toISOString().split('T')[0]; 
-    };
-  
-    const [selectedDate, setSelectedDate] = useState(getCurrentDate());
-  
+  const getCurrentDate = () => {
+    const currentDate = new Date();
+    return currentDate.toISOString().split("T")[0];
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
 
   const doctorId = userDetails?.UserDoctor?.[0]?.doctor_id;
   const isSuperAdmin = userDetails?.role_id === 1;
@@ -92,6 +98,7 @@ const Appointments = () => {
       setLoading(false);
     } catch (error) {
       setAllAppointments([]);
+      setTotalAppointments(0);
       console.log(error);
       setLoading(false);
     }
@@ -104,9 +111,35 @@ const Appointments = () => {
     }
   }, [clinicId, selectedDate, page, pageSize]);
 
+  const openAddRescheduleModal = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    console.log(bookingId);
+    setAddRescheduleModal(true);
+  };
 
-  
+  const openCancelRescheduleModal = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    console.log(bookingId);
+    setCancelRescheduleModal(true);
+  };
 
+  const openCancelAllAppoimentsModal = (selectedDoctorId) => {
+
+    console.log(selectedDoctorId);
+    setCancelAllAppoinments(true);
+  };
+
+  const closeAddRescheduleModal = () => {
+    setAddRescheduleModal(false);
+  };
+
+  const closeCancelAllAppoimentsModal = () => {
+    setCancelAllAppoinments(false);
+  };
+
+  const closeCancelRescheduleModal = () => {
+    setCancelRescheduleModal(false);
+  };
 
   return (
     <div>
@@ -168,14 +201,14 @@ const Appointments = () => {
             <h5 className="font-semibold text-lg dark:text-white-light ">
               Appointments
             </h5>
-              <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
-                <CountUp
-                  start={0}
-                  end={totalAppointments}
-                  duration={3}
-                  redraw={true}
-                ></CountUp>
-              </span>
+            <span className="badge bg-[#006241] p-0.5 px-1 rounded-full">
+              <CountUp
+                start={0}
+                end={totalAppointments}
+                duration={3}
+                redraw={true}
+              ></CountUp>
+            </span>
           </div>
 
           <div>
@@ -186,7 +219,7 @@ const Appointments = () => {
                     htmlFor="Date"
                     className="block text-gray-700 text-base dark:text-white-dark"
                   >
-                    Select a date to view appointment
+                    Select a date to view appointments
                   </label>
                 </div>
                 <div>
@@ -203,7 +236,29 @@ const Appointments = () => {
               </div>
             </form>
           </div>
+
+          {allAppointments && totalAppointments > 0 ? (
+            
+            <div className="w-full  flex justify-end ">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
+                <button
+                  type="button"
+                  className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
+                >
+                  Reschedule Todays Appoinments
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+                  onClick={() => openCancelAllAppoimentsModal(doctorId)}
+                >
+                  Cancel all Appoinments
+                </button>
+              </div>
+            </div>
+          ): ""}
         </div>
+
         {allAppointments && allAppointments.length > 0 ? (
           <>
             {loading ? (
@@ -260,6 +315,46 @@ const Appointments = () => {
                       title: "Time",
                       render: (row) => formatTime(row?.schedule_time),
                     },
+
+                    {
+                      accessor: "actions",
+                      title: "Actions",
+                      textAlignment: "center",
+                      render: (row) => (
+                        <div className="dropdown grid place-items-center">
+                          <Dropdown
+                            placement="middle"
+                            btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
+                            button={
+                              <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
+                            }
+                          >
+                            <ul className="text-black dark:text-white-dark">
+                              <li>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    openAddRescheduleModal(row.booking_id)
+                                  }
+                                >
+                                  Reschedule
+                                </button>
+                              </li>
+                              <li>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    openCancelRescheduleModal(row.booking_id)
+                                  }
+                                >
+                                  Cancel
+                                </button>
+                              </li>
+                            </ul>
+                          </Dropdown>
+                        </div>
+                      ),
+                    },
                   ]}
                   totalRecords={totalAppointments}
                   recordsPerPage={pageSize}
@@ -284,6 +379,31 @@ const Appointments = () => {
           </div>
         )}
       </div>
+
+      <RescheduleModal
+        addRescheduleModal={addRescheduleModal}
+        closeAddRescheduleModal={closeAddRescheduleModal}
+        bookingId={selectedBookingId}
+        fetchAppointments={getallConsultation}
+      />
+
+      <CancelReschedule
+        cancelRescheduleModal={cancelRescheduleModal}
+        setCancelRescheduleModal={setCancelRescheduleModal}
+        closeCancelRescheduleModal={closeCancelRescheduleModal}
+        bookingId={selectedBookingId}
+        fetchAppointments={getallConsultation}
+      />
+
+      <CancelReschedule
+        cancelRescheduleModal={cancelAllAppoinments}
+        closeCancelRescheduleModal={closeCancelAllAppoimentsModal}
+        selectedDoctorId={doctorId}
+        fetchAppointments={getallConsultation}
+        cancelAll={true}
+        clinicId={clinicId}
+        selectedDate={selectedDate}
+      />
     </div>
   );
 };

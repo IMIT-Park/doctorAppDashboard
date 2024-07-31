@@ -224,6 +224,23 @@ const Clinics = () => {
                 { accessor: "place", title: "Place" },
                 { accessor: "address", title: "Address" },
                 {
+                  accessor: "Status",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="flex justify-center items-center">
+                      <span
+                        className={`text-sm font-medium ${
+                          rowData?.User?.status
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {rowData?.User?.status ? "Active" : "Blocked"}
+                      </span>
+                    </div>
+                  ),
+                },
+                {
                   accessor: "clinic_id",
                   title: "Plan Details",
                   textAlignment: "center",
@@ -238,6 +255,30 @@ const Clinics = () => {
                         className="btn btn-green btn-sm py-1"
                       >
                         View Plan
+                      </button>
+                    </div>
+                  ),
+                },
+                
+                {
+               
+                  accessor: "actions",
+                  title: "View Booking",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="grid place-items-center">
+                     <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Add your view booking handler here
+                          navigate(
+                            `/owner/bookings/${rowData?.clinic_id}`
+                          );
+                        }}
+                        className="btn btn-green btn-sm py-1.5 px-3.5"
+                      >
+                        View Booking
                       </button>
                     </div>
                   ),
@@ -280,23 +321,7 @@ const Clinics = () => {
                 //   ),
                 // },
 
-                {
-                  accessor: "Status",
-                  textAlignment: "center",
-                  render: (rowData) => (
-                    <div className="flex justify-center items-center">
-                      <span
-                        className={`text-sm font-medium ${
-                          rowData?.User?.status
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        {rowData?.User?.status ? "Active" : "Blocked"}
-                      </span>
-                    </div>
-                  ),
-                },
+              
               ]}
               totalRecords={totalClinics}
               recordsPerPage={pageSize}

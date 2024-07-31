@@ -520,7 +520,7 @@ const Clinics = () => {
                             : "text-red-500"
                         }`}
                       >
-                        {rowData?.User?.status ? "Active" : "Blocked"}
+                        {rowData?.clinic?.User?.status ? "Active" : "Blocked"}
                       </span>
                     </div>
                   ),

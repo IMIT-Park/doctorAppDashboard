@@ -35,15 +35,16 @@ const SupportUser = () => {
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [supportPersonId, setSupportPersonId] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
   const [input, setInput] = useState({
     name: "",
     phone: "",
     address: "",
     email: "",
     user_name: "",
-    chat_access: 0,
-    website_leads_access: 0,
-    doctor_verify_access: 0,
+    chat_access: false,
+    website_leads_access: false,
+    doctor_verify_access: false,
     password: "",
     confirmPassword: "",
   });
@@ -95,9 +96,9 @@ const SupportUser = () => {
       address: "",
       email: "",
       user_name: "",
-      chat_access:0,
-      website_leads_access:0,
-      doctor_verify_access:0,
+      chat_access: false,
+      website_leads_access: false,
+      doctor_verify_access: false,
       password: "",
       confirmPassword: "",
     });
@@ -107,17 +108,20 @@ const SupportUser = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (input.password !== input.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-      showMessage("Passwords do not match", "warning");
+    if (!isEditMode) {
+      if (input.password !== input.confirmPassword) {
+        newErrors.confirmPassword = "Passwords do not match";
+        showMessage("Passwords do not match", "warning");
+      }
+      if (input.password.length < 6) {
+        newErrors.password = "password must be more than 5 characters long";
+        showMessage("password must be more than 5 characters long", "warning");
+      }
     }
+
     if (input.phone.length !== 10) {
       newErrors.phone = "Phone number must be exactly 10 digits";
       showMessage("Phone number must be exactly 10 digits", "warning");
-    }
-    if (!input.chat_access === 0 || !input.website_leads_access === 0 || !input.doctor_verify_access === 0) {
-      newErrors.checkboxes = "At least one permission checkbox must be selected";
-      showMessage("At least one permission checkbox must be selected", "warning");
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -137,6 +141,15 @@ const SupportUser = () => {
       return true;
     }
 
+    if (
+      !input.chat_access &&
+      !input.website_leads_access &&
+      !input.doctor_verify_access
+    ) {
+      showMessage("One permission checkbox must be selected", "warning");
+      return true;
+    }
+
     if (validate()) {
       setButtonLoading(true);
 
@@ -145,6 +158,8 @@ const SupportUser = () => {
         phone: `+91${input.phone}`,
         user_name: input?.email,
       };
+
+      console.log(updatedData);
 
       try {
         const response = await NetworkHandler.makePostRequest(
@@ -183,19 +198,20 @@ const SupportUser = () => {
   const openEditModal = (rowData) => {
     const phoneWithoutCountryCode = rowData.phone.replace(/^\+91/, "");
 
+    const chataccess = rowData.chat_access;
+
     setSupportPersonId(rowData?.supportuser_id || "");
     setInput({
       name: rowData?.name || "",
       phone: phoneWithoutCountryCode || "",
       address: rowData?.address || "",
-      chat_access: rowData?.chat_access || 0,
-      website_leads_access: rowData?.website_leads_access || 0,
-      doctor_verify_access: rowData?.doctor_verify_access || 0,
-
+      chat_access: rowData?.chat_access || false,
+      website_leads_access: rowData?.website_leads_access || false,
+      doctor_verify_access: rowData?.doctor_verify_access || false,
     });
+    setIsEditMode(true);
     setEditModal(true);
   };
-
   const closeEditModal = () => {
     setSupportPersonId("");
     setInput({
@@ -205,12 +221,13 @@ const SupportUser = () => {
       address: "",
       email: "",
       user_name: "",
-      chat_access:"",
-      website_leads_access: "",
-      doctor_verify_access: "",
+      chat_access: false,
+      website_leads_access: false,
+      doctor_verify_access: false,
       password: "",
       confirmPassword: "",
     });
+    setIsEditMode(false);
     setErrors(null);
     setEditModal(false);
   };
@@ -221,13 +238,21 @@ const SupportUser = () => {
       showMessage("Please fill in all required fields", "warning");
       return true;
     }
-
+    if (
+      !input.chat_access &&
+      !input.website_leads_access &&
+      !input.doctor_verify_access
+    ) {
+      showMessage("One permission checkbox must be selected", "warning");
+      return true;
+    }
     if (validate()) {
       setButtonLoading(true);
 
       const updatedData = {
         ...input,
         phone: `+91${input.phone}`,
+        
       };
 
       try {

@@ -126,7 +126,7 @@ const Booking = () => {
                 { accessor: "clinic.User.email", title: "Email" },
 
                 { accessor: "clinic.phone", title: "Phone" },
-                { accessor: "doctor_count", title: "Total Doctors" },
+                { accessor: "doctor_count", title: "Total Doctors",textAlignment:"center" },
 
                 // {
                 //   accessor: "Actions",

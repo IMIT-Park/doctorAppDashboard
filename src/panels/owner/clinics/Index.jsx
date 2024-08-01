@@ -455,9 +455,9 @@ const Clinics = () => {
                 { accessor: "clinic.User.email", title: "Email" },
                 { accessor: "clinic.User.user_name", title: "Username" },
                 { accessor: "clinic.phone", title: "Phone" },
-                { accessor: "clinic.address", title: "Address" },
+                // { accessor: "clinic.address", title: "Address" },
                 { accessor: "clinic.type", title: "Category" },
-                { accessor: "clinic.place", title: "Place" },
+                // { accessor: "clinic.place", title: "Place" },
                 {
                   accessor: "doctor_count",
                   title: "Total Doctors",

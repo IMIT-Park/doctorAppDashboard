@@ -65,7 +65,15 @@ const Clinics = () => {
   };
 
   const clinicSearch = async () => {
-    const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    // const updatedKeyword = isNaN(search) ? search : `+91${search}`;
+
+    let updatedKeyword;
+    if(search.startsWith('+9' || '+91')){
+      updatedKeyword = search;
+    } else {
+      updatedKeyword = isNaN(search) ? search : `+91${search}`;
+    }
+
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/clinic/getallclinicdata?pageSize=1${pageSize}&page=${page}`,
@@ -96,7 +104,7 @@ const Clinics = () => {
     useBlockUnblock(fetchData);
 
   const handleSubButtonClick = (clinic) => {
-    setCurrentClinicId(clinic.clinic_id);
+    setCurrentClinicId(clinic.clinic_id); 
     setsubscriptionAddModal(true);
   };
 

@@ -106,14 +106,12 @@ const Appointments = () => {
 
   useEffect(() => {
     if (clinicId) {
-      console.log("Selected Clinic ID:", clinicId);
       getallConsultation();
     }
   }, [clinicId, selectedDate, page, pageSize]);
 
   const openAddRescheduleModal = (bookingId) => {
     setSelectedBookingId(bookingId);
-    console.log(bookingId);
     setAddRescheduleModal(true);
   };
 
@@ -321,7 +319,7 @@ const Appointments = () => {
                       render: (row) => (
                         <div className="dropdown grid place-items-center">
                           <Dropdown
-                            placement="middle"
+                            placement="top-end"
                             btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
                             button={
                               <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
@@ -383,6 +381,8 @@ const Appointments = () => {
         closeAddRescheduleModal={closeAddRescheduleModal}
         bookingId={selectedBookingId}
         fetchAppointments={getallConsultation}
+        clinicId={clinicId}
+        doctorId={doctorId}
       />
 
       <CancelReschedule

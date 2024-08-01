@@ -124,7 +124,6 @@ const Appointments = () => {
   };
 
   const openCancelAllAppoimentsModal = (selectedDoctorId) => {
-
     console.log(selectedDoctorId);
     setCancelAllAppoinments(true);
   };
@@ -226,11 +225,9 @@ const Appointments = () => {
                   <input
                     id="Date"
                     type="date"
-                    className="form-input"
+                    className="form-input form-input-green"
                     value={selectedDate || ""}
                     onChange={handleDateChange}
-                    disabled={loading}
-                    // placeholder="Select a date to view appointment"
                   />
                 </div>
               </div>
@@ -238,7 +235,6 @@ const Appointments = () => {
           </div>
 
           {allAppointments && totalAppointments > 0 ? (
-            
             <div className="w-full  flex justify-end ">
               <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
                 <button
@@ -256,7 +252,9 @@ const Appointments = () => {
                 </button>
               </div>
             </div>
-          ): ""}
+          ) : (
+            ""
+          )}
         </div>
 
         {allAppointments && allAppointments.length > 0 ? (

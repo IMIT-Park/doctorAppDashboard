@@ -946,11 +946,11 @@ const ClinicSingleView = () => {
                   accessor: "gender",
                   cellsStyle: { textTransform: "capitalize" },
                 },
-                {
-                  accessor: "dateOfBirth",
-                  title: "Date of Birth",
-                  render: (row) => formatDate(row?.dateOfBirth),
-                },
+                // {
+                //   accessor: "dateOfBirth",
+                //   title: "Date of Birth",
+                //   render: (row) => formatDate(row?.dateOfBirth),
+                // },
                 { accessor: "qualification" },
                 { accessor: "specialization" },
                 // {

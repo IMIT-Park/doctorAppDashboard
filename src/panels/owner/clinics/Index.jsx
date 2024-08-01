@@ -50,6 +50,8 @@ const Clinics = () => {
   const [currentClinicId, setCurrentClinicId] = useState("");
   const [loading, setLoading] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
   const [input, setInput] = useState({
     name: "",
     email: "",
@@ -66,10 +68,28 @@ const Clinics = () => {
   });
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [search, setSearch] = useState("");
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     setPage(1);
   }, [pageSize, search]);
+
+  const validate = () => {
+    const newErrors = {};
+    if (!isEditMode && input.password.length < 6) {
+      newErrors.password = "Password must be 6 characters or more.";
+      showMessage("Password must be 6 characters or more.", "warning");
+    }
+    if (input.password !== input.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    if (input.phone.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+      showMessage("Phone number must be exactly 10 digits", "warning");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -141,7 +161,6 @@ const Clinics = () => {
   };
 
   const openEditModal = (clinic) => {
-    console.log(clinic);
     const phoneWithoutCountryCode = clinic?.phone?.replace(/^\+91/, "");
     const isGoogleLocationValid =
       clinic?.googleLocation && clinic.googleLocation !== `"{}"`;
@@ -161,6 +180,8 @@ const Clinics = () => {
     });
     setCurrentClinicId(clinic?.clinic_id);
     setEditModal(true);
+    setIsEditMode(true);
+
   };
 
   const closeEditModal = () => {
@@ -177,6 +198,8 @@ const Clinics = () => {
       type: "",
     });
     setCurrentClinicId(null);
+    setIsEditMode(false);
+
   };
 
   // Function to create a new clinic
@@ -204,7 +227,7 @@ const Clinics = () => {
       showMessage("Please select clinic location", "warning");
       return true;
     }
-
+    if (validate()) {
     setButtonLoading(true);
 
     const formData = new FormData();
@@ -221,34 +244,37 @@ const Clinics = () => {
       formData.append("image_url[]", input.picture);
     }
     formData.append("password", input.password);
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        "/v1/clinic/createClinic",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      if (response.status === 201) {
-        setButtonLoading(false);
-        showMessage("Clinic added successfully.", "success");
-        fetchData();
-        closeAddModal();
-      }
-    } catch (error) {
-      console.log(error);
-      if (error?.response?.status === 403) {
-        showMessage(
-          error?.response?.data?.error == "User Already Exists"
-            ? "Username Already Exist."
-            : "Email Already Exist.",
-          "error"
-        );
-      } else {
-        showMessage("An error occurred. Please try again.", "error");
-      }
-      setButtonLoading(false);
-    } finally {
-      setButtonLoading(false);
-    }
+    // try {
+    //   const response = await NetworkHandler.makePostRequest(
+    //     "/v1/clinic/createClinic",
+    //     formData,
+    //     { headers: { "Content-Type": "multipart/form-data" } }
+    //   );
+    //   if (response.status === 201) {
+    //     setButtonLoading(false);
+    //     showMessage("Clinic added successfully.", "success");
+    //     fetchData();
+    //     closeAddModal();
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    //   if (error?.response?.status === 403) {
+    //     showMessage(
+    //       error?.response?.data?.error == "User Already Exists"
+    //         ? "Username Already Exist."
+    //         : "Email Already Exist.",
+    //       "error"
+    //     );
+    //   } else {
+    //     showMessage("An error occurred. Please try again.", "error");
+    //   }
+    //   setButtonLoading(false);
+    // } finally {
+    //   setButtonLoading(false);
+    // }
+    console.log("passed");
+
+  }
   };
 
   const updateClinic = async () => {
@@ -315,12 +341,12 @@ const Clinics = () => {
     // const updatedKeyword = isNaN(search) ? search : `+91${search}`;
 
     let updatedKeyword;
-    if(search.startsWith('+9' || '+91')){
+    if (search.startsWith("+9" || "+91")) {
       updatedKeyword = search;
-    } else{
+    } else {
       updatedKeyword = isNaN(search) ? search : `+91${search}`;
     }
-    
+
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/clinic/getclinicdata/${ownerId}?pageSize=${pageSize}&page=${page}`,
@@ -579,6 +605,8 @@ const Clinics = () => {
         setData={setInput}
         handleSubmit={createClinic}
         buttonLoading={buttonLoading}
+        errors={errors}
+        setErrors={setErrors}
       />
       {/* edit clinic modal */}
       <AddClinic
@@ -590,7 +618,9 @@ const Clinics = () => {
         setData={setInput}
         handleSubmit={updateClinic}
         buttonLoading={buttonLoading}
-        isEdit={true}
+        isEdit={isEditMode}
+        errors={errors}
+        setErrors={setErrors}
       />
 
       <ModalSubscription

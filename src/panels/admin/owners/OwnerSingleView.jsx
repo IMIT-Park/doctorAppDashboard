@@ -402,9 +402,9 @@ const OwnerSingleView = () => {
                   title: "No.",
                   render: (row, rowIndex) => rowIndex + 1,
                 },
-                { accessor: "clinic.name", title: "Name" },
+                { accessor: "clinic.name", title: "Name", cellsClassName:"capitalize" },
                 { accessor: "clinic.phone", title: "Phone" },
-                { accessor: "clinic.address", title: "Address" },
+                // { accessor: "clinic.address", title: "Address" },
                 { accessor: "clinic.email", title: "Email" },
 
                 { accessor: "clinic.place", title: "Place" },

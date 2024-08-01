@@ -19,23 +19,11 @@ const AddClinic = ({
   handleRemoveImage,
   buttonLoading,
   isEdit,
+  errors,
+  setErrors,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState({});
-
-  const validate = () => {
-    const newErrors = {};
-    if (data.password !== data.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-    if (data.phone.length !== 10) {
-      newErrors.phone = "Phone number must be exactly 10 digits";
-      showMessage("Phone number must be exactly 10 digits", "warning");
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handlePasswordChange = (e) => {
     setData({ ...data, password: e.target.value });
@@ -51,6 +39,14 @@ const AddClinic = ({
     }
   };
 
+  const handleCPasswordChange = (e) => {
+    const { value } = e.target;
+    setData({ ...data, password: value });
+    if (value.length > 5) {
+      setErrors((prevErrors) => ({ ...prevErrors, password: "" }));
+    }
+  };
+
   const handlePhoneChange = (value) => {
     setData({ ...data, phone: value });
     if (value.length === 10) {
@@ -60,9 +56,9 @@ const AddClinic = ({
 
   const handleSubmitAdd = (e) => {
     e.preventDefault();
-    if (validate()) {
+  
       handleSubmit();
-    }
+    
   };
 
   return (
@@ -263,14 +259,19 @@ const AddClinic = ({
                         <>
                           <div className="w-full">
                             <label htmlFor="password">Password</label>
-                            <div className="relative text-white-dark">
+                            {/* <div className="relative text-white-dark"> */}
+                            <div
+                              className={`relative text-white-dark${
+                                errors?.password && "has-error"
+                              }`}
+                            >
                               <input
                                 id="password"
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Enter Password"
                                 className="form-input form-input-green ps-10 pr-9 placeholder:text-white-dark"
                                 value={data.password}
-                                onChange={handlePasswordChange}
+                                onChange={handleCPasswordChange}
                               />
                               <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                 <IconLockDots fill={true} />
@@ -287,6 +288,11 @@ const AddClinic = ({
                                 {showPassword ? <IconEye /> : <IconCloseEye />}
                               </span>
                             </div>
+                            {errors?.password && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {errors?.password}
+                              </p>
+                            )}
                           </div>
 
                           <div className="w-full">

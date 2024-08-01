@@ -58,6 +58,7 @@ const Sales = () => {
   const [showComfirmPassword, setShowComfirmPassword] = useState(false);
   const [singleDetails, setSingleDetails] = useState({});
   const [errors, setErrors] = useState({});
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     setPage(1);
@@ -112,6 +113,11 @@ const Sales = () => {
 
   const validate = () => {
     const newErrors = {};
+    if (!isEditMode && input.password.length < 6) {
+      newErrors.password = "Password must be 6 characters or more.";
+      showMessage("Password must be 6 characters or more.", "warning");
+    }
+
     if (input.password !== input.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
       showMessage("Passwords do not match", "warning");
@@ -145,34 +151,36 @@ const Sales = () => {
         phone: `+91${input.phone}`,
         user_name: input?.email,
       };
-      try {
-        const response = await NetworkHandler.makePostRequest(
-          "/v1/salesperson/createsalesperson",
-          updatedData
-        );
-        setAddSalesPersonModal(false);
+      // try {
+      //   console.log("passed");
+      //   const response = await NetworkHandler.makePostRequest(
+      //     "/v1/salesperson/createsalesperson",
+      //     updatedData
+      //   );
+      //   setAddSalesPersonModal(false);
 
-        if (response.status === 201) {
-          showMessage("Sales Person has been added successfully.");
-          closeAddSalesPersonModal();
-          fetchData();
-        } else {
-          showMessage("Failed to add sales person. Please try again.", "error");
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 403) {
-          showMessage(
-            error?.response?.data?.error == "User Already Exists"
-              ? "Username Already Exists"
-              : "Email already exists.",
-            "error"
-          );
-        } else {
-          showMessage("Failed to add sales person. Please try again.", "error");
-        }
-      } finally {
-        setButtonLoading(false);
-      }
+      //   if (response.status === 201) {
+      //     showMessage("Sales Person has been added successfully.");
+      //     closeAddSalesPersonModal();
+      //     fetchData();
+      //   } else {
+      //     showMessage("Failed to add sales person. Please try again.", "error");
+      //   }
+      // } catch (error) {
+      //   if (error.response && error.response.status === 403) {
+      //     showMessage(
+      //       error?.response?.data?.error == "User Already Exists"
+      //         ? "Username Already Exists"
+      //         : "Email already exists.",
+      //       "error"
+      //     );
+      //   } else {
+      //     showMessage("Failed to add sales person. Please try again.", "error");
+      //   }
+      // } finally {
+      //   setButtonLoading(false);
+      // }
+      console.log("passed");
     }
   };
 
@@ -226,6 +234,7 @@ const Sales = () => {
       phone: phoneWithoutCountryCode,
       address: salesPerson?.address,
     });
+    setIsEditMode(true);
   };
 
   const closeEditModal = () => {
@@ -242,6 +251,7 @@ const Sales = () => {
       confirmPassword: "",
     });
     setErrors(null);
+    setIsEditMode(false);
   };
 
   const openViewModal = (user) => {
@@ -309,12 +319,7 @@ const Sales = () => {
           </div>
 
           <div className="flex items-center ml-auto text-gray-500 font-semibold  dark:text-white-dark gap-2">
-            <CustomButton onClick={openAddSalesPersonModal}>
-              <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-              Add Sales Person
-            </CustomButton>
-
-            <button
+          <button
               type="button"
               className="btn btn-secondary"
               onClick={exportToExcel}
@@ -322,6 +327,13 @@ const Sales = () => {
               <IconFile className="ltr:mr-2 rtl:ml-2 " />
               Export to Excel
             </button>
+            
+            <CustomButton onClick={openAddSalesPersonModal}>
+              <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
+              Add Sales Person
+            </CustomButton>
+
+       
           </div>
         </div>
         <div className="datatables">
@@ -418,6 +430,7 @@ const Sales = () => {
           )}
         </div>
       </div>
+      {/* add sales person modal */}
       <AddSalesPerson
         open={addSalesPersonModal}
         closeModal={closeAddSalesPersonModal}
@@ -433,13 +446,14 @@ const Sales = () => {
         errors={errors}
         setErrors={setErrors}
       />
+      {/* edit sales person modal */}
       <AddSalesPerson
         open={editSalesPersonModal}
         closeModal={closeEditModal}
         input={input}
         setInput={setInput}
         formSubmit={updateSalesPerson}
-        isEditMode={true}
+        isEditMode={isEditMode}
         buttonLoading={buttonLoading}
         setButtonLoading={setButtonLoading}
         errors={errors}

@@ -48,6 +48,7 @@ const ClinicDoctor = () => {
   const [errors, setErrors] = useState({});
   const [removeModal, setRemoveModal] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [input, setInput] = useState({
     name: "",
@@ -119,6 +120,10 @@ const ClinicDoctor = () => {
 
   const validate = () => {
     const newErrors = {};
+    if (!isEditMode && input.password.length < 6) {
+      newErrors.password = "Password must be 6 characters or more.";
+      showMessage("Password must be 6 characters or more.", "warning");
+    }
     if (input.password !== input.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
       showMessage("Passwords do not match", "warning");
@@ -188,6 +193,7 @@ const ClinicDoctor = () => {
       } finally {
         setButtonLoading(false);
       }
+      console.log("passed");
     }
   };
 

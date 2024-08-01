@@ -69,6 +69,14 @@ const AddDoctor = ({
     }
   };
 
+  const handleCPasswordChange = (e) => {
+    const { value } = e.target;
+    setInput({ ...input, password: value });
+    if (value.length > 5) {
+      setErrors((prevErrors) => ({ ...prevErrors, password: "" }));
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     formSubmit();
@@ -296,16 +304,20 @@ const AddDoctor = ({
                       <>
                         <div className="mb-5 relative">
                           {/* <label htmlFor="password">Password</label> */}
-                          <div className="relative">
+                          {/* <div className="relative"> */}
+                          <div
+                              className={`relative ${
+                                errors?.password && "has-error"
+                              }`}
+                            >
                             <input
                               id="password"
                               type={showPassword ? "text" : "password"}
                               placeholder="Enter Password"
                               className="form-input form-input-green pr-10 h-10"
                               value={input?.password}
-                              onChange={(e) =>
-                                setInput({ ...input, password: e.target.value })
-                              }
+                              onChange={handleCPasswordChange}
+
                             />
                             <span
                               title={
@@ -317,6 +329,11 @@ const AddDoctor = ({
                               {showPassword ? <IconEye /> : <IconCloseEye />}
                             </span>
                           </div>
+                          {errors?.password && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {errors?.password}
+                              </p>
+                            )}
                         </div>
 
                         <div className="mb-5 relative">

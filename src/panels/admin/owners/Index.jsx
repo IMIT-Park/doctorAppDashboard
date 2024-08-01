@@ -168,17 +168,16 @@ const Owners = () => {
               </div>
             </form>
           </div>
-
-          <div>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={exportToExcel}
-            >
-              <IconFile className="ltr:mr-2 rtl:ml-2" />
-              Export to Excel
-            </button>
-          </div>
+            <div>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={exportToExcel}
+              >
+                <IconFile className="ltr:mr-2 rtl:ml-2" />
+                Export to Excel
+              </button>
+            </div>
         </div>
 
         {loading ? (
@@ -211,7 +210,7 @@ const Owners = () => {
                 },
                 { accessor: "Owner.email", title: "Email" },
                 { accessor: "Owner.phone", title: "Phone" },
-                { accessor: "Owner.address", title: "Address" },
+                // { accessor: "Owner.address", title: "Address" },
                 {
                   accessor: "Clinic_count",
                   title: "Total clinics",

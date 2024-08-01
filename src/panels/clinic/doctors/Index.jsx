@@ -372,7 +372,7 @@ const ClinicDoctor = () => {
                   title: "Specialization",
                   textAlignment: "center",
                 },
-                { accessor: "address", title: "Address" },
+                // { accessor: "address", title: "Address" },
                 {
                   accessor: "fees",
                   title: "Fees",

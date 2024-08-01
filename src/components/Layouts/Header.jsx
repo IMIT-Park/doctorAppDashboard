@@ -121,7 +121,13 @@ const Header = () => {
 
   const handleLogout = () => {
     sessionStorage.clear();
-    localStorage.clear();
+    localStorage.removeItem("doctorReportId")
+    localStorage.removeItem("ids")
+    localStorage.removeItem("bookingDetails")
+    localStorage.removeItem("userData")
+    localStorage.removeItem("accessToken")
+    localStorage.removeItem("refreshToken")
+    localStorage.removeItem("patientDetails")
     setUserDetails(null);
     setIds(null);
     setBookingDetails(null);

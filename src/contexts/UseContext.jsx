@@ -4,9 +4,17 @@ const UserContext = createContext(null);
 
 const UserProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState(null);
-  const [doctorReportId, setDoctorReportId] = useState(
-    localStorage.getItem("doctorReportId") || null
-  );
+  const storedDoctorReportId = localStorage.getItem("doctorReportId");
+
+  // Check if the stored value is null or a valid number
+  const initialDoctorReportId =
+    storedDoctorReportId === null
+      ? null
+      : isNaN(Number(storedDoctorReportId))
+      ? null
+      : Number(storedDoctorReportId);
+
+  const [doctorReportId, setDoctorReportId] = useState(initialDoctorReportId);
 
   const [ids, setIds] = useState(() => {
     const savedBookingDetails = localStorage.getItem("ids");
@@ -40,7 +48,11 @@ const UserProvider = ({ children }) => {
   const [patientDetails, setPatientDetails] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("doctorReportId",doctorReportId );
+    if (doctorReportId === null) {
+      localStorage.removeItem("doctorReportId");
+    } else {
+      localStorage.setItem("doctorReportId", doctorReportId.toString());
+    }
   }, [doctorReportId]);
 
   useEffect(() => {

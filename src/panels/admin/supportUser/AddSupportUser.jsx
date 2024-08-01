@@ -43,6 +43,15 @@ const AddSupportUser = ({
     }
   };
 
+  const handlePasswordChange = (e) => {
+    const { value } = e.target;
+    setInput({ ...input, password: value });
+
+    if (value.length > 5) {
+      setErrors((prevErrors) => ({ ...prevErrors, password: "" }));
+    }
+  };
+
   const handleConfirmPasswordChange = (e) => {
     const { value } = e.target;
     setInput({ ...input, confirmPassword: value });
@@ -55,7 +64,7 @@ const AddSupportUser = ({
     const { name, checked } = e.target;
     setInput((prevInput) => ({
       ...prevInput,
-      [name]: checked ? 1 : 0,
+      [name]: checked ? true : false,
     }));
   };
 
@@ -185,7 +194,7 @@ const AddSupportUser = ({
                           className="form-checkbox border-gray-200 text-green-600 "
                           type="checkbox"
                           name="chat_access"
-                          checked={input.chat_access === 1}
+                          checked={input.chat_access === true}
                           onChange={handleCheckboxChange}
                         />
                         Chat Access
@@ -196,7 +205,7 @@ const AddSupportUser = ({
                           className="form-checkbox border-gray-200 text-green-600 "
                           type="checkbox"
                           name="website_leads_access"
-                          checked={input.website_leads_access === 1}
+                          checked={input.website_leads_access === true}
                           onChange={handleCheckboxChange}
                         />
                         Website Lead Access
@@ -207,7 +216,7 @@ const AddSupportUser = ({
                           className="form-checkbox border-gray-200 text-green-600 "
                           type="checkbox"
                           name="doctor_verify_access"
-                          checked={input.doctor_verify_access === 1}
+                          checked={input.doctor_verify_access === true}
                           onChange={handleCheckboxChange}
                         />
                         Doctor Verify Access
@@ -216,7 +225,11 @@ const AddSupportUser = ({
 
                     {!isEditMode && (
                       <>
-                        <div className="mb-5 relative">
+                        <div
+                          className={`mb-5 relative ${
+                            errors?.password && "has-error"
+                          }`}
+                        >
                           <label htmlFor="password">Password</label>
                           <div className="relative">
                             <input
@@ -225,9 +238,7 @@ const AddSupportUser = ({
                               placeholder="Enter Password"
                               className="form-input form-input-green pr-10"
                               value={input?.password}
-                              onChange={(e) =>
-                                setInput({ ...input, password: e.target.value })
-                              }
+                              onChange={handlePasswordChange}
                             />
                             <span
                               title={
@@ -239,9 +250,18 @@ const AddSupportUser = ({
                               {showPassword ? <IconEye /> : <IconCloseEye />}
                             </span>
                           </div>
+                          {errors?.password && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors?.password}
+                            </p>
+                          )}
                         </div>
 
-                        <div className="mb-5 relative">
+                        <div
+                          className={`mb-5 relative ${
+                            errors?.confirmPassword && "has-error"
+                          }`}
+                        >
                           <label htmlFor="confirm-password">
                             Confirm Password
                           </label>

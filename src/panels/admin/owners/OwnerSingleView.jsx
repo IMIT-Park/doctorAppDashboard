@@ -85,6 +85,7 @@ const OwnerSingleView = () => {
       );
 
       setOwnerInfo(response?.data?.Owner);
+      // console.log(response?.data?.Owner);
       setDetailsLoading(false);
     } catch (error) {
       console.log(error);
@@ -177,10 +178,6 @@ const OwnerSingleView = () => {
     XLSX.writeFile(workbook, "ClinicsData.xlsx");
   };
 
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-  };
-
   const handleRowClick = (clinicId) => {
     setIds({ ...ids, clinicId: clinicId });
     navigate("/clinics/single-view");
@@ -227,23 +224,31 @@ const OwnerSingleView = () => {
                       <div className="text-white-dark min-w-96 text-base mb-1">
                         Address
                       </div>
-                      <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base h-full bg-gray-100">
+                      <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-[7.2rem] bg-gray-100">
                         {ownerInfo?.address}
+                      </div>
+                      <div className="text-white-dark text-base mt-2">Country</div>
+                      <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min:h-10 bg-gray-100">
+                        {ownerInfo?.country || "-----"}
                       </div>
                     </div>
                     <div className="flex flex-col mb-2 md:w-1/2 gap-1">
-                      <div className="text-white-dark text-base">City</div>
-                      <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min:h-10 bg-gray-100">
-                        {ownerInfo?.city || "-----"}
-                      </div>
-                      <div className="text-white-dark text-base">Country</div>
-                      <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
-                        {ownerInfo?.country || "-----"}
-                      </div>
                       <div className="text-white-dark text-base">State</div>
+                      <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min:h-10 bg-gray-100">
+                        {ownerInfo?.state || "-----"}
+                      </div>
+                      <div className="text-white-dark text-base">District</div>
                       <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
-                        {ownerInfo?.state
-                          ? capitalizeFirstLetter(ownerInfo.state)
+                        {ownerInfo?.district
+                          ? ownerInfo?.district.charAt(0).toUpperCase() +
+                            ownerInfo.district.slice(1).toLowerCase()
+                          : "-----"}
+                      </div>
+                      <div className="text-white-dark text-base">City</div>
+                      <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
+                        {ownerInfo?.city
+                          ? ownerInfo?.city.charAt(0).toUpperCase() +
+                            ownerInfo.city.slice(1).toLowerCase()
                           : "-----"}
                       </div>
                     </div>
@@ -402,7 +407,11 @@ const OwnerSingleView = () => {
                   title: "No.",
                   render: (row, rowIndex) => rowIndex + 1,
                 },
-                { accessor: "clinic.name", title: "Name", cellsClassName:"capitalize" },
+                {
+                  accessor: "clinic.name",
+                  title: "Name",
+                  cellsClassName: "capitalize",
+                },
                 { accessor: "clinic.phone", title: "Phone" },
                 // { accessor: "clinic.address", title: "Address" },
                 { accessor: "clinic.email", title: "Email" },
@@ -456,7 +465,7 @@ const OwnerSingleView = () => {
                   textAlignment: "center",
                   render: (rowData) => (
                     <div className="grid place-items-center">
-                     <button
+                      <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -510,7 +519,6 @@ const OwnerSingleView = () => {
                 //     />
                 //   ),
                 // },
-              
               ]}
               totalRecords={totalClinics}
               recordsPerPage={pageSize}

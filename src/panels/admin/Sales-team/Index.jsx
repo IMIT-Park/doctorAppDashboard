@@ -45,7 +45,8 @@ const Sales = () => {
   const [allSalesPerson, setAllSalesPerson] = useState([]);
   const [loading, setLoading] = useState(true);
   const [input, setInput] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     user_name: "",
     phone: "",
@@ -77,7 +78,8 @@ const Sales = () => {
     setAddSalesPersonModal(false);
     setInput({
       ...input,
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       user_name: "",
       password: "",
@@ -94,7 +96,6 @@ const Sales = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/salesperson/getallsalespersons?page=${page}&pageSize=${pageSize}`
       );
-      console.log(response);
       setTotalSalesPerson(response.data?.pageInfo?.total);
       setTotalSalespersonsCount(response.data?.pageInfo?.total);
       setAllSalesPerson(response.data?.Salesperson?.rows);
@@ -133,7 +134,8 @@ const Sales = () => {
   //Add Sales Person function
   const saveSalesPerson = async () => {
     if (
-      !input.name ||
+      !input.firstName ||
+      !input.lastName ||
       !input.email ||
       !input.phone ||
       !input.address ||
@@ -145,42 +147,44 @@ const Sales = () => {
     }
     if (validate()) {
       setButtonLoading(true);
+      const { firstName, lastName, ...rest } = input;
 
       const updatedData = {
-        ...input,
+        ...rest,
+        name: `${firstName} ${lastName}`,
         phone: `+91${input.phone}`,
         user_name: input?.email,
       };
-      // try {
-      //   console.log("passed");
-      //   const response = await NetworkHandler.makePostRequest(
-      //     "/v1/salesperson/createsalesperson",
-      //     updatedData
-      //   );
-      //   setAddSalesPersonModal(false);
 
-      //   if (response.status === 201) {
-      //     showMessage("Sales Person has been added successfully.");
-      //     closeAddSalesPersonModal();
-      //     fetchData();
-      //   } else {
-      //     showMessage("Failed to add sales person. Please try again.", "error");
-      //   }
-      // } catch (error) {
-      //   if (error.response && error.response.status === 403) {
-      //     showMessage(
-      //       error?.response?.data?.error == "User Already Exists"
-      //         ? "Username Already Exists"
-      //         : "Email already exists.",
-      //       "error"
-      //     );
-      //   } else {
-      //     showMessage("Failed to add sales person. Please try again.", "error");
-      //   }
-      // } finally {
-      //   setButtonLoading(false);
-      // }
-      console.log("passed");
+      try {
+        // console.log("passed");
+        const response = await NetworkHandler.makePostRequest(
+          "/v1/salesperson/createsalesperson",
+          updatedData
+        );
+        setAddSalesPersonModal(false);
+
+        if (response.status === 201) {
+          showMessage("Sales Person has been added successfully.");
+          closeAddSalesPersonModal();
+          fetchData();
+        } else {
+          showMessage("Failed to add sales person. Please try again.", "error");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          showMessage(
+            error?.response?.data?.error == "User Already Exists"
+              ? "Username Already Exists"
+              : "Email already exists.",
+            "error"
+          );
+        } else {
+          showMessage("Failed to add sales person. Please try again.", "error");
+        }
+      } finally {
+        setButtonLoading(false);
+      }
     }
   };
 
@@ -190,23 +194,26 @@ const Sales = () => {
       return;
     }
 
-    if (!input.name || !input.phone || !input.address) {
-      showMessage("Please fill in all required fields", "error");
+    if (!input.firstName || !input.phone || !input.address) {
+      showMessage("Please fill in all required fields", "warning");
       return;
     }
     if (validate()) {
       setButtonLoading(true);
 
+      const { firstName, lastName, ...rest } = input;
+
       const updatedData = {
-        ...input,
+        ...rest,
+        name: firstName,
         phone: `+91${input.phone}`,
       };
+
       try {
         const response = await NetworkHandler.makePutRequest(
           `/v1/salesperson/updatesalesperson/${selectedSalesPerson.salesperson_id}`,
           updatedData
         );
-
         if (response.status === 200) {
           showMessage("Salesperson has been updated successfully.");
           closeEditModal();
@@ -230,7 +237,7 @@ const Sales = () => {
     setSelectedSalesPerson(salesPerson);
     setEditSalesPersonModal(true);
     setInput({
-      name: salesPerson?.name,
+      firstName: salesPerson.name,
       phone: phoneWithoutCountryCode,
       address: salesPerson?.address,
     });
@@ -242,7 +249,8 @@ const Sales = () => {
     setSelectedSalesPerson(null);
     setInput({
       ...input,
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       user_name: "",
       phone: "",
@@ -298,7 +306,7 @@ const Sales = () => {
     worksheet["!rows"] = rowHeights;
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "SalesPersons");
     XLSX.writeFile(workbook, "SalesPersonData.xlsx");
   };
 
@@ -318,22 +326,20 @@ const Sales = () => {
             </Tippy>
           </div>
 
-          <div className="flex items-center ml-auto text-gray-500 font-semibold  dark:text-white-dark gap-2">
-          <button
+          <div className="flex items-center ml-auto text-gray-500 font-semibold dark:text-white-dark gap-2">
+            <button
               type="button"
               className="btn btn-secondary"
               onClick={exportToExcel}
             >
-              <IconFile className="ltr:mr-2 rtl:ml-2 " />
+              <IconFile className="ltr:mr-2 rtl:ml-2" />
               Export to Excel
             </button>
-            
+
             <CustomButton onClick={openAddSalesPersonModal}>
               <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
               Add Sales Person
             </CustomButton>
-
-       
           </div>
         </div>
         <div className="datatables">

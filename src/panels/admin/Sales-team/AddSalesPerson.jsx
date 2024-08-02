@@ -116,18 +116,35 @@ const AddSalesPerson = ({
                   <div className="p-5">
                     <form>
                       <div className="mb-5">
-                        <label htmlFor="full-name">Full Name</label>
+                        <label htmlFor="first-name">
+                          {isEditMode ? "Full Name" : "First Name"}
+                        </label>
                         <input
-                          id="full-name"
+                          id="first-name"
                           type="text"
-                          placeholder="Enter Full Name"
+                          placeholder="Enter First Name"
                           className="form-input form-input-green"
-                          value={input?.name}
+                          value={input?.firstName}
                           onChange={(e) =>
-                            setInput({ ...input, name: e.target.value })
+                            setInput({ ...input, firstName: e.target.value })
                           }
                         />
                       </div>
+                      {!isEditMode && (
+                        <div className="mb-5">
+                          <label htmlFor="last-name">Last Name</label>
+                          <input
+                            id="last-name"
+                            type="text"
+                            placeholder="Enter Last Name"
+                            className="form-input form-input-green"
+                            value={input?.lastName}
+                            onChange={(e) =>
+                              setInput({ ...input, lastName: e.target.value })
+                            }
+                          />
+                        </div>
+                      )}
                       {!isEditMode && (
                         <div className={`mb-5 ${errors?.email && "has-error"}`}>
                           <label htmlFor="email">Email</label>

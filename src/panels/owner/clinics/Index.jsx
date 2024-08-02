@@ -53,7 +53,8 @@ const Clinics = () => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const [input, setInput] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     user_name: "",
     phone: "",
@@ -145,7 +146,8 @@ const Clinics = () => {
     setAddModal(false);
     setInput({
       ...input,
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       user_name: "",
       password: "",
@@ -181,13 +183,13 @@ const Clinics = () => {
     setCurrentClinicId(clinic?.clinic_id);
     setEditModal(true);
     setIsEditMode(true);
-
   };
 
   const closeEditModal = () => {
     setEditModal(false);
     setInput({
-      name: "",
+      firstName: "",
+      lastName:"",
       email: "",
       user_name: "",
       phone: "",
@@ -199,13 +201,13 @@ const Clinics = () => {
     });
     setCurrentClinicId(null);
     setIsEditMode(false);
-
   };
 
   // Function to create a new clinic
   const createClinic = async () => {
     if (
-      !input.name ||
+      !input.firstName ||
+      !input.lastName ||
       !input.email ||
       !input.phone ||
       !input.address ||
@@ -228,53 +230,52 @@ const Clinics = () => {
       return true;
     }
     if (validate()) {
-    setButtonLoading(true);
+      setButtonLoading(true);
 
-    const formData = new FormData();
-    formData.append("name", input.name);
-    formData.append("email", input.email);
-    formData.append("user_name", input.email);
-    formData.append("phone", `+91${input.phone}`);
-    formData.append("address", input.address);
-    formData.append("place", input.place);
-    formData.append("type", input.type);
+      const formData = new FormData();
+      formData.append("name", `${input.firstName} ${input.lastName}`);
+      formData.append("email", input.email);
+      formData.append("user_name", input.email);
+      formData.append("phone", `+91${input.phone}`);
+      formData.append("address", input.address);
+      formData.append("place", input.place);
+      formData.append("type", input.type);
 
-    formData.append("googleLocation", JSON.stringify(input.googleLocation));
-    if (input.picture) {
-      formData.append("image_url[]", input.picture);
+      formData.append("googleLocation", JSON.stringify(input.googleLocation));
+      if (input.picture) {
+        formData.append("image_url[]", input.picture);
+      }
+      formData.append("password", input.password);
+      try {
+        const response = await NetworkHandler.makePostRequest(
+          "/v1/clinic/createClinic",
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        if (response.status === 201) {
+          setButtonLoading(false);
+          showMessage("Clinic added successfully.", "success");
+          fetchData();
+          closeAddModal();
+        }
+      } catch (error) {
+        console.log(error);
+        if (error?.response?.status === 403) {
+          showMessage(
+            error?.response?.data?.error == "User Already Exists"
+              ? "Username Already Exist."
+              : "Email Already Exist.",
+            "error"
+          );
+        } else {
+          showMessage("An error occurred. Please try again.", "error");
+        }
+        setButtonLoading(false);
+      } finally {
+        setButtonLoading(false);
+      }
+      console.log("passed");
     }
-    formData.append("password", input.password);
-    // try {
-    //   const response = await NetworkHandler.makePostRequest(
-    //     "/v1/clinic/createClinic",
-    //     formData,
-    //     { headers: { "Content-Type": "multipart/form-data" } }
-    //   );
-    //   if (response.status === 201) {
-    //     setButtonLoading(false);
-    //     showMessage("Clinic added successfully.", "success");
-    //     fetchData();
-    //     closeAddModal();
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    //   if (error?.response?.status === 403) {
-    //     showMessage(
-    //       error?.response?.data?.error == "User Already Exists"
-    //         ? "Username Already Exist."
-    //         : "Email Already Exist.",
-    //       "error"
-    //     );
-    //   } else {
-    //     showMessage("An error occurred. Please try again.", "error");
-    //   }
-    //   setButtonLoading(false);
-    // } finally {
-    //   setButtonLoading(false);
-    // }
-    console.log("passed");
-
-  }
   };
 
   const updateClinic = async () => {
@@ -297,7 +298,7 @@ const Clinics = () => {
     setButtonLoading(true);
 
     const formData = new FormData();
-    formData.append("name", input.name);
+    formData.append("name", `${input.firstName} ${input.lastName}`);
     formData.append("phone", `+91${input.phone}`);
     formData.append("address", input.address);
     formData.append("place", input.place);

@@ -51,7 +51,8 @@ const ClinicDoctor = () => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const [input, setInput] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     user_name: "",
     phone: "",
@@ -76,7 +77,8 @@ const ClinicDoctor = () => {
     setAddDoctorModal(false);
     setInput({
       ...input,
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       user_name: "",
       phone: "",
@@ -138,7 +140,8 @@ const ClinicDoctor = () => {
 
   const saveDoctorPerson = async () => {
     if (
-      !input.name ||
+      !input.firstName ||
+      !input.lastName ||
       !input.email ||
       !input.phone ||
       !input.dateOfBirth ||
@@ -157,12 +160,17 @@ const ClinicDoctor = () => {
     if (validate()) {
       setButtonLoading(true);
 
+
+      const { firstName, lastName, ...rest } = input;
+
       const updatedData = {
-        ...input,
+        ...rest,
+        name: `${firstName} ${lastName}`,
         phone: `+91${input.phone}`,
-        user_name: input.email,
+        user_name: input?.email,
         clinic_id: clinicId,
       };
+
 
       try {
         const response = await NetworkHandler.makePostRequest(
@@ -396,7 +404,7 @@ const ClinicDoctor = () => {
                           : ""
                       }`}
                     >
-                      {row?.verification_status.replace("_", " ")}
+                      {row?.verification_status?.replace("_", " ")}
                     </span>
                   ),
                   cellsClassName: "capitalize",

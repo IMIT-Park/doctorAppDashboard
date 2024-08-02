@@ -131,17 +131,36 @@ const AddDoctor = ({
                   <form>
                     <div className="mb-5">
                       {/* <label htmlFor="full-name">Full Name</label> */}
+                      {isEditMode ? "Full Name" : "First Name"}
                       <input
                         id="full-name"
                         type="text"
-                        placeholder="Enter Full Name"
+                        placeholder="First Name"
                         className="form-input form-input-green h-10"
                         value={input?.name}
                         onChange={(e) =>
-                          setInput({ ...input, name: e.target.value })
+                          setInput({ ...input, firstName: e.target.value })
+
                         }
                       />
                     </div>
+                    {!isEditMode && (
+                    <div className="mb-5">
+                      {/* <label htmlFor="full-name">Full Name</label> */}
+                      <input
+                        id="last-name"
+                        type="text"
+                        placeholder="Last Name"
+                        className="form-input form-input-green h-10"
+                        value={input?.name}
+                        onChange={(e) =>
+                          setInput({ ...input, lastName: e.target.value })
+
+                        }
+                      />
+                    </div>
+                      )}
+                    
 
                     {!isEditMode && (
                       <div className={`mb-5 ${errors?.email && "has-error"}`}>

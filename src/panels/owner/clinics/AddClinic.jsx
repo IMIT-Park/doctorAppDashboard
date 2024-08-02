@@ -18,9 +18,10 @@ const AddClinic = ({
   handleSubmit,
   handleRemoveImage,
   buttonLoading,
-  isEdit,
   errors,
   setErrors,
+  isEdit,
+
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -107,19 +108,42 @@ const AddClinic = ({
                     <div
                       className={`grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5`}
                     >
-                      <div className="w-full">
-                        <label htmlFor="first-name">Name</label>
+                       <div className={`w-full ${isEdit ? "col-span-2" : ""}`}>
+                        <label htmlFor="first-name">
+                          {isEdit ? "Full Name" : "First Name"}
+                        </label>
                         <input
                           id="first-name"
                           type="text"
-                          placeholder="Enter Name"
+                          placeholder="First Name"
                           className="form-input form-input-green"
-                          value={data.name}
+                          value={data.firstName}
                           onChange={(e) =>
-                            setData({ ...data, name: e.target.value })
+                            setData({ ...data, firstName: e.target.value })
                           }
                         />
                       </div>
+                      {!isEdit && (
+                      <div className="w-full">
+                        <label htmlFor="first-name">Last Name</label>
+                        <input
+                          id="first-name"
+                          type="text"
+                          placeholder="Last Name"
+                          className="form-input form-input-green"
+                          value={data.lastName}
+                          onChange={(e) =>
+                            setData({ ...data, lastName: e.target.value })
+                          }
+                        />
+                      </div>
+                      )}
+                      
+                      
+                    </div>
+                    <div
+                      className={`grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5`}
+                    >
                       <div className="w-full">
                         <label htmlFor="email">Email</label>
                         <input
@@ -135,10 +159,6 @@ const AddClinic = ({
                           readOnly={isEdit}
                         />
                       </div>
-                    </div>
-                    <div
-                      className={`grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5`}
-                    >
                       <div className="w-full">
                         <label htmlFor="username">Username</label>
                         <input
@@ -153,7 +173,10 @@ const AddClinic = ({
                           }
                         />
                       </div>
-                      <div className="w-full">
+                     
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                    <div className="w-full">
                         <label htmlFor="number">Phone Number</label>
                         <PhoneNumberInput
                           value={data?.phone}
@@ -162,8 +185,6 @@ const AddClinic = ({
                           maxLength="10"
                         />
                       </div>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                       <div className="">
                         <label htmlFor="type">Category</label>
                         <input

@@ -340,6 +340,19 @@ const SupportUser = () => {
   
     const closeViewModal = () => {
       setViewModal(false);
+      setInput({
+        ...input,
+        name: "",
+        phone: "",
+        address: "",
+        email: "",
+        user_name: "",
+        chat_access: false,
+        website_leads_access: false,
+        doctor_verify_access: false,
+        password: "",
+        confirmPassword: "",
+      });
     };
   
   
@@ -479,7 +492,8 @@ const SupportUser = () => {
       <ShowSupportUser
         open={viewModal}
         closeModal={closeViewModal}
-        details={singleDetails}
+         userDetails={singleDetails}
+         fetchdata={fetchData}
       />
       {/* add support user modal */}
      

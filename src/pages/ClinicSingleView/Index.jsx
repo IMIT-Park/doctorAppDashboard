@@ -978,7 +978,7 @@ const ClinicSingleView = () => {
                           : ""
                       }`}
                     >
-                      {row?.verification_status.replace("_", " ")}
+                      {row?.verification_status?.replace("_", " ")}
                     </span>
                   ),
                   cellsClassName: "capitalize",

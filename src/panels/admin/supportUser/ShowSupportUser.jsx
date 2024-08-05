@@ -15,7 +15,6 @@ const ShowSupportUser = ({ open, closeModal , userDetails , fetchdata }) => {
     showSupportAlert(userDetails?.user_id, action, "support user");
   };
 
-console.log(userDetails);
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog

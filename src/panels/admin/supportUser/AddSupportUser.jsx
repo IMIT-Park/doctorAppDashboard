@@ -19,10 +19,6 @@ const AddSupportUser = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showComfirmPassword, setShowComfirmPassword] = useState(false);
-  const [firstName, setFirstName] = useState(input?.name?.split(" ")[0] || "");
-  const [lastName, setLastName] = useState(input?.name?.split(" ")[1] || "");
-
-
 
   const handleEmailChange = (e) => {
     const email = e.target.value;
@@ -72,15 +68,12 @@ const AddSupportUser = ({
     }));
   };
   const handleFirstNameChange = (e) => {
-    const firstName = e.target.value;
-    setFirstName(firstName);
+    setInput({ ...input, first_name: e.target.value });
   };
 
   const handleLastNameChange = (e) => {
-    const lastName = e.target.value;
-    setLastName(lastName);
+    setInput({ ...input, last_name: e.target.value });
   };
-
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -125,47 +118,47 @@ const AddSupportUser = ({
                 </div>
                 <div className="p-5">
                   <form>
-                    {!isEditMode ? <div className="flex justify-between gap-5">
-                    <div className="mb-5 w-full">
-                      <label htmlFor="full-name">First Name</label>
-                      <input
-                        id="first-name"
-                        type="text"
-                        placeholder="Enter First Name"
-                        className="form-input form-input-green"
-                        value={firstName}
-                        onChange={handleFirstNameChange}
-                      />
-                    </div>
-                    <div className="mb-5 w-full">
-                      <label htmlFor="full-name">Last Name</label>
-                      <input
-                        id="last-name"
-                        type="text"
-                        placeholder="Enter Last Name"
-                        className="form-input form-input-green"
-                        value={lastName}
-                        onChange={handleLastNameChange
-                        }
-                      />
-                    </div>
-                    </div> 
-                    : <div className="mb-5">
-                      <label htmlFor="Full-name">Full Name</label>
-                      <input
-                        id="Full-name"
-                        type="text"
-                        placeholder="Enter Full Name"
-                        className="form-input form-input-green"
-                        value={input?.name}
-                        onChange={(e) =>
-                          setInput({ ...input, name: e.target.value })
-                        }
-                      />
-                    </div>
-}
-                    
-                    
+                    {!isEditMode ? (
+                      <div className="flex justify-between gap-5">
+                        <div className="mb-5 w-full">
+                          <label htmlFor="full-name">First Name</label>
+                          <input
+                            id="first-name"
+                            type="text"
+                            placeholder="Enter First Name"
+                            className="form-input form-input-green"
+                            value={input?.first_name}
+                            onChange={handleFirstNameChange}
+                          />
+                        </div>
+                        <div className="mb-5 w-full">
+                          <label htmlFor="full-name">Last Name</label>
+                          <input
+                            id="last-name"
+                            type="text"
+                            placeholder="Enter Last Name"
+                            className="form-input form-input-green"
+                            value={input?.last_name}
+                            onChange={handleLastNameChange}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mb-5">
+                        <label htmlFor="Full-name">Full Name</label>
+                        <input
+                          id="Full-name"
+                          type="text"
+                          placeholder="Enter Full Name"
+                          className="form-input form-input-green"
+                          value={input?.name}
+                          onChange={(e) =>
+                            setInput({ ...input, name: e.target.value })
+                          }
+                        />
+                      </div>
+                    )}
+
                     {!isEditMode && (
                       <div className={`mb-5 ${errors?.email && "has-error"}`}>
                         <label htmlFor="email">Email</label>

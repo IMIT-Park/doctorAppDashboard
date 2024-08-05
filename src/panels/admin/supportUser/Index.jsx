@@ -15,7 +15,6 @@ import AddSupportUser from "./AddSupportUser";
 import IconEdit from "../../../components/Icon/IconEdit";
 import IconTrashLines from "../../../components/Icon/IconTrashLines";
 import { showMessage } from "../../../utils/showMessage";
-import CustomSwitch from "../../../components/CustomSwitch";
 import CustomButton from "../../../components/CustomButton";
 import DeleteSupportPerson from "../../../components/CustomDeleteModal";
 import IconEye from "../../../components/Icon/IconEye";
@@ -41,7 +40,8 @@ const SupportUser = () => {
   const [viewModal, setViewModal] = useState(false);
   const [singleDetails, setSingleDetails] = useState({});
   const [input, setInput] = useState({
-    name: "",
+    first_name: "",
+    last_name: "",
     phone: "",
     address: "",
     email: "",
@@ -95,7 +95,8 @@ const SupportUser = () => {
   const closeAddModal = () => {
     setInput({
       ...input,
-      name: "",
+      first_name: "",
+      last_name: "",
       phone: "",
       address: "",
       email: "",
@@ -134,7 +135,8 @@ const SupportUser = () => {
   //Add Support User function
   const addSupportUser = async () => {
     if (
-      !input.name ||
+      !input.first_name ||
+      !input.last_name ||
       !input.email ||
       !input.phone ||
       !input.address ||
@@ -156,13 +158,15 @@ const SupportUser = () => {
 
     if (validate()) {
       setButtonLoading(true);
+      const { first_name, last_name, ...rest } = input;
 
       const updatedData = {
-        ...input,
+        ...rest,
+        name: `${first_name} ${last_name}`,
         phone: `+91${input.phone}`,
         user_name: input?.email,
       };
-
+      console.log(input.name);
       console.log(updatedData);
 
       try {
@@ -202,8 +206,6 @@ const SupportUser = () => {
   const openEditModal = (rowData) => {
     const phoneWithoutCountryCode = rowData.phone.replace(/^\+91/, "");
 
-    const chataccess = rowData.chat_access;
-
     setSupportPersonId(rowData?.supportuser_id || "");
     setInput({
       name: rowData?.name || "",
@@ -220,7 +222,8 @@ const SupportUser = () => {
     setSupportPersonId("");
     setInput({
       ...input,
-      name: "",
+      first_name: "",
+      last_name: "",
       phone: "",
       address: "",
       email: "",
@@ -256,7 +259,6 @@ const SupportUser = () => {
       const updatedData = {
         ...input,
         phone: `+91${input.phone}`,
-        
       };
 
       try {
@@ -332,31 +334,28 @@ const SupportUser = () => {
   const { showAlert: showSupportAlert, loading: blockUnblockSupportLoading } =
     useBlockUnblock(fetchData);
 
+  const openViewModal = (user) => {
+    setSingleDetails(user);
+    setViewModal(true);
+  };
 
-    const openViewModal = (user) => {
-      setSingleDetails(user);
-      setViewModal(true);
-    };
-  
-    const closeViewModal = () => {
-      setViewModal(false);
-      setInput({
-        ...input,
-        name: "",
-        phone: "",
-        address: "",
-        email: "",
-        user_name: "",
-        chat_access: false,
-        website_leads_access: false,
-        doctor_verify_access: false,
-        password: "",
-        confirmPassword: "",
-      });
-    };
-  
-  
-
+  const closeViewModal = () => {
+    setViewModal(false);
+    setInput({
+      ...input,
+      first_name: "",
+      last_name: "",
+      phone: "",
+      address: "",
+      email: "",
+      user_name: "",
+      chat_access: false,
+      website_leads_access: false,
+      doctor_verify_access: false,
+      password: "",
+      confirmPassword: "",
+    });
+  };
 
   return (
     <div>
@@ -437,7 +436,7 @@ const SupportUser = () => {
                         uniqueId={`support${rowData?.supportuser_id}`}
                         size="normal"
                       /> */}
-                       <Tippy content="View">
+                      <Tippy content="View">
                         <button
                           className="flex hover:text-primary"
                           onClick={(e) => {
@@ -492,11 +491,11 @@ const SupportUser = () => {
       <ShowSupportUser
         open={viewModal}
         closeModal={closeViewModal}
-         userDetails={singleDetails}
-         fetchdata={fetchData}
+        userDetails={singleDetails}
+        fetchdata={fetchData}
       />
       {/* add support user modal */}
-     
+
       <AddSupportUser
         open={addModal}
         closeModal={closeAddModal}

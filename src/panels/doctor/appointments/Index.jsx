@@ -18,6 +18,7 @@ import Dropdown from "../../../components/Dropdown";
 import IconHorizontalDots from "../../../components/Icon/IconHorizontalDots";
 import RescheduleModal from "../../clinic/profile/RescheduleModal";
 import CancelReschedule from "../../clinic/profile/CancelReschedule";
+import RescheduleAllModal from "../../clinic/profile/RescheduleAllModal";
 
 const Appointments = () => {
   const dispatch = useDispatch();
@@ -40,6 +41,9 @@ const Appointments = () => {
   const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
   const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
+
+  const [addRescheduleAllModal, setAddRescheduleAllModal] = useState(false);
+
 
   const getCurrentDate = () => {
     const currentDate = new Date();
@@ -93,6 +97,7 @@ const Appointments = () => {
           schedule_date: selectedDate || null,
         }
       );
+      console.log(response);
       setAllAppointments(response?.data?.Consultations?.rows || []);
       setTotalAppointments(response?.data?.Consultations?.count || 0);
       setLoading(false);
@@ -136,6 +141,16 @@ const Appointments = () => {
 
   const closeCancelRescheduleModal = () => {
     setCancelRescheduleModal(false);
+  };
+
+
+  const openRescheduleAllModal = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setAddRescheduleAllModal(true);
+  };
+
+  const closeRescheduleAllModal = () => {
+    setAddRescheduleAllModal(false);
   };
 
   return (
@@ -238,6 +253,7 @@ const Appointments = () => {
                 <button
                   type="button"
                   className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
+                  onClick={() => openRescheduleAllModal(doctorId)}
                 >
                   Reschedule Todays Appoinments
                 </button>
@@ -385,9 +401,19 @@ const Appointments = () => {
         doctorId={doctorId}
       />
 
+      <RescheduleAllModal
+        addRescheduleAllModal={addRescheduleAllModal}
+        closeRescheduleAllModal={closeRescheduleAllModal}
+        bookingId={selectedBookingId}
+        fetchAppointments={getallConsultation}
+        clinicId={clinicId}
+        doctorId={doctorId}
+        schedule_date={selectedDate}
+      />
+
       <CancelReschedule
         cancelRescheduleModal={cancelRescheduleModal}
-        setCancelRescheduleModal={setCancelRescheduleModal}
+        closeAddRescheduleModal={closeAddRescheduleModal}
         closeCancelRescheduleModal={closeCancelRescheduleModal}
         bookingId={selectedBookingId}
         fetchAppointments={getallConsultation}

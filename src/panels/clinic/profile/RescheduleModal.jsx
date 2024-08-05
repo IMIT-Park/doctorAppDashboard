@@ -10,6 +10,7 @@ import { showMessage } from "../../../utils/showMessage";
 import IconLoader from "../../../components/Icon/IconLoader";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
+import Swal from "sweetalert2";
 
 const RescheduleModal = ({
   addRescheduleModal,
@@ -76,7 +77,10 @@ const RescheduleModal = ({
   // timeslot select function
   const handleSelectTimeslot = (timeslot) => {
     setSelectedTimeSlot(timeslot);
+   
   };
+console.log(selectedTimeSlot);
+  
 
   const handleDateChange = (selectedDates) => {
     const date = selectedDates[0];
@@ -98,6 +102,7 @@ const RescheduleModal = ({
           clinic_id: clinicId,
         }
       );
+      console.log(response.data);
       if (response?.data?.noOfConsultationsPerDay?.length > 0) {
         setConsultationWarning(
           "No available consultations for this day. Please select another day."
@@ -124,128 +129,69 @@ const RescheduleModal = ({
     setSelectedConsultation(consultation);
   };
 
-  const createBooking = async () => {
-    if (!selectedTimeSlot) {
-      showMessage("please select a timeslot !", "warning");
+ 
+  console.log(selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id);
+
+  const createBooking = async (event) => {
+    event.preventDefault();
+    console.log("Selected Date:", selectedDate);
+    console.log("Booking ID:", bookingId);
+
+    if (!selectedDate) {
+      showMessage("Please select a date.", "error");
       return;
     }
 
-    if (!selectedConsultation) {
-      showMessage("please select a time !", "warning");
-      return;
-    }
-
-    setBookingLoading(true);
-
+    // setBookingLoading(true);
     try {
-      const { whoIsBooking, ...restBookingDetails } = bookingDetails;
-      const bookingData = {
-        ...restBookingDetails,
-        schedule_date: reverseformatDate(selectedDate) || "",
-        schedule_time: selectedConsultation?.slot || "",
-        DoctorTimeSlot_id:
-          selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id || null,
-        type: "walkin",
-      };
-
       const response = await NetworkHandler.makePostRequest(
-        "/v1/booking/createBooking",
-        bookingData
+        `/v1/consultation/Reschedule/${bookingId}`,
+        {
+          new_schedule_date: reverseformatDate(selectedDate) || "",
+          schedule_time: selectedConsultation?.slot || "",
+          DoctorTimeSlot_id:
+            selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id || null,
+        }
       );
 
+      console.log("Response:", response);
+
       if (response.status === 201) {
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: "Booking Added Successfully",
-          padding: "2em",
-          customClass: "sweet-alerts",
-          confirmButtonColor: "#006241",
-        });
-        setTimeout(() => {
-          navigate(
-            bookingDetails?.whoIsBooking === "owner"
-              ? "/owner/add-booking"
-              : "/clinic/bookings"
-          );
-        }, 3000);
-        setBookingDetails({
-          doctor_id: null,
-          clinic_id: null,
-          patient_id: null,
-          schedule_date: "",
-          schedule_time: "",
-          DoctorTimeSlot_id: null,
-          type: "walkin",
-          whoIsBooking: "",
-          created_by: "",
-        });
+        showMessage("Rescheduled successfully!", "success");
+        closeAddRescheduleModal();
+        fetchAppointments();
+      } else {
+        showMessage("Failed to reschedule. Please try again.", "error");
       }
     } catch (error) {
-      if (error?.response?.status === 403) {
+      console.log(error);
+      if (error.response && error.response.status === 404) {
+        showMessage(
+          `Doctor is on leave on ${formatDate(selectedDate)}`,
+          "warning"
+        );
+      } else if (error.response && error.response.status === 403) {
+        // showMessage(
+        //   `Pick the date that corresponds to the day of the week`,
+        //   "warning"
+        // );
         Swal.fire({
           icon: "error",
           title: "Todays Booking Slots Filled!",
-          text: "Todays Booking Slots Filled. Kindly Select Another date to book.",
+          text: "Please select the date matching the day of the week",
           padding: "2em",
           customClass: "sweet-alerts",
           confirmButtonColor: "#006241",
         });
+      } else {
+        showMessage("An error occurred. Please try again.", "error");
       }
-      console.error(error?.response?.data?.error);
     } finally {
-      setBookingLoading(false);
+      // setBookingLoading(true);
     }
   };
 
-  // const handleReschedule = async (event) => {
-  //   event.preventDefault();
-  //   console.log("Selected Date:", selectedDate);
-  //   console.log("Booking ID:", bookingId);
-
-  //   if (!selectedDate) {
-  //     showMessage("Please select a date.", "error");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-
-  //   try {
-  //     const response = await NetworkHandler.makePostRequest(
-  //       `/v1/consultation/Reschedule/${bookingId}`,
-  //       {
-  //         new_schedule_date: reverseformatDate(selectedDate),
-  //       }
-  //     );
-
-  //     console.log("Response:", response);
-
-  //     if (response.status === 200) {
-  //       showMessage("Rescheduled successfully!", "success");
-  //       closeAddRescheduleModal();
-  //       fetchAppointments();
-  //     } else {
-  //       showMessage("Failed to reschedule. Please try again.", "error");
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     if (error.response && error.response.status === 404) {
-  //       showMessage(
-  //         `Doctor is on leave on ${formatDate(selectedDate)}`,
-  //         "warning"
-  //       );
-  //     } else if (error.response && error.response.status === 403) {
-  //       showMessage(
-  //         `Pick the date that corresponds to the day of the week`,
-  //         "warning"
-  //       );
-  //     } else {
-  //       showMessage("An error occurred. Please try again.", "error");
-  //     }
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const currentDate = formatDate(new Date());
 
   return (
     <Transition appear show={addRescheduleModal} as={Fragment}>
@@ -348,6 +294,7 @@ const RescheduleModal = ({
                               dateFormat: "d-m-Y",
                               position: "auto left",
                               inline: true,
+                              minDate: "today",
                             }}
                             className="form-input"
                             onChange={handleDateChange}
@@ -449,6 +396,23 @@ const RescheduleModal = ({
                           )}
                         </>
                       )}
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <div className="flex items-center justify-center">
+                      <button
+                        type="button"
+                        className="btn btn-green text-base px-10 min-w-40"
+                        onClick={createBooking}
+                        disabled={bookingLoading}
+                      >
+                        {bookingLoading ? (
+                          <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7 h-7 align-middle shrink-0" />
+                        ) : (
+                          "Book Now"
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>

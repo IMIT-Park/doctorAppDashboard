@@ -71,7 +71,7 @@ const SupportUser = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/supportuser/getallSupportuser?pageSize=${pageSize}&page=${page}`
       );
-
+console.log(response);
       setTotalSupportUsers(response?.data?.Supportuser?.count);
       setAllSupportUsers(response?.data?.Supportuser?.rows);
       setLoading(false);
@@ -166,7 +166,6 @@ const SupportUser = () => {
         phone: `+91${input.phone}`,
         user_name: input?.email,
       };
-      console.log(input.name);
       console.log(updatedData);
 
       try {
@@ -470,6 +469,21 @@ const SupportUser = () => {
                           <IconTrashLines />
                         </button>
                       </Tippy>
+                    </div>
+                  ),
+                },
+                {
+                  accessor: "Status",
+                  textAlignment: "center",
+                  render: (rowData) => (
+                    <div className="flex justify-center items-center">
+                      <span
+                        className={`text-sm font-medium ${
+                          rowData?.User?.status ? "text-green-500" : "text-red-500"
+                        }`}
+                      >
+                        {rowData?.User?.status ? "Active" : "Blocked"}
+                      </span>
                     </div>
                   ),
                 },

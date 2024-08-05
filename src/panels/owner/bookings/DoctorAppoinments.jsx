@@ -17,6 +17,7 @@ import IconCaretDown from "../../../components/Icon/IconCaretDown";
 import CancelReschedule from "../../clinic/profile/CancelReschedule";
 import RescheduleModal from "../../clinic/profile/RescheduleModal";
 import { UserContext } from "../../../contexts/UseContext";
+import RescheduleAllModal from "../../clinic/profile/RescheduleAllModal";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -26,7 +27,6 @@ const ClinicProfile = () => {
 
   const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
-
 
   // const clinicId = userData?.UserClinic?.[0]?.clinic_id || 0;
 
@@ -56,6 +56,9 @@ const ClinicProfile = () => {
   const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
   const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
+
+  const [addRescheduleAllModal, setAddRescheduleAllModal] = useState(false);
+
 
   const getCurrentDate = () => {
     const currentDate = new Date();
@@ -171,6 +174,15 @@ const ClinicProfile = () => {
     setCancelAllAppoinments(false);
   };
 
+  const openRescheduleAllModal = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setAddRescheduleAllModal(true);
+  };
+
+  const closeRescheduleAllModal = () => {
+    setAddRescheduleAllModal(false);
+  };
+
   setCancelAllAppoinments;
 
   const handleRowClick = (bookingId) => {
@@ -268,6 +280,8 @@ const ClinicProfile = () => {
                   <button
                     type="button"
                     className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
+                  onClick={() => openRescheduleAllModal(selectedDoctorId)}
+
                   >
                     Reschedule Todays Appoinments
                   </button>
@@ -282,7 +296,6 @@ const ClinicProfile = () => {
                   </button>
                 </div>
               )}
-
             </Tab.List>
             <Tab.Panels>
               <Tab.Panel>
@@ -354,7 +367,9 @@ const ClinicProfile = () => {
                                     <button
                                       type="button"
                                       onClick={() =>
-                                        openCancelRescheduleModal(row.booking_id)
+                                        openCancelRescheduleModal(
+                                          row.booking_id
+                                        )
                                       }
                                     >
                                       Cancel
@@ -365,8 +380,7 @@ const ClinicProfile = () => {
                             </div>
                           ),
                         },
-                      ].filter(Boolean)} 
-                    
+                      ].filter(Boolean)}
                       totalRecords={totalAppointments}
                       recordsPerPage={pageSize}
                       page={page}
@@ -392,6 +406,18 @@ const ClinicProfile = () => {
         closeAddRescheduleModal={closeAddRescheduleModal}
         bookingId={selectedBookingId}
         fetchAppointments={fetchAppointments}
+        clinicId={clinicId}
+        doctorId={selectedDoctorId}
+      />
+
+      <RescheduleAllModal
+        addRescheduleAllModal={addRescheduleAllModal}
+        closeRescheduleAllModal={closeRescheduleAllModal}
+        bookingId={selectedBookingId}
+        fetchAppointments={fetchAppointments}
+        clinicId={clinicId}
+        doctorId={selectedDoctorId}
+        schedule_date={selectedDate}
       />
 
       <CancelReschedule

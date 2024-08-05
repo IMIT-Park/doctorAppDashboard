@@ -27,6 +27,7 @@ import RescheduleModal from "./RescheduleModal";
 import CancelReschedule from "./CancelReschedule";
 import { UserContext } from "../../../contexts/UseContext";
 import { formatTime } from "../../../utils/formatTime";
+import RescheduleAllModal from "./RescheduleAllModal";
 
 const ClinicProfile = () => {
   const dispatch = useDispatch();
@@ -78,6 +79,9 @@ const ClinicProfile = () => {
   const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
   const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
+
+  const [addRescheduleAllModal, setAddRescheduleAllModal] = useState(false);
+
 
   const getCurrentDate = () => {
     const currentDate = new Date();
@@ -318,6 +322,15 @@ const ClinicProfile = () => {
     setCancelAllAppoinments(false);
   };
 
+  const openRescheduleAllModal = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setAddRescheduleAllModal(true);
+  };
+
+  const closeRescheduleAllModal = () => {
+    setAddRescheduleAllModal(false);
+  };
+
   setCancelAllAppoinments;
   // block and unblock handler
   const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
@@ -527,6 +540,7 @@ const ClinicProfile = () => {
                     <button
                       type="button"
                       className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
+                      onClick={() => openRescheduleAllModal(selectedDoctorId)}
                     >
                       Reschedule Todays Appoinments
                     </button>
@@ -663,6 +677,18 @@ const ClinicProfile = () => {
         closeAddRescheduleModal={closeAddRescheduleModal}
         bookingId={selectedBookingId}
         fetchAppointments={fetchAppointments}
+        doctorId={selectedDoctorId}
+        clinicId={clinicId}
+      />
+
+      <RescheduleAllModal
+        addRescheduleAllModal={addRescheduleAllModal}
+        closeRescheduleAllModal={closeRescheduleAllModal}
+        bookingId={selectedBookingId}
+        fetchAppointments={fetchAppointments}
+        clinicId={clinicId}
+        doctorId={selectedDoctorId}
+        schedule_date={selectedDate}
       />
 
       <CancelReschedule

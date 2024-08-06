@@ -3,6 +3,9 @@ import IconLockDots from "../../../components/Icon/IconLockDots";
 import IconCloseEye from "../../../components/Icon/IconCloseEye";
 import { UserContext } from "../../../contexts/UseContext";
 import { formatDate } from "../../../utils/formatDate";
+import IconX from "../../../components/Icon/IconX";
+import IconEdit from "../../../components/Icon/IconEdit";
+import "tippy.js/dist/tippy.css";
 
 const OwnerProfile = () => {
   const { userDetails } = useContext(UserContext);
@@ -116,10 +119,22 @@ const OwnerProfile = () => {
   return (
     <div>
       <div className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-8 mb-5 bg-white dark:bg-black">
-        <div className="flex flex-col items-start">
+        <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
           <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
-            <div className="w-full flex items-start justify-between gap-2 mt-2">
-              {userData?.additionalDetails?.name}
+            <div className="w-full flex items-center justify-between gap-10 mt-2">
+              <span>{userData?.additionalDetails?.name}</span>
+              <div className="flex gap-4 items-center w-max mx-auto">
+
+                <button
+                  className="flex hover:text-info"
+                  onClick={{
+
+                  }}
+                >
+                  <IconEdit className="w-4.5 h-4.5" />
+                </button>
+
+              </div>
             </div>
           </div>
         </div>
@@ -134,10 +149,6 @@ const OwnerProfile = () => {
               </div>
             </div>
             <div className="flex flex-col mb-2 md:w-1/2 gap-1">
-              <div className="text-white-dark text-base">City</div>
-              <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
-                {userData?.additionalDetails?.city  || "-----"} 
-              </div>
               <div className="text-white-dark text-base">Country</div>
               <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
                 {userData?.additionalDetails?.country || "-----"}
@@ -146,6 +157,12 @@ const OwnerProfile = () => {
               <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
                 {userData?.additionalDetails?.state ? convertFirstLetterCapital(userData?.additionalDetails?.state) : "-----"}
               </div>
+              <div className="text-white-dark text-base">City</div>
+              <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
+                {userData?.additionalDetails?.city || "-----"}
+              </div>
+
+
             </div>
           </div>
 

@@ -31,6 +31,8 @@ const Sidebar = () => {
   };
   const role = roleMap[userDetails?.role_id] || "superAdmin";
 
+  const supportUserDetails = userDetails?.UserSupportuser?.[0] || null;
+
   const [errorSubMenu, setErrorSubMenu] = useState(false);
   const themeConfig = useSelector((state) => state.themeConfig);
   const semidark = useSelector((state) => state.themeConfig.semidark);
@@ -201,7 +203,7 @@ const Sidebar = () => {
                   <NavLink to="/clinic/timing" className="group">
                     <div className="flex items-center">
                       <IconClock
-                      fill
+                        fill
                         className={`group-hover:!text-[#006241] shrink-0 `}
                       />
                       <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
@@ -359,30 +361,35 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
-                <li className="nav-item">
-                  <NavLink to="/supportuser/doctors" className="group">
-                    <div className="flex items-center">
-                      <IconMenuDashboard
-                        className={`group-hover:!text-[#006241] shrink-0 `}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Doctors"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/supportuser/chats" className="group">
-                    <div className="flex items-center">
-                      <IconMenuChat
-                        className={`group-hover:!text-[#006241] shrink-0 `}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Chats"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
+                {supportUserDetails &&
+                  supportUserDetails?.doctor_verify_access && (
+                    <li className="nav-item">
+                      <NavLink to="/supportuser/doctors" className="group">
+                        <div className="flex items-center">
+                          <IconMenuUsers
+                            className={`group-hover:!text-[#006241] shrink-0 `}
+                          />
+                          <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                            {"Doctors"}
+                          </span>
+                        </div>
+                      </NavLink>
+                    </li>
+                  )}
+                {supportUserDetails && supportUserDetails?.chat_access && (
+                  <li className="nav-item">
+                    <NavLink to="/supportuser/chats" className="group">
+                      <div className="flex items-center">
+                        <IconMenuChat
+                          className={`group-hover:!text-[#006241] shrink-0 `}
+                        />
+                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                          {"Chats"}
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
+                )}
 
                 <li className="nav-item">
                   <NavLink to="/supportuser/complaints" className="group">

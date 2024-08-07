@@ -19,11 +19,11 @@ const RescheduleAllModal = ({
   bookingId,
   clinicId,
   doctorId,
-  schedule_date
+  schedule_date,
 }) => {
   const [timeslotsLoading, setTimeslotsLoading] = useState(false);
   const [doctorTimeSlots, setDoctorTimeSlots] = useState([]);
-  const [doctorTimeSlotsId,setDoctorTimeSlotsId] =useState(null);
+  const [doctorTimeSlotsId, setDoctorTimeSlotsId] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [consultationLoading, setConsultationLoading] = useState(false);
@@ -56,10 +56,9 @@ const RescheduleAllModal = ({
       const doctorTimeSlotIds = filteredTimeSlots.map(
         (timeslot) => timeslot.timeSlot?.DoctorTimeSlot_id
       );
-  
-      setDoctorTimeSlotsId(doctorTimeSlotIds);
-      console.log(response);
 
+      setDoctorTimeSlotsId(doctorTimeSlotIds);
+      // console.log(response);
     } catch (error) {
       if (error?.response?.status === 400) {
         setTimeslotWarning(
@@ -82,8 +81,6 @@ const RescheduleAllModal = ({
       fetchTimeSlots(reverseformatDate(selectedDate));
     }
   }, [clinicId, selectedDate, addRescheduleAllModal]);
-
- 
 
   const handleDateChange = (selectedDates) => {
     const date = selectedDates[0];
@@ -128,77 +125,97 @@ const RescheduleAllModal = ({
     }
   }, [selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id]);
 
-  console.log(selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id);
-
+  // console.log(selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id);
 
   // Bulk Rescheduling
 
   const createReschedule = async (event) => {
-  event.preventDefault();
-  console.log("Selected Date:", selectedDate);
-  console.log("Booking ID:", bookingId);
+    event.preventDefault();
+    console.log("Selected Date:", selectedDate);
+    console.log("Booking ID:", bookingId);
 
-  if (!selectedDate) {
-    showMessage("Please select a date.", "error");
-    return;
-  }
-  console.log("Response:");
-  setBookingLoading(true);
-  try {
-    const response = await NetworkHandler.makePostRequest(
-      `/v1/consultation/RescheduleBooking/${doctorId}`,
-      {
-        clinic_id: clinicId,
-        schedule_date: schedule_date,
-        new_schedule_date: reverseformatDate(selectedDate) || "",
-        timeslots: doctorTimeSlotsId.map(id => ({ DoctorTimeSlot_id: id })),
-      }
-    );
-
-    console.log("Response:", response);
-
-    if (response?.status === 200) {
-      showMessage("Rescheduled successfully!", "success");
-      closeRescheduleAllModal();
-      fetchAppointments();
-    } else {
-      showMessage("Failed to reschedule. Please try again.", "error");
+    if (!selectedDate) {
+      showMessage("Please select a date.", "error");
+      return;
     }
-  } catch (error) {
-    console.error(error);
-    if (error.response) {
-      const { status, data } = error.response;
-      if (status === 404) {
-        showMessage(
-          `Doctor is on leave on ${formatDate(selectedDate)}`,
-          "warning"
-        );
-      } else if (status === 403) {
-        if (data.error.includes("Booking already exists")) {
-          showMessage(data.error, "warning");
-        } else if (data.error.includes("Please select the date matching the day of the week")) {
-          Swal.fire({
-            icon: "error",
-            title: "Today's Booking Slots Filled!",
-            text: data.error,
-            padding: "2em",
-            customClass: "sweet-alerts",
-            confirmButtonColor: "#006241",
-          });
-        } else {
-          showMessage("An error occurred. Please try again.", "error");
+    setBookingLoading(true);
+    try {
+      const response = await NetworkHandler.makePostRequest(
+        `/v1/consultation/RescheduleBooking/${doctorId}`,
+        {
+          clinic_id: clinicId,
+          schedule_date: schedule_date,
+          new_schedule_date: reverseformatDate(selectedDate) || "",
+          timeslots: doctorTimeSlotsId?.map((id) => ({
+            DoctorTimeSlot_id: id,
+          })),
         }
-      } else {
-        showMessage("An error occurred. Please try again.", "error");
-      }
-    } else {
-      showMessage("An error occurred. Please try again.", "error");
-    }
-  } finally {
-    setBookingLoading(false);
-  }
-};
+      );
 
+      if (response?.status === 200) {
+        showMessage("Rescheduled successfully!", "success");
+        closeRescheduleAllModal();
+        fetchAppointments();
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 404) {
+          showMessage(
+            `Doctor is on leave on ${formatDate(selectedDate)}`,
+            "warning"
+          );
+        }
+       
+        else if (status === 403) {
+          if (
+            data.error.includes(
+              "Please select the date matching the day of the week"
+            )
+          ) {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Date Selection",
+              text: data.error,
+              padding: "2em",
+              customClass: "sweet-alerts",
+              confirmButtonColor: "#006241",
+            });
+          } else if (
+            data.error.includes("Booking already exists on") &&
+            data.error.includes("and timeslot")
+          ) {
+            Swal.fire({
+              icon: "error",
+              title: "Booking Conflict",
+              text: data.error,
+              padding: "2em",
+              customClass: "sweet-alerts",
+              confirmButtonColor: "#006241",
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Date Selection",
+              text: data.error,
+              padding: "2em",
+              customClass: "sweet-alerts",
+              confirmButtonColor: "#006241",
+            });
+          }
+        }
+
+        // else if (error.response.status === 400) {
+        //   showMessage("Doctor is not available on this date.", "error");
+        // } else {
+        //   showMessage("An error occurred. Please try again.", "error");
+        // }
+      }
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   return (
     <Transition appear show={addRescheduleAllModal} as={Fragment}>

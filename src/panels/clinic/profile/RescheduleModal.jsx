@@ -77,10 +77,8 @@ const RescheduleModal = ({
   // timeslot select function
   const handleSelectTimeslot = (timeslot) => {
     setSelectedTimeSlot(timeslot);
-   
   };
-console.log(selectedTimeSlot);
-  
+  console.log(selectedTimeSlot);
 
   const handleDateChange = (selectedDates) => {
     const date = selectedDates[0];
@@ -129,9 +127,9 @@ console.log(selectedTimeSlot);
     setSelectedConsultation(consultation);
   };
 
- 
   console.log(selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id);
 
+  // Create booking
   const createBooking = async (event) => {
     event.preventDefault();
     console.log("Selected Date:", selectedDate);
@@ -154,8 +152,6 @@ console.log(selectedTimeSlot);
         }
       );
 
-      console.log("Response:", response);
-
       if (response.status === 201) {
         showMessage("Rescheduled successfully!", "success");
         closeAddRescheduleModal();
@@ -164,20 +160,20 @@ console.log(selectedTimeSlot);
         showMessage("Failed to reschedule. Please try again.", "error");
       }
     } catch (error) {
-      console.log(error);
-      if (error.response && error.response.status === 404) {
-        showMessage(
-          `Doctor is on leave on ${formatDate(selectedDate)}`,
-          "warning"
-        );
-      } else if (error.response && error.response.status === 403) {
-        // showMessage(
-        //   `Pick the date that corresponds to the day of the week`,
-        //   "warning"
-        // );
+      console.error(error);
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 404) {
+          showMessage(
+            `Doctor is on leave on ${formatDate(selectedDate)}`,
+            "warning"
+          );
+        } 
+        
+        else if (error.response && error.response.status === 403) {
         Swal.fire({
           icon: "error",
-          title: "Todays Booking Slots Filled!",
+          title: "Invalid Date Selection",
           text: "Please select the date matching the day of the week",
           padding: "2em",
           customClass: "sweet-alerts",
@@ -186,7 +182,7 @@ console.log(selectedTimeSlot);
       } else {
         showMessage("An error occurred. Please try again.", "error");
       }
-    } finally {
+    } }finally {
       // setBookingLoading(true);
     }
   };

@@ -41,9 +41,9 @@ const Appointments = () => {
   const [cancelRescheduleModal, setCancelRescheduleModal] = useState(false);
   const [cancelAllAppoinments, setCancelAllAppoinments] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
+  const [doctorClinics, setDoctorClinics] = useState([]);
 
   const [addRescheduleAllModal, setAddRescheduleAllModal] = useState(false);
-
 
   const getCurrentDate = () => {
     const currentDate = new Date();
@@ -64,12 +64,31 @@ const Appointments = () => {
     const to = from + pageSize;
   }, [page, pageSize]);
 
-  const {
-    data: clinicsData,
-    loading: clinicsLoading,
-    refetch: fetchDoctorClinics,
-  } = useFetchData(`/v1/doctor/getClincbydr/${doctorId}`, {}, [doctorId]);
-  const doctorClinics = clinicsData?.allclinics;
+  // const {
+  //   data: clinicsData,
+  //   loading: clinicsLoading,
+  //   refetch: fetchDoctorClinics,
+  // } = useFetchData(`/v1/doctor/getClincbydr/${doctorId}`, {}, [doctorId]);
+  // const doctorClinics = clinicsData?.allclinics?.map(clinic => clinic.clinicDetails);
+
+  useEffect(() => {
+    const fetchDoctorClinics = async () => {
+      setLoading(true);
+      try {
+        const response = await NetworkHandler.makeGetRequest(
+          `/v1/doctor/getClincbydr/${doctorId}`
+        );
+       
+        const clinicsData = response?.data?.allclinics || [];
+        setDoctorClinics(clinicsData.map((clinic) => clinic.clinicDetails));
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    };
+    fetchDoctorClinics();
+  }, [doctorId]);
 
   useEffect(() => {
     if (doctorClinics && doctorClinics.length > 0) {
@@ -87,6 +106,8 @@ const Appointments = () => {
     setClinicId(clinic?.clinic_id);
   };
 
+ 
+
   const getallConsultation = async () => {
     setLoading(true);
     try {
@@ -97,7 +118,7 @@ const Appointments = () => {
           schedule_date: selectedDate || null,
         }
       );
-      console.log(response);
+      
       setAllAppointments(response?.data?.Consultations?.rows || []);
       setTotalAppointments(response?.data?.Consultations?.count || 0);
       setLoading(false);
@@ -142,7 +163,6 @@ const Appointments = () => {
   const closeCancelRescheduleModal = () => {
     setCancelRescheduleModal(false);
   };
-
 
   const openRescheduleAllModal = (bookingId) => {
     setSelectedBookingId(bookingId);

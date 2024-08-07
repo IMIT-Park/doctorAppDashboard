@@ -38,6 +38,8 @@ const DoctorLeaves = () => {
   const [deleteLeaveModal, setDeleteLeaveModal] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
+  const [doctorClinics, setDoctorClinics] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // fetch doctor data function
   const {
@@ -48,14 +50,34 @@ const DoctorLeaves = () => {
   const doctorDetails = doctorData?.Doctor;
 
   // fetch doctor's clinics function
-  const {
-    data: clinicsData,
-    loading: clinicsLoading,
-    refetch: fetchDoctorClinics,
-  } = useFetchData(`/v1/doctor/getClincbydr/${doctorId}`, {}, [doctorId]);
-  const doctorClinics = clinicsData?.allclinics;
+  // const {
+  //   data: clinicsData,
+  //   loading: clinicsLoading,
+  //   refetch: fetchDoctorClinics,
+  // } = useFetchData(`/v1/doctor/getClincbydr/${doctorId}`, {}, [doctorId]);
+  // const doctorClinics = clinicsData?.allclinics;
 
-  // set the first clinic from the clinics list into the selectedClinic state
+  // fetch doctor's clinics function
+
+  useEffect(() => {
+    const fetchDoctorClinics = async () => {
+      setLoading(true);
+      try {
+        const response = await NetworkHandler.makeGetRequest(
+          `/v1/doctor/getClincbydr/${doctorId}`
+        );
+
+        const clinicsData = response?.data?.allclinics || [];
+        setDoctorClinics(clinicsData.map((clinic) => clinic.clinicDetails));
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    };
+    fetchDoctorClinics();
+  }, [doctorId]);
+
   useEffect(() => {
     if (doctorClinics && doctorClinics.length > 0) {
       setSelectedClinic(doctorClinics[0]);
@@ -72,7 +94,7 @@ const DoctorLeaves = () => {
         "/v1/leave/getdrleave",
         { doctor_id: doctorId, clinic_id: clinicId }
       );
-
+      console.log(response);
       if (response.status === 201) {
         setLeavesLoading(false);
         setDoctorLeaves(response?.data?.leaveDetails);
@@ -124,7 +146,6 @@ const DoctorLeaves = () => {
     setSelectedTimeSlots([]);
     setSelectedLeave(null);
   };
-
 
   return (
     <div>

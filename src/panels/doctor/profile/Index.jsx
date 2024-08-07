@@ -73,6 +73,9 @@ const Profile = () => {
   const [doctorTimeSlots, setDoctorTimeSlots] = useState([]);
   const [selectedDay, setSelectedDay] = useState("");
   const [errors, setErrors] = useState({});
+  const [doctorClinics, setDoctorClinics] = useState([]);
+  const [loading, setLoading] = useState(false);
+
 
   const validate = () => {
     const newErrors = {};
@@ -108,14 +111,35 @@ const Profile = () => {
   const doctorDetails = doctorData?.Doctor;
 
   // fetch doctor's clinics function
-  const {
-    data: clinicsData,
-    loading: clinicsLoading,
-    refetch: fetchDoctorClinics,
-  } = useFetchData(`/v1/doctor/getClincbydr/${doctorId}`, {}, [doctorId]);
-  const doctorClinics = clinicsData?.allclinics;
+  // const {
+  //   data: clinicsData,
+  //   loading: clinicsLoading,
+  //   refetch: fetchDoctorClinics,
+  // } = useFetchData(`/v1/doctor/getClincbydr/${doctorId}`, {}, [doctorId]);
+  // const doctorClinics = clinicsData?.allclinics;
 
-  // set the first clinic from the clinics list into the selectedClinic state
+  
+// Fetch clinic
+
+  useEffect(() => {
+    const fetchDoctorClinics = async () => {
+      setLoading(true);
+      try {
+        const response = await NetworkHandler.makeGetRequest(
+          `/v1/doctor/getClincbydr/${doctorId}`
+        );     
+       console.log(response);
+        const clinicsData = response?.data?.allclinics || [];
+        setDoctorClinics(clinicsData.map((clinic) => clinic.clinicDetails));
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    };
+    fetchDoctorClinics();
+  }, [doctorId]);
+
   useEffect(() => {
     if (doctorClinics && doctorClinics.length > 0) {
       setSelectedClinic(doctorClinics[0]);

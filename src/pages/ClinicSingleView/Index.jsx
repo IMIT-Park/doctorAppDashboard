@@ -176,7 +176,7 @@ const ClinicSingleView = () => {
 
   // edit modal handler
   const openEditModal = () => {
-    const phoneWithoutCountryCode = clinicDetails.phone.replace(/^\+91/, "");
+    const phoneWithoutCountryCode = clinicDetails?.phone?.replace(/^\+91/, "");
     const isGoogleLocationValid =
       clinicDetails?.googleLocation && clinicDetails.googleLocation !== `"{}"`;
     setClinicInput({

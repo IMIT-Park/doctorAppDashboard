@@ -176,7 +176,7 @@ const ClinicSingleView = () => {
 
   // edit modal handler
   const openEditModal = () => {
-    const phoneWithoutCountryCode = clinicDetails.phone.replace(/^\+91/, "");
+    const phoneWithoutCountryCode = clinicDetails?.phone?.replace(/^\+91/, "");
     const isGoogleLocationValid =
       clinicDetails?.googleLocation && clinicDetails.googleLocation !== `"{}"`;
     setClinicInput({
@@ -978,7 +978,7 @@ const ClinicSingleView = () => {
                           : ""
                       }`}
                     >
-                      {row?.verification_status.replace("_", " ")}
+                      {row?.verification_status?.replace("_", " ")}
                     </span>
                   ),
                   cellsClassName: "capitalize",

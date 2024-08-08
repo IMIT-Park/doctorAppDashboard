@@ -33,7 +33,6 @@ const RescheduleModal = ({
   const [bookingLoading, setBookingLoading] = useState(false);
   const [consultationWarning, setConsultationWarning] = useState("");
 
-
   // fetch timeslots function
   const fetchTimeSlots = async (date) => {
     setConsultationWarning("");
@@ -79,7 +78,7 @@ const RescheduleModal = ({
   const handleSelectTimeslot = (timeslot) => {
     setSelectedTimeSlot(timeslot);
   };
-  console.log(selectedTimeSlot);
+  // console.log(selectedTimeSlot);
 
   const handleDateChange = (selectedDates) => {
     const date = selectedDates[0];
@@ -128,10 +127,10 @@ const RescheduleModal = ({
     setSelectedConsultation(consultation);
   };
 
-  console.log(selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id);
+  // console.log(selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id);
 
-  // Create booking
-  const createBooking = async (event) => {
+  // Create Reschedule
+  const createReschedule = async (event) => {
     event.preventDefault();
     console.log("Selected Date:", selectedDate);
     console.log("Booking ID:", bookingId);
@@ -140,10 +139,8 @@ const RescheduleModal = ({
       showMessage("Please select a date.", "error");
       return;
     }
-    console.log(selectedDate);
-    console.log(selectedConsultation?.slot);
-    console.log( selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id);
-    // setBookingLoading(true);
+
+    setBookingLoading(true);
     try {
       const response = await NetworkHandler.makePostRequest(
         `/v1/consultation/Reschedule/${bookingId}`,
@@ -154,7 +151,7 @@ const RescheduleModal = ({
             selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id || null,
         }
       );
-        console.log(response);
+      console.log(response);
       if (response.status === 201) {
         showMessage("Rescheduled successfully!", "success");
         closeAddRescheduleModal();
@@ -175,23 +172,16 @@ const RescheduleModal = ({
             customClass: "sweet-alerts",
             confirmButtonColor: "#006241",
           });
-        } else if (error.response && error.response.status === 403) {
-          Swal.fire({
-            icon: "error",
-            title: "Invalid Date Selection",
-            text: "Please select the date matching the day of the week",
-            padding: "2em",
-            customClass: "sweet-alerts",
-            confirmButtonColor: "#006241",
-          });
         } else {
           showMessage("An error occurred. Please try again.", "error");
         }
       }
     } finally {
-      // setBookingLoading(true);
+      setBookingLoading(false);
     }
   };
+
+  
 
   const currentDate = formatDate(new Date());
 
@@ -240,48 +230,6 @@ const RescheduleModal = ({
                 </button>
 
                 <div className="p-5 ">
-                  {/* <div className="panel">
-                    <h1 className="text-center font-bold text-2xl text-slate-800 m-8 dark:text-slate-">
-                      Select Date
-                    </h1>
-                    <form onSubmit={handleReschedule}>
-                      <div className="flex flex-wrap justify-center mb-6 space-x-4">
-                        <div className="mb-5">
-                          <Flatpickr
-                            value={selectedDate}
-                            options={{
-                              dateFormat: "Y-m-d",
-                              position: "auto left",
-                              inline: true,
-                            }}
-                            className="form-input"
-                            onChange={(date) => setSelectedDate(date)}
-                          />
-                        </div>
-                      </div>
-                      <div className="flex justify-center items-center mt-8">
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger gap-2"
-                          onClick={() => {
-                            closeAddRescheduleModal();
-                          }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="btn btn-green ltr:ml-4 rtl:mr-4"
-                        >
-                          {loading ? (
-                            <IconLoader className="animate-[spin_2s_linear_infinite] inline-block align-middle" />
-                          ) : (
-                            "Submit"
-                          )}
-                        </button>
-                      </div>
-                    </form>
-                  </div> */}
                   <div className="flex flex-col md:flex-row gap-4 justify-center">
                     <div className="border-gray-300 p-2 md:mb-4 w-full sm:w-max mt-5">
                       <div className="border border-blue-300 dark:border-blue-900 rounded py-1 px-6 mb-4 text-center text-[#006241] font-semibold text-lg w-fit">
@@ -406,7 +354,7 @@ const RescheduleModal = ({
                       <button
                         type="button"
                         className="btn btn-green text-base px-10 min-w-40"
-                        onClick={createBooking}
+                        onClick={createReschedule}
                         disabled={bookingLoading}
                       >
                         {bookingLoading ? (

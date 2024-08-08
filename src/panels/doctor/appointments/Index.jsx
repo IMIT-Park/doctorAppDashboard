@@ -153,6 +153,7 @@ const Appointments = () => {
   };
 
   const closeAddRescheduleModal = () => {
+   
     setAddRescheduleModal(false);
   };
 
@@ -355,7 +356,7 @@ const Appointments = () => {
                       render: (row) => (
                         <div className="dropdown grid place-items-center">
                           <Dropdown
-                            placement="top-end"
+                            placement="left"
                             btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
                             button={
                               <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />

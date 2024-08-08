@@ -44,10 +44,8 @@ const OwnerProfile = () => {
 
   const userData = createUserData(userDetails);
   const [data, setData] = useState({ oldpassword: "", newpassword: "" });
-  const [showPassword, setShowPassword] = useState(false);
   const [isIncorrect, setIsIncorrect] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [editData, setEditData] = useState();
   const [isEdit, setIsEdit] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [profileData, setProfileData] = useState();

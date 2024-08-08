@@ -42,6 +42,7 @@ const Patients = () => {
   );
   const [bookingLoading, setBookingLoading] = useState(false);
   const [consultationWarning, setConsultationWarning] = useState("");
+  const [bookingType, setBookingType] = useState("walkin");
 
   // fetch timeslots function
   const fetchTimeSlots = async (date) => {
@@ -156,7 +157,7 @@ const Patients = () => {
         schedule_time: selectedConsultation?.slot || "",
         DoctorTimeSlot_id:
           selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id || null,
-        type: "walkin",
+        type: bookingType,
       };
 
       const response = await NetworkHandler.makePostRequest(
@@ -220,6 +221,19 @@ const Patients = () => {
         <IconCaretDown className="w-4 h-4 rotate-90" />
       </button>
       <div className="panel mb-1">
+        <div className="flex items-center flex-wrap gap-2 sm:gap-4">
+          <label htmlFor="full-name">Booking Type :</label>
+          <select
+            id="bookingType"
+            className={`form-select form-select-green h-10 max-w-32`}
+            value={bookingType}
+            onChange={(e) => setBookingType(e.target.value)}
+          >
+            <option value="walkin">Walkin</option>
+            <option value="emergency">Emergency</option>
+          </select>
+        </div>
+
         <div className="flex flex-col md:flex-row gap-4 justify-center">
           <div className="border-gray-300 p-2 md:mb-4 w-full sm:w-max mt-5">
             <div className="border border-blue-300 dark:border-blue-900 rounded py-1 px-6 mb-4 text-center text-[#006241] font-semibold text-lg w-fit">

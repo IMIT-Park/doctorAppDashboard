@@ -17,6 +17,7 @@ import IconUserPlus from "../Icon/IconUserPlus";
 import IconClock from "../Icon/IconClock";
 import IconUsersGroup from "../Icon/IconUsersGroup";
 import { UserContext } from "../../contexts/UseContext";
+import NetworkHandler from "../../utils/NetworkHandler";
 
 const Sidebar = () => {
   // role handler
@@ -32,12 +33,15 @@ const Sidebar = () => {
   const role = roleMap[userDetails?.role_id] || "superAdmin";
 
   const supportUserDetails = userDetails?.UserSupportuser?.[0] || null;
+  const clinicUserId = userDetails?.UserClinic?.[0]?.clinic_id || null;
 
   const [errorSubMenu, setErrorSubMenu] = useState(false);
   const themeConfig = useSelector((state) => state.themeConfig);
   const semidark = useSelector((state) => state.themeConfig.semidark);
   const location = useLocation();
   const dispatch = useDispatch();
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const selector = document.querySelector(
@@ -64,6 +68,33 @@ const Sidebar = () => {
     }
   }, [location]);
 
+  // fetch subscriptionStatus
+  const fetchSubscriptionStatus = async () => {
+    setLoading(true);
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/subscription/subscriptionStatus/${clinicUserId}`
+      );
+      const status = response?.data?.SubscriptionStatus;
+      setSubscriptionStatus(status);
+
+      if (status === "Active") {
+        console.log("Subscription is active. Executing additional code...");
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  // fetching subscriptionStatus
+  useEffect(() => {
+    fetchSubscriptionStatus();
+  }, []);
+
+  
   return (
     <div className={semidark ? "dark" : ""}>
       <nav
@@ -186,6 +217,7 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+
                 <li className="nav-item">
                   <NavLink to="/clinic/profile" className="group">
                     <div className="flex items-center">
@@ -199,6 +231,7 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+
                 <li className="nav-item">
                   <NavLink to="/clinic/timing" className="group">
                     <div className="flex items-center">
@@ -212,58 +245,62 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
-                <li className="nav-item">
-                  <NavLink to="/clinic/doctors" className="group">
-                    <div className="flex items-center">
-                      <IconMenuUsers
-                        className={`group-hover:!text-[#006241] shrink-0 `}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Doctors"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
+                {subscriptionStatus === "Active" && (
+                  <>
+                    <li className="nav-item">
+                      <NavLink to="/clinic/doctors" className="group">
+                        <div className="flex items-center">
+                          <IconMenuUsers
+                            className={`group-hover:!text-[#006241] shrink-0 `}
+                          />
+                          <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                            {"Doctors"}
+                          </span>
+                        </div>
+                      </NavLink>
+                    </li>
 
-                <li className="nav-item">
-                  <NavLink to="/clinic/bookings" className="group">
-                    <div className="flex items-center">
-                      <IconMenuDocumentation
-                        className={`group-hover:!text-[#006241] shrink-0 `}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Bookings"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
+                    <li className="nav-item">
+                      <NavLink to="/clinic/bookings" className="group">
+                        <div className="flex items-center">
+                          <IconMenuDocumentation
+                            className={`group-hover:!text-[#006241] shrink-0 `}
+                          />
+                          <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                            {"Bookings"}
+                          </span>
+                        </div>
+                      </NavLink>
+                    </li>
 
-                <li className="nav-item">
-                  <NavLink to="/clinic/leaves" className="group">
-                    <div className="flex items-center">
-                      <IconMenuNotes
-                        className={`group-hover:!text-[#006241] shrink-0 `}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Leaves"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
+                    <li className="nav-item">
+                      <NavLink to="/clinic/leaves" className="group">
+                        <div className="flex items-center">
+                          <IconMenuNotes
+                            className={`group-hover:!text-[#006241] shrink-0 `}
+                          />
+                          <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                            {"Leaves"}
+                          </span>
+                        </div>
+                      </NavLink>
+                    </li>
 
-                <li className="nav-item">
-                  <NavLink to="/clinic/requestToDoctor" className="group">
-                    <div className="flex items-center">
-                      <IconUserPlus
-                        fill
-                        className={`group-hover:!text-[#006241] shrink-0 `}
-                      />
-                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                        {"Request To Doctor"}
-                      </span>
-                    </div>
-                  </NavLink>
-                </li>
+                    <li className="nav-item">
+                      <NavLink to="/clinic/requestToDoctor" className="group">
+                        <div className="flex items-center">
+                          <IconUserPlus
+                            fill
+                            className={`group-hover:!text-[#006241] shrink-0 `}
+                          />
+                          <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                            {"Request To Doctor"}
+                          </span>
+                        </div>
+                      </NavLink>
+                    </li>
+                  </>
+                )}
               </ul>
             ) : role === "doctor" ? (
               <ul className="relative font-semibold space-y-0.5 p-4 py-0">

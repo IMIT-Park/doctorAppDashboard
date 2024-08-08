@@ -8,10 +8,12 @@ const OwnerProfileEditModal = ({
   formSubmit,
   input,
   setInput,
+  fetchdata,
 }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     formSubmit();
+    fetchdata();
     closeModal();
   };
 
@@ -68,20 +70,6 @@ const OwnerProfileEditModal = ({
                         value={input?.name}
                         onChange={(e) =>
                           setInput({ ...input, name: e.target.value })
-                        }
-                      />
-                    </div>
-
-                    <div className="mb-5">
-                      <label htmlFor="user-name">Email</label>
-                      <input
-                        id="user-name"
-                        type="text"
-                        placeholder="Enter Username"
-                        className="form-input form-input-green"
-                        value={input?.email}
-                        onChange={(e) =>
-                          setInput({ ...input, email: e.target.value })
                         }
                       />
                     </div>

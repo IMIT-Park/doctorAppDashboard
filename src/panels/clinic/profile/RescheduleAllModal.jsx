@@ -47,18 +47,19 @@ const RescheduleAllModal = ({
           clinic_id: clinicId,
         }
       );
-      const filteredTimeSlots = response?.data?.doctorTimeSlots.filter(
-        (timeslot) => timeslot?.leave !== true
-      );
+      // const filteredTimeSlots = response?.data?.doctorTimeSlots.filter(
+      //   (timeslot) => timeslot?.leave !== true
+      // );
 
-      setDoctorTimeSlots(filteredTimeSlots);
+      // setDoctorTimeSlots(filteredTimeSlots);
 
-      const doctorTimeSlotIds = filteredTimeSlots.map(
-        (timeslot) => timeslot.timeSlot?.DoctorTimeSlot_id
+      setDoctorTimeSlots(response?.data?.doctorTimeSlots);
+
+      const doctorTimeSlotIds = response?.data?.doctorTimeSlots?.map(
+        (timeslot) => timeslot?.timeSlot?.DoctorTimeSlot_id
       );
 
       setDoctorTimeSlotsId(doctorTimeSlotIds);
-      // console.log(response);
     } catch (error) {
       if (error?.response?.status === 400) {
         setTimeslotWarning(
@@ -70,7 +71,7 @@ const RescheduleAllModal = ({
         setTimeslotWarning("Doctor is not available on this date.");
       }
       setDoctorTimeSlots([]);
-      console.error(error?.response?.data?.error);
+      console.error(error);
     } finally {
       setTimeslotsLoading(false);
     }
@@ -78,9 +79,9 @@ const RescheduleAllModal = ({
 
   useEffect(() => {
     if (addRescheduleAllModal && clinicId) {
-      fetchTimeSlots(reverseformatDate(selectedDate));
+      fetchTimeSlots(reverseformatDate(schedule_date));
     }
-  }, [clinicId, selectedDate, addRescheduleAllModal]);
+  }, [clinicId, addRescheduleAllModal]);
 
   const handleDateChange = (selectedDates) => {
     const date = selectedDates[0];
@@ -127,8 +128,8 @@ const RescheduleAllModal = ({
 
   // console.log(selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id);
 
-  // Bulk Rescheduling
 
+  // Bulk Rescheduling create function  start
   const createReschedule = async (event) => {
     event.preventDefault();
     console.log("Selected Date:", selectedDate);
@@ -162,13 +163,15 @@ const RescheduleAllModal = ({
       if (error.response) {
         const { status, data } = error.response;
         if (status === 404) {
-          showMessage(
-            `Doctor is on leave on ${formatDate(selectedDate)}`,
-            "warning"
-          );
-        }
-       
-        else if (status === 403) {
+          Swal.fire({
+            icon: "error",
+            title: "Doctor is on leave",
+            text: data.error,
+            padding: "2em",
+            customClass: "sweet-alerts",
+            confirmButtonColor: "#006241",
+          });
+        } else if (status === 403) {
           if (
             data.error.includes(
               "Please select the date matching the day of the week"
@@ -211,11 +214,15 @@ const RescheduleAllModal = ({
         // } else {
         //   showMessage("An error occurred. Please try again.", "error");
         // }
+        
       }
     } finally {
       setBookingLoading(false);
     }
   };
+
+  // Bulk Rescheduling create function end
+
 
   return (
     <Transition appear show={addRescheduleAllModal} as={Fragment}>

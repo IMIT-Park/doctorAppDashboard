@@ -33,6 +33,7 @@ const RescheduleModal = ({
   const [bookingLoading, setBookingLoading] = useState(false);
   const [consultationWarning, setConsultationWarning] = useState("");
 
+
   // fetch timeslots function
   const fetchTimeSlots = async (date) => {
     setConsultationWarning("");
@@ -139,7 +140,9 @@ const RescheduleModal = ({
       showMessage("Please select a date.", "error");
       return;
     }
-
+    console.log(selectedDate);
+    console.log(selectedConsultation?.slot);
+    console.log( selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id);
     // setBookingLoading(true);
     try {
       const response = await NetworkHandler.makePostRequest(
@@ -151,7 +154,7 @@ const RescheduleModal = ({
             selectedTimeSlot?.timeSlot?.DoctorTimeSlot_id || null,
         }
       );
-
+        console.log(response);
       if (response.status === 201) {
         showMessage("Rescheduled successfully!", "success");
         closeAddRescheduleModal();
@@ -164,25 +167,28 @@ const RescheduleModal = ({
       if (error.response) {
         const { status, data } = error.response;
         if (status === 404) {
-          showMessage(
-            `Doctor is on leave on ${formatDate(selectedDate)}`,
-            "warning"
-          );
-        } 
-        
-        else if (error.response && error.response.status === 403) {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid Date Selection",
-          text: "Please select the date matching the day of the week",
-          padding: "2em",
-          customClass: "sweet-alerts",
-          confirmButtonColor: "#006241",
-        });
-      } else {
-        showMessage("An error occurred. Please try again.", "error");
+          Swal.fire({
+            icon: "error",
+            title: "Doctor is on leave",
+            text: `Doctor is on leave on ${formatDate(selectedDate)}`,
+            padding: "2em",
+            customClass: "sweet-alerts",
+            confirmButtonColor: "#006241",
+          });
+        } else if (error.response && error.response.status === 403) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Date Selection",
+            text: "Please select the date matching the day of the week",
+            padding: "2em",
+            customClass: "sweet-alerts",
+            confirmButtonColor: "#006241",
+          });
+        } else {
+          showMessage("An error occurred. Please try again.", "error");
+        }
       }
-    } }finally {
+    } finally {
       // setBookingLoading(true);
     }
   };

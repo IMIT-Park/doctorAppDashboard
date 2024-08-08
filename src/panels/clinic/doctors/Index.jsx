@@ -238,7 +238,6 @@ const ClinicDoctor = () => {
   };
 
   const doctorSearch = async () => {
-    // const updatedKeyword = isNaN(search) ? search : `+91${search}`;
 
     let updatedKeyword;
     if(search.startsWith('+9' || '+91')){

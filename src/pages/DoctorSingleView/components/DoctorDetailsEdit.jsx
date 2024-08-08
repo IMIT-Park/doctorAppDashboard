@@ -158,7 +158,7 @@ const DoctorDetailsEdit = ({
                           type="date"
                           className="form-input form-input-green"
                           value={input.dateOfBirth}
-                      max={currentDate} 
+                          max={currentDate}
                           onChange={(e) =>
                             setInput({ ...input, dateOfBirth: e.target.value })
                           }
@@ -235,20 +235,6 @@ const DoctorDetailsEdit = ({
                         ></textarea>
                       </div>
 
-                      <div className="mb-5">
-                        <label className="inline-flex cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="form-checkbox"
-                            checked={!input.visibility}
-                            onChange={handleCheckboxChange}
-                          />
-                          <span className="text-white-dark relative checked:bg-none">
-                            Hide Profile in Website
-                          </span>
-                        </label>
-                      </div>
-
                       <div className="flex justify-end items-center mt-8">
                         <button
                           type="button"
@@ -259,7 +245,7 @@ const DoctorDetailsEdit = ({
                         </button>
                         <button
                           type="button"
-                          className="btn btn-green ltr:ml-4 rtl:mr-4"
+                          className="btn btn-green ltr:ml-4 rtl:mr-4 min-w-24"
                           onClick={handleSubmit}
                           disabled={buttonLoading}
                         >

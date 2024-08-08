@@ -73,7 +73,8 @@ const ClinicSingleView = () => {
     type: "",
   });
   const [input, setInput] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     phone: "",
     email: "",
     address: "",
@@ -265,7 +266,8 @@ const ClinicSingleView = () => {
     setAddDoctorModal(false);
     setInput({
       ...input,
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       user_name: "",
       phone: "",
@@ -296,7 +298,8 @@ const ClinicSingleView = () => {
 
   const saveDoctorPerson = async () => {
     if (
-      !input.name ||
+      !input.firstName ||
+      !input.lastName ||
       !input.email ||
       !input.phone ||
       !input.dateOfBirth ||
@@ -315,8 +318,11 @@ const ClinicSingleView = () => {
     if (validate()) {
       setButtonLoading(true);
 
+      const { firstName, lastName, ...rest } = input;
+
       const updatedData = {
-        ...input,
+        ...rest,
+        name: `${firstName} ${lastName}`,
         phone: `+91${input.phone}`,
         user_name: input.email,
         clinic_id: clinicId,

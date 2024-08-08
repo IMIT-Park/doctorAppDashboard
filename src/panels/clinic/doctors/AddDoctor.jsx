@@ -8,7 +8,6 @@ import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberIn
 import NetworkHandler from "../../../utils/NetworkHandler";
 import { reverseformatDate } from "../../../utils/formatDate";
 
-
 const AddDoctor = ({
   open,
   closeModal,
@@ -116,7 +115,7 @@ const AddDoctor = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-xl text-black dark:text-white-dark">
+              <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-3xl text-black dark:text-white-dark">
                 <button
                   type="button"
                   onClick={closeModal}
@@ -129,184 +128,196 @@ const AddDoctor = ({
                 </div>
                 <div className="p-5">
                   <form>
-                    <div className="mb-5">
-                      {/* <label htmlFor="full-name">Full Name</label> */}
-                      {isEditMode ? "Full Name" : "First Name"}
-                      <input
-                        id="full-name"
-                        type="text"
-                        placeholder="First Name"
-                        className="form-input form-input-green h-10"
-                        value={input?.name}
-                        onChange={(e) =>
-                          setInput({ ...input, firstName: e.target.value })
-
-                        }
-                      />
-                    </div>
-                    {!isEditMode && (
-                    <div className="mb-5">
-                      {/* <label htmlFor="full-name">Full Name</label> */}
-                      <input
-                        id="last-name"
-                        type="text"
-                        placeholder="Last Name"
-                        className="form-input form-input-green h-10"
-                        value={input?.name}
-                        onChange={(e) =>
-                          setInput({ ...input, lastName: e.target.value })
-
-                        }
-                      />
-                    </div>
-                      )}
-                    
-
-                    {!isEditMode && (
-                      <div className={`mb-5 ${errors?.email && "has-error"}`}>
-                        {/* <label htmlFor="email">Email</label> */}
+                    <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                      <div>
+                        <label htmlFor="full-name">
+                          {isEditMode ? "Full Name" : "First Name"}
+                        </label>
                         <input
-                          id="email"
-                          type="email"
-                          placeholder="Enter Email"
-                          className="form-input form-input-green h-10"
-                          value={input?.email}
-                          onChange={handleEmailChange}
-                        />
-                        {errors?.email && (
-                          <p className="text-red-500 text-sm mt-1">
-                            {errors?.email}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                    {!isEditMode && (
-                      <div className="mb-5">
-                        {/* <label htmlFor="user-name">User Name</label> */}
-                        <input
-                          id="user-name"
+                          id="full-name"
                           type="text"
-                          placeholder="Enter User Name"
+                          placeholder="First Name"
                           className="form-input form-input-green h-10"
-                          value={input?.email}
+                          value={input?.firstName}
                           onChange={(e) =>
-                            setInput({ ...input, email: e.target.value })
+                            setInput({ ...input, firstName: e.target.value })
                           }
-                          readOnly
                         />
                       </div>
-                    )}
-
-                    <div className="mb-5">
-                      {/* <label htmlFor="phone">Phone Number</label> */}
-                      <PhoneNumberInput
-                        value={input?.phone}
-                        onChange={handlePhoneChange}
-                        error={errors?.phone}
-                        maxLength="10"
-                      />
+                      {!isEditMode && (
+                        <div>
+                          <label htmlFor="full-name">Last Name</label>
+                          <input
+                            id="last-name"
+                            type="text"
+                            placeholder="Last Name"
+                            className="form-input form-input-green h-10"
+                            value={input?.lastName}
+                            onChange={(e) =>
+                              setInput({ ...input, lastName: e.target.value })
+                            }
+                          />
+                        </div>
+                      )}
                     </div>
-                    <div className="mb-5">
-                      <label htmlFor="dateOfBirth">Date of Birth</label>
-                      <input
-                        id="dob"
-                        type="date"
-                        className="form-input form-input-green h-10"
-                        value={input?.dateOfBirth}
-                        max={currentDate} 
-                        onChange={(e) =>
-                          setInput({ ...input, dateOfBirth: e.target.value })
-                        }
-                      />
+                    <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                      {!isEditMode && (
+                        <div className={`${errors?.email && "has-error"}`}>
+                          <label htmlFor="email">Email</label>
+                          <input
+                            id="email"
+                            type="email"
+                            placeholder="Enter Email"
+                            className="form-input form-input-green h-10"
+                            value={input?.email}
+                            onChange={handleEmailChange}
+                          />
+                          {errors?.email && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors?.email}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {!isEditMode && (
+                        <div>
+                          <label htmlFor="user-name">User Name</label>
+                          <input
+                            id="user-name"
+                            type="text"
+                            placeholder="Enter User Name"
+                            className="form-input form-input-green h-10"
+                            value={input?.email}
+                            onChange={(e) =>
+                              setInput({ ...input, email: e.target.value })
+                            }
+                            readOnly
+                          />
+                        </div>
+                      )}
                     </div>
-                    <div className="mb-5">
-                      <label>Select Gender</label>
-                      <div className="flex space-x-4">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="gender"
-                            className="form-radio peer text-[#006241]"
-                            value="Male"
-                            checked={input?.gender === "Male"}
-                            onChange={(e) =>
-                              setInput({ ...input, gender: e.target.value })
-                            }
-                          />
-                          <span className="text-gray-500">Male</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="gender"
-                            className="form-radio peer text-[#006241]"
-                            value="Female"
-                            checked={input?.gender === "Female"}
-                            onChange={(e) =>
-                              setInput({ ...input, gender: e.target.value })
-                            }
-                          />
-                          <span className=" text-gray-500">Female</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="gender"
-                            className="form-radio peer text-[#006241]"
-                            value="Other"
-                            checked={input?.gender === "Other"}
-                            onChange={(e) =>
-                              setInput({ ...input, gender: e.target.value })
-                            }
-                          />
-                          <span className=" text-gray-500">Other</span>
-                        </label>
+                    <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                      <div>
+                        <label htmlFor="phone">Phone Number</label>
+                        <PhoneNumberInput
+                          value={input?.phone}
+                          onChange={handlePhoneChange}
+                          error={errors?.phone}
+                          maxLength="10"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="dateOfBirth">Date of Birth</label>
+                        <input
+                          id="dob"
+                          type="date"
+                          className="form-input form-input-green h-10"
+                          value={input?.dateOfBirth}
+                          max={currentDate}
+                          onChange={(e) =>
+                            setInput({ ...input, dateOfBirth: e.target.value })
+                          }
+                        />
                       </div>
                     </div>
-                    <div className="mb-5">
-                      {/* <label htmlFor="qualification">Qualification</label> */}
-                      <input
-                        id="qualification"
-                        type="text"
-                        placeholder="Enter Qualification"
-                        className="form-input form-input-green h-10"
-                        value={input?.qualification}
-                        onChange={(e) =>
-                          setInput({ ...input, qualification: e.target.value })
-                        }
-                      />
+                    <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                      <div>
+                        <label>Select Gender</label>
+                        <div className="flex space-x-4 mt-4">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="gender"
+                              className="form-radio peer text-[#006241]"
+                              value="Male"
+                              checked={input?.gender === "Male"}
+                              onChange={(e) =>
+                                setInput({ ...input, gender: e.target.value })
+                              }
+                            />
+                            <span className="text-gray-500">Male</span>
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="gender"
+                              className="form-radio peer text-[#006241]"
+                              value="Female"
+                              checked={input?.gender === "Female"}
+                              onChange={(e) =>
+                                setInput({ ...input, gender: e.target.value })
+                              }
+                            />
+                            <span className=" text-gray-500">Female</span>
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="gender"
+                              className="form-radio peer text-[#006241]"
+                              value="Other"
+                              checked={input?.gender === "Other"}
+                              onChange={(e) =>
+                                setInput({ ...input, gender: e.target.value })
+                              }
+                            />
+                            <span className=" text-gray-500">Other</span>
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <label htmlFor="fees">Fees</label>
+                        <input
+                          id="fees"
+                          type="tel"
+                          placeholder="Enter Fees"
+                          className="form-input form-input-green h-10"
+                          value={input?.fees}
+                          onChange={handleFeesChange}
+                        />
+                      </div>
                     </div>
-
-                    <div className="mb-5">
-                      {/* <label htmlFor="fees">Fees</label> */}
-                      <input
-                        id="fees"
-                        type="tel"
-                        placeholder="Enter Fees"
-                        className="form-input form-input-green h-10"
-                        value={input?.fees}
-                        onChange={handleFeesChange}
-                      />
-                    </div>
-
-                    <div className="mb-5">
-                      <select
-                        id="specialization"
-                        className={`form-select form-select-green h-10 ${!input?.specialization && "text-gray-500"}`}
-                        value={input?.specialization}
-                        onChange={handleSpecializationChange}
-                      >
-                        <option value="" className="text-gray-500">Select Specialization</option>
-                        {specializations?.map((spec) => (
-                          <option key={spec?.id} value={spec.name}>
-                            {spec?.name}
+                    <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                      <div>
+                        <label htmlFor="qualification">Qualification</label>
+                        <input
+                          id="qualification"
+                          type="text"
+                          placeholder="Enter Qualification"
+                          className="form-input form-input-green h-10"
+                          value={input?.qualification}
+                          onChange={(e) =>
+                            setInput({
+                              ...input,
+                              qualification: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="specialization">Specialization</label>
+                        <select
+                          id="specialization"
+                          className={`form-select form-select-green h-10 ${
+                            !input?.specialization && "text-gray-500"
+                          }`}
+                          value={input?.specialization}
+                          onChange={handleSpecializationChange}
+                        >
+                          <option value="" className="text-gray-500">
+                            Select Specialization
                           </option>
-                        ))}
-                      </select>
+                          {specializations?.map((spec) => (
+                            <option key={spec?.id} value={spec.name}>
+                              {spec?.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
 
                     <div className="mb-5">
-                      {/* <label htmlFor="address">Address</label> */}
+                      <label htmlFor="address">Address</label>
                       <textarea
                         id="location"
                         rows={3}
@@ -319,85 +330,87 @@ const AddDoctor = ({
                       ></textarea>
                     </div>
 
-                    {!isEditMode && (
-                      <>
-                        <div className="mb-5 relative">
-                          {/* <label htmlFor="password">Password</label> */}
-                          {/* <div className="relative"> */}
-                          <div
+                    <div className="grid sm:grid-cols-2 gap-5 mb-12">
+                      {!isEditMode && (
+                        <>
+                          <div className="relative">
+                            <label htmlFor="password">Password</label>
+                            <div
                               className={`relative ${
                                 errors?.password && "has-error"
                               }`}
                             >
-                            <input
-                              id="password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Enter Password"
-                              className="form-input form-input-green pr-10 h-10"
-                              value={input?.password}
-                              onChange={handleCPasswordChange}
-
-                            />
-                            <span
-                              title={
-                                showPassword ? "hide password" : "show password"
-                              }
-                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <IconEye /> : <IconCloseEye />}
-                            </span>
-                          </div>
-                          {errors?.password && (
+                              <input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter Password"
+                                className="form-input form-input-green pr-10 h-10"
+                                value={input?.password}
+                                onChange={handleCPasswordChange}
+                              />
+                              <span
+                                title={
+                                  showPassword
+                                    ? "hide password"
+                                    : "show password"
+                                }
+                                className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                {showPassword ? <IconEye /> : <IconCloseEye />}
+                              </span>
+                            </div>
+                            {errors?.password && (
                               <p className="text-red-500 text-sm mt-1">
                                 {errors?.password}
                               </p>
                             )}
-                        </div>
-
-                        <div className="mb-5 relative">
-                          {/* <label htmlFor="confirm-password">
-                            Confirm Password
-                          </label> */}
-                          <div
-                            className={`relative ${
-                              errors?.confirmPassword && "has-error"
-                            }`}
-                          >
-                            <input
-                              id="confirm-password"
-                              type={showComfirmPassword ? "text" : "password"}
-                              placeholder="Enter Confirm Password"
-                              className="form-input form-input-green pr-10 h-10"
-                              value={input?.confirmPassword}
-                              onChange={handleConfirmPasswordChange}
-                            />
-                            <span
-                              title={
-                                showComfirmPassword
-                                  ? "hide confirm-password"
-                                  : "show confirm-password"
-                              }
-                              className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
-                              onClick={() =>
-                                setShowComfirmPassword(!showComfirmPassword)
-                              }
-                            >
-                              {showComfirmPassword ? (
-                                <IconEye />
-                              ) : (
-                                <IconCloseEye />
-                              )}
-                            </span>
                           </div>
-                          {errors?.confirmPassword && (
-                            <p className="text-red-500 text-sm mt-1">
-                              {errors?.confirmPassword}
-                            </p>
-                          )}
-                        </div>
-                      </>
-                    )}
+
+                          <div className="relative">
+                            <label htmlFor="confirm-password">
+                              Confirm Password
+                            </label>
+                            <div
+                              className={`relative ${
+                                errors?.confirmPassword && "has-error"
+                              }`}
+                            >
+                              <input
+                                id="confirm-password"
+                                type={showComfirmPassword ? "text" : "password"}
+                                placeholder="Enter Confirm Password"
+                                className="form-input form-input-green pr-10 h-10"
+                                value={input?.confirmPassword}
+                                onChange={handleConfirmPasswordChange}
+                              />
+                              <span
+                                title={
+                                  showComfirmPassword
+                                    ? "hide confirm-password"
+                                    : "show confirm-password"
+                                }
+                                className="absolute end-3 top-1/2 -translate-y-1/2 cursor-pointer select-none"
+                                onClick={() =>
+                                  setShowComfirmPassword(!showComfirmPassword)
+                                }
+                              >
+                                {showComfirmPassword ? (
+                                  <IconEye />
+                                ) : (
+                                  <IconCloseEye />
+                                )}
+                              </span>
+                            </div>
+                            {errors?.confirmPassword && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {errors?.confirmPassword}
+                              </p>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
 
                     <div className="flex justify-end items-center mt-8">
                       <button
@@ -409,7 +422,7 @@ const AddDoctor = ({
                       </button>
                       <button
                         type="button"
-                        className="btn btn-green ltr:ml-4 rtl:mr-4"
+                        className="btn btn-green ltr:ml-4 rtl:mr-4 min-w-24"
                         onClick={handleSubmit}
                         disabled={buttonLoading}
                       >

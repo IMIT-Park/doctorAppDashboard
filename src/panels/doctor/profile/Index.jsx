@@ -57,7 +57,6 @@ const Profile = () => {
     qualification: "",
     specialization: "",
     fees: "",
-    visibility: true,
   });
   const [profilePicture, setProfilePicture] = useState(null);
   const [timesInput, setTimesInput] = useState({
@@ -202,7 +201,6 @@ const Profile = () => {
       qualification: doctorDetails?.qualification || "",
       specialization: doctorDetails?.specialization || "",
       fees: doctorDetails?.fees || "",
-      visibility: doctorDetails?.visibility || true,
     });
     setEditDetailsModal(true);
   };
@@ -219,7 +217,6 @@ const Profile = () => {
       qualification: "",
       specialization: "",
       fees: "",
-      visibility: true,
     });
     setEditDetailsModal(false);
   };

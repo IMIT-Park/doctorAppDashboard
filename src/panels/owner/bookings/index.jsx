@@ -62,7 +62,7 @@ const Booking = () => {
     }
   };
 
-  // fetching Mds
+  // fetching 
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);

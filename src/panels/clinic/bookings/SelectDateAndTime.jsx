@@ -164,7 +164,6 @@ const Patients = () => {
         "/v1/booking/createBooking",
         bookingData
       );
-
       if (response.status === 201) {
         Swal.fire({
           icon: "success",

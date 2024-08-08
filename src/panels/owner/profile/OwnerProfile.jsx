@@ -1,11 +1,11 @@
-import { useContext, useState } from "react";
-import IconLockDots from "../../../components/Icon/IconLockDots";
-import IconCloseEye from "../../../components/Icon/IconCloseEye";
+import { useContext, useState, useEffect } from "react";
 import { UserContext } from "../../../contexts/UseContext";
 import { formatDate } from "../../../utils/formatDate";
-import IconX from "../../../components/Icon/IconX";
 import IconEdit from "../../../components/Icon/IconEdit";
 import "tippy.js/dist/tippy.css";
+import OwnerProfileEditModal from "./ownerProfileEditModal";
+import NetworkHandler from "../../../utils/NetworkHandler";
+import { showMessage } from "../../../utils/showMessage";
 
 const OwnerProfile = () => {
   const { userDetails } = useContext(UserContext);
@@ -37,16 +37,42 @@ const OwnerProfile = () => {
       userData.additionalDetails = userDetails?.UserSupportuser[0];
     }
 
-    console.log(userData);
+    // console.log(userData);
 
     return userData;
   };
 
   const userData = createUserData(userDetails);
   const [data, setData] = useState({ oldpassword: "", newpassword: "" });
-  const [showPassword, setShowPassword] = useState(false);
   const [isIncorrect, setIsIncorrect] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [profileData, setProfileData] = useState();
+  const [input, setInput] = useState({
+    name: "",
+    address: "",
+    phone: "",
+    city: "",
+    district: "",
+    state: "",
+    country: "",
+  });
+
+  const getProfileData = async () => {
+    const ownerid = userData?.additionalDetails?.owner_id;
+
+    try {
+      const response = await NetworkHandler.makeGetRequest(
+        `/v1/owner/getowner/${ownerid}`
+      );
+      setProfileData(response?.data?.Owner);
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    getProfileData();
+  }, []);
 
   // change password function
   const handleChangePassword = async (e) => {
@@ -113,27 +139,71 @@ const OwnerProfile = () => {
   };
 
   const convertFirstLetterCapital = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
-  }
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
+  // profile edit
+
+  const profileEdit = async (e) => {
+    const ownerid = userData?.additionalDetails?.owner_id;
+    const updatedData = {
+      ...input,
+    };
+    console.log(ownerid);
+    try {
+      const response = await NetworkHandler.makePutRequest(
+        `/v1/owner/updateOwner/${ownerid}`,
+        updatedData
+      );
+
+      console.log(response);
+      if (response.status === 200) {
+        showMessage("Profile updated successfully.");
+      } else {
+        showMessage("Failed to update profile. Please try again.", "error");
+        setButtonLoading(false);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 403) {
+        showMessage("Email already exists.", "error");
+      } else {
+        showMessage("An error occurred. Please try again.", "error");
+      }
+    }
+  };
+
+  const handleEdit = () => {
+    setInput({
+      name: profileData?.name || "",
+      address: profileData?.address || "",
+      phone: profileData?.phone || "",
+      city: profileData?.city || "",
+      district: profileData?.district || "",
+      state: profileData?.state || "",
+      country: profileData?.country || "",
+    });
+    openownerProfileEditModal();
+    setIsEdit(true);
+  };
+
+  const openownerProfileEditModal = () => {
+    setEditModal(true);
+  };
+  const closeOwnerProfileModal = () => {
+    setEditModal(false);
+  };
 
   return (
     <div>
       <div className="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-8 mb-5 bg-white dark:bg-black">
         <div className="flex items-center flex-wrap gap-1 justify-between mb-5">
-          <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between">
+          <div className="text-2xl md:text-4xl text-green-800 font-semibold capitalize mb-4 flex sm:flex-col lg:flex-row justify-between w-full">
             <div className="w-full flex items-center justify-between gap-10 mt-2">
-              <span>{userData?.additionalDetails?.name}</span>
-              <div className="flex gap-4 items-center w-max mx-auto">
-
-                <button
-                  className="flex hover:text-info"
-                  onClick={{
-
-                  }}
-                >
+              <span>{profileData?.name}</span>
+              <div className="flex gap-4 items-center w-max ml-auto">
+                <button className="flex  hover:text-info" onClick={handleEdit}>
                   <IconEdit className="w-4.5 h-4.5" />
                 </button>
-
               </div>
             </div>
           </div>
@@ -145,29 +215,33 @@ const OwnerProfile = () => {
                 Address
               </div>
               <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base h-full bg-gray-100">
-                {userData?.additionalDetails?.address}
+                {profileData?.address}
               </div>
             </div>
             <div className="flex flex-col mb-2 md:w-1/2 gap-1">
-              <div className="text-white-dark text-base">Country</div>
-              <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
-                {userData?.additionalDetails?.country || "-----"}
-              </div>
               <div className="text-white-dark text-base">State</div>
               <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
-                {userData?.additionalDetails?.state ? convertFirstLetterCapital(userData?.additionalDetails?.state) : "-----"}
+                {profileData?.state
+                  ? convertFirstLetterCapital(profileData?.state)
+                  : "-----"}
               </div>
-              <div className="text-white-dark text-base">City</div>
-              <div className="capitalize dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
-                {userData?.additionalDetails?.city || "-----"}
+              <div className="text-white-dark text-base">District</div>
+              <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800  rounded p-2 text-base min-h-10 bg-gray-100">
+                {profileData?.district
+                  ? convertFirstLetterCapital(profileData?.district)
+                  : "-----"}
               </div>
-
-
             </div>
           </div>
 
           <div className="w-full flex flex-col md:flex-row gap-3">
             <div className="lg:w-1/2 w-full flex flex-col gap-4">
+              <div className="gap-1 mb-2 w-full">
+                <div className="text-white-dark text-base mb-1">Country</div>
+                <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                  {profileData?.country || "-----"}
+                </div>
+              </div>
               <div className="gap-1 mb-2 w-full">
                 <div className="text-white-dark text-base mb-1">Email</div>
                 <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
@@ -179,29 +253,43 @@ const OwnerProfile = () => {
                   Phone Number
                 </div>
                 <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
-                  {userData?.additionalDetails?.phone}
+                  {profileData?.phone}
                 </div>
               </div>
             </div>
             <div className="lg:w-1/2 w-full flex flex-col gap-4">
               <div className="gap-1 mb-2 w-full">
+                <div className="text-white-dark text-base mb-1">City</div>
+                <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
+                  {profileData?.city || "-----"}
+                </div>
+              </div>
+              <div className="gap-1 mb-2 w-full">
                 <div className="text-white-dark text-base mb-1">
                   Account Creation Date
                 </div>
                 <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
-                  {formatDate(userData?.additionalDetails?.created_at)}
+                  {formatDate(profileData?.created_at)}
                 </div>
               </div>
               <div className="gap-1 mb-2 w-full">
                 <div className="text-white-dark text-base mb-1">Entered By</div>
                 <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
-                  {userData?.additionalDetails?.salesperson_id ? "Salesperson" : "Application"}
+                  {profileData?.salesperson_id ? "Salesperson" : "Application"}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <OwnerProfileEditModal
+        open={editModal}
+        closeModal={closeOwnerProfileModal}
+        formSubmit={profileEdit}
+        input={input}
+        setInput={setInput}
+        fetchdata={getProfileData}
+      />
     </div>
   );
 };

@@ -6,10 +6,9 @@ import close from "/assets/images/redclose.svg";
 import CustomSwitch from "../../../components/CustomSwitch";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 
-
-const ShowSupportUser = ({ open, closeModal , userDetails , fetchdata }) => {
+const ShowSupportUser = ({ open, closeModal, userDetails, fetchdata }) => {
   const { showAlert: showSupportAlert, loading: blockUnblockSalesLoading } =
-  useBlockUnblock(fetchdata);
+    useBlockUnblock(fetchdata);
   const handleSwitchToggle = () => {
     const action = userDetails?.User?.status ? "block" : "activate";
     showSupportAlert(userDetails?.user_id, action, "support user");
@@ -63,21 +62,21 @@ const ShowSupportUser = ({ open, closeModal , userDetails , fetchdata }) => {
 
                 <ul className="flex flex-col space-y-4 font-semibold text-black dark:text-gray-500 p-5">
                   <div className="flex  justify-end">
-                  <CustomSwitch
-                        checked={userDetails?.User?.status}
-                        onChange={
-                          handleSwitchToggle
-                        }
-                        tooltipText={
-                          userDetails?.User?.status ? "Block" : "Unblock"
-                        }
-                        uniqueId={`support${userDetails?.supportuser_id}`}
-                        size="normal"
-                      />
+                    <CustomSwitch
+                      checked={userDetails?.User?.status}
+                      onChange={handleSwitchToggle}
+                      tooltipText={
+                        userDetails?.User?.status ? "Block" : "Unblock"
+                      }
+                      uniqueId={`support${userDetails?.supportuser_id}`}
+                      size="normal"
+                    />
                   </div>
-                 
-                  <div className="flex items-center gap-4">
-                    <li className="w-20 text-black dark:text-gray-500">Email :</li>
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+                    <li className="w-20 text-black dark:text-gray-500">
+                      Email
+                    </li>
                     <li className="flex items-center gap-2 border border-gray-800 rounded w-10/12 p-2">
                       <span
                         className="whitespace-nowrap text-black dark:text-green-500 "
@@ -87,33 +86,50 @@ const ShowSupportUser = ({ open, closeModal , userDetails , fetchdata }) => {
                       </span>
                     </li>
                   </div>
-                  <div className="flex gap-4">
-                    <li className="w-20">Phone no :</li>
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                    <li className="w-20">Phone no</li>
                     <li className="flex items-center gap-2 border border-gray-800 rounded px-2 py-2 w-10/12">
                       <span className="whitespace-nowrap" dir="ltr">
                         {userDetails.phone}
                       </span>
                     </li>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <li className="w-20">Address :</li>
+                  <div className="flex flex-col sm:flex-row items-start gap-2 sm:gap-4">
+                    <li className="w-20">Address</li>
                     <li className="flex items-center gap-2 border border-gray-800 rounded w-10/12 min-h-20 px-2 py-2">
-                      <span
-                        className=""
-                        dir="ltr"
-                      >
+                      <span className="" dir="ltr">
                         {userDetails.address}
                       </span>
                     </li>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <li className="w-24">Permissions :</li>
+                  <div className="flex flex-col sm:flex-row items-start gap-2 sm:gap-4">
+                    <li className="w-24">Permissions</li>
                     <div className="flex flex-col gap-2">
-                    <div className="flex gap-4"><img className="w-4" src={userDetails?.chat_access ? tick :close } alt="" /><li>Chat Access</li></div>
-                   <div className="flex gap-4"><img className="w-4" src={userDetails?.website_leads_access ? tick : close} alt="" /><li>Website Lead Access</li></div>
-                   <div className="flex gap-4"><img className="w-4" src={userDetails?.doctor_verify_access ? tick : close} alt="" /><li>Doctor Verify Access</li></div>
+                      <div className="flex gap-4">
+                        <img
+                          className="w-4"
+                          src={userDetails?.chat_access ? tick : close}
+                          alt=""
+                        />
+                        <li>Chat Access</li>
+                      </div>
+                      <div className="flex gap-4">
+                        <img
+                          className="w-4"
+                          src={userDetails?.website_leads_access ? tick : close}
+                          alt=""
+                        />
+                        <li>Website Lead Access</li>
+                      </div>
+                      <div className="flex gap-4">
+                        <img
+                          className="w-4"
+                          src={userDetails?.doctor_verify_access ? tick : close}
+                          alt=""
+                        />
+                        <li>Doctor Verify Access</li>
+                      </div>
                     </div>
-                  
                   </div>
                 </ul>
               </Dialog.Panel>

@@ -81,7 +81,7 @@ const ClinicProfile = () => {
   const [selectedBookingId, setSelectedBookingId] = useState("");
 
   const [addRescheduleAllModal, setAddRescheduleAllModal] = useState(false);
-
+  const [subscriptionStatus, setSubscriptionStatus] = useState([]);
 
   const getCurrentDate = () => {
     const currentDate = new Date();
@@ -209,6 +209,9 @@ const ClinicProfile = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/clinic/getbyId/${clinicId}`
       );
+      console.log(response);
+      setSubscriptionStatus(response?.data?.Subscription_Status);
+
       if (response?.status === 201) {
         setProfileData(response?.data?.Clinic);
         setLoading(false);
@@ -463,45 +466,46 @@ const ClinicProfile = () => {
                 No Data Found
               </div>
             )}
+            {subscriptionStatus === "Active" && (
+              <>
+                <div className="border-t border-gray-300 dark:border-gray-800 flex-grow ml-2 mt-10"></div>
+                <h5 className="mt-8 mb-10 text-xl font-semibold text-dark dark:text-slate-400">
+                  Select a Doctor to View Appointments
+                </h5>
 
-            <div className="border-t border-gray-300 dark:border-gray-800 flex-grow ml-2 mt-10"></div>
-            <h5 className="mt-8 mb-10 text-xl font-semibold text-dark dark:text-slate-400">
-              Select a Doctor to View Appointments
-            </h5>
-
-            <div className="flex flex-col md:flex-row items-start justify-start gap-8">
-              <div className="w-full md:w-96">
-                <select
-                  id="ChooseDoctor"
-                  className="form-select text-white-dark bg-gray-200 rounded-full h-11 w-full capitalize"
-                  required
-                  onChange={handleDoctorChange}
-                >
-                  <option value="">Select Doctors</option>
-                  {doctors?.map((doctor) => (
-                    <option
-                      key={doctor?.doctor_id}
-                      value={doctor?.doctor_id}
-                      className="capitalize"
+                <div className="flex flex-col md:flex-row items-start justify-start gap-8">
+                  <div className="w-full md:w-96">
+                    <select
+                      id="ChooseDoctor"
+                      className="form-select text-white-dark bg-gray-200 rounded-full h-11 w-full capitalize"
+                      required
+                      onChange={handleDoctorChange}
                     >
-                      {doctor?.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                      <option value="">Select Doctors</option>
+                      {doctors?.map((doctor) => (
+                        <option
+                          key={doctor?.doctor_id}
+                          value={doctor?.doctor_id}
+                          className="capitalize"
+                        >
+                          {doctor?.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="w-full md:w-auto">
-                <input
-                  id="Date"
-                  type="date"
-                  className="form-input form-input-green w-full md:w-auto min-w-52 pr-2"
-                  value={selectedDate || ""}
-                  onChange={handleDateChange}
-                  placeholder="Select date"
-                />
-              </div>
+                  <div className="w-full md:w-auto">
+                    <input
+                      id="Date"
+                      type="date"
+                      className="form-input form-input-green w-full md:w-auto min-w-52 pr-2"
+                      value={selectedDate || ""}
+                      onChange={handleDateChange}
+                      placeholder="Select date"
+                    />
+                  </div>
 
-              {/* <div className="w-full md:w-auto">
+                  {/* <div className="w-full md:w-auto">
                 <button
                   type="button"
                   className="btn btn-green btn-md mb-4 px-16 w-full md:w-auto whitespace-nowrap"
@@ -509,153 +513,159 @@ const ClinicProfile = () => {
                   Book Now
                 </button>
               </div> */}
-            </div>
-
-            <Tab.Group>
-              <Tab.List className="flex flex-wrap font-bold text-lg justify-between">
-                <div className="flex gap-4 items-center ">
-                  <Tab as={Fragment}>
-                    {({ selected }) => (
-                      <button
-                        className={`${
-                          selected
-                            ? "text-success !outline-none before:!w-full before:bg-success"
-                            : "before:w-full before:bg-gray-100 dark:before:bg-gray-600"
-                        } relative -mb-[1px] p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[2px] before:transition-all before:duration-700 hover:text-success mt-4`}
-                      >
-                        Patients Appointments{" "}
-                        <span className="badge bg-[#006241] p-0.5 px-1 rounded-full ">
-                          <CountUp
-                            start={0}
-                            end={totalAppointments}
-                            duration={3}
-                          />
-                        </span>
-                      </button>
-                    )}
-                  </Tab>
                 </div>
-                {totalAppointments > 0 && (
-                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
-                    <button
-                      type="button"
-                      className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
-                      onClick={() => openRescheduleAllModal(selectedDoctorId)}
-                    >
-                      Reschedule Todays Appoinments
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
-                      onClick={() =>
-                        openCancelAllAppoimentsModal(selectedDoctorId)
-                      }
-                    >
-                      Cancel all Appoinments
-                    </button>
-                  </div>
-                )}
-              </Tab.List>
-              <Tab.Panels>
-                <Tab.Panel>
-                  {appointmentsLoading ? (
-                    <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7  h-7 align-middle shrink-0 mt-4" />
-                  ) : (
-                    <div className="datatables mt-8">
-                      <DataTable
-                        noRecordsText="No appointments to show"
-                        noRecordsIcon={
-                          <span className="mb-2">
-                            <img src={emptyBox} alt="" className="w-10" />
-                          </span>
-                        }
-                        mih={180}
-                        highlightOnHover
-                        className="whitespace-nowrap table-hover flex justify-evenly"
-                        records={appointments}
-                        idAccessor="booking_id"
-                        onRowClick={(row) => handleRowClick(row.booking_id)}
-                        columns={[
-                          {
-                            accessor: "No",
-                            title: "No",
-                            textAlignment: "center",
-                            render: (row, rowIndex) => rowIndex + 1,
-                          },
-                          {
-                            accessor: "Patient.name",
-                            title: "Name",
-                            textAlignment: "center",
-                          },
-                          {
-                            accessor: "Patient.gender",
-                            title: "Gender",
-                            textAlignment: "center",
-                          },
-                          {
-                            accessor: "schedule_time",
-                            title: "Time",
-                            textAlignment: "center",
-                            render: (row) => formatTime(row?.schedule_time),
-                          },
-                          {
-                            accessor: "actions",
-                            title: "Actions",
-                            textAlignment: "center",
-                            render: (row) => (
-                              <div className="dropdown grid place-items-center">
-                                <Dropdown
-                                  placement="middle"
-                                  btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
-                                  button={
-                                    <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
-                                  }
-                                >
-                                  <ul className="text-black dark:text-white-dark">
-                                    <li>
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          openAddRescheduleModal(row.booking_id)
-                                        }
-                                      >
-                                        Reschedule
-                                      </button>
-                                    </li>
-                                    <li>
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          openCancelRescheduleModal(
-                                            row.booking_id
-                                          )
-                                        }
-                                      >
-                                        Cancel
-                                      </button>
-                                    </li>
-                                  </ul>
-                                </Dropdown>
-                              </div>
-                            ),
-                          },
-                        ]}
-                        totalRecords={totalAppointments}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
-                        minHeight={200}
-                        paginationText={({ from, to, totalRecords }) =>
-                          `Showing ${from} to ${to} of ${totalRecords} entries`
-                        }
-                      />
+
+                <Tab.Group>
+                  <Tab.List className="flex flex-wrap font-bold text-lg justify-between">
+                    <div className="flex gap-4 items-center ">
+                      <Tab as={Fragment}>
+                        {({ selected }) => (
+                          <button
+                            className={`${
+                              selected
+                                ? "text-success !outline-none before:!w-full before:bg-success"
+                                : "before:w-full before:bg-gray-100 dark:before:bg-gray-600"
+                            } relative -mb-[1px] p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[2px] before:transition-all before:duration-700 hover:text-success mt-4`}
+                          >
+                            Patients Appointments{" "}
+                            <span className="badge bg-[#006241] p-0.5 px-1 rounded-full ">
+                              <CountUp
+                                start={0}
+                                end={totalAppointments}
+                                duration={3}
+                              />
+                            </span>
+                          </button>
+                        )}
+                      </Tab>
                     </div>
-                  )}
-                </Tab.Panel>
-              </Tab.Panels>
-            </Tab.Group>
+                    {totalAppointments > 0 && (
+                      <div className="flex flex-col sm:flex-row items-center gap-2 sm:mt-5">
+                        <button
+                          type="button"
+                          className="btn btn-white text-green-600 border-green-600 md:text-sm sm:text-base max-w-60 md:w-72 lg:text-sm max-lg:text-base shadow-sm px-10 py-2 h-fit whitespace-nowrap"
+                          onClick={() =>
+                            openRescheduleAllModal(selectedDoctorId)
+                          }
+                        >
+                          Reschedule Todays Appoinments
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-green px-10 py-2 h-fit whitespace-nowrap"
+                          onClick={() =>
+                            openCancelAllAppoimentsModal(selectedDoctorId)
+                          }
+                        >
+                          Cancel all Appoinments
+                        </button>
+                      </div>
+                    )}
+                  </Tab.List>
+                  <Tab.Panels>
+                    <Tab.Panel>
+                      {appointmentsLoading ? (
+                        <IconLoader className="animate-[spin_2s_linear_infinite] inline-block w-7  h-7 align-middle shrink-0 mt-4" />
+                      ) : (
+                        <div className="datatables mt-8">
+                          <DataTable
+                            noRecordsText="No appointments to show"
+                            noRecordsIcon={
+                              <span className="mb-2">
+                                <img src={emptyBox} alt="" className="w-10" />
+                              </span>
+                            }
+                            mih={180}
+                            highlightOnHover
+                            className="whitespace-nowrap table-hover flex justify-evenly"
+                            records={appointments}
+                            idAccessor="booking_id"
+                            onRowClick={(row) => handleRowClick(row.booking_id)}
+                            columns={[
+                              {
+                                accessor: "No",
+                                title: "No",
+                                textAlignment: "center",
+                                render: (row, rowIndex) => rowIndex + 1,
+                              },
+                              {
+                                accessor: "Patient.name",
+                                title: "Name",
+                                textAlignment: "center",
+                              },
+                              {
+                                accessor: "Patient.gender",
+                                title: "Gender",
+                                textAlignment: "center",
+                              },
+                              {
+                                accessor: "schedule_time",
+                                title: "Time",
+                                textAlignment: "center",
+                                render: (row) => formatTime(row?.schedule_time),
+                              },
+                              {
+                                accessor: "actions",
+                                title: "Actions",
+                                textAlignment: "center",
+                                render: (row) => (
+                                  <div className="dropdown grid place-items-center">
+                                    <Dropdown
+                                      placement="middle"
+                                      btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light  w-8 h-8 rounded-full flex justify-center items-center"
+                                      button={
+                                        <IconHorizontalDots className="hover:text-primary rotate-90 opacity-70" />
+                                      }
+                                    >
+                                      <ul className="text-black dark:text-white-dark">
+                                        <li>
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              openAddRescheduleModal(
+                                                row.booking_id
+                                              )
+                                            }
+                                          >
+                                            Reschedule
+                                          </button>
+                                        </li>
+                                        <li>
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              openCancelRescheduleModal(
+                                                row.booking_id
+                                              )
+                                            }
+                                          >
+                                            Cancel
+                                          </button>
+                                        </li>
+                                      </ul>
+                                    </Dropdown>
+                                  </div>
+                                ),
+                              },
+                            ]}
+                            totalRecords={totalAppointments}
+                            recordsPerPage={pageSize}
+                            page={page}
+                            onPageChange={(p) => setPage(p)}
+                            recordsPerPageOptions={PAGE_SIZES}
+                            onRecordsPerPageChange={setPageSize}
+                            minHeight={200}
+                            paginationText={({ from, to, totalRecords }) =>
+                              `Showing ${from} to ${to} of ${totalRecords} entries`
+                            }
+                          />
+                        </div>
+                      )}
+                    </Tab.Panel>
+                  </Tab.Panels>
+                </Tab.Group>
+              </>
+            )}
           </>
         )}
       </div>

@@ -757,3 +757,18 @@ pre.hljs {
   background: #006241 !important;
   border-color: #006241 !important;
 }
+
+
+/* CSS */
+@keyframes slide-left-to-right {
+  5% {
+    transform: translateX(10%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-slide-left-to-right {
+  animation: slide-left-to-right 8s linear infinite;
+}

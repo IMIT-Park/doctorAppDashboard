@@ -14,6 +14,7 @@ import NetworkHandler from "../../../utils/NetworkHandler";
 import useBlockUnblock from "../../../utils/useBlockUnblock";
 import { UserContext } from "../../../contexts/UseContext";
 import CustomSwitch from "../../../components/CustomSwitch";
+import Swal from "sweetalert2";
 
 const Booking = () => {
   const dispatch = useDispatch();
@@ -33,6 +34,7 @@ const Booking = () => {
   const [allClinics, setAllClinics] = useState([]);
   const [totalClinics, setTotalClinics] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState([]);
 
   useEffect(() => {
     setPage(1);
@@ -42,6 +44,7 @@ const Booking = () => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
   }, [page, pageSize]);
+
 
   // fetch function
   const fetchData = async () => {
@@ -53,6 +56,11 @@ const Booking = () => {
       setTotalClinics(response.data?.pageInfo.total);
       setAllClinics(response.data?.Clinic);
 
+      const subscriptionStatuses = response.data?.Clinic.map(
+        (clinic) => clinic.SubscriptionStatus[0] || "no subscription found"
+      );
+      setSubscriptionStatus(subscriptionStatuses);
+
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -62,24 +70,55 @@ const Booking = () => {
     }
   };
 
-  // fetching 
+  // fetching
   useEffect(() => {
     fetchData();
   }, [page, pageSize]);
 
   // block and unblock handler
-  const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
-    useBlockUnblock(fetchData);
+  // const { showAlert: showClinicAlert, loading: blockUnblockClinicLoading } =
+  //   useBlockUnblock(fetchData);
 
+  const handleAddBooking = (clinicId, subscriptionStatusArray) => {
+    const subscriptionStatus = subscriptionStatusArray?.[0];
+    console.log("subscriptionStatus:", subscriptionStatus);
 
-  const handleAddBooking = (clinicId) => {
-    setBookingDetails({
-      ...bookingDetails,
-      clinic_id: clinicId,
-      type: "walkin",
-      whoIsBooking: "owner",
-    });
-    navigate("/clinic/bookings");
+    if (subscriptionStatus === "Active") {
+      setBookingDetails({
+        ...bookingDetails,
+        clinic_id: clinicId,
+        type: "walkin",
+        whoIsBooking: "owner",
+      });
+      navigate("/clinic/bookings");
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "No subscription found",
+        text: `Please subscribe to continue`,
+        padding: "2em",
+        customClass: "sweet-alerts",
+        confirmButtonColor: "#006241",
+      });
+    }
+  };
+
+  const handleViewBooking = (clinicId, subscriptionStatusArray) => {
+    const subscriptionStatus = subscriptionStatusArray?.[0];
+    console.log("subscriptionStatus:", subscriptionStatus);
+
+    if (subscriptionStatus === "Active") {
+      navigate(`/owner/bookings/${clinicId}`);
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "No subscription found",
+        text: `Please subscribe to continue`,
+        padding: "2em",
+        customClass: "sweet-alerts",
+        confirmButtonColor: "#006241",
+      });
+    }
   };
 
   return (
@@ -126,7 +165,11 @@ const Booking = () => {
                 { accessor: "clinic.User.email", title: "Email" },
 
                 { accessor: "clinic.phone", title: "Phone" },
-                { accessor: "doctor_count", title: "Total Doctors",textAlignment:"center" },
+                {
+                  accessor: "doctor_count",
+                  title: "Total Doctors",
+                  textAlignment: "center",
+                },
 
                 // {
                 //   accessor: "Actions",
@@ -192,7 +235,10 @@ const Booking = () => {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleAddBooking(rowData?.clinic?.clinic_id);
+                          handleAddBooking(
+                            rowData?.clinic?.clinic_id,
+                            rowData?.SubscriptionStatus
+                          );
                         }}
                         className="btn btn-green btn-sm py-1"
                       >
@@ -203,9 +249,10 @@ const Booking = () => {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Add your view booking handler here
-                          navigate(
-                            `/owner/bookings/${rowData?.clinic?.clinic_id}`
+
+                          handleViewBooking(
+                            rowData?.clinic?.clinic_id,
+                            rowData?.SubscriptionStatus
                           );
                         }}
                         className="btn btn-green btn-sm py-1.5 px-3.5"

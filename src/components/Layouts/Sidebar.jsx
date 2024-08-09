@@ -529,6 +529,19 @@ const Sidebar = () => {
                     </div>
                   </NavLink>
                 </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/speciality" className="group">
+                    <div className="flex items-center">
+                      <IconUser
+                        fill
+                        className={`group-hover:!text-[#006241] shrink-0 `}
+                      />
+                      <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                        {"Specialization"}
+                      </span>
+                    </div>
+                  </NavLink>
+                </li>
               </ul>
             )}
           </PerfectScrollbar>

@@ -5,9 +5,8 @@ import NetworkHandler from "../../../utils/NetworkHandler";
 import IconLoader from "../../../components/Icon/IconLoader";
 import { showMessage } from "../../../utils/showMessage";
 
-const AddModal = ({ open, close, selectedSpeciality, isEditmode, id, fetchData }) => {
+const AddModal = ({ open, close, selectedSpeciality, isEditmode, id, fetchData, specialization, setSpecialization }) => {
   const [loading, setLoading] = useState(false);
-  const [specialization, setSpecialization] = useState("");
 
   useEffect(() => {
     if (open && selectedSpeciality) {

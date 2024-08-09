@@ -28,6 +28,7 @@ const Specialization = () => {
   const [totalSpecializations, setTotalSpecializations] = useState(0);
   const [addOpen, setAddOpen] = useState(false); // opening modal
   const [selectedSpeciality, setSelectedSpeciality] = useState(null); // selecting speciality for editing
+  const [specialization, setSpecialization] = useState("");
 
   useEffect(() => {
     setPage(1);
@@ -53,12 +54,12 @@ const Specialization = () => {
   const handleDelete = (specialization) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      text: "Are you sure you want to delete this!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes",
+      confirmButtonText: "Delete",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -90,6 +91,7 @@ const Specialization = () => {
   };
 
   const closeModal = () => {
+    setSpecialization("");
     setAddOpen(false);
     setSelectedSpeciality(null);
   };
@@ -202,6 +204,8 @@ const Specialization = () => {
         id={selectedSpeciality ? selectedSpeciality.id : null}
         isEditmode={!!selectedSpeciality}
         fetchData={fetchData}
+        specialization={specialization}
+        setSpecialization={setSpecialization}
       />
     </div>
   );

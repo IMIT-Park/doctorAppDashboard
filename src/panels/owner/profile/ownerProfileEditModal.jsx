@@ -2,6 +2,7 @@ import React from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import IconX from "../../../components/Icon/IconX";
+import PhoneNumberInput from "../../../components/PhoneNumberInput/PhoneNumberInput";
 const OwnerProfileEditModal = ({
   open,
   closeModal,
@@ -9,12 +10,19 @@ const OwnerProfileEditModal = ({
   input,
   setInput,
   fetchdata,
+  errors,
+  setErrors,
 }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     formSubmit();
-    fetchdata();
-    closeModal();
+  };
+
+  const handlePhoneChange = (value) => {
+    setInput({ ...input, phone: value });
+    if (value.length === 10) {
+      setErrors((prevErrors) => ({ ...prevErrors, phone: "" }));
+    }
   };
 
   return (
@@ -76,15 +84,11 @@ const OwnerProfileEditModal = ({
 
                     <div className="mb-5">
                       <label htmlFor="user-name">Phone</label>
-                      <input
-                        id="user-name"
-                        type="text"
-                        placeholder="Enter Username"
-                        className="form-input form-input-green"
+                      <PhoneNumberInput
                         value={input?.phone}
-                        onChange={(e) =>
-                          setInput({ ...input, phone: e.target.value })
-                        }
+                        onChange={handlePhoneChange}
+                        error={errors?.phone}
+                        maxLength="10"
                       />
                     </div>
 

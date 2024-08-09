@@ -91,10 +91,11 @@ const Sidebar = () => {
   };
   // fetching subscriptionStatus
   useEffect(() => {
-    fetchSubscriptionStatus();
-  }, []);
+    if (clinicUserId) {
+      fetchSubscriptionStatus();
+    }
+  }, [clinicUserId]);
 
-  
   return (
     <div className={semidark ? "dark" : ""}>
       <nav

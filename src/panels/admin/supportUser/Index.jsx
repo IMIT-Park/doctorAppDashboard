@@ -71,7 +71,6 @@ const SupportUser = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/supportuser/getallSupportuser?pageSize=${pageSize}&page=${page}`
       );
-console.log(response);
       setTotalSupportUsers(response?.data?.Supportuser?.count);
       setAllSupportUsers(response?.data?.Supportuser?.rows);
       setLoading(false);

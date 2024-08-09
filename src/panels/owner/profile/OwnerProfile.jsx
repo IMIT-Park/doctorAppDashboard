@@ -10,41 +10,8 @@ import { showMessage } from "../../../utils/showMessage";
 const OwnerProfile = () => {
   const { userDetails } = useContext(UserContext);
 
-  const createUserData = (userDetails) => {
-    const userData = {
-      user_id: userDetails?.user_id,
-      role_id: userDetails?.role_id,
-      user_name: userDetails?.user_name,
-      password: userDetails?.password,
-      email: userDetails?.email,
-      status: userDetails?.status,
-      additionalDetails: {},
-    };
+  const ownerId = userDetails?.UserOwner?.[0]?.owner_id || null;
 
-    if (userDetails?.UserClinic?.length > 0) {
-      userData.additionalDetails = userDetails?.UserClinic[0];
-    }
-    if (userDetails?.UserOwner?.length > 0) {
-      userData.additionalDetails = userDetails?.UserOwner[0];
-    }
-    if (userDetails?.UserDoctor?.length > 0) {
-      userData.additionalDetails = userDetails?.UserDoctor[0];
-    }
-    if (userDetails?.UserSalesperson?.length > 0) {
-      userData.additionalDetails = userDetails?.UserSalesperson[0];
-    }
-    if (userDetails?.UserSupportuser?.length > 0) {
-      userData.additionalDetails = userDetails?.UserSupportuser[0];
-    }
-
-    // console.log(userData);
-
-    return userData;
-  };
-
-  const userData = createUserData(userDetails);
-  const [data, setData] = useState({ oldpassword: "", newpassword: "" });
-  const [isIncorrect, setIsIncorrect] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -58,13 +25,12 @@ const OwnerProfile = () => {
     state: "",
     country: "",
   });
+  const [errors, setErrors] = useState({});
 
   const getProfileData = async () => {
-    const ownerid = userData?.additionalDetails?.owner_id;
-
     try {
       const response = await NetworkHandler.makeGetRequest(
-        `/v1/owner/getowner/${ownerid}`
+        `/v1/owner/getowner/${ownerId}`
       );
       setProfileData(response?.data?.Owner);
     } catch (error) {}
@@ -74,123 +40,71 @@ const OwnerProfile = () => {
     getProfileData();
   }, []);
 
-  // change password function
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-
-    setLoading(true);
-
-    if (!data.oldpassword || !data.newpassword) {
-      showMessage("Please fill in all input fields.", "warning");
-      setLoading(false);
-      return;
-    }
-
-    const userId = userData?.user_id;
-
-    if (!userId) {
-      showMessage("User ID not found.", "error");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await NetworkHandler.makePostRequest(
-        `/v1/auth/reset/${userId}`,
-        data
-      );
-
-      if (response.status === 201) {
-        setIsIncorrect(false);
-        showMessage("Password changed successfully.", "success");
-        setData({ oldpassword: "", newpassword: "" });
-      } else {
-        showMessage(response.data.message || "An error occurred.", "error");
-        setIsIncorrect(true);
-      }
-    } catch (error) {
-      console.error("Error response:", error);
-      if (error.response?.status === 403) {
-        showMessage("Current password is incorrect.", "error");
-      } else {
-        const message =
-          error.response?.data?.message ||
-          "An error occurred. Please try again.";
-        showMessage(message, "error");
-      }
-      setIsIncorrect(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCurrentPasswordKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      document.getElementById("newpassword").focus();
-    }
-  };
-
-  const handleNewPasswordKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleChangePassword(e);
-    }
-  };
-
   const convertFirstLetterCapital = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
 
+  const validate = () => {
+    const newErrors = {};
+
+    if (input.phone.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+      showMessage("Phone number must be exactly 10 digits", "warning");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   // profile edit
-
   const profileEdit = async (e) => {
-    const ownerid = userData?.additionalDetails?.owner_id;
-    const updatedData = {
-      ...input,
-    };
-    console.log(ownerid);
-    try {
-      const response = await NetworkHandler.makePutRequest(
-        `/v1/owner/updateOwner/${ownerid}`,
-        updatedData
-      );
+    if (validate()) {
+      const updatedData = {
+        ...input,
+        phone: `+91${input.phone}`,
+      };
 
-      console.log(response);
-      if (response.status === 200) {
-        showMessage("Profile updated successfully.");
-      } else {
-        showMessage("Failed to update profile. Please try again.", "error");
-        setButtonLoading(false);
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 403) {
-        showMessage("Email already exists.", "error");
-      } else {
-        showMessage("An error occurred. Please try again.", "error");
+      try {
+        const response = await NetworkHandler.makePutRequest(
+          `/v1/owner/updateOwner/${ownerId}`,
+          updatedData
+        );
+
+        console.log(response);
+        if (response.status === 200) {
+          showMessage("Profile updated successfully.");
+        } else {
+          showMessage("Failed to update profile. Please try again.", "error");
+          setButtonLoading(false);
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          showMessage("Email already exists.", "error");
+        } else {
+          showMessage("An error occurred. Please try again.", "error");
+        }
       }
     }
   };
 
   const handleEdit = () => {
+    const phoneWithoutCountryCode = profileData.phone.replace(/^\+91/, "");
+
     setInput({
       name: profileData?.name || "",
       address: profileData?.address || "",
-      phone: profileData?.phone || "",
+      phone: phoneWithoutCountryCode || "",
       city: profileData?.city || "",
       district: profileData?.district || "",
       state: profileData?.state || "",
       country: profileData?.country || "",
     });
-    openownerProfileEditModal();
+    setEditModal(true);
     setIsEdit(true);
   };
 
-  const openownerProfileEditModal = () => {
-    setEditModal(true);
-  };
   const closeOwnerProfileModal = () => {
     setEditModal(false);
+    setErrors(null);
   };
 
   return (
@@ -245,7 +159,7 @@ const OwnerProfile = () => {
               <div className="gap-1 mb-2 w-full">
                 <div className="text-white-dark text-base mb-1">Email</div>
                 <div className="dark:text-slate-300 border dark:border-slate-800 dark:bg-gray-800 rounded p-2 text-base bg-gray-100">
-                  {userData?.email}
+                  {profileData?.email}
                 </div>
               </div>
               <div className="gap-1 mb-2 w-full">
@@ -289,6 +203,8 @@ const OwnerProfile = () => {
         input={input}
         setInput={setInput}
         fetchdata={getProfileData}
+        errors={errors}
+        setErrors={setErrors}
       />
     </div>
   );

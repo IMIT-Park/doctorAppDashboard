@@ -28,6 +28,9 @@ const AdminSubscriptionPlans = lazy(() =>
 const AdminSupportUser = lazy(() =>
   import("../panels/admin/supportUser/Index")
 );
+const AdminSpeciality = lazy(() =>
+  import("../panels/admin/speciality/Index")
+);
 
 // <--------------> admin panel imports ends here <-------------->
 
@@ -210,6 +213,13 @@ const routes = [
   {
     path: "/admin/supportuser",
     element: <AdminSupportUser />,
+    layout: "default",
+  },
+
+  // Speciality
+  {
+    path: "/admin/speciality",
+    element: <AdminSpeciality />,
     layout: "default",
   },
 

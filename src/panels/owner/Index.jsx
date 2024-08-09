@@ -13,6 +13,7 @@ const Index = () => {
   const [ownerReport, setOwnerReport] = useState(null);
   const [currentMonth, setCurrentMonth] = useState("");
   const [currentMonthBookings, setCurrentMonthBookings] = useState(0);
+  const [pendingBills, setPendingBills] = useState(false);
 
   const userDetails = localStorage.getItem("userData");
   const userData = JSON.parse(userDetails);
@@ -29,7 +30,13 @@ const Index = () => {
       const response = await NetworkHandler.makeGetRequest(
         `/v1/report/getOwnerReport/${ownerId}`
       );
+      console.log(response.data);
       setOwnerReport(response?.data?.results);
+
+      const totalPendingBills = response?.data?.results?.total_pending_bills;
+
+      setPendingBills(totalPendingBills);
+
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -442,6 +449,20 @@ const Index = () => {
           </div>
         </>
       )} */}
+
+      {pendingBills > 0 && (
+        <div className="relative flex items-center border p-5 rounded bg-danger-light text-danger overflow-hidden">
+          <div className="absolute inset-0 flex items-center">
+            <div className="whitespace-nowrap animate-slide-left-to-right">
+              <span className="pr-2">
+                <strong className="mr-1">Warning!</strong> You have{" "}
+                {pendingBills} pending bills. Please take action.
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ul className="flex space-x-2 rtl:space-x-reverse mt-5">
         <li className="ltr:before:mr-2 rtl:before:ml-2">
           <span>Dashboard</span>
